@@ -12,6 +12,7 @@ export type ScriptConfig = {
 	target: string;
 	storage: StorageType;
 	themeColors: string | Partial<Record<string, string>> | undefined;
+	initialTheme: string | undefined;
 };
 
 /**
@@ -30,11 +31,14 @@ function themeScript(
 	target: string,
 	storage: string,
 	themeColors: string | Record<string, string> | null,
+	initialTheme: string | null,
 ): void {
 	let theme: string;
 
 	if (forcedTheme) {
 		theme = forcedTheme;
+	} else if (initialTheme && themes.includes(initialTheme)) {
+		theme = initialTheme;
 	} else {
 		let stored: string | null = null;
 
@@ -115,6 +119,7 @@ export function getScript(config: ScriptConfig): string {
 		JSON.stringify(config.target),
 		JSON.stringify(config.storage),
 		JSON.stringify(config.themeColors ?? null),
+		JSON.stringify(config.initialTheme ?? null),
 	].join(",");
 
 	return `(${fn})(${args})`;

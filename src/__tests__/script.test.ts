@@ -13,6 +13,7 @@ const base = {
 	target: "html",
 	storage: "localStorage" as const,
 	themeColors: undefined,
+	initialTheme: undefined,
 };
 
 describe("getScript", () => {

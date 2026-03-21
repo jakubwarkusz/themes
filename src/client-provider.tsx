@@ -39,6 +39,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	themeColor,
 	followSystem = false,
 	onThemeChange,
+	initialTheme,
 }: ThemeProviderProps<Themes>): ReactElement {
 	const resolvedDefault = (defaultTheme ?? (enableSystem ? "system" : "light")) as
 		| Themes
@@ -127,6 +128,15 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		if (forcedTheme) {
 			setStoreTheme(forcedTheme);
 			applyToDom(forcedTheme);
+		} else if (initialTheme) {
+			setStoreTheme(initialTheme);
+			applyToDom(initialTheme === "system" ? (sys ?? "light") : (initialTheme as string));
+			try {
+				if (storage !== "none") {
+					const s = storage === "localStorage" ? localStorage : sessionStorage;
+					s.setItem(storageKey, initialTheme);
+				}
+			} catch {}
 		} else {
 			let stored: string | null = null;
 			try {
@@ -162,6 +172,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		return () => mq.removeEventListener("change", handler);
 	}, [
 		forcedTheme,
+		initialTheme,
 		resolvedDefault,
 		storage,
 		storageKey,

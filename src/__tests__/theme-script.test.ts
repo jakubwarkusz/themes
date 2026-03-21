@@ -34,6 +34,7 @@ const base = {
 	target: "html",
 	storage: "localStorage" as const,
 	themeColors: undefined,
+	initialTheme: undefined,
 };
 
 describe("themeScript - class attribute", () => {
@@ -213,6 +214,33 @@ describe("themeScript - multiple classes via value map", () => {
 		});
 		expect(document.documentElement.classList.contains("dark")).toBe(false);
 		expect(document.documentElement.classList.contains("dark-palette")).toBe(false);
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+	});
+});
+
+describe("themeScript - initialTheme", () => {
+	test("overrides localStorage when initialTheme is provided", () => {
+		localStorage.setItem("theme", "light");
+		runScript({ ...base, initialTheme: "dark" });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+		expect(document.documentElement.classList.contains("light")).toBe(false);
+	});
+
+	test("falls back to localStorage when initialTheme is not provided", () => {
+		localStorage.setItem("theme", "light");
+		runScript({ ...base, initialTheme: undefined });
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+	});
+
+	test("forcedTheme takes priority over initialTheme", () => {
+		runScript({ ...base, forcedTheme: "light", initialTheme: "dark" });
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+		expect(document.documentElement.classList.contains("dark")).toBe(false);
+	});
+
+	test("ignores initialTheme not in themes list", () => {
+		window.matchMedia = () => ({ matches: false }) as MediaQueryList;
+		runScript({ ...base, initialTheme: "invalid" as "light" });
 		expect(document.documentElement.classList.contains("light")).toBe(true);
 	});
 });

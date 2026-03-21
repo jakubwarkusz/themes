@@ -58,6 +58,7 @@ export function ThemeToggle() {
 | `themes` | `string[]` | `["light", "dark"]` | Available themes |
 | `defaultTheme` | `string` | `"system"` | Theme used when no preference is stored |
 | `forcedTheme` | `string` | - | Force a specific theme, ignoring user preference |
+| `initialTheme` | `string` | - | Server-provided theme that overrides storage on mount. User can still call `setTheme` to change it |
 | `enableSystem` | `boolean` | `true` | Detect system preference via `prefers-color-scheme` |
 | `enableColorScheme` | `boolean` | `true` | Set native `color-scheme` CSS property |
 | `attribute` | `string \| string[]` | `"class"` | HTML attribute(s) to set on target element (`"class"`, `"data-theme"`, etc.) |
@@ -132,12 +133,23 @@ const { theme, setTheme } = useTheme<AppTheme>();
 </ThemeProvider>
 ```
 
-### Meta theme-color (Safari / PWA)
+### Multiple classes per theme
+
+Map a theme to multiple CSS classes by using a space-separated value:
 
 ```tsx
 <ThemeProvider
-  themeColor={{ light: "#ffffff", dark: "#0a0a0a" }}
+  themes={["light", "dark", "dim"]}
+  value={{ light: "light", dark: "dark high-contrast", dim: "dark dim" }}
 >
+  {children}
+</ThemeProvider>
+```
+
+### Meta theme-color (Safari / PWA)
+
+```tsx
+<ThemeProvider themeColor={{ light: "#ffffff", dark: "#0a0a0a" }}>
   {children}
 </ThemeProvider>
 ```
@@ -166,6 +178,30 @@ Works with CSS variables too:
 <ThemeProvider forcedTheme="dark">
   {children}
 </ThemeProvider>
+```
+
+### Server-provided theme
+
+Use `initialTheme` to initialize from a server-side source (database, session, cookie) on every mount, overriding any locally stored value. The user can still call `setTheme` to change it - use `onThemeChange` to persist the change back.
+
+```tsx
+// app/layout.tsx (server component)
+export default async function RootLayout({ children }) {
+  const userTheme = await getUserTheme(); // "light" | "dark" | null
+
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider
+          initialTheme={userTheme ?? undefined}
+          onThemeChange={saveUserTheme}
+        >
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
 ```
 
 ### Nested provider in a Client Component
@@ -201,9 +237,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 | React 19 script warning | Yes | Fixed (RSC split) |
 | `__name` minification bug | Yes | Fixed |
 | React 19 Activity/cacheComponents stale theme | Yes | Fixed (`useSyncExternalStore`) |
+| Multiple classes per theme | No | Yes (`value` map with spaces) |
+| Nested providers | No | Yes (per-instance store) |
 | `sessionStorage` support | No | Yes |
 | Disable storage | No | Yes (`storage: "none"`) |
 | `meta theme-color` support | No | Yes (`themeColor` prop) |
+| Server-provided theme | No | Yes (`initialTheme` prop) |
 | Generic types | No | Yes (`useTheme<AppTheme>()`) |
 | Zero runtime dependencies | Yes | Yes |
 
