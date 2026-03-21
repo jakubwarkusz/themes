@@ -1,6 +1,6 @@
 {
   "name": "@wrksz/themes",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "A modern, fully-featured theme management library for Next.js",
   "license": "MIT",
   "files": [
