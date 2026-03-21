@@ -180,6 +180,38 @@ Works with CSS variables too:
 </ThemeProvider>
 ```
 
+### Different theme per section (scoped theming)
+
+Apply the theme to a specific element instead of `<html>` using the `target` prop. This lets different sections of your app have independent themes simultaneously.
+
+```tsx
+// app/landing/layout.tsx
+export default function LandingLayout({ children }) {
+  return (
+    <ThemeProvider forcedTheme="dark" target="#landing-root" storage="none">
+      <div id="landing-root">{children}</div>
+    </ThemeProvider>
+  );
+}
+
+// app/dashboard/layout.tsx
+export default function DashboardLayout({ children }) {
+  return (
+    <ThemeProvider forcedTheme="light" target="#dashboard-root" storage="none">
+      <div id="dashboard-root">{children}</div>
+    </ThemeProvider>
+  );
+}
+```
+
+```css
+/* scope your CSS variables to the target element */
+#landing-root { --bg: #0a0a0a; --fg: #fafafa; }
+#dashboard-root { --bg: #ffffff; --fg: #0a0a0a; }
+```
+
+Use `storage="none"` when the theme is forced — there's nothing to persist.
+
 ### Server-provided theme
 
 Use `initialTheme` to initialize from a server-side source (database, session, cookie) on every mount, overriding any locally stored value. The user can still call `setTheme` to change it - use `onThemeChange` to persist the change back.
