@@ -39,7 +39,7 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 export type ThemeContextValue<Themes extends string = DefaultTheme> = {
 	/** Current theme (may be "system") */
 	theme: Themes | "system" | undefined;
-	/** Resolved theme — never "system" */
+	/** Resolved theme - never "system" */
 	resolvedTheme: Themes | undefined;
 	/** System preference */
 	systemTheme: "light" | "dark" | undefined;
