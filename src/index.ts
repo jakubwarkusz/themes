@@ -4,6 +4,7 @@ export type {
 	Attribute,
 	DefaultTheme,
 	StorageType,
+	ThemeColor,
 	ThemeContextValue,
 	ThemeProviderProps,
 	ValueObject,

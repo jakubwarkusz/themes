@@ -11,6 +11,7 @@ export type ScriptConfig = {
 	value: Record<string, string> | undefined;
 	target: string;
 	storage: StorageType;
+	themeColors: string | Partial<Record<string, string>> | undefined;
 };
 
 /**
@@ -28,6 +29,7 @@ function themeScript(
 	value: Record<string, string> | null,
 	target: string,
 	storage: string,
+	themeColors: string | Record<string, string> | null,
 ): void {
 	let theme: string;
 
@@ -80,6 +82,19 @@ function themeScript(
 	if (enableColorScheme && (theme === "light" || theme === "dark")) {
 		(el as HTMLElement).style.colorScheme = theme;
 	}
+
+	if (themeColors) {
+		const color = typeof themeColors === "string" ? themeColors : themeColors[theme];
+		if (color) {
+			let meta = document.querySelector('meta[name="theme-color"]');
+			if (!meta) {
+				meta = document.createElement("meta");
+				meta.setAttribute("name", "theme-color");
+				document.head.appendChild(meta);
+			}
+			meta.setAttribute("content", color);
+		}
+	}
 }
 
 /**
@@ -99,6 +114,7 @@ export function getScript(config: ScriptConfig): string {
 		JSON.stringify(config.value ?? null),
 		JSON.stringify(config.target),
 		JSON.stringify(config.storage),
+		JSON.stringify(config.themeColors ?? null),
 	].join(",");
 
 	return `(${fn})(${args})`;

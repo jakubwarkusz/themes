@@ -8,6 +8,9 @@ export type ValueObject = Record<string, string>;
 
 export type StorageType = "localStorage" | "sessionStorage" | "none";
 
+/** Per-theme colors for meta theme-color, or a single string for all themes */
+export type ThemeColor = string | Partial<Record<string, string>>;
+
 export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	children: ReactNode;
 	/** All available themes */
@@ -36,6 +39,8 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	nonce?: string;
 	/** Called when theme changes */
 	onThemeChange?: (theme: Themes) => void;
+	/** Colors for meta theme-color tag, per theme or a single value */
+	themeColor?: ThemeColor;
 };
 
 export type ThemeContextValue<Themes extends string = DefaultTheme> = {
