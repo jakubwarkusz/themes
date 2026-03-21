@@ -210,7 +210,7 @@ export default function DashboardLayout({ children }) {
 #dashboard-root { --bg: #ffffff; --fg: #0a0a0a; }
 ```
 
-Use `storage="none"` when the theme is forced — there's nothing to persist.
+Use `storage="none"` when the theme is forced - there's nothing to persist.
 
 ### Server-provided theme
 
@@ -250,6 +250,60 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     <ClientThemeProvider forcedTheme="dark">
       {children}
     </ClientThemeProvider>
+  );
+}
+```
+
+### Theme-aware images
+
+Showing different images per theme has a hydration mismatch problem - `resolvedTheme` is always `undefined` on the server. Use the built-in `ThemedImage` component which shows a transparent placeholder until the theme resolves on the client:
+
+```tsx
+import { ThemedImage } from "@wrksz/themes";
+
+<ThemedImage
+  src={{ light: "/logo-light.png", dark: "/logo-dark.png" }}
+  alt="Logo"
+  width={200}
+  height={50}
+/>
+```
+
+Works with any custom themes too:
+
+```tsx
+<ThemedImage
+  src={{
+    light: "/logo-light.png",
+    dark: "/logo-dark.png",
+    purple: "/logo-purple.png",
+  }}
+  alt="Logo"
+  width={200}
+  height={50}
+/>
+```
+
+For custom themes or `next/image`, use `resolvedTheme` directly with a fallback:
+
+```tsx
+"use client";
+
+import Image from "next/image";
+import { useTheme } from "@wrksz/themes";
+
+export function Logo() {
+  const { resolvedTheme } = useTheme();
+
+  return (
+    <Image
+      src={resolvedTheme === "dark" ? "/logo-dark.png" : "/logo-light.png"}
+      alt="Logo"
+      width={200}
+      height={50}
+      // avoids layout shift while theme is resolving
+      style={{ visibility: resolvedTheme ? "visible" : "hidden" }}
+    />
   );
 }
 ```
