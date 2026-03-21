@@ -254,6 +254,25 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 }
 ```
 
+### `useThemeValue`
+
+Returns the value from a map that matches the current resolved theme. Returns `undefined` before the theme resolves on the client.
+
+```tsx
+"use client";
+
+import { useThemeValue } from "@wrksz/themes";
+
+// strings
+const label = useThemeValue({ light: "Switch to dark", dark: "Switch to light" });
+
+// CSS values
+const bg = useThemeValue({ light: "#ffffff", dark: "#0a0a0a", purple: "#6633ff" });
+
+// any type
+const icon = useThemeValue({ light: <SunIcon />, dark: <MoonIcon /> });
+```
+
 ### Theme-aware images
 
 Showing different images per theme has a hydration mismatch problem - `resolvedTheme` is always `undefined` on the server. Use the built-in `ThemedImage` component which shows a transparent placeholder until the theme resolves on the client:
