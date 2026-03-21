@@ -141,6 +141,29 @@ describe("themeScript - storage options", () => {
 	});
 });
 
+describe("themeScript - #308 (from next-themes) enableSystem + defaultTheme", () => {
+	test("defaultTheme is respected even when enableSystem=true and system is dark", () => {
+		// system is dark, but defaultTheme="light" - should apply light
+		window.matchMedia = () => ({ matches: true }) as MediaQueryList;
+		runScript({ ...base, enableSystem: true, defaultTheme: "light" });
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+		expect(document.documentElement.classList.contains("dark")).toBe(false);
+	});
+
+	test("system preference is used when defaultTheme is not set and enableSystem=true", () => {
+		window.matchMedia = () => ({ matches: true }) as MediaQueryList;
+		runScript({ ...base, enableSystem: true, defaultTheme: "system" });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("stored theme overrides defaultTheme regardless of enableSystem", () => {
+		localStorage.setItem("theme", "dark");
+		window.matchMedia = () => ({ matches: false }) as MediaQueryList;
+		runScript({ ...base, enableSystem: true, defaultTheme: "light" });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+});
+
 describe("themeScript - themeColor", () => {
 	test("creates meta theme-color tag", () => {
 		localStorage.setItem("theme", "dark");
