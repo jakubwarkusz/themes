@@ -71,9 +71,9 @@ function themeScript(
 
 	for (const attr of attrs) {
 		if (attr === "class") {
-			const toRemove = themes.map((t) => value?.[t] || t);
+			const toRemove = themes.flatMap((t) => (value?.[t] || t).split(" "));
 			el.classList.remove(...toRemove);
-			el.classList.add(attrValue);
+			el.classList.add(...attrValue.split(" "));
 		} else {
 			el.setAttribute(attr, attrValue);
 		}

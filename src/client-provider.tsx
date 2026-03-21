@@ -90,9 +90,11 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 			for (const attr of attrs) {
 				if (attr === "class") {
-					const toRemove = (themes as string[]).map((t) => valueMap?.[t] ?? t);
+					const toRemove = (themes as string[]).flatMap((t) =>
+						(valueMap?.[t] ?? t).split(" "),
+					);
 					el.classList.remove(...toRemove);
-					el.classList.add(attrValue);
+					el.classList.add(...attrValue.split(" "));
 				} else {
 					el.setAttribute(attr, attrValue);
 				}

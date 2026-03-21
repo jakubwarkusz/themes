@@ -190,3 +190,29 @@ describe("themeScript - themeColor", () => {
 		expect(meta?.getAttribute("content")).toBe("var(--bg)");
 	});
 });
+
+describe("themeScript - multiple classes via value map", () => {
+	test("adds multiple classes when value contains space-separated tokens", () => {
+		localStorage.setItem("theme", "dark");
+		runScript({
+			...base,
+			themes: ["light", "dark"],
+			value: { light: "light", dark: "dark dark-palette" },
+		});
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+		expect(document.documentElement.classList.contains("dark-palette")).toBe(true);
+	});
+
+	test("removes all space-separated tokens on theme switch", () => {
+		document.documentElement.classList.add("dark", "dark-palette");
+		localStorage.setItem("theme", "light");
+		runScript({
+			...base,
+			themes: ["light", "dark"],
+			value: { light: "light", dark: "dark dark-palette" },
+		});
+		expect(document.documentElement.classList.contains("dark")).toBe(false);
+		expect(document.documentElement.classList.contains("dark-palette")).toBe(false);
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+	});
+});
