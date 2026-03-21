@@ -1,0 +1,105 @@
+---
+title: Why not next-themes?
+description: A comparison of @wrksz/themes and next-themes.
+---
+
+`@wrksz/themes` is a drop-in replacement for `next-themes`. It fixes every known bug and adds missing features. No API changes needed.
+
+<Callout type="warn">
+  `next-themes` is slowly maintained - 43 open issues and 16 open PRs as of March 2026, with React 19 compatibility bugs still unresolved in the latest release.
+</Callout>
+
+## Bug fixes
+
+### React 19 script warning
+
+`next-themes` renders an inline `<script>` inside a Client Component, which triggers a React 19 warning. `@wrksz/themes` splits the provider into a Server Component (`ThemeProvider`) that renders the script, and a Client Component (`ClientThemeProvider`) that handles state.
+
+### `__name` minification bug
+
+Production builds that minify function names break `next-themes` internals. Fixed.
+
+### Stale theme in React 19 Activity and `cacheComponents`
+
+`next-themes` uses `useState` + `useContext`, which causes stale theme values when React's `Activity` or `cacheComponents` suspend and resume a subtree. `@wrksz/themes` uses `useSyncExternalStore` with a per-instance store, which always returns the latest value.
+
+## Missing features
+
+### Multiple classes per theme
+
+Both libraries support space-separated values in the `value` map. The bug is in removal: `next-themes` removes only the top-level theme key as a single class, so switching from a multi-class theme leaves stale classes in the DOM.
+
+`@wrksz/themes` flattens all mapped values before removing them:
+
+```typescript
+for (const attr of attrs) {
+  if (attr === "class") {
+    const toRemove = themes.flatMap((t) =>
+      (valueMap?.[t] ?? t).split(" "),
+    );
+    el.classList.remove(...toRemove);
+    el.classList.add(...attrValue.split(" "));
+  } else {
+    el.setAttribute(attr, attrValue);
+  }
+}
+```
+
+This means switching from `"dark high-contrast"` to `"light"` correctly removes both `dark` and `high-contrast`.
+
+### Nested providers
+
+`next-themes` uses a single global context - nested providers share state. `@wrksz/themes` creates a per-instance store so each provider is fully independent.
+
+### `sessionStorage` support
+
+```tsx
+<ThemeProvider storage="sessionStorage">
+```
+
+### Disable storage
+
+```tsx
+<ThemeProvider storage="none">
+```
+
+### `meta theme-color` support
+
+Updates `<meta name="theme-color">` automatically when the theme changes. Useful for Safari and PWAs:
+
+```tsx
+<ThemeProvider themeColor={{ light: "#ffffff", dark: "#0a0a0a" }}>
+```
+
+### Server-provided theme
+
+Initialize the theme from a server-side source (database, session, cookie) on every mount:
+
+```tsx
+<ThemeProvider
+  initialTheme={userTheme}
+  onThemeChange={saveUserTheme}
+>
+```
+
+### Generic types
+
+```tsx
+const { theme, setTheme } = useTheme<"light" | "dark" | "high-contrast">();
+```
+
+## Comparison table
+
+| | `next-themes` | `@wrksz/themes` |
+|---|:---:|:---:|
+| React 19 script warning | <Bug /> | <Fixed note="RSC split" /> |
+| `__name` minification bug | <Bug /> | <Fixed /> |
+| React 19 Activity / `cacheComponents` stale theme | <Bug /> | <Fixed note="useSyncExternalStore" /> |
+| Multiple classes per theme | <Bug /> | <Fixed note="correct class removal" /> |
+| Nested providers | <No /> | <Yes note="per-instance store" /> |
+| `sessionStorage` support | <No /> | <Yes /> |
+| Disable storage | <No /> | <Yes note='storage="none"' /> |
+| `meta theme-color` support | <No /> | <Yes note="themeColor prop" /> |
+| Server-provided theme | <No /> | <Yes note="initialTheme prop" /> |
+| Generic types | <No /> | <Yes note="useTheme<AppTheme>()" /> |
+| Zero runtime dependencies | <Yes /> | <Yes /> |

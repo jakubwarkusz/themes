@@ -1,0 +1,67 @@
+---
+title: Server-provided theme
+description: Initialize the theme from a database, session, or cookie on every mount.
+---
+
+Use `initialTheme` to override the stored theme on every mount with a value from a server-side source. The user can still call `setTheme` to change it - use `onThemeChange` to persist the change back.
+
+## Setup
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider } from "@wrksz/themes";
+import { getUserTheme, saveUserTheme } from "@/lib/user";
+
+export default async function RootLayout({ children }) {
+  const userTheme = await getUserTheme(); // "light" | "dark" | null
+
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider
+          initialTheme={userTheme ?? undefined}
+          onThemeChange={saveUserTheme}
+        >
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+`initialTheme` also writes to storage on mount, so `setTheme` and cross-tab sync continue to work normally.
+
+## Cookie-based example
+
+Cookies are available in Server Components via `next/headers`:
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider } from "@wrksz/themes";
+import { cookies } from "next/headers";
+
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const theme = (await cookies()).get("theme")?.value;
+
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider
+          initialTheme={theme}
+          onThemeChange={async (next) => {
+            "use server";
+            const { cookies } = await import("next/headers");
+            (await cookies()).set("theme", next, { path: "/", maxAge: 60 * 60 * 24 * 365 });
+          }}
+        >
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+## Priority
+
+When both `initialTheme` and a stored localStorage value are present, `initialTheme` wins on every mount. This ensures the server-side value is always applied on page load, even if the user has a different value stored locally.

@@ -1,0 +1,81 @@
+---
+title: Tailwind CSS
+description: Using @wrksz/themes with Tailwind CSS v4 dark mode.
+---
+
+`@wrksz/themes` applies a `dark` class to `<html>` by default. In Tailwind v4, you need to tell Tailwind to use that class for `dark:` variants instead of the default `prefers-color-scheme` media query.
+
+## Setup
+
+Add `@custom-variant` to your CSS:
+
+```css title="app/globals.css"
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+```
+
+Then add `ThemeProvider` to your root layout:
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider } from "@wrksz/themes";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+Now use `dark:` variants anywhere:
+
+```tsx
+<div className="bg-white text-black dark:bg-zinc-900 dark:text-white">
+  Hello
+</div>
+```
+
+## Data attribute
+
+If you prefer `attribute="data-theme"` over classes, update the `@custom-variant` selector accordingly:
+
+```tsx
+<ThemeProvider attribute="data-theme">
+  {children}
+</ThemeProvider>
+```
+
+```css title="app/global.css"
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+```
+
+## Custom themes
+
+For more than two themes, use CSS variables per theme and reference them with Tailwind:
+
+```tsx
+<ThemeProvider
+  themes={["light", "dark", "dim"]}
+  attribute="class"
+>
+  {children}
+</ThemeProvider>
+```
+
+```css
+.light { --bg: #ffffff; --fg: #0a0a0a; }
+.dark  { --bg: #09090b; --fg: #fafafa; }
+.dim   { --bg: #1c1c1e; --fg: #fafafa; }
+```
+
+```tsx
+<div className="bg-(--bg) text-(--fg)">
+  Hello
+</div>
+```

@@ -1,0 +1,85 @@
+---
+title: Getting Started
+description: Install and configure @wrksz/themes in your Next.js app.
+---
+
+## Installation
+
+<Tabs items={["bun", "npm", "pnpm", "yarn"]}>
+  <Tab value="bun">
+    ```bash
+    bun add @wrksz/themes
+    ```
+  </Tab>
+  <Tab value="npm">
+    ```bash
+    npm install @wrksz/themes
+    ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash
+    pnpm add @wrksz/themes
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn add @wrksz/themes
+    ```
+  </Tab>
+</Tabs>
+
+## Setup
+
+Add `ThemeProvider` to your root layout. Add `suppressHydrationWarning` to `<html>` to prevent hydration warnings caused by the inline theme script that runs before React hydrates.
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider } from "@wrksz/themes";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+## Usage
+
+Use the `useTheme` hook in any Client Component to read and update the current theme.
+
+```tsx title="components/theme-toggle.tsx"
+"use client";
+
+import { useTheme } from "@wrksz/themes";
+
+export function ThemeToggle() {
+  const { resolvedTheme, setTheme } = useTheme();
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+    >
+      Toggle theme
+    </button>
+  );
+}
+```
+
+## Requirements
+
+- Next.js 16+
+- React 19+
+
+<Callout type="info">
+  `@wrksz/themes` is a drop-in replacement for `next-themes` - no API changes needed. See [Why not next-themes?](/docs/why-not-next-themes) for a full comparison.
+</Callout>
+
+## Next steps
+
+- [ThemeProvider API](/docs/api/theme-provider) - all available props
+- [useTheme API](/docs/api/use-theme) - hook reference
+- [Examples](/docs/examples) - Tailwind, data attributes, scoped theming, and more

@@ -1,0 +1,85 @@
+---
+title: useTheme
+description: Hook for reading and updating the current theme.
+---
+
+`useTheme` returns the current theme state and a setter. Must be used inside a Client Component.
+
+```tsx
+"use client";
+
+import { useTheme } from "@wrksz/themes";
+
+export function ThemeToggle() {
+  const { resolvedTheme, setTheme } = useTheme();
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+    >
+      Toggle theme
+    </button>
+  );
+}
+```
+
+## Return value
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `theme` | `string \| undefined` | Current theme - may be `"system"` |
+| `resolvedTheme` | `string \| undefined` | Actual applied theme - never `"system"`. `undefined` before hydration |
+| `systemTheme` | `"light" \| "dark" \| undefined` | Current system preference |
+| `forcedTheme` | `string \| undefined` | Forced theme if set via `forcedTheme` prop |
+| `themes` | `string[]` | Available themes |
+| `setTheme` | `(theme: string \| "system" \| ((current: string \| "system" \| undefined) => string \| "system")) => void` | Update the current theme, or pass a function to compute it from the current value |
+
+## Generic types
+
+Pass a type argument for full type safety on custom theme names:
+
+```tsx
+type AppTheme = "light" | "dark" | "high-contrast";
+
+const { theme, setTheme } = useTheme<AppTheme>();
+// theme:    AppTheme | "system" | undefined
+// setTheme: (theme: AppTheme | "system") => void
+```
+
+## `theme` vs `resolvedTheme`
+
+Use `resolvedTheme` in most cases - it always contains the actual applied theme.
+
+`theme` can be `"system"`, which means the user has chosen to follow the system preference. `resolvedTheme` resolves that to `"light"` or `"dark"` based on `prefers-color-scheme`.
+
+```tsx
+const { theme, resolvedTheme } = useTheme();
+
+theme         // "system"
+resolvedTheme // "dark"
+```
+
+## Hydration
+
+Both `theme` and `resolvedTheme` are `undefined` on the server and during the first client render to avoid hydration mismatch. Use `resolvedTheme` with a fallback or conditional rendering:
+
+```tsx
+const { resolvedTheme } = useTheme();
+
+// wait for theme to resolve before rendering theme-dependent content
+if (!resolvedTheme) return null;
+```
+
+For images, use [`ThemedImage`](/docs/api/themed-image) or [`useThemeValue`](/docs/api/use-theme-value) which handle this automatically.
+
+## `setTheme` with a function
+
+`setTheme` accepts a function that receives the current theme and returns the next one:
+
+```tsx
+const { setTheme } = useTheme();
+
+// toggle between light and dark
+setTheme((current) => (current === "dark" ? "light" : "dark"));
+```

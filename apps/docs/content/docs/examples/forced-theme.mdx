@@ -1,0 +1,59 @@
+---
+title: Forced theme
+description: Force a specific theme on a page or section, ignoring user preference.
+---
+
+Use `forcedTheme` to lock the theme for a page or section. `setTheme` calls are ignored while a theme is forced.
+
+## Per-page forced theme
+
+```tsx title="app/dashboard/layout.tsx"
+import { ClientThemeProvider } from "@wrksz/themes";
+
+export default function DashboardLayout({ children }) {
+  return (
+    <ClientThemeProvider forcedTheme="dark">
+      {children}
+    </ClientThemeProvider>
+  );
+}
+```
+
+## Reading the forced theme
+
+`forcedTheme` is exposed via `useTheme` so you can disable theme toggle controls when a theme is forced:
+
+```tsx
+"use client";
+
+import { useTheme } from "@wrksz/themes";
+
+export function ThemeToggle() {
+  const { resolvedTheme, setTheme, forcedTheme } = useTheme();
+
+  if (forcedTheme) {
+    return <span>Theme locked to {forcedTheme}</span>;
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+    >
+      Toggle theme
+    </button>
+  );
+}
+```
+
+## With scoped theming
+
+Combine `forcedTheme` with `target` to force a theme on a specific section without affecting the rest of the app:
+
+```tsx
+<ClientThemeProvider forcedTheme="dark" target="#hero" storage="none">
+  <section id="hero">{children}</section>
+</ClientThemeProvider>
+```
+
+See [Scoped theming](/docs/examples/scoped-theming) for more details.

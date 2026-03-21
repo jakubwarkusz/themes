@@ -1,0 +1,58 @@
+---
+title: Data attribute
+description: Applying themes via data attributes instead of CSS classes.
+---
+
+Instead of adding a class to `<html>`, you can set a `data-*` attribute. This is useful when you want to avoid conflicts with existing class-based styling.
+
+## Setup
+
+```tsx
+<ThemeProvider attribute="data-theme">
+  {children}
+</ThemeProvider>
+```
+
+This sets `data-theme="light"` or `data-theme="dark"` on `<html>`. Use it in CSS:
+
+```css
+[data-theme="light"] {
+  --bg: #ffffff;
+  --fg: #0a0a0a;
+}
+
+[data-theme="dark"] {
+  --bg: #09090b;
+  --fg: #fafafa;
+}
+```
+
+## Custom attribute values
+
+Map theme names to different attribute values using the `value` prop:
+
+```tsx
+<ThemeProvider
+  attribute="data-mode"
+  value={{ light: "light-mode", dark: "dark-mode" }}
+>
+  {children}
+</ThemeProvider>
+```
+
+```css
+[data-mode="light-mode"] { --bg: #ffffff; }
+[data-mode="dark-mode"]  { --bg: #09090b; }
+```
+
+## Multiple attributes
+
+Apply multiple attributes at once by passing an array:
+
+```tsx
+<ThemeProvider attribute={["class", "data-theme"]}>
+  {children}
+</ThemeProvider>
+```
+
+This sets both the `dark` class and `data-theme="dark"` simultaneously, useful when mixing Tailwind with CSS variable styles.

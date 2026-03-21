@@ -1,0 +1,85 @@
+---
+title: ThemedImage
+description: Component that displays the correct image for the current theme.
+---
+
+`ThemedImage` renders a different image depending on the current resolved theme. Before the theme resolves on the client, it shows a transparent 1x1 placeholder to avoid hydration mismatch.
+
+```tsx
+import { ThemedImage } from "@wrksz/themes";
+
+<ThemedImage
+  src={{ light: "/logo-light.png", dark: "/logo-dark.png" }}
+  alt="Logo"
+  width={200}
+  height={50}
+/>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `src` | `Record<string, string>` | **required** | Map of theme name to image source |
+| `alt` | `string` | **required** | Alt text |
+| `fallback` | `string` | transparent 1x1 GIF | Shown before the theme resolves |
+| `...rest` | `ImgHTMLAttributes` | - | All other `<img>` attributes |
+
+## Examples
+
+### Custom themes
+
+```tsx
+<ThemedImage
+  src={{
+    light: "/logo-light.png",
+    dark: "/logo-dark.png",
+    "high-contrast": "/logo-hc.png",
+  }}
+  alt="Logo"
+  width={200}
+  height={50}
+/>
+```
+
+### Custom fallback
+
+By default the placeholder is a transparent 1x1 GIF, so the image space is empty until the theme resolves. You can provide a custom fallback - for example a low-quality placeholder or a neutral image:
+
+```tsx
+<ThemedImage
+  src={{ light: "/logo-light.png", dark: "/logo-dark.png" }}
+  fallback="/logo-placeholder.png"
+  alt="Logo"
+  width={200}
+  height={50}
+/>
+```
+
+## next/image
+
+`ThemedImage` uses a native `<img>` tag. For `next/image` with automatic optimization, use [`useThemeValue`](/docs/api/use-theme-value) instead:
+
+```tsx
+"use client";
+
+import Image from "next/image";
+import { useTheme, useThemeValue } from "@wrksz/themes";
+
+export function Logo() {
+  const { resolvedTheme } = useTheme();
+  const src =
+    useThemeValue({ light: "/logo-light.png", dark: "/logo-dark.png" })
+    ?? "/logo-light.png";
+
+  return (
+    <Image
+      src={src}
+      alt="Logo"
+      width={200}
+      height={50}
+      style={{ visibility: resolvedTheme ? "visible" : "hidden" }}
+    />
+  );
+}
+```

@@ -1,0 +1,84 @@
+---
+title: ClientThemeProvider
+description: Theme provider for use inside Client Components.
+---
+
+`ClientThemeProvider` is the client-side counterpart of [`ThemeProvider`](/docs/api/theme-provider). Use it when you need a nested provider inside a Client Component - `ThemeProvider` renders an inline `<script>` which is not allowed in Client Components.
+
+```tsx
+"use client";
+
+import { ClientThemeProvider } from "@wrksz/themes";
+
+export function AdminShell({ children }: { children: React.ReactNode }) {
+  return (
+    <ClientThemeProvider forcedTheme="dark">
+      {children}
+    </ClientThemeProvider>
+  );
+}
+```
+
+## ThemeProvider vs ClientThemeProvider
+
+| | `ThemeProvider` | `ClientThemeProvider` |
+|---|---|---|
+| Renders inline script | Yes - prevents flash on load | No |
+| Use in Server Components | Yes | No |
+| Use in Client Components | No | Yes |
+| Supports all props | Yes | Yes |
+
+For your root layout, always use `ThemeProvider`. Use `ClientThemeProvider` only for nested providers deeper in the tree.
+
+## Props
+
+Accepts the same props as [`ThemeProvider`](/docs/api/theme-provider#props), with one exception: the `nonce` prop is not used since `ClientThemeProvider` renders no inline script.
+
+## Examples
+
+### Scoped theming
+
+Apply an independent theme to a specific section of your app by combining `target` and `storage="none"`:
+
+```tsx
+// app/landing/layout.tsx
+export default function LandingLayout({ children }) {
+  return (
+    <ThemeProvider forcedTheme="dark" target="#landing-root" storage="none">
+      <div id="landing-root">{children}</div>
+    </ThemeProvider>
+  );
+}
+
+// app/dashboard/layout.tsx
+export default function DashboardLayout({ children }) {
+  return (
+    <ThemeProvider forcedTheme="light" target="#dashboard-root" storage="none">
+      <div id="dashboard-root">{children}</div>
+    </ThemeProvider>
+  );
+}
+```
+
+```css
+#landing-root { --bg: #0a0a0a; --fg: #fafafa; }
+#dashboard-root { --bg: #ffffff; --fg: #0a0a0a; }
+```
+
+### Nested provider in a Client Component
+
+```tsx
+"use client";
+
+import { ClientThemeProvider, useTheme } from "@wrksz/themes";
+
+export function Sidebar({ children }: { children: React.ReactNode }) {
+  return (
+    <ClientThemeProvider storageKey="sidebar-theme">
+      {children}
+    </ClientThemeProvider>
+  );
+}
+```
+
+Each `ClientThemeProvider` maintains its own independent theme state - nested providers do not affect each other.

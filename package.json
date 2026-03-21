@@ -1,0 +1,18 @@
+{
+	"name": "@wrksz/themes-monorepo",
+	"private": true,
+	"workspaces": ["packages/*", "apps/*"],
+	"scripts": {
+		"build": "bun run --cwd packages/themes build",
+		"test": "bun run --cwd packages/themes test",
+		"dev:docs": "bun run --cwd apps/docs dev",
+		"build:docs": "bun run --cwd apps/docs build",
+		"lint": "biome check packages apps",
+		"format": "biome format --write packages apps",
+		"prepare": "[ \"$CI\" = \"true\" ] || lefthook install"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.8",
+		"lefthook": "^2.1.4"
+	}
+}

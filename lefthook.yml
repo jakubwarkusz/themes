@@ -5,5 +5,8 @@ pre-commit:
       glob: "*.{ts,tsx}"
       stage_fixed: true
 
-    - name: type-check
-      run: bun run type-check
+    - name: type-check-themes
+      run: bun run --cwd packages/themes type-check
+
+    - name: type-check-docs
+      run: bun run --cwd apps/docs types:check

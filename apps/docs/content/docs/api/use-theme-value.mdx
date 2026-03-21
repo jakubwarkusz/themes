@@ -1,0 +1,83 @@
+---
+title: useThemeValue
+description: Hook that returns a value from a map keyed by the current resolved theme.
+---
+
+`useThemeValue` returns the value from a map that matches the current resolved theme. Returns `undefined` before the theme resolves on the client.
+
+```tsx
+"use client";
+
+import { useThemeValue } from "@wrksz/themes";
+
+const label = useThemeValue({ light: "Switch to dark", dark: "Switch to light" });
+```
+
+## Signature
+
+```ts
+function useThemeValue<T>(map: Record<string, T>): T | undefined
+```
+
+## Examples
+
+### Strings
+
+```tsx
+const label = useThemeValue({ light: "Switch to dark", dark: "Switch to light" });
+```
+
+### CSS values
+
+```tsx
+const background = useThemeValue({ light: "#ffffff", dark: "#0a0a0a" });
+```
+
+### Custom themes
+
+```tsx
+const color = useThemeValue({
+  light: "#ffffff",
+  dark: "#0a0a0a",
+  high-contrast: "#000000",
+});
+```
+
+### JSX elements
+
+```tsx
+const icon = useThemeValue({
+  light: <SunIcon />,
+  dark: <MoonIcon />,
+});
+```
+
+### next/image
+
+`useThemeValue` returns `undefined` before the theme resolves, which `next/image` does not accept as `src`. Use a fallback with `??`:
+
+```tsx
+"use client";
+
+import Image from "next/image";
+import { useTheme, useThemeValue } from "@wrksz/themes";
+
+export function Logo() {
+  const { resolvedTheme } = useTheme();
+  const src =
+    useThemeValue({ light: "/logo-light.png", dark: "/logo-dark.png" })
+    ?? "/logo-light.png";
+
+  return (
+    <Image
+      src={src}
+      alt="Logo"
+      width={200}
+      height={50}
+      style={{ visibility: resolvedTheme ? "visible" : "hidden" }}
+    />
+  );
+}
+```
+
+For regular `<img>` tags, use [`ThemedImage`](/docs/api/themed-image) instead - it handles the unresolved state automatically with a transparent placeholder.

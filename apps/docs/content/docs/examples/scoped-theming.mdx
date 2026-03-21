@@ -1,0 +1,67 @@
+---
+title: Scoped theming
+description: Apply independent themes to different sections of your app simultaneously.
+---
+
+By default `ThemeProvider` applies the theme to `<html>`. Use the `target` prop to scope the theme to a specific element instead, so different sections of your app can have independent themes at the same time.
+
+Use `ClientThemeProvider` for nested providers - the inline anti-flash script is only needed in the root layout. `ClientThemeProvider` handles state without rendering an extra script.
+
+## Setup
+
+```tsx title="app/landing/layout.tsx"
+import { ClientThemeProvider } from "@wrksz/themes";
+
+export default function LandingLayout({ children }) {
+  return (
+    <ClientThemeProvider forcedTheme="dark" target="#landing-root" storage="none">
+      <div id="landing-root">{children}</div>
+    </ClientThemeProvider>
+  );
+}
+```
+
+```tsx title="app/dashboard/layout.tsx"
+import { ClientThemeProvider } from "@wrksz/themes";
+
+export default function DashboardLayout({ children }) {
+  return (
+    <ClientThemeProvider forcedTheme="light" target="#dashboard-root" storage="none">
+      <div id="dashboard-root">{children}</div>
+    </ClientThemeProvider>
+  );
+}
+```
+
+```css
+#landing-root   { --bg: #0a0a0a; --fg: #fafafa; }
+#dashboard-root { --bg: #ffffff; --fg: #0a0a0a; }
+```
+
+Use `storage="none"` when the theme is forced - there's nothing to persist.
+
+## User-selectable scoped theme
+
+If the user can change the theme within a section, omit `forcedTheme` and use a separate `storageKey` per section so the themes are stored independently:
+
+```tsx title="app/dashboard/layout.tsx"
+import { ClientThemeProvider } from "@wrksz/themes";
+
+export default function DashboardLayout({ children }) {
+  return (
+    <ClientThemeProvider target="#dashboard-root" storageKey="dashboard-theme">
+      <div id="dashboard-root">{children}</div>
+    </ClientThemeProvider>
+  );
+}
+```
+
+## Target selector
+
+The `target` prop accepts any CSS selector, plus the shortcuts `"html"` (default) and `"body"`:
+
+```tsx
+<ClientThemeProvider target="body">          // applies to <body>
+<ClientThemeProvider target="#my-element">   // applies to #my-element
+<ClientThemeProvider target=".my-class">     // applies to .my-class (first match)
+```

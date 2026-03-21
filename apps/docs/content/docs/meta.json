@@ -1,0 +1,12 @@
+{
+  "title": "@wrksz/themes",
+  "pages": [
+    "index",
+    "---API---",
+    "api",
+    "---Examples---",
+    "examples",
+    "---More---",
+    "why-not-next-themes"
+  ]
+}

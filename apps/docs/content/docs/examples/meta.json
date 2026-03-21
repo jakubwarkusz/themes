@@ -1,0 +1,11 @@
+{
+  "title": "Examples",
+  "pages": [
+    "tailwind",
+    "data-attribute",
+    "scoped-theming",
+    "forced-theme",
+    "server-theme",
+    "meta-theme-color"
+  ]
+}

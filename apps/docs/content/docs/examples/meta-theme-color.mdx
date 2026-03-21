@@ -1,0 +1,39 @@
+---
+title: Meta theme-color
+description: Update the browser theme color on theme change for Safari and PWAs.
+---
+
+The `themeColor` prop keeps `<meta name="theme-color">` in sync with the current theme. Browsers like Safari use this to color the tab bar and status bar.
+
+## Per-theme colors
+
+```tsx
+<ThemeProvider themeColor={{ light: "#ffffff", dark: "#0a0a0a" }}>
+  {children}
+</ThemeProvider>
+```
+
+The meta tag is created automatically if it doesn't exist and updated whenever the theme changes.
+
+## CSS variable
+
+Pass a CSS variable and the browser resolves it against the current theme styles:
+
+```tsx
+<ThemeProvider themeColor="var(--color-background)">
+  {children}
+</ThemeProvider>
+```
+
+## Custom themes
+
+Works with any number of themes:
+
+```tsx
+<ThemeProvider
+  themes={["light", "dark", "dim"]}
+  themeColor={{ light: "#ffffff", dark: "#09090b", dim: "#1c1c1e" }}
+>
+  {children}
+</ThemeProvider>
+```

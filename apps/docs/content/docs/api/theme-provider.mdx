@@ -1,0 +1,133 @@
+---
+title: ThemeProvider
+description: API reference for the ThemeProvider component.
+---
+
+`ThemeProvider` is a Server Component that wraps your app and injects an inline script to apply the theme before React hydrates, preventing flash of unstyled content.
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider } from "@wrksz/themes";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+<Callout type="info">
+  `ThemeProvider` renders an inline `<script>` and must be used in a Server Component. For nested providers inside Client Components, use [`ClientThemeProvider`](/docs/api/client-theme-provider) instead.
+</Callout>
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `themes` | `string[]` | `["light", "dark"]` | Available themes |
+| `defaultTheme` | `string` | `"system"` | Theme used when no preference is stored |
+| `forcedTheme` | `string` | - | Force a specific theme, ignoring user preference |
+| `initialTheme` | `string` | - | Server-provided theme that overrides storage on mount. User can still call `setTheme` to change it |
+| `enableSystem` | `boolean` | `true` | Detect system preference via `prefers-color-scheme` |
+| `enableColorScheme` | `boolean` | `true` | Set native `color-scheme` CSS property |
+| `attribute` | `"class" \| "data-*" \| ("class" \| "data-*")[]` | `"class"` | HTML attribute(s) to set on the target element. Must be `"class"` or a `data-*` attribute |
+| `value` | `Record<string, string>` | - | Map theme names to attribute values |
+| `target` | `string` | `"html"` | Element to apply theme to (`"html"`, `"body"`, or a CSS selector) |
+| `storageKey` | `string` | `"theme"` | Key used for storage |
+| `storage` | `"localStorage" \| "sessionStorage" \| "none"` | `"localStorage"` | Where to persist the theme |
+| `disableTransitionOnChange` | `boolean` | `false` | Disable CSS transitions when switching themes |
+| `followSystem` | `boolean` | `false` | Always follow system preference, even after `setTheme` was called. Also ignores stored value on mount |
+| `themeColor` | `string \| Record<string, string>` | - | Update `<meta name="theme-color">` on theme change |
+| `nonce` | `string` | - | CSP nonce for the inline script |
+| `onThemeChange` | `(theme: string) => void` | - | Called whenever the resolved theme changes. Can be an async function or a Server Action |
+
+## Examples
+
+### Custom themes
+
+```tsx
+<ThemeProvider themes={["light", "dark", "high-contrast"]}>
+  {children}
+</ThemeProvider>
+```
+
+### Data attribute instead of class
+
+```tsx
+<ThemeProvider attribute="data-theme">
+  {children}
+</ThemeProvider>
+```
+
+### Multiple classes per theme
+
+Map a theme to multiple CSS classes using a space-separated value:
+
+```tsx
+<ThemeProvider
+  themes={["light", "dark", "dim"]}
+  value={{ light: "light", dark: "dark high-contrast", dim: "dark dim" }}
+>
+  {children}
+</ThemeProvider>
+```
+
+### Force a theme per page
+
+```tsx
+// app/dashboard/layout.tsx
+<ThemeProvider forcedTheme="dark">
+  {children}
+</ThemeProvider>
+```
+
+### Server-provided theme
+
+Use `initialTheme` to initialize from a server-side source (database, session, cookie) on every mount:
+
+```tsx
+// app/layout.tsx (server component)
+export default async function RootLayout({ children }) {
+  const userTheme = await getUserTheme();
+
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider
+          initialTheme={userTheme ?? undefined}
+          onThemeChange={saveUserTheme}
+        >
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### Disable storage
+
+```tsx
+<ThemeProvider storage="none" defaultTheme="dark">
+  {children}
+</ThemeProvider>
+```
+
+### Meta theme-color
+
+```tsx
+<ThemeProvider themeColor={{ light: "#ffffff", dark: "#0a0a0a" }}>
+  {children}
+</ThemeProvider>
+```
+
+Works with CSS variables too:
+
+```tsx
+<ThemeProvider themeColor="var(--color-background)">
+  {children}
+</ThemeProvider>
+```
