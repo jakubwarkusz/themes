@@ -5,6 +5,8 @@ export type ScriptConfig = {
 	attribute: Attribute | Attribute[];
 	defaultTheme: string;
 	enableSystem: boolean;
+	enableColorScheme: boolean;
+	forcedTheme: string | undefined;
 	themes: string[];
 	value: Record<string, string> | undefined;
 	target: string;
@@ -20,23 +22,28 @@ function themeScript(
 	attribute: string | string[],
 	defaultTheme: string,
 	enableSystem: boolean,
+	enableColorScheme: boolean,
+	forcedTheme: string | null,
 	themes: string[],
 	value: Record<string, string> | null,
 	target: string,
 	storage: string,
 ): void {
-	let theme: string | null = null;
+	let theme: string;
 
-	// Read from storage
-	try {
-		if (storage !== "none") {
-			const store = storage === "localStorage" ? localStorage : sessionStorage;
-			theme = store.getItem(storageKey);
-		}
-	} catch {}
+	if (forcedTheme) {
+		theme = forcedTheme;
+	} else {
+		let stored: string | null = null;
 
-	if (!theme || !themes.includes(theme)) {
-		theme = defaultTheme;
+		try {
+			if (storage !== "none") {
+				const store = storage === "localStorage" ? localStorage : sessionStorage;
+				stored = store.getItem(storageKey);
+			}
+		} catch {}
+
+		theme = stored && themes.includes(stored) ? stored : defaultTheme;
 	}
 
 	if (theme === "system") {
@@ -69,6 +76,10 @@ function themeScript(
 			el.setAttribute(attr, attrValue);
 		}
 	}
+
+	if (enableColorScheme && (theme === "light" || theme === "dark")) {
+		(el as HTMLElement).style.colorScheme = theme;
+	}
 }
 
 /**
@@ -82,6 +93,8 @@ export function getScript(config: ScriptConfig): string {
 		JSON.stringify(config.attribute),
 		JSON.stringify(config.defaultTheme),
 		String(config.enableSystem),
+		String(config.enableColorScheme),
+		JSON.stringify(config.forcedTheme ?? null),
 		JSON.stringify(config.themes),
 		JSON.stringify(config.value ?? null),
 		JSON.stringify(config.target),

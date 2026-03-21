@@ -30,6 +30,8 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	storage?: StorageType;
 	/** Storage key */
 	storageKey?: string;
+	/** Set native color-scheme CSS property */
+	enableColorScheme?: boolean;
 	/** Nonce for CSP */
 	nonce?: string;
 	/** Called when theme changes */
