@@ -1,3 +1,5 @@
+export { useTheme } from "./context.js";
+export { ThemeProvider } from "./provider.js";
 export type {
 	Attribute,
 	DefaultTheme,

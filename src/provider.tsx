@@ -1,0 +1,64 @@
+import type { ReactElement } from "react";
+import { ClientThemeProvider } from "./client-provider.js";
+import { getScript } from "./script.js";
+import type { DefaultTheme, ThemeProviderProps } from "./types.js";
+
+const DEFAULT_THEMES: string[] = ["light", "dark"];
+
+export function ThemeProvider<Themes extends string = DefaultTheme>({
+	children,
+	themes = DEFAULT_THEMES as Themes[],
+	forcedTheme,
+	enableSystem = true,
+	defaultTheme,
+	attribute = "class",
+	value: valueMap,
+	target = "html",
+	disableTransitionOnChange = false,
+	storage = "localStorage",
+	storageKey = "theme",
+	enableColorScheme = true,
+	nonce,
+	onThemeChange,
+}: ThemeProviderProps<Themes>): ReactElement {
+	const resolvedDefault = (defaultTheme ?? (enableSystem ? "system" : "light")) as string;
+
+	return (
+		<>
+			<script
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: inline script required to prevent flash of unstyled theme
+				dangerouslySetInnerHTML={{
+					__html: getScript({
+						storageKey,
+						attribute,
+						defaultTheme: resolvedDefault,
+						enableSystem,
+						enableColorScheme,
+						forcedTheme: forcedTheme as string | undefined,
+						themes: themes as string[],
+						value: valueMap,
+						target,
+						storage,
+					}),
+				}}
+				nonce={nonce}
+			/>
+			<ClientThemeProvider
+				themes={themes}
+				forcedTheme={forcedTheme}
+				enableSystem={enableSystem}
+				defaultTheme={defaultTheme}
+				attribute={attribute}
+				value={valueMap}
+				target={target}
+				disableTransitionOnChange={disableTransitionOnChange}
+				storage={storage}
+				storageKey={storageKey}
+				enableColorScheme={enableColorScheme}
+				onThemeChange={onThemeChange}
+			>
+				{children}
+			</ClientThemeProvider>
+		</>
+	);
+}
