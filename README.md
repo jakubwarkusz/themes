@@ -66,6 +66,7 @@ export function ThemeToggle() {
 | `storageKey` | `string` | `"theme"` | Key used for storage |
 | `storage` | `"localStorage" \| "sessionStorage" \| "none"` | `"localStorage"` | Where to persist the theme |
 | `disableTransitionOnChange` | `boolean` | `false` | Disable CSS transitions when switching themes |
+| `followSystem` | `boolean` | `false` | Always follow system preference changes, even after `setTheme` was called |
 | `themeColor` | `string \| Record<string, string>` | - | Update `<meta name="theme-color">` on theme change |
 | `nonce` | `string` | - | CSP nonce for the inline script |
 | `onThemeChange` | `(theme: string) => void` | - | Called whenever the resolved theme changes |

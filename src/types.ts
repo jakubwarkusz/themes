@@ -41,6 +41,8 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	onThemeChange?: (theme: Themes) => void;
 	/** Colors for meta theme-color tag, per theme or a single value */
 	themeColor?: ThemeColor;
+	/** Always follow system preference changes, even after setTheme was called */
+	followSystem?: boolean;
 };
 
 export type ThemeContextValue<Themes extends string = DefaultTheme> = {

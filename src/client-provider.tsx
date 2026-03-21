@@ -37,6 +37,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	storageKey = "theme",
 	enableColorScheme = true,
 	themeColor,
+	followSystem = false,
 	onThemeChange,
 }: ThemeProviderProps<Themes>): ReactElement {
 	const resolvedDefault = (defaultTheme ?? (enableSystem ? "system" : "light")) as
@@ -144,14 +145,17 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			const next = e.matches ? "dark" : "light";
 			themeStore.setSystemTheme(next);
 			const current = themeStore.getSnapshot().theme;
-			if (current === "system" || current === undefined) {
+			if (current === "system" || current === undefined || followSystem) {
+				if (followSystem) {
+					themeStore.setTheme("system");
+				}
 				applyToDom(next);
 				onThemeChangeRef.current?.(next as Themes);
 			}
 		};
 		mq.addEventListener("change", handler);
 		return () => mq.removeEventListener("change", handler);
-	}, [enableSystem, applyToDom]);
+	}, [enableSystem, followSystem, applyToDom]);
 
 	useEffect(() => {
 		if (storage === "none") return;
