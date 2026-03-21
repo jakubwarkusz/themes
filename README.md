@@ -168,6 +168,24 @@ Works with CSS variables too:
 </ThemeProvider>
 ```
 
+### Nested provider in a Client Component
+
+`ThemeProvider` renders an inline `<script>` and must be used in a Server Component. For nested providers inside Client Components, use `ClientThemeProvider` instead:
+
+```tsx
+"use client";
+
+import { ClientThemeProvider } from "@wrksz/themes";
+
+export function AdminShell({ children }: { children: React.ReactNode }) {
+  return (
+    <ClientThemeProvider forcedTheme="dark">
+      {children}
+    </ClientThemeProvider>
+  );
+}
+```
+
 ### Class on body instead of html
 
 ```tsx
