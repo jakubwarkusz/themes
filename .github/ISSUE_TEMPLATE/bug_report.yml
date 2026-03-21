@@ -1,0 +1,109 @@
+name: Bug Report
+description: Something isn't working as expected
+title: "[Bug]: "
+labels: ["bug", "triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening a bug report, please check that the issue hasn't already been reported.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+      description: |
+        A minimal code snippet or repository that reproduces the issue. The easier it is to reproduce, the faster it can be fixed.
+      placeholder: |
+        <ThemeProvider ...>
+          ...
+        </ThemeProvider>
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened? Include any error messages or console output.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: "@wrksz/themes version"
+      placeholder: "e.g. 0.3.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: framework
+    attributes:
+      label: Framework
+      options:
+        - Next.js (App Router)
+        - Next.js (Pages Router)
+        - React (other)
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: framework_version
+    attributes:
+      label: Framework version
+      placeholder: "e.g. Next.js 15.1.0, React 19.0.0"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: react_version
+    attributes:
+      label: React version
+      options:
+        - "19"
+        - "18"
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      description: Is the issue browser-specific?
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - Other
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else that might be relevant - OS, reproduction link, etc.
+    validations:
+      required: false
