@@ -1,0 +1,9 @@
+pre-commit:
+  jobs:
+    - name: format-and-lint
+      run: bun biome check --write {staged_files}
+      glob: "*.{ts,tsx,js,jsx,json}"
+      stage_fixed: true
+
+    - name: type-check
+      run: bun run type-check
