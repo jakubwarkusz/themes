@@ -1,7 +1,13 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
 	"files": {
-		"includes": ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.ts"]
+		"includes": [
+			"packages/*/src/**/*.ts",
+			"packages/*/src/**/*.tsx",
+			"packages/*/scripts/**/*.ts",
+			"apps/*/src/**/*.ts",
+			"apps/*/src/**/*.tsx"
+		]
 	},
 	"vcs": {
 		"enabled": true,
