@@ -269,6 +269,24 @@ describe("ClientThemeProvider - followSystem", () => {
 		expect(document.documentElement.classList.contains("light")).toBe(true);
 		expect(document.documentElement.classList.contains("dark")).toBe(false);
 	});
+
+	test("ignores stored localStorage value on mount when followSystem=true", () => {
+		mockMatchMedia(true);
+		localStorage.setItem("theme", "light");
+		wrap(<ThemeConsumer />, { followSystem: true });
+
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+		expect(document.documentElement.classList.contains("light")).toBe(false);
+	});
+
+	test("localStorage still used on mount when followSystem=false", () => {
+		mockMatchMedia(true);
+		localStorage.setItem("theme", "light");
+		wrap(<ThemeConsumer />);
+
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+		expect(document.documentElement.classList.contains("dark")).toBe(false);
+	});
 });
 
 describe("ClientThemeProvider - onThemeChange", () => {
