@@ -25,7 +25,7 @@ jobs:
         run: bun type-check
 
       - name: Build
-        run: bun build
+        run: bun run build
 
       - name: Publish to npm
         run: bun publish --access public
