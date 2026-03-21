@@ -2,7 +2,7 @@
 
 import { type ReactElement, useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import { ThemeContext } from "./context.js";
-import { themeStore } from "./store.js";
+import { createThemeStore } from "./store.js";
 import type { DefaultTheme, ThemeColor, ThemeContextValue, ThemeProviderProps } from "./types.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
@@ -44,10 +44,14 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		| Themes
 		| "system";
 
+	const storeRef = useRef(createThemeStore());
+	const store = storeRef.current;
+	const { getSnapshot, setTheme: setStoreTheme, setSystemTheme: setStoreSystemTheme } = store;
+
 	const { theme, systemTheme } = useSyncExternalStore(
-		themeStore.subscribe,
-		themeStore.getSnapshot,
-		themeStore.getServerSnapshot,
+		store.subscribe,
+		store.getSnapshot,
+		store.getServerSnapshot,
 	);
 
 	const resolvedTheme: Themes | undefined =
@@ -114,41 +118,39 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	);
 
 	useEffect(() => {
+		const mq = enableSystem ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+		const sys: "light" | "dark" | undefined = mq ? (mq.matches ? "dark" : "light") : undefined;
+		if (sys) setStoreSystemTheme(sys);
+
 		if (forcedTheme) {
-			themeStore.setTheme(forcedTheme);
+			setStoreTheme(forcedTheme);
 			applyToDom(forcedTheme);
-			return;
+		} else {
+			let stored: string | null = null;
+			try {
+				if (storage !== "none") {
+					const s = storage === "localStorage" ? localStorage : sessionStorage;
+					stored = s.getItem(storageKey);
+				}
+			} catch {}
+
+			const initial =
+				stored && (themes as string[]).includes(stored)
+					? (stored as Themes | "system")
+					: resolvedDefault;
+
+			setStoreTheme(initial);
+			applyToDom(initial === "system" ? (sys ?? "light") : (initial as string));
 		}
 
-		let stored: string | null = null;
-		try {
-			if (storage !== "none") {
-				const store = storage === "localStorage" ? localStorage : sessionStorage;
-				stored = store.getItem(storageKey);
-			}
-		} catch {}
-
-		const initial =
-			stored && (themes as string[]).includes(stored)
-				? (stored as Themes | "system")
-				: resolvedDefault;
-
-		themeStore.setTheme(initial);
-	}, [forcedTheme, resolvedDefault, storage, storageKey, themes, applyToDom]);
-
-	useEffect(() => {
-		if (!enableSystem) return;
-
-		const mq = window.matchMedia("(prefers-color-scheme: dark)");
-		themeStore.setSystemTheme(mq.matches ? "dark" : "light");
-
+		if (!mq) return;
 		const handler = (e: MediaQueryListEvent) => {
 			const next = e.matches ? "dark" : "light";
-			themeStore.setSystemTheme(next);
-			const current = themeStore.getSnapshot().theme;
+			setStoreSystemTheme(next);
+			const current = getSnapshot().theme;
 			if (current === "system" || current === undefined || followSystem) {
 				if (followSystem) {
-					themeStore.setTheme("system");
+					setStoreTheme("system");
 				}
 				applyToDom(next);
 				onThemeChangeRef.current?.(next as Themes);
@@ -156,12 +158,24 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		};
 		mq.addEventListener("change", handler);
 		return () => mq.removeEventListener("change", handler);
-	}, [enableSystem, followSystem, applyToDom]);
+	}, [
+		forcedTheme,
+		resolvedDefault,
+		storage,
+		storageKey,
+		themes,
+		enableSystem,
+		followSystem,
+		applyToDom,
+		getSnapshot,
+		setStoreTheme,
+		setStoreSystemTheme,
+	]);
 
 	// Re-apply theme on bfcache restore (pageshow) and history navigation (popstate)
 	useEffect(() => {
 		const handler = () => {
-			const { theme, systemTheme } = themeStore.getSnapshot();
+			const { theme, systemTheme } = getSnapshot();
 			const resolved =
 				forcedTheme ?? (theme === "system" || theme === undefined ? systemTheme : theme);
 			if (resolved) applyToDom(resolved);
@@ -172,7 +186,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			window.removeEventListener("pageshow", handler);
 			window.removeEventListener("popstate", handler);
 		};
-	}, [applyToDom, forcedTheme]);
+	}, [applyToDom, forcedTheme, getSnapshot]);
 
 	useEffect(() => {
 		if (storage === "none") return;
@@ -182,16 +196,14 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			if ((themes as string[]).includes(e.newValue)) {
 				const newTheme = e.newValue as Themes | "system";
 				const resolved =
-					newTheme === "system"
-						? (themeStore.getSnapshot().systemTheme ?? "light")
-						: newTheme;
-				themeStore.setTheme(newTheme);
+					newTheme === "system" ? (getSnapshot().systemTheme ?? "light") : newTheme;
+				setStoreTheme(newTheme);
 				applyToDom(resolved);
 			}
 		};
 		window.addEventListener("storage", handler);
 		return () => window.removeEventListener("storage", handler);
-	}, [storage, storageKey, themes, applyToDom]);
+	}, [storage, storageKey, themes, applyToDom, getSnapshot, setStoreTheme]);
 
 	const setTheme = useCallback(
 		(
@@ -202,14 +214,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		) => {
 			if (forcedTheme) return;
 
-			const current = themeStore.getSnapshot().theme as Themes | "system" | undefined;
+			const current = getSnapshot().theme as Themes | "system" | undefined;
 			const newTheme = typeof next === "function" ? next(current) : next;
 			const resolved =
-				newTheme === "system"
-					? (themeStore.getSnapshot().systemTheme ?? "light")
-					: newTheme;
+				newTheme === "system" ? (getSnapshot().systemTheme ?? "light") : newTheme;
 
-			themeStore.setTheme(newTheme);
+			setStoreTheme(newTheme);
 			applyToDom(resolved);
 			onThemeChangeRef.current?.(resolved as Themes);
 
@@ -220,7 +230,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				}
 			} catch {}
 		},
-		[applyToDom, forcedTheme, storage, storageKey],
+		[applyToDom, forcedTheme, storage, storageKey, getSnapshot, setStoreTheme],
 	);
 
 	const contextValue: ThemeContextValue<string> = {
