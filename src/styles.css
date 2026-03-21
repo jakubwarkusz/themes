@@ -1,0 +1,28 @@
+:root {
+	--button-bg: hsl(211, 100%, 50%);
+	--button-bg-hover: hsl(211, 100%, 45%);
+	--button-text: hsl(0, 0%, 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--button-bg: hsl(211, 80%, 55%);
+		--button-bg-hover: hsl(211, 80%, 60%);
+		--button-text: hsl(0, 0%, 100%);
+	}
+}
+
+[data-slot="button"] {
+	background: var(--button-bg);
+	color: var(--button-text);
+	padding: 0.6rem 1.2rem;
+	border: none;
+	border-radius: 0.5rem;
+	cursor: pointer;
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+[data-slot="button"]:hover {
+	background: var(--button-bg-hover);
+}

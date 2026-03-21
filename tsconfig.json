@@ -1,0 +1,35 @@
+{
+	"compilerOptions": {
+		"lib": ["ESNext", "DOM"],
+		"target": "ES2023",
+		"module": "Preserve",
+		"moduleDetection": "force",
+		"jsx": "react-jsx",
+
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
+		"noEmit": true,
+
+		"strict": true,
+		"skipLibCheck": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitOverride": true,
+
+		"declaration": true,
+		"isolatedDeclarations": true,
+
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./src/*"]
+		},
+
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"noPropertyAccessFromIndexSignature": false
+	},
+
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "dist", "bunup.config.ts"]
+}
