@@ -8,7 +8,7 @@ description: Hook that returns a value from a map keyed by the current resolved 
 ```tsx
 "use client";
 
-import { useThemeValue } from "@wrksz/themes";
+import { useThemeValue } from "@wrksz/themes/client";
 
 const label = useThemeValue({ light: "Switch to dark", dark: "Switch to light" });
 ```
@@ -60,7 +60,7 @@ const icon = useThemeValue({
 "use client";
 
 import Image from "next/image";
-import { useTheme, useThemeValue } from "@wrksz/themes";
+import { useTheme, useThemeValue } from "@wrksz/themes/client";
 
 export function Logo() {
   const { resolvedTheme } = useTheme();

@@ -8,7 +8,7 @@ Use `forcedTheme` to lock the theme for a page or section. `setTheme` calls are 
 ## Per-page forced theme
 
 ```tsx title="app/dashboard/layout.tsx"
-import { ClientThemeProvider } from "@wrksz/themes";
+import { ClientThemeProvider } from "@wrksz/themes/client";
 
 export default function DashboardLayout({ children }) {
   return (
@@ -26,7 +26,7 @@ export default function DashboardLayout({ children }) {
 ```tsx
 "use client";
 
-import { useTheme } from "@wrksz/themes";
+import { useTheme } from "@wrksz/themes/client";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme, forcedTheme } = useTheme();

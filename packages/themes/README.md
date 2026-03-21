@@ -36,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```tsx
 "use client";
 
-import { useTheme } from "@wrksz/themes";
+import { useTheme } from "@wrksz/themes/client";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -243,7 +243,7 @@ export default async function RootLayout({ children }) {
 ```tsx
 "use client";
 
-import { ClientThemeProvider } from "@wrksz/themes";
+import { ClientThemeProvider } from "@wrksz/themes/client";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   return (
@@ -261,7 +261,7 @@ Returns the value from a map that matches the current resolved theme. Returns `u
 ```tsx
 "use client";
 
-import { useThemeValue } from "@wrksz/themes";
+import { useThemeValue } from "@wrksz/themes/client";
 
 // strings
 const label = useThemeValue({ light: "Switch to dark", dark: "Switch to light" });
@@ -278,7 +278,7 @@ const icon = useThemeValue({ light: <SunIcon />, dark: <MoonIcon /> });
 Showing different images per theme has a hydration mismatch problem - `resolvedTheme` is always `undefined` on the server. Use the built-in `ThemedImage` component which shows a transparent placeholder until the theme resolves on the client:
 
 ```tsx
-import { ThemedImage } from "@wrksz/themes";
+import { ThemedImage } from "@wrksz/themes/client";
 
 <ThemedImage
   src={{ light: "/logo-light.png", dark: "/logo-dark.png" }}
@@ -309,7 +309,7 @@ For custom themes or `next/image`, use `resolvedTheme` directly with a fallback:
 "use client";
 
 import Image from "next/image";
-import { useTheme } from "@wrksz/themes";
+import { useTheme } from "@wrksz/themes/client";
 
 export function Logo() {
   const { resolvedTheme } = useTheme();

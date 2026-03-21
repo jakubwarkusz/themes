@@ -11,8 +11,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "bunup",
-    "dev": "bunup --watch",
+    "build": "bunup src/index.ts src/client.ts",
+    "dev": "bunup src/index.ts src/client.ts --watch",
     "type-check": "tsc --noEmit",
     "lint": "biome check src",
     "lint:fix": "biome check --write src",
@@ -49,6 +49,12 @@
       "import": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
+      }
+    },
+    "./client": {
+      "import": {
+        "types": "./dist/client.d.ts",
+        "default": "./dist/client.js"
       }
     },
     "./styles.css": "./dist/index.css",

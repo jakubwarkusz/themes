@@ -53,7 +53,7 @@ Use the `useTheme` hook in any Client Component to read and update the current t
 ```tsx title="components/theme-toggle.tsx"
 "use client";
 
-import { useTheme } from "@wrksz/themes";
+import { useTheme } from "@wrksz/themes/client";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();

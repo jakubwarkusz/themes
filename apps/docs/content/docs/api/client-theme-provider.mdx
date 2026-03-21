@@ -8,7 +8,7 @@ description: Theme provider for use inside Client Components.
 ```tsx
 "use client";
 
-import { ClientThemeProvider } from "@wrksz/themes";
+import { ClientThemeProvider } from "@wrksz/themes/client";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   return (
@@ -70,7 +70,7 @@ export default function DashboardLayout({ children }) {
 ```tsx
 "use client";
 
-import { ClientThemeProvider, useTheme } from "@wrksz/themes";
+import { ClientThemeProvider, useTheme } from "@wrksz/themes/client";
 
 export function Sidebar({ children }: { children: React.ReactNode }) {
   return (

@@ -1,8 +1,4 @@
-export { ClientThemeProvider } from "./client-provider.js";
-export { useTheme } from "./context.js";
 export { ThemeProvider } from "./provider.js";
-export type { ThemedImageProps } from "./themed-image.js";
-export { ThemedImage } from "./themed-image.js";
 export type {
 	Attribute,
 	DefaultTheme,
@@ -12,4 +8,3 @@ export type {
 	ThemeProviderProps,
 	ValueObject,
 } from "./types.js";
-export { useThemeValue } from "./use-theme-value.js";

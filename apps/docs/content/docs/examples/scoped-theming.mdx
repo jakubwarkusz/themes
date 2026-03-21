@@ -10,7 +10,7 @@ Use `ClientThemeProvider` for nested providers - the inline anti-flash script is
 ## Setup
 
 ```tsx title="app/landing/layout.tsx"
-import { ClientThemeProvider } from "@wrksz/themes";
+import { ClientThemeProvider } from "@wrksz/themes/client";
 
 export default function LandingLayout({ children }) {
   return (
@@ -22,7 +22,7 @@ export default function LandingLayout({ children }) {
 ```
 
 ```tsx title="app/dashboard/layout.tsx"
-import { ClientThemeProvider } from "@wrksz/themes";
+import { ClientThemeProvider } from "@wrksz/themes/client";
 
 export default function DashboardLayout({ children }) {
   return (
@@ -45,7 +45,7 @@ Use `storage="none"` when the theme is forced - there's nothing to persist.
 If the user can change the theme within a section, omit `forcedTheme` and use a separate `storageKey` per section so the themes are stored independently:
 
 ```tsx title="app/dashboard/layout.tsx"
-import { ClientThemeProvider } from "@wrksz/themes";
+import { ClientThemeProvider } from "@wrksz/themes/client";
 
 export default function DashboardLayout({ children }) {
   return (

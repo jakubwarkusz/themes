@@ -8,7 +8,7 @@ description: Hook for reading and updating the current theme.
 ```tsx
 "use client";
 
-import { useTheme } from "@wrksz/themes";
+import { useTheme } from "@wrksz/themes/client";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();

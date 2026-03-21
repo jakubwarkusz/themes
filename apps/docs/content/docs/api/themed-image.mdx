@@ -6,7 +6,7 @@ description: Component that displays the correct image for the current theme.
 `ThemedImage` renders a different image depending on the current resolved theme. Before the theme resolves on the client, it shows a transparent 1x1 placeholder to avoid hydration mismatch.
 
 ```tsx
-import { ThemedImage } from "@wrksz/themes";
+import { ThemedImage } from "@wrksz/themes/client";
 
 <ThemedImage
   src={{ light: "/logo-light.png", dark: "/logo-dark.png" }}
@@ -64,7 +64,7 @@ By default the placeholder is a transparent 1x1 GIF, so the image space is empty
 "use client";
 
 import Image from "next/image";
-import { useTheme, useThemeValue } from "@wrksz/themes";
+import { useTheme, useThemeValue } from "@wrksz/themes/client";
 
 export function Logo() {
   const { resolvedTheme } = useTheme();
