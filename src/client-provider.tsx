@@ -116,6 +116,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	useEffect(() => {
 		if (forcedTheme) {
 			themeStore.setTheme(forcedTheme);
+			applyToDom(forcedTheme);
 			return;
 		}
 
@@ -133,7 +134,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				: resolvedDefault;
 
 		themeStore.setTheme(initial);
-	}, [forcedTheme, resolvedDefault, storage, storageKey, themes]);
+	}, [forcedTheme, resolvedDefault, storage, storageKey, themes, applyToDom]);
 
 	useEffect(() => {
 		if (!enableSystem) return;
@@ -156,6 +157,22 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		mq.addEventListener("change", handler);
 		return () => mq.removeEventListener("change", handler);
 	}, [enableSystem, followSystem, applyToDom]);
+
+	// Re-apply theme on bfcache restore (pageshow) and history navigation (popstate)
+	useEffect(() => {
+		const handler = () => {
+			const { theme, systemTheme } = themeStore.getSnapshot();
+			const resolved =
+				forcedTheme ?? (theme === "system" || theme === undefined ? systemTheme : theme);
+			if (resolved) applyToDom(resolved);
+		};
+		window.addEventListener("pageshow", handler);
+		window.addEventListener("popstate", handler);
+		return () => {
+			window.removeEventListener("pageshow", handler);
+			window.removeEventListener("popstate", handler);
+		};
+	}, [applyToDom, forcedTheme]);
 
 	useEffect(() => {
 		if (storage === "none") return;
