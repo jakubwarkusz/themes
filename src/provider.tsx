@@ -20,6 +20,7 @@ export function ThemeProvider<Themes extends string = DefaultTheme>({
 	enableColorScheme = true,
 	nonce,
 	onThemeChange,
+	themeColor,
 }: ThemeProviderProps<Themes>): ReactElement {
 	const resolvedDefault = (defaultTheme ?? (enableSystem ? "system" : "light")) as string;
 
@@ -39,6 +40,7 @@ export function ThemeProvider<Themes extends string = DefaultTheme>({
 						value: valueMap,
 						target,
 						storage,
+						themeColors: themeColor,
 					}),
 				}}
 				nonce={nonce}
@@ -55,6 +57,7 @@ export function ThemeProvider<Themes extends string = DefaultTheme>({
 				storage={storage}
 				storageKey={storageKey}
 				enableColorScheme={enableColorScheme}
+				themeColor={themeColor}
 				onThemeChange={onThemeChange}
 			>
 				{children}
