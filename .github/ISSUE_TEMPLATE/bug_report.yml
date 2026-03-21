@@ -61,7 +61,11 @@ body:
       options:
         - Next.js (App Router)
         - Next.js (Pages Router)
-        - React (other)
+        - TanStack Start
+        - Remix
+        - Astro
+        - Vite + React
+        - Create React App
         - Other
     validations:
       required: true

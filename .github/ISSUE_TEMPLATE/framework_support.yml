@@ -1,0 +1,63 @@
+name: Framework Support Request
+description: Request support for a framework not currently covered
+title: "[Framework]: "
+labels: ["enhancement", "framework"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        @wrksz/themes currently targets **Next.js 16+ (App Router) and React 19+**.
+        Use this template to request support for other frameworks.
+
+  - type: input
+    id: framework
+    attributes:
+      label: Framework
+      placeholder: "e.g. TanStack Start, Remix, Vite + React, Astro"
+    validations:
+      required: true
+
+  - type: input
+    id: framework_version
+    attributes:
+      label: Framework version
+      placeholder: "e.g. TanStack Start 1.0.0"
+    validations:
+      required: false
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What doesn't work
+      description: Describe what breaks or doesn't work when using @wrksz/themes with this framework.
+      placeholder: |
+        e.g. ThemeProvider uses a <script> tag rendered as a Server Component - TanStack Start
+        doesn't support RSC, so the script is never injected and there's a flash of unstyled theme.
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Current workaround
+      description: Is there any workaround you're using today?
+    validations:
+      required: false
+
+  - type: textarea
+    id: prior_art
+    attributes:
+      label: Prior art
+      description: |
+        Links to how other theme libraries (next-themes, shadcn, etc.) handle this framework,
+        or any relevant framework docs.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I'm willing to help implement this
