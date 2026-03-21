@@ -1,10 +1,27 @@
 "use client";
 
-import { type ReactElement, useCallback, useEffect, useRef, useState } from "react";
+import { type ReactElement, useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import { ThemeContext } from "./context.js";
-import type { DefaultTheme, ThemeContextValue, ThemeProviderProps } from "./types.js";
+import { themeStore } from "./store.js";
+import type { DefaultTheme, ThemeColor, ThemeContextValue, ThemeProviderProps } from "./types.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
+
+function resolveThemeColor(themeColor: ThemeColor, resolved: string): string | undefined {
+	if (typeof themeColor === "string") return themeColor;
+	return themeColor[resolved];
+}
+
+function updateMetaThemeColor(color: string | undefined): void {
+	if (!color) return;
+	let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+	if (!meta) {
+		meta = document.createElement("meta");
+		meta.name = "theme-color";
+		document.head.appendChild(meta);
+	}
+	meta.content = color;
+}
 
 export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	children,
@@ -19,18 +36,24 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	storage = "localStorage",
 	storageKey = "theme",
 	enableColorScheme = true,
+	themeColor,
 	onThemeChange,
 }: ThemeProviderProps<Themes>): ReactElement {
 	const resolvedDefault = (defaultTheme ?? (enableSystem ? "system" : "light")) as
 		| Themes
 		| "system";
 
-	const [theme, setThemeState] = useState<Themes | "system" | undefined>(undefined);
-	const [systemTheme, setSystemTheme] = useState<"light" | "dark" | undefined>(undefined);
+	const { theme, systemTheme } = useSyncExternalStore(
+		themeStore.subscribe,
+		themeStore.getSnapshot,
+		themeStore.getServerSnapshot,
+	);
 
 	const resolvedTheme: Themes | undefined =
 		forcedTheme ??
-		(theme === "system" || theme === undefined ? (systemTheme as Themes | undefined) : theme);
+		(theme === "system" || theme === undefined
+			? (systemTheme as Themes | undefined)
+			: (theme as Themes));
 
 	const onThemeChangeRef = useRef(onThemeChange);
 	useEffect(() => {
@@ -73,13 +96,25 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			if (enableColorScheme && (resolved === "light" || resolved === "dark")) {
 				(el as HTMLElement).style.colorScheme = resolved;
 			}
+
+			if (themeColor) {
+				updateMetaThemeColor(resolveThemeColor(themeColor, resolved));
+			}
 		},
-		[attribute, disableTransitionOnChange, enableColorScheme, getTargetEl, themes, valueMap],
+		[
+			attribute,
+			disableTransitionOnChange,
+			enableColorScheme,
+			getTargetEl,
+			themes,
+			valueMap,
+			themeColor,
+		],
 	);
 
 	useEffect(() => {
 		if (forcedTheme) {
-			setThemeState(forcedTheme);
+			themeStore.setTheme(forcedTheme);
 			return;
 		}
 
@@ -96,27 +131,27 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				? (stored as Themes | "system")
 				: resolvedDefault;
 
-		setThemeState(initial);
+		themeStore.setTheme(initial);
 	}, [forcedTheme, resolvedDefault, storage, storageKey, themes]);
 
 	useEffect(() => {
 		if (!enableSystem) return;
 
 		const mq = window.matchMedia("(prefers-color-scheme: dark)");
-		const sys = mq.matches ? "dark" : "light";
-		setSystemTheme(sys);
+		themeStore.setSystemTheme(mq.matches ? "dark" : "light");
 
 		const handler = (e: MediaQueryListEvent) => {
 			const next = e.matches ? "dark" : "light";
-			setSystemTheme(next);
-			if (theme === "system" || theme === undefined) {
+			themeStore.setSystemTheme(next);
+			const current = themeStore.getSnapshot().theme;
+			if (current === "system" || current === undefined) {
 				applyToDom(next);
 				onThemeChangeRef.current?.(next as Themes);
 			}
 		};
 		mq.addEventListener("change", handler);
 		return () => mq.removeEventListener("change", handler);
-	}, [enableSystem, theme, applyToDom]);
+	}, [enableSystem, applyToDom]);
 
 	useEffect(() => {
 		if (storage === "none") return;
@@ -125,14 +160,17 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			if (e.key !== storageKey || !e.newValue) return;
 			if ((themes as string[]).includes(e.newValue)) {
 				const newTheme = e.newValue as Themes | "system";
-				const resolved = newTheme === "system" ? (systemTheme ?? "light") : newTheme;
-				setThemeState(newTheme);
+				const resolved =
+					newTheme === "system"
+						? (themeStore.getSnapshot().systemTheme ?? "light")
+						: newTheme;
+				themeStore.setTheme(newTheme);
 				applyToDom(resolved);
 			}
 		};
 		window.addEventListener("storage", handler);
 		return () => window.removeEventListener("storage", handler);
-	}, [storage, storageKey, themes, systemTheme, applyToDom]);
+	}, [storage, storageKey, themes, applyToDom]);
 
 	const setTheme = useCallback(
 		(
@@ -143,10 +181,14 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		) => {
 			if (forcedTheme) return;
 
-			const newTheme = typeof next === "function" ? next(theme) : next;
-			const resolved = newTheme === "system" ? (systemTheme ?? "light") : newTheme;
+			const current = themeStore.getSnapshot().theme as Themes | "system" | undefined;
+			const newTheme = typeof next === "function" ? next(current) : next;
+			const resolved =
+				newTheme === "system"
+					? (themeStore.getSnapshot().systemTheme ?? "light")
+					: newTheme;
 
-			setThemeState(newTheme);
+			themeStore.setTheme(newTheme);
 			applyToDom(resolved);
 			onThemeChangeRef.current?.(resolved as Themes);
 
@@ -157,7 +199,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				}
 			} catch {}
 		},
-		[applyToDom, forcedTheme, storage, storageKey, systemTheme, theme],
+		[applyToDom, forcedTheme, storage, storageKey],
 	);
 
 	const contextValue: ThemeContextValue<string> = {
