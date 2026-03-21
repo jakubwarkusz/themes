@@ -358,4 +358,15 @@ describe("ClientThemeProvider - cross-tab storage sync", () => {
 
 		expect(screen.getByTestId("theme").textContent).toBe("light");
 	});
+
+	test("does not react to storage events when storage='sessionStorage'", () => {
+		sessionStorage.setItem("theme", "light");
+		wrap(<ThemeConsumer />, { storage: "sessionStorage" });
+
+		act(() => {
+			dispatchStorageEvent("theme", "dark");
+		});
+
+		expect(screen.getByTestId("theme").textContent).toBe("light");
+	});
 });

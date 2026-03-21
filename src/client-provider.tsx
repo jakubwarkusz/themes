@@ -202,10 +202,10 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	}, [applyToDom, forcedTheme, getSnapshot]);
 
 	useEffect(() => {
-		if (storage === "none") return;
+		if (storage === "none" || storage === "sessionStorage") return;
 
 		const handler = (e: StorageEvent) => {
-			if (e.key !== storageKey || !e.newValue) return;
+			if (e.storageArea !== localStorage || e.key !== storageKey || !e.newValue) return;
 			if ((themes as string[]).includes(e.newValue)) {
 				const newTheme = e.newValue as Themes | "system";
 				const resolved =
