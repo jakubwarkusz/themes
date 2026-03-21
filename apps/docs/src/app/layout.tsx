@@ -13,8 +13,8 @@ export const metadata: Metadata = {
 		template: "%s | @wrksz/themes",
 	},
 	description:
-		"Modern theme management for Next.js 16+ and React 19+. Drop-in replacement for next-themes — fixes every known bug and adds missing features.",
-	keywords: ["next-themes", "theme", "dark mode", "nextjs", "react"],
+		"Drop-in replacement for next-themes. Fixes React 19 bugs, adds nested providers, sessionStorage, meta theme-color, server-provided themes, and more.",
+	keywords: ["next-themes", "theme", "dark mode", "nextjs", "react", "dark mode toggle"],
 };
 
 export default function Layout({ children }: LayoutProps<"/">) {
