@@ -13,6 +13,9 @@ jobs:
   publish:
     name: Publish a package to NPM registry
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/themes
 
     steps:
       - name: Checkout code
@@ -31,12 +34,13 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+        working-directory: .
 
       - name: Set version from tag
         run: bun scripts/set-version.ts ${{ github.ref_name }}
 
       - name: Type check
-        run: bun run type-check
+        run: bun type-check
 
       - name: Build
         run: bun run build

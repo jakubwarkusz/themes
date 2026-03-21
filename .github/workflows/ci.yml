@@ -3,13 +3,22 @@ name: CI
 on:
   push:
     branches: [main]
+    paths:
+      - "packages/themes/**"
+      - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "packages/themes/**"
+      - ".github/workflows/ci.yml"
 
 jobs:
   check:
     name: Lint, type-check & build
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/themes
     steps:
       - uses: actions/checkout@v6
 
@@ -19,6 +28,7 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+        working-directory: .
 
       - name: Lint
         run: bun lint
