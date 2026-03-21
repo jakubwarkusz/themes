@@ -7,7 +7,7 @@ import { useTheme } from "./context.js";
 const TRANSPARENT_FALLBACK =
 	"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
-type ThemedImageProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> & {
+export type ThemedImageProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> & {
 	/** Map of theme name to image source */
 	src: Record<string, string>;
 	/**
