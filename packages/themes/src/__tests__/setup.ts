@@ -22,6 +22,14 @@ Object.defineProperties(globalThis, {
 	},
 });
 
+if (typeof globalThis.requestAnimationFrame === "undefined") {
+	globalThis.requestAnimationFrame = (cb: FrameRequestCallback) => {
+		setTimeout(() => cb(0), 0);
+		return 0;
+	};
+	globalThis.cancelAnimationFrame = () => {};
+}
+
 export function clearCookies(): void {
 	const cookies = document.cookie.split(";");
 	for (const cookie of cookies) {

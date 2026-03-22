@@ -427,3 +427,46 @@ describe("ClientThemeProvider - cookie storage", () => {
 		expect(screen.getByTestId("theme").textContent).toBe("light");
 	});
 });
+
+describe("ClientThemeProvider - disableTransitionOnChange", () => {
+	test("injected style contains 'none' for boolean true", () => {
+		wrap(<ThemeConsumer />, { disableTransitionOnChange: true, defaultTheme: "dark" });
+
+		const captured = { content: null as string | null };
+		const origAppend = document.head.appendChild.bind(document.head);
+		document.head.appendChild = <T extends Node>(node: T): T => {
+			if ((node as unknown as Element).tagName === "STYLE")
+				captured.content = (node as unknown as Element).textContent;
+			return origAppend(node) as T;
+		};
+
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-light"));
+		});
+
+		document.head.appendChild = origAppend;
+		expect(captured.content).toContain("transition:none");
+	});
+
+	test("injected style uses custom CSS string", () => {
+		wrap(<ThemeConsumer />, {
+			disableTransitionOnChange: "background-color 0s, color 0s",
+			defaultTheme: "dark",
+		});
+
+		const captured = { content: null as string | null };
+		const origAppend = document.head.appendChild.bind(document.head);
+		document.head.appendChild = <T extends Node>(node: T): T => {
+			if ((node as unknown as Element).tagName === "STYLE")
+				captured.content = (node as unknown as Element).textContent;
+			return origAppend(node) as T;
+		};
+
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-light"));
+		});
+
+		document.head.appendChild = origAppend;
+		expect(captured.content).toContain("background-color 0s, color 0s");
+	});
+});
