@@ -5,7 +5,7 @@
 [![npm version](https://img.shields.io/npm/v/@wrksz/themes)](https://www.npmjs.com/package/@wrksz/themes)
 [![docs](https://img.shields.io/badge/docs-themes.wrksz.dev-7c3aed)](https://themes.wrksz.dev)
 
-Modern theme management for Next.js 16+ and React 19+. Near drop-in replacement for `next-themes` - fixes every known bug and adds missing features.
+Modern theme management for Next.js 16+ and React 19+. Near drop-in replacement for `next-themes` - fixes every known bug and adds missing features. Migrating requires changing one import line.
 
 ```bash
 bun add @wrksz/themes
@@ -13,9 +13,42 @@ bun add @wrksz/themes
 npm install @wrksz/themes
 ```
 
+## Why not `next-themes`?
+
+| | next-themes | @wrksz/themes |
+|---|:---:|:---:|
+| React 19 script warning | ❌ | ✅ `useServerInsertedHTML` |
+| `__name` minification bug | ❌ | ✅ |
+| Stale theme with React 19 `cacheComponents` | ❌ | ✅ `useSyncExternalStore` |
+| Multi-class theme removal leaving stale classes | ❌ | ✅ |
+| Nested providers | ❌ | ✅ per-instance store |
+| `sessionStorage` support | ❌ | ✅ |
+| `cookie` storage (zero-flash SSR) | ❌ | ✅ |
+| Disable storage | ❌ | ✅ `storage="none"` |
+| `meta theme-color` support | ❌ | ✅ `themeColor` prop |
+| Server-provided theme | ❌ | ✅ `initialTheme` prop |
+| `disableTransitionOnChange` per property | ❌ | ✅ pass a CSS string |
+| Read theme outside React | ❌ | ✅ `getTheme()` helper |
+| Generic types | ❌ | ✅ `useTheme<AppTheme>()` |
+| Zero runtime dependencies | ✅ | ✅ |
+
+## Table of Contents
+
+- [Setup](#setup)
+- [Usage](#usage)
+- [Zero-flash SSR with cookie storage](#zero-flash-ssr-with-cookie-storage)
+- [API](#api)
+  - [ThemeProvider](#themeprovider)
+  - [useTheme](#usetheme)
+  - [getTheme](#gettheme)
+  - [useThemeValue](#usethemevalue)
+  - [ThemedImage](#themedimage)
+- [Examples](#examples)
+- [Import paths](#import-paths)
+
 ## Setup
 
-Add the provider to your root layout. Add `suppressHydrationWarning` to `<html>` to prevent hydration warnings caused by the inline theme script running before React hydrates.
+Add the provider to your root layout. Import from `@wrksz/themes/next` for Next.js - this avoids the React 19 inline script warning by using `useServerInsertedHTML`. Add `suppressHydrationWarning` to `<html>` to prevent hydration mismatches.
 
 ```tsx
 // app/layout.tsx
@@ -32,6 +65,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
+> **Note:** `ThemeProvider` from `@wrksz/themes/next` is an async Server Component. Use it directly in `layout.tsx` - it cannot be wrapped in a `"use client"` component. For nested providers inside Client Components, use [`ClientThemeProvider`](#nested-provider-in-a-client-component).
+
 ## Usage
 
 ```tsx
@@ -40,15 +75,51 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 import { useTheme } from "@wrksz/themes/client";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
 
   return (
-    <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+    <button onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
       Toggle theme
     </button>
   );
 }
 ```
+
+## Zero-flash SSR with cookie storage
+
+Use `storage="cookie"` with `@wrksz/themes/next` to eliminate SSR theme flash. The provider reads the cookie server-side automatically - no boilerplate required:
+
+```tsx
+// app/layout.tsx
+import { ThemeProvider } from "@wrksz/themes/next";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider storage="cookie" defaultTheme="dark" disableTransitionOnChange>
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+For apps using CSS media queries (`@media (prefers-color-scheme: dark)`) alongside CSS class variables, avoid the media query fallback - the library sets the correct class before the first paint:
+
+```css
+/* ❌ causes flash when system pref differs from stored theme */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) { --bg: #09090b; }
+}
+
+/* ✅ */
+:root      { --bg: #ffffff; }
+:root.dark { --bg: #09090b; }
+```
+
+> Cookie storage does not support cross-tab theme sync. Use `localStorage` with `initialTheme` if you need it.
 
 ## API
 
@@ -66,12 +137,12 @@ export function ThemeToggle() {
 | `value` | `Record<string, string>` | - | Map theme names to attribute values |
 | `target` | `string` | `"html"` | Element to apply theme to (`"html"`, `"body"`, or a CSS selector) |
 | `storageKey` | `string` | `"theme"` | Key used for storage |
-| `storage` | `"localStorage" \| "sessionStorage" \| "none"` | `"localStorage"` | Where to persist the theme |
-| `disableTransitionOnChange` | `boolean` | `false` | Disable CSS transitions when switching themes |
-| `followSystem` | `boolean` | `false` | Always follow system preference changes, even after `setTheme` was called. Also ignores stored value on mount in favor of current system preference |
+| `storage` | `"localStorage" \| "sessionStorage" \| "cookie" \| "none"` | `"localStorage"` | Where to persist the theme. `"cookie"` reads/writes `document.cookie` and with `@wrksz/themes/next` also reads server-side for zero-flash SSR |
+| `disableTransitionOnChange` | `boolean \| string` | `false` | Suppress CSS transitions when switching themes. `true` disables all. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties |
+| `followSystem` | `boolean` | `false` | Always follow system preference, ignores stored value on mount |
 | `themeColor` | `string \| Record<string, string>` | - | Update `<meta name="theme-color">` on theme change |
-| `nonce` | `string` | - | CSP nonce for the inline script (`ThemeProvider` only - `ClientThemeProvider` renders no script) |
-| `onThemeChange` | `(theme: string) => void` | - | Called whenever the resolved theme changes |
+| `nonce` | `string` | - | CSP nonce for the inline script |
+| `onThemeChange` | `(theme: string) => void` | - | Called when theme changes. Receives the selected value (may be `"system"`). When system preference changes while theme is `"system"`, fires with the resolved value |
 
 ### `useTheme`
 
@@ -96,15 +167,63 @@ const { theme, setTheme } = useTheme<AppTheme>();
 // setTheme: (theme: AppTheme | "system") => void
 ```
 
-## Examples
+### `getTheme`
 
-### Custom themes with Tailwind
+Reads the current theme from a cookie outside React. Available in `@wrksz/themes/next`.
+
+```ts
+// proxy.ts - sync, reads from Request
+import { getTheme } from "@wrksz/themes/next";
+
+export function proxy(request: Request) {
+  const theme = getTheme(request, { defaultTheme: "dark" });
+}
+
+// layout.tsx - async, reads via cookies() from next/headers
+const theme = await getTheme({ defaultTheme: "dark" });
+return <html className={theme}>...</html>;
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `storageKey` | `string` | `"theme"` | Cookie name to read from |
+| `defaultTheme` | `string` | `"system"` | Returned when no valid theme is found |
+| `themes` | `string[]` | - | When provided, stored values not in the list fall back to `defaultTheme` |
+
+### `useThemeValue`
+
+Returns the value from a map matching the current resolved theme. Returns `undefined` before the theme resolves on the client.
 
 ```tsx
-<ThemeProvider
-  themes={["light", "dark", "high-contrast"]}
-  attribute="class"
->
+"use client";
+import { useThemeValue } from "@wrksz/themes/client";
+
+const label = useThemeValue({ light: "Switch to dark", dark: "Switch to light" });
+const bg = useThemeValue({ light: "#ffffff", dark: "#0a0a0a" });
+const icon = useThemeValue({ light: <SunIcon />, dark: <MoonIcon /> });
+```
+
+### `ThemedImage`
+
+Shows different images per theme. Renders a transparent placeholder on the server to avoid hydration mismatches.
+
+```tsx
+import { ThemedImage } from "@wrksz/themes/client";
+
+<ThemedImage
+  src={{ light: "/logo-light.png", dark: "/logo-dark.png" }}
+  alt="Logo"
+  width={200}
+  height={50}
+/>
+```
+
+## Examples
+
+### Custom themes
+
+```tsx
+<ThemeProvider themes={["light", "dark", "high-contrast"]}>
   {children}
 </ThemeProvider>
 ```
@@ -122,21 +241,7 @@ const { theme, setTheme } = useTheme<AppTheme>();
 [data-theme="light"] { --bg: #fff; }
 ```
 
-### Custom attribute values
-
-```tsx
-<ThemeProvider
-  themes={["light", "dark"]}
-  attribute="data-mode"
-  value={{ light: "light-mode", dark: "dark-mode" }}
->
-  {children}
-</ThemeProvider>
-```
-
 ### Multiple classes per theme
-
-Map a theme to multiple CSS classes by using a space-separated value:
 
 ```tsx
 <ThemeProvider
@@ -147,30 +252,7 @@ Map a theme to multiple CSS classes by using a space-separated value:
 </ThemeProvider>
 ```
 
-### Meta theme-color (Safari / PWA)
-
-```tsx
-<ThemeProvider themeColor={{ light: "#ffffff", dark: "#0a0a0a" }}>
-  {children}
-</ThemeProvider>
-```
-
-Works with CSS variables too:
-
-```tsx
-<ThemeProvider themeColor="var(--color-background)">
-  {children}
-</ThemeProvider>
-```
-
-### Disable storage
-
-```tsx
-// No persistence - always uses defaultTheme or system preference
-<ThemeProvider storage="none" defaultTheme="dark">
-  {children}
-</ThemeProvider>
-```
+Switching away from `"dark"` correctly removes both `dark` and `high-contrast`.
 
 ### Forced theme per page
 
@@ -181,54 +263,32 @@ Works with CSS variables too:
 </ThemeProvider>
 ```
 
-### Different theme per section (scoped theming)
+### Scoped theming
 
-Apply the theme to a specific element instead of `<html>` using the `target` prop. This lets different sections of your app have independent themes simultaneously.
+Apply the theme to a specific element instead of `<html>`, so different sections can have independent themes simultaneously:
 
 ```tsx
-// app/landing/layout.tsx
-export default function LandingLayout({ children }) {
-  return (
-    <ThemeProvider forcedTheme="dark" target="#landing-root" storage="none">
-      <div id="landing-root">{children}</div>
-    </ThemeProvider>
-  );
-}
-
-// app/dashboard/layout.tsx
-export default function DashboardLayout({ children }) {
-  return (
-    <ThemeProvider forcedTheme="light" target="#dashboard-root" storage="none">
-      <div id="dashboard-root">{children}</div>
-    </ThemeProvider>
-  );
-}
+<ThemeProvider forcedTheme="dark" target="#landing-root" storage="none">
+  <div id="landing-root">{children}</div>
+</ThemeProvider>
 ```
 
 ```css
-/* scope your CSS variables to the target element */
 #landing-root { --bg: #0a0a0a; --fg: #fafafa; }
-#dashboard-root { --bg: #ffffff; --fg: #0a0a0a; }
 ```
-
-Use `storage="none"` when the theme is forced - there's nothing to persist.
 
 ### Server-provided theme
 
-Use `initialTheme` to initialize from a server-side source (database, session, cookie) on every mount, overriding any locally stored value. The user can still call `setTheme` to change it - use `onThemeChange` to persist the change back.
+Initialize from a server-side source (database, session) - overrides stored value on every mount:
 
 ```tsx
-// app/layout.tsx (server component)
 export default async function RootLayout({ children }) {
-  const userTheme = await getUserTheme(); // "light" | "dark" | null
+  const userTheme = await getUserTheme();
 
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider
-          initialTheme={userTheme ?? undefined}
-          onThemeChange={saveUserTheme}
-        >
+        <ThemeProvider initialTheme={userTheme ?? undefined} onThemeChange={saveUserTheme}>
           {children}
         </ThemeProvider>
       </body>
@@ -239,11 +299,8 @@ export default async function RootLayout({ children }) {
 
 ### Nested provider in a Client Component
 
-`ThemeProvider` renders an inline `<script>` and must be used in a Server Component. For nested providers inside Client Components, use `ClientThemeProvider` instead:
-
 ```tsx
 "use client";
-
 import { ClientThemeProvider } from "@wrksz/themes/client";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -255,102 +312,27 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 }
 ```
 
-### `useThemeValue`
-
-Returns the value from a map that matches the current resolved theme. Returns `undefined` before the theme resolves on the client.
+### Suppress transitions on theme change
 
 ```tsx
-"use client";
+// Disable all transitions
+<ThemeProvider disableTransitionOnChange>
+  {children}
+</ThemeProvider>
 
-import { useThemeValue } from "@wrksz/themes/client";
-
-// strings
-const label = useThemeValue({ light: "Switch to dark", dark: "Switch to light" });
-
-// CSS values
-const bg = useThemeValue({ light: "#ffffff", dark: "#0a0a0a", purple: "#6633ff" });
-
-// any type
-const icon = useThemeValue({ light: <SunIcon />, dark: <MoonIcon /> });
-```
-
-### Theme-aware images
-
-Showing different images per theme has a hydration mismatch problem - `resolvedTheme` is always `undefined` on the server. Use the built-in `ThemedImage` component which shows a transparent placeholder until the theme resolves on the client:
-
-```tsx
-import { ThemedImage } from "@wrksz/themes/client";
-
-<ThemedImage
-  src={{ light: "/logo-light.png", dark: "/logo-dark.png" }}
-  alt="Logo"
-  width={200}
-  height={50}
-/>
-```
-
-Works with any custom themes too:
-
-```tsx
-<ThemedImage
-  src={{
-    light: "/logo-light.png",
-    dark: "/logo-dark.png",
-    purple: "/logo-purple.png",
-  }}
-  alt="Logo"
-  width={200}
-  height={50}
-/>
-```
-
-For custom themes or `next/image`, use `resolvedTheme` directly with a fallback:
-
-```tsx
-"use client";
-
-import Image from "next/image";
-import { useTheme } from "@wrksz/themes/client";
-
-export function Logo() {
-  const { resolvedTheme } = useTheme();
-
-  return (
-    <Image
-      src={resolvedTheme === "dark" ? "/logo-dark.png" : "/logo-light.png"}
-      alt="Logo"
-      width={200}
-      height={50}
-      // avoids layout shift while theme is resolving
-      style={{ visibility: resolvedTheme ? "visible" : "hidden" }}
-    />
-  );
-}
-```
-
-### Class on body instead of html
-
-```tsx
-<ThemeProvider target="body">
+// Suppress only color properties, keep transform/opacity transitions intact
+<ThemeProvider disableTransitionOnChange="background-color 0s, color 0s, border-color 0s">
   {children}
 </ThemeProvider>
 ```
 
-## Why not `next-themes`?
+## Import paths
 
-| Issue | next-themes | @wrksz/themes |
-|-------|-------------|---------------|
-| React 19 script warning | Yes | Fixed (useServerInsertedHTML) |
-| `__name` minification bug | Yes | Fixed |
-| React 19 Activity/cacheComponents stale theme | Yes | Fixed (`useSyncExternalStore`) |
-| Multiple classes per theme | No | Yes (`value` map with spaces) |
-| Nested providers | No | Yes (per-instance store) |
-| `sessionStorage` support | No | Yes |
-| Disable storage | No | Yes (`storage: "none"`) |
-| `meta theme-color` support | No | Yes (`themeColor` prop) |
-| Server-provided theme | No | Yes (`initialTheme` prop) |
-| Generic types | No | Yes (`useTheme<AppTheme>()`) |
-| Zero runtime dependencies | Yes | Yes |
+| Import | Use for |
+|--------|---------|
+| `@wrksz/themes/next` | `ThemeProvider`, `getTheme` in Next.js (recommended) |
+| `@wrksz/themes/client` | `useTheme`, `useThemeValue`, `ThemedImage`, `ClientThemeProvider` |
+| `@wrksz/themes` | `ThemeProvider` for non-Next.js frameworks |
 
 ## License
 
