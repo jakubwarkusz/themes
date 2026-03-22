@@ -1,5 +1,6 @@
 {
   "title": "Examples",
+  "description": "Integration examples for common use cases.",
   "pages": [
     "tailwind",
     "data-attribute",
