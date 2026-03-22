@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
+import { getScript } from "../core/script.js";
+import type { DefaultTheme, ThemeProviderProps } from "../core/types.js";
 import { ClientThemeProvider } from "./client-provider.js";
-import { getScript } from "./script.js";
-import type { DefaultTheme, ThemeProviderProps } from "./types.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
 

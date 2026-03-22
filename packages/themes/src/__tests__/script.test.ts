@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { getScript } from "../script.js";
+import { getScript } from "../core/script.js";
 
 const base = {
 	storageKey: "theme",

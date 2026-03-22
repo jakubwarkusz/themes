@@ -1,7 +1,7 @@
 "use client";
 
 import type { ImgHTMLAttributes, ReactElement } from "react";
-import { useTheme } from "./context.js";
+import { useTheme } from "../core/context.js";
 
 // Transparent 1x1 GIF - shown before theme resolves to avoid hydration mismatch
 const TRANSPARENT_FALLBACK =

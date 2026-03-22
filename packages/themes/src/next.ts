@@ -7,4 +7,4 @@ export type {
 	ThemeProviderProps,
 	ValueObject,
 } from "./core/types.js";
-export { ThemeProvider } from "./providers/provider.js";
+export { ThemeProvider } from "./providers/next-provider.js";

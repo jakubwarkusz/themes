@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "./context.js";
+import { useTheme } from "../core/context.js";
 
 /**
  * Returns the value from the map that corresponds to the current resolved theme.

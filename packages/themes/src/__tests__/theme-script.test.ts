@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { getScript } from "../script.js";
+import { getScript } from "../core/script.js";
 
 beforeEach(() => {
 	document.documentElement.className = "";

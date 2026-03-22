@@ -1,9 +1,14 @@
 "use client";
 
 import { type ReactElement, useCallback, useEffect, useRef, useSyncExternalStore } from "react";
-import { ThemeContext } from "./context.js";
-import { createThemeStore } from "./store.js";
-import type { DefaultTheme, ThemeColor, ThemeContextValue, ThemeProviderProps } from "./types.js";
+import { ThemeContext } from "../core/context.js";
+import { createThemeStore } from "../core/store.js";
+import type {
+	DefaultTheme,
+	ThemeColor,
+	ThemeContextValue,
+	ThemeProviderProps,
+} from "../core/types.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
 

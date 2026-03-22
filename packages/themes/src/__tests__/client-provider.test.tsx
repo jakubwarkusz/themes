@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { ClientThemeProvider } from "../client-provider.js";
-import { useTheme } from "../context.js";
+import { useTheme } from "../core/context.js";
+import { ClientThemeProvider } from "../providers/client-provider.js";
 
 (globalThis as unknown as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
