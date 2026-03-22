@@ -11,7 +11,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "bunup src/index.ts src/client.ts src/next.ts",
+    "build": "bunup src/index.ts src/client.ts src/next.ts --env.NODE_ENV=production",
     "dev": "bunup src/index.ts src/client.ts src/next.ts --watch",
     "type-check": "tsc --noEmit",
     "lint": "biome check src",
