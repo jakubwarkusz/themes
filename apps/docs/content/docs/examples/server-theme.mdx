@@ -32,6 +32,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 Theme changes are written to `document.cookie` automatically. On subsequent requests the server reads the cookie via `cookies()` from `next/headers` and injects the correct class before the first paint.
 
+<Callout type="info">
+  Flash may still appear in Next.js development mode - this is expected. Next.js dev mode does not fully replicate SSR behavior. The flash disappears in production builds.
+</Callout>
+
 <Callout type="warn">
   Cookie storage does not support cross-tab theme sync. If you need it, use the `initialTheme` approach below with `localStorage`.
 </Callout>
