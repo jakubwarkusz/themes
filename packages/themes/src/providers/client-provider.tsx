@@ -137,15 +137,21 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			setStoreTheme(initialTheme);
 			applyToDom(initialTheme === "system" ? (sys ?? "light") : (initialTheme as string));
 			try {
-				if (storage !== "none") {
+				if (storage === "cookie") {
+					document.cookie = `${storageKey}=${encodeURIComponent(String(initialTheme))}; path=/; max-age=31536000; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
+				} else if (storage !== "none") {
 					const s = storage === "localStorage" ? localStorage : sessionStorage;
-					s.setItem(storageKey, initialTheme);
+					s.setItem(storageKey, String(initialTheme));
 				}
 			} catch {}
 		} else {
 			let stored: string | null = null;
 			try {
-				if (storage !== "none") {
+				if (storage === "cookie") {
+					const re = new RegExp("(?:^|;\\s*)" + storageKey + "=([^;]*)");
+					const match = document.cookie.match(re);
+					stored = match?.[1] != null ? decodeURIComponent(match[1]) : null;
+				} else if (storage !== "none") {
 					const s = storage === "localStorage" ? localStorage : sessionStorage;
 					stored = s.getItem(storageKey);
 				}
@@ -207,7 +213,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	}, [applyToDom, forcedTheme, getSnapshot]);
 
 	useEffect(() => {
-		if (storage === "none" || storage === "sessionStorage") return;
+		if (storage === "none" || storage === "sessionStorage" || storage === "cookie") return;
 
 		const handler = (e: StorageEvent) => {
 			if (e.storageArea !== localStorage || e.key !== storageKey || !e.newValue) return;
@@ -242,7 +248,9 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			onThemeChangeRef.current?.(resolved as Themes);
 
 			try {
-				if (storage !== "none") {
+				if (storage === "cookie") {
+					document.cookie = `${storageKey}=${encodeURIComponent(newTheme)}; path=/; max-age=31536000; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
+				} else if (storage !== "none") {
 					const store = storage === "localStorage" ? localStorage : sessionStorage;
 					store.setItem(storageKey, newTheme);
 				}
