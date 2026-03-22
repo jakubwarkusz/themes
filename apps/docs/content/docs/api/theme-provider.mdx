@@ -72,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `target` | `string` | `"html"` | Element to apply theme to (`"html"`, `"body"`, or a CSS selector) |
 | `storageKey` | `string` | `"theme"` | Key used for storage |
 | `storage` | `"localStorage" \| "sessionStorage" \| "cookie" \| "none"` | `"localStorage"` | Where to persist the theme. `"cookie"` reads/writes `document.cookie` and with `@wrksz/themes/next` also reads server-side - zero-flash SSR without boilerplate. <Since version="0.7.0" /> |
-| `disableTransitionOnChange` | `boolean \| string` | `false` | Temporarily suppress CSS transitions when switching themes. `true` disables all transitions. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties while keeping others (transforms, opacity, etc.) intact. <Since version="0.7.2" /> |
+| `disableTransitionOnChange` | `boolean \| string` | `false` | Suppress CSS transitions on initial load and when switching themes. `true` disables all transitions. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties while keeping others (transforms, opacity, etc.) intact. <Since version="0.7.4" /> |
 | `followSystem` | `boolean` | `false` | Always follow system preference, ignores stored value on mount |
 | `themeColor` | `string \| Record<string, string>` | - | Update `<meta name="theme-color">` on theme change |
 | `nonce` | `string` | - | CSP nonce for the inline script |
@@ -177,9 +177,9 @@ The provider reads `document.cookie` on the client and `cookies()` from `next/he
 
 ### Suppress transitions on theme change
 
-<Since version="0.7.3" />
+<Since version="0.7.4" />
 
-Disable all transitions briefly when switching themes to prevent visual jank:
+Suppress CSS transitions on two occasions: when the inline script applies the theme on initial load, and whenever the user switches themes. This prevents both first-paint flash and animated jank:
 
 ```tsx
 <ThemeProvider disableTransitionOnChange>
@@ -195,7 +195,7 @@ To keep some transitions intact (e.g. hover effects, animations) while only supp
 </ThemeProvider>
 ```
 
-The string is injected as `transition: <value> !important` on all elements for two animation frames during the switch.
+The string is injected as `transition: <value> !important` on all elements for two animation frames - both during the initial script run and on each subsequent theme change.
 
 ### Always follow system preference
 

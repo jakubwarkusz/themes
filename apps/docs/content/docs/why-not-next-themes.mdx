@@ -97,7 +97,7 @@ Initialize the theme from a server-side source (database, session, cookie) on ev
 <ThemeProvider disableTransitionOnChange="background-color 0s, color 0s, border-color 0s">
 ```
 
-The string is injected as `*,*::before,*::after{transition:<value>!important}` for exactly two frames, then removed.
+The style is also injected by the inline script on initial page load - not just when the user switches themes. This means there is no transition flash on first paint either.
 
 ### Read theme outside React
 
