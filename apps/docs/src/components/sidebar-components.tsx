@@ -13,13 +13,13 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 const base =
-	"flex w-full items-center rounded-md px-2 py-1.5 text-sm transition-colors duration-100 hover:text-fd-foreground";
+	"flex w-full items-center rounded-md px-3 py-1.5 text-sm transition-colors duration-100 hover:text-fd-foreground";
 
 const muted = "text-fd-muted-foreground";
 const active = "text-fd-foreground font-medium";
 
 function indent(depth: number) {
-	return depth > 0 ? { paddingInlineStart: `${depth * 12 + 8}px` } : undefined;
+	return depth > 0 ? { paddingInlineStart: `${depth * 12 + 12}px` } : undefined;
 }
 
 export function SidebarItemComponent({ item }: { item: Item }) {
@@ -61,7 +61,7 @@ export function SidebarFolderComponent({ item, children }: { item: Folder; child
 
 export function SidebarSeparatorComponent({ item }: { item: Separator }) {
 	return (
-		<p className="mb-1 mt-5 px-2 text-[10px] font-semibold uppercase tracking-widest text-fd-muted-foreground/50 first:mt-1">
+		<p className="mb-1 mt-5 px-3 text-[10px] font-semibold uppercase tracking-widest text-fd-muted-foreground/50 first:mt-1">
 			{item.name}
 		</p>
 	);

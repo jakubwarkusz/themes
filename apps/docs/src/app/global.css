@@ -9,7 +9,6 @@
 #nd-sidebar {
 	background-color: var(--color-fd-background) !important;
 	border-inline-end: 1px solid oklch(0.88 0 0 / 40%) !important;
-	padding-inline: 12px !important;
 }
 
 .dark #nd-sidebar {
