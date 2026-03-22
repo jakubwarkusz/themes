@@ -3,8 +3,8 @@ import Link from "next/link";
 
 const links = [
 	{ label: "Docs", href: "/docs" },
-	{ label: "API", href: "/docs/api" },
-	{ label: "Examples", href: "/docs/examples" },
+	{ label: "API", href: "/docs/api/theme-provider" },
+	{ label: "Examples", href: "/docs/examples/tailwind" },
 	{
 		label: "GitHub",
 		href: "https://github.com/jakubwarkusz/themes",
