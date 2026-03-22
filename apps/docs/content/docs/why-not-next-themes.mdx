@@ -51,11 +51,14 @@ This means switching from `"dark high-contrast"` to `"light"` correctly removes 
 
 `next-themes` uses a single global context - nested providers share state. `@wrksz/themes` creates a per-instance store so each provider is fully independent.
 
-### `sessionStorage` support
+### `sessionStorage` and `cookie` storage
 
 ```tsx
 <ThemeProvider storage="sessionStorage">
+<ThemeProvider storage="cookie">
 ```
+
+`storage="cookie"` is especially useful with `@wrksz/themes/next` - the provider reads the cookie server-side automatically, eliminating SSR theme flash without any manual boilerplate.
 
 ### Disable storage
 
@@ -98,6 +101,7 @@ const { theme, setTheme } = useTheme<"light" | "dark" | "high-contrast">();
 | Multiple classes per theme | <Bug /> | <Fixed note="correct class removal" /> |
 | Nested providers | <No /> | <Yes note="per-instance store" /> |
 | `sessionStorage` support | <No /> | <Yes /> |
+| `cookie` storage (zero-flash SSR) | <No /> | <Yes note='storage="cookie"' /> |
 | Disable storage | <No /> | <Yes note='storage="none"' /> |
 | `meta theme-color` support | <No /> | <Yes note="themeColor prop" /> |
 | Server-provided theme | <No /> | <Yes note="initialTheme prop" /> |

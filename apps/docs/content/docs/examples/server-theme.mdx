@@ -1,11 +1,44 @@
 ---
 title: Server-provided theme
-description: Initialize the theme from a database, session, or cookie on every mount.
+description: Eliminate SSR theme flash with cookie storage or a custom server-side source.
 ---
 
-Use `initialTheme` to override the stored theme on every mount with a value from a server-side source. The user can still call `setTheme` to change it - use `onThemeChange` to persist the change back.
+## Cookie storage
 
-## Setup
+<Since version="0.7.0" />
+
+The simplest way to eliminate SSR theme flash. Use `storage="cookie"` with `@wrksz/themes/next` - the provider reads the cookie server-side automatically, no boilerplate required:
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider } from "@wrksz/themes/next";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          storage="cookie"
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+Theme changes are written to `document.cookie` automatically. On subsequent requests the server reads the cookie via `cookies()` from `next/headers` and injects the correct class before the first paint.
+
+<Callout type="warn">
+  Cookie storage does not support cross-tab theme sync. If you need it, use the `initialTheme` approach below with `localStorage`.
+</Callout>
+
+## Custom server-side source
+
+Use `initialTheme` to initialize the theme from any server-side source (database, session, cookie) on every mount. The user can still call `setTheme` - use `onThemeChange` to persist the change back.
 
 ```tsx title="app/layout.tsx"
 import { ThemeProvider } from "@wrksz/themes/next";
@@ -31,37 +64,6 @@ export default async function RootLayout({ children }) {
 
 `initialTheme` also writes to storage on mount, so `setTheme` and cross-tab sync continue to work normally.
 
-## Cookie-based example
-
-Cookies are available in Server Components via `next/headers`:
-
-```tsx title="app/layout.tsx"
-import { ThemeProvider } from "@wrksz/themes/next";
-import { cookies } from "next/headers";
-
-
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const theme = (await cookies()).get("theme")?.value;
-
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider
-          initialTheme={theme}
-          onThemeChange={async (next) => {
-            "use server";
-            const { cookies } = await import("next/headers");
-            (await cookies()).set("theme", next, { path: "/", maxAge: 60 * 60 * 24 * 365 });
-          }}
-        >
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
-  );
-}
-```
-
 ## Priority
 
-When both `initialTheme` and a stored localStorage value are present, `initialTheme` wins on every mount. This ensures the server-side value is always applied on page load, even if the user has a different value stored locally.
+When both `initialTheme` and a stored value are present, `initialTheme` wins on every mount. This ensures the server-side value is always applied on page load.

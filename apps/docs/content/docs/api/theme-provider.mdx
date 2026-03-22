@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `value` | `Record<string, string>` | - | Map theme names to attribute values |
 | `target` | `string` | `"html"` | Element to apply theme to (`"html"`, `"body"`, or a CSS selector) |
 | `storageKey` | `string` | `"theme"` | Key used for storage |
-| `storage` | `"localStorage" \| "sessionStorage" \| "none"` | `"localStorage"` | Where to persist the theme |
+| `storage` | `"localStorage" \| "sessionStorage" \| "cookie" \| "none"` | `"localStorage"` | Where to persist the theme. `"cookie"` reads/writes `document.cookie` and with `@wrksz/themes/next` also reads server-side - zero-flash SSR without boilerplate. <Since version="0.7.0" /> |
 | `disableTransitionOnChange` | `boolean` | `false` | Disable CSS transitions when switching themes |
 | `followSystem` | `boolean` | `false` | Always follow system preference, ignores stored value on mount |
 | `themeColor` | `string \| Record<string, string>` | - | Update `<meta name="theme-color">` on theme change |
@@ -116,6 +116,39 @@ export default async function RootLayout({ children }) {
   );
 }
 ```
+
+### Cookie storage (zero-flash SSR)
+
+<Since version="0.7.0" />
+
+When using `@wrksz/themes/next`, `storage="cookie"` automatically reads the theme cookie server-side and renders the correct class on `<html>` from the first byte - no flash for any user, no boilerplate:
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider } from "@wrksz/themes/next";
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          storage="cookie"
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+The provider reads `document.cookie` on the client and `cookies()` from `next/headers` on the server. Theme changes are written to the cookie automatically.
+
+<Callout type="warn">
+  Cookie storage does not support cross-tab theme sync. If you need cross-tab sync, use `localStorage` with [`initialTheme`](/docs/examples/server-theme).
+</Callout>
 
 ### Disable storage
 
