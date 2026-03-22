@@ -1,8 +1,11 @@
-import { ArrowRight01Icon, Bug01Icon, GithubIcon } from "@hugeicons/core-free-icons";
+import { ArrowRight01Icon, Bug01Icon, GithubIcon, StarIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/button";
+import { formatStars, getGitHubStars, gitConfig } from "@/lib/layout.shared";
 
-export function Hero() {
+export async function Hero() {
+	const stars = await getGitHubStars();
+
 	return (
 		<section className="relative flex flex-col items-center text-center pt-16 pb-16 sm:pt-24 sm:pb-20 max-w-2xl w-full">
 			<div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-fd-border bg-fd-card px-3 py-1 text-xs text-fd-muted-foreground">
@@ -36,7 +39,7 @@ export function Hero() {
 					/>
 				</Button>
 				<Button
-					href="https://github.com/jakubwarkusz/themes"
+					href={`https://github.com/${gitConfig.user}/${gitConfig.repo}`}
 					target="_blank"
 					rel="noopener noreferrer"
 					variant="secondary"
@@ -48,6 +51,19 @@ export function Hero() {
 						strokeWidth={1.5}
 					/>
 					GitHub
+					{stars != null && (
+						<>
+							<span className="text-fd-border">·</span>
+							<HugeiconsIcon
+								icon={StarIcon}
+								size={13}
+								color="#f59e0b"
+								fill="#f59e0b"
+								strokeWidth={0}
+							/>
+							{formatStars(stars)}
+						</>
+					)}
 				</Button>
 			</div>
 		</section>
