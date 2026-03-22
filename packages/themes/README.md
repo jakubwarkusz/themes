@@ -1,4 +1,4 @@
-<img src=".github/images/banner.png" alt="@wrksz/themes" width="100%" />
+<img src="https://raw.githubusercontent.com/jakubwarkusz/themes/main/.github/images/banner.png" alt="@wrksz/themes" width="100%" />
 
 # @wrksz/themes
 
