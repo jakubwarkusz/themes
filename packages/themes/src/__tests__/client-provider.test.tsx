@@ -3,6 +3,7 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import type { ReactNode } from "react";
 import { useTheme } from "../core/context.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
+import { clearCookies } from "./setup.js";
 
 (globalThis as unknown as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -83,6 +84,7 @@ beforeEach(() => {
 	document.documentElement.style.colorScheme = "";
 	localStorage.clear();
 	sessionStorage.clear();
+	clearCookies();
 	mockMatchMedia(false);
 });
 
@@ -90,6 +92,7 @@ afterEach(() => {
 	cleanup();
 	localStorage.clear();
 	sessionStorage.clear();
+	clearCookies();
 });
 
 describe("ClientThemeProvider - basic", () => {
@@ -299,7 +302,16 @@ describe("ClientThemeProvider - onThemeChange", () => {
 		expect(calls).toEqual(["dark"]);
 	});
 
-	test("fires with resolved theme when system changes", () => {
+	test("fires with 'system' when setTheme('system') is called", () => {
+		const calls: string[] = [];
+		wrap(<ThemeConsumer />, { onThemeChange: (t) => calls.push(t) });
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-system"));
+		});
+		expect(calls).toEqual(["system"]);
+	});
+
+	test("fires with resolved theme when system preference changes", () => {
 		const calls: string[] = [];
 		const mql = mockMatchMedia(false);
 		wrap(<ThemeConsumer />, { onThemeChange: (t) => calls.push(t) });
@@ -311,7 +323,7 @@ describe("ClientThemeProvider - onThemeChange", () => {
 			mql.dispatchChange(true);
 		});
 
-		expect(calls).toContain("dark");
+		expect(calls).toEqual(["system", "dark"]);
 	});
 });
 
@@ -362,6 +374,51 @@ describe("ClientThemeProvider - cross-tab storage sync", () => {
 	test("does not react to storage events when storage='sessionStorage'", () => {
 		sessionStorage.setItem("theme", "light");
 		wrap(<ThemeConsumer />, { storage: "sessionStorage" });
+
+		act(() => {
+			dispatchStorageEvent("theme", "dark");
+		});
+
+		expect(screen.getByTestId("theme").textContent).toBe("light");
+	});
+});
+
+describe("ClientThemeProvider - cookie storage", () => {
+	test("reads stored theme from cookie on mount", () => {
+		document.cookie = "theme=dark; path=/";
+		wrap(<ThemeConsumer />, { storage: "cookie" });
+		expect(screen.getByTestId("theme").textContent).toBe("dark");
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("writes to cookie when setTheme is called", () => {
+		wrap(<ThemeConsumer />, { storage: "cookie" });
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		expect(document.cookie).toContain("theme=dark");
+	});
+
+	test("ignores cookie value not in themes list", () => {
+		document.cookie = "theme=purple; path=/";
+		wrap(<ThemeConsumer />, { storage: "cookie", defaultTheme: "light", enableSystem: false });
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+	});
+
+	test("respects custom storageKey for cookie name", () => {
+		document.cookie = "app-theme=dark; path=/";
+		wrap(<ThemeConsumer />, { storage: "cookie", storageKey: "app-theme" });
+		expect(screen.getByTestId("theme").textContent).toBe("dark");
+	});
+
+	test("initialTheme writes to cookie", () => {
+		wrap(<ThemeConsumer />, { storage: "cookie", initialTheme: "dark" });
+		expect(document.cookie).toContain("theme=dark");
+	});
+
+	test("does not react to localStorage storage events when storage='cookie'", () => {
+		document.cookie = "theme=light; path=/";
+		wrap(<ThemeConsumer />, { storage: "cookie" });
 
 		act(() => {
 			dispatchStorageEvent("theme", "dark");
