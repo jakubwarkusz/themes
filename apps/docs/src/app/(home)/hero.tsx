@@ -1,6 +1,6 @@
 import { ArrowRight01Icon, Bug01Icon, GithubIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import Link from "next/link";
+import { Button } from "@/components/button";
 
 export function Hero() {
 	return (
@@ -26,10 +26,7 @@ export function Hero() {
 			</p>
 
 			<div className="mt-6 flex w-full max-w-xs flex-col items-stretch gap-2 sm:mt-8 sm:w-auto sm:flex-row sm:items-center sm:justify-center sm:gap-3">
-				<Link
-					href="/docs"
-					className="inline-flex items-center justify-center gap-2 rounded-lg bg-fd-primary px-5 py-2.5 text-sm font-semibold text-fd-primary-foreground transition-[transform,opacity] duration-150 hover:opacity-90 active:scale-[0.96]"
-				>
+				<Button href="/docs">
 					Get started
 					<HugeiconsIcon
 						icon={ArrowRight01Icon}
@@ -37,12 +34,12 @@ export function Hero() {
 						color="currentColor"
 						strokeWidth={2.5}
 					/>
-				</Link>
-				<Link
+				</Button>
+				<Button
 					href="https://github.com/jakubwarkusz/themes"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="inline-flex items-center justify-center gap-2 rounded-lg border border-fd-border bg-fd-card px-5 py-2.5 text-sm font-medium text-fd-foreground transition-[transform,background-color] duration-150 hover:bg-fd-accent active:scale-[0.96]"
+					variant="secondary"
 				>
 					<HugeiconsIcon
 						icon={GithubIcon}
@@ -51,7 +48,7 @@ export function Hero() {
 						strokeWidth={1.5}
 					/>
 					GitHub
-				</Link>
+				</Button>
 			</div>
 		</section>
 	);
