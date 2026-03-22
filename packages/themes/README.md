@@ -339,7 +339,7 @@ export function Logo() {
 
 | Issue | next-themes | @wrksz/themes |
 |-------|-------------|---------------|
-| React 19 script warning | Yes | Fixed (RSC split) |
+| React 19 script warning | Yes | Fixed (useServerInsertedHTML) |
 | `__name` minification bug | Yes | Fixed |
 | React 19 Activity/cacheComponents stale theme | Yes | Fixed (`useSyncExternalStore`) |
 | Multiple classes per theme | No | Yes (`value` map with spaces) |

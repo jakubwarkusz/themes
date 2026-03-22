@@ -30,10 +30,10 @@ description: Install and configure @wrksz/themes in your Next.js app.
 
 ## Setup
 
-Add `ThemeProvider` to your root layout. Add `suppressHydrationWarning` to `<html>` to prevent hydration warnings caused by the inline theme script that runs before React hydrates.
+Add `ThemeProvider` to your root layout. Import from `@wrksz/themes/next` for Next.js - this avoids the React 19 inline script warning by using `useServerInsertedHTML`. Add `suppressHydrationWarning` to `<html>` to prevent hydration mismatches.
 
 ```tsx title="app/layout.tsx"
-import { ThemeProvider } from "@wrksz/themes";
+import { ThemeProvider } from "@wrksz/themes/next";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -69,14 +69,24 @@ export function ThemeToggle() {
 }
 ```
 
+## Import paths
+
+<Since version="0.6.0" />
+
+| Import | Use for |
+|--------|---------|
+| `@wrksz/themes/next` | `ThemeProvider` in Next.js (recommended) |
+| `@wrksz/themes/client` | `useTheme`, `useThemeValue`, `ThemedImage`, `ClientThemeProvider` |
+| `@wrksz/themes` | `ThemeProvider` for non-Next.js frameworks |
+
+<Callout type="info">
+  The API is identical to `next-themes`. Migrating requires changing one import line: `@wrksz/themes/next` instead of `next-themes`. See [Why not next-themes?](/docs/why-not-next-themes) for a full comparison.
+</Callout>
+
 ## Requirements
 
 - Next.js 16+
 - React 19+
-
-<Callout type="info">
-  `@wrksz/themes` is a drop-in replacement for `next-themes` - no API changes needed. See [Why not next-themes?](/docs/why-not-next-themes) for a full comparison.
-</Callout>
 
 ## Next steps
 

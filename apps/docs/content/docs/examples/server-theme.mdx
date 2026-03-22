@@ -8,7 +8,7 @@ Use `initialTheme` to override the stored theme on every mount with a value from
 ## Setup
 
 ```tsx title="app/layout.tsx"
-import { ThemeProvider } from "@wrksz/themes";
+import { ThemeProvider } from "@wrksz/themes/next";
 import { getUserTheme, saveUserTheme } from "@/lib/user";
 
 export default async function RootLayout({ children }) {
@@ -36,7 +36,7 @@ export default async function RootLayout({ children }) {
 Cookies are available in Server Components via `next/headers`:
 
 ```tsx title="app/layout.tsx"
-import { ThemeProvider } from "@wrksz/themes";
+import { ThemeProvider } from "@wrksz/themes/next";
 import { cookies } from "next/headers";
 
 

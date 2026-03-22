@@ -3,10 +3,19 @@ title: ThemeProvider
 description: API reference for the ThemeProvider component.
 ---
 
-`ThemeProvider` is a Server Component that wraps your app and injects an inline script to apply the theme before React hydrates, preventing flash of unstyled content.
+`ThemeProvider` wraps your app, injects an anti-flash script before hydration, and manages theme state via `ClientThemeProvider`.
 
-```tsx title="app/layout.tsx"
-import { ThemeProvider } from "@wrksz/themes";
+Two variants are available depending on your framework:
+
+<Since version="0.6.0" />
+
+| Import | Mechanism | Use when |
+|--------|-----------|----------|
+| `@wrksz/themes/next` | `useServerInsertedHTML` | Next.js 16+ (no React 19 warning) |
+| `@wrksz/themes` | inline `<script>` in RSC | Other frameworks |
+
+```tsx title="app/layout.tsx (Next.js)"
+import { ThemeProvider } from "@wrksz/themes/next";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 <Callout type="info">
-  `ThemeProvider` renders an inline `<script>` and must be used in a Server Component. For nested providers inside Client Components, use [`ClientThemeProvider`](/docs/api/client-theme-provider) instead.
+  For nested providers inside Client Components, use [`ClientThemeProvider`](/docs/api/client-theme-provider) instead - it skips the script injection.
 </Callout>
 
 ## Props
@@ -33,16 +42,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `initialTheme` | `string` | - | Server-provided theme that overrides storage on mount. User can still call `setTheme` to change it |
 | `enableSystem` | `boolean` | `true` | Detect system preference via `prefers-color-scheme` |
 | `enableColorScheme` | `boolean` | `true` | Set native `color-scheme` CSS property |
-| `attribute` | `"class" \| "data-*" \| ("class" \| "data-*")[]` | `"class"` | HTML attribute(s) to set on the target element. Must be `"class"` or a `data-*` attribute |
+| `attribute` | `"class" \| "data-*" \| ("class" \| "data-*")[]` | `"class"` | HTML attribute(s) to set on the target element |
 | `value` | `Record<string, string>` | - | Map theme names to attribute values |
 | `target` | `string` | `"html"` | Element to apply theme to (`"html"`, `"body"`, or a CSS selector) |
 | `storageKey` | `string` | `"theme"` | Key used for storage |
 | `storage` | `"localStorage" \| "sessionStorage" \| "none"` | `"localStorage"` | Where to persist the theme |
 | `disableTransitionOnChange` | `boolean` | `false` | Disable CSS transitions when switching themes |
-| `followSystem` | `boolean` | `false` | Always follow system preference, even after `setTheme` was called. Also ignores stored value on mount |
+| `followSystem` | `boolean` | `false` | Always follow system preference, ignores stored value on mount |
 | `themeColor` | `string \| Record<string, string>` | - | Update `<meta name="theme-color">` on theme change |
 | `nonce` | `string` | - | CSP nonce for the inline script |
-| `onThemeChange` | `(theme: string) => void` | - | Called whenever the resolved theme changes. Can be an async function or a Server Action |
+| `onThemeChange` | `(theme: string) => void` | - | Called whenever the resolved theme changes |
 
 ## Examples
 
@@ -89,7 +98,7 @@ Map a theme to multiple CSS classes using a space-separated value:
 Use `initialTheme` to initialize from a server-side source (database, session, cookie) on every mount:
 
 ```tsx
-// app/layout.tsx (server component)
+// app/layout.tsx
 export default async function RootLayout({ children }) {
   const userTheme = await getUserTheme();
 

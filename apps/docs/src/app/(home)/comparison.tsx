@@ -44,7 +44,7 @@ const rows = [
 	{
 		label: "React 19 script warning",
 		next: <Bug />,
-		wrksz: <Fixed note="RSC split" />,
+		wrksz: <Fixed note="useServerInsertedHTML" />,
 	},
 	{ label: "__name minification bug", next: <Bug />, wrksz: <Fixed /> },
 	{
