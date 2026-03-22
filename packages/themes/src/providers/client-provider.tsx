@@ -249,7 +249,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 			setStoreTheme(newTheme);
 			applyToDom(resolved);
-			onThemeChangeRef.current?.(resolved as Themes);
+			onThemeChangeRef.current?.(newTheme as Themes);
 
 			try {
 				if (storage === "cookie") {

@@ -37,8 +37,8 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	enableColorScheme?: boolean;
 	/** Nonce for CSP */
 	nonce?: string;
-	/** Called when theme changes */
-	onThemeChange?: (theme: Themes) => void;
+	/** Called when theme changes. Receives the selected theme (may be "system"), not the resolved value. When the system preference changes while the theme is set to "system", fires with the resolved value ("light" | "dark"). */
+	onThemeChange?: (theme: Themes | "system") => void;
 	/** Colors for meta theme-color tag, per theme or a single value */
 	themeColor?: ThemeColor;
 	/** Always follow system preference changes, even after setTheme was called */

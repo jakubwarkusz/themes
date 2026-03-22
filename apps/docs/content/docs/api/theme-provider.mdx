@@ -76,7 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `followSystem` | `boolean` | `false` | Always follow system preference, ignores stored value on mount |
 | `themeColor` | `string \| Record<string, string>` | - | Update `<meta name="theme-color">` on theme change |
 | `nonce` | `string` | - | CSP nonce for the inline script |
-| `onThemeChange` | `(theme: string) => void` | - | Called whenever the resolved theme changes |
+| `onThemeChange` | `(theme: string) => void` | - | Called whenever the theme changes. Receives the selected value (may be `"system"`). When system preference changes while theme is `"system"`, fires with the resolved value (`"light"` or `"dark"`). |
 
 ## Examples
 
