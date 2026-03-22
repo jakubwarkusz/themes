@@ -1,48 +1,53 @@
-import { ArrowRight01Icon, Bug01Icon, GithubIcon, StarIcon } from "@hugeicons/core-free-icons";
+import {
+	GithubIcon,
+	Package01Icon,
+	ReactIcon,
+	StarIcon,
+	Typescript01Icon,
+} from "@hugeicons/core-free-icons";
+import type { IconSvgElement } from "@hugeicons/react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@/components/button";
+import Link from "next/link";
 import { formatStars, getGitHubStars, gitConfig } from "@/lib/layout.shared";
+
+const trustItems: { icon: IconSvgElement; label: string }[] = [
+	{ icon: Package01Icon, label: "Zero dependencies" },
+	{ icon: ReactIcon, label: "React 19 ready" },
+	{ icon: Typescript01Icon, label: "TypeScript" },
+];
 
 export async function Hero() {
 	const stars = await getGitHubStars();
 
 	return (
-		<section className="relative flex flex-col items-center text-center pt-16 pb-16 sm:pt-24 sm:pb-20 max-w-2xl w-full">
-			<div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-fd-border bg-fd-card px-3 py-1 text-xs text-fd-muted-foreground">
-				<HugeiconsIcon icon={Bug01Icon} size={12} color="currentColor" strokeWidth={1.5} />
-				Drop-in replacement for next-themes
-			</div>
-
+		<section className="relative flex flex-col items-center text-center pt-20 pb-16 sm:pt-28 sm:pb-20 max-w-2xl w-full">
 			<h1
-				className="text-4xl font-bold tracking-tight text-fd-foreground sm:text-5xl lg:text-6xl"
-				style={{ textWrap: "balance" } as React.CSSProperties}
+				className="bg-linear-to-b from-fd-foreground to-fd-muted-foreground bg-clip-text text-transparent text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
+				style={{ textWrap: "balance", lineHeight: 1.15 } as React.CSSProperties}
 			>
 				@wrksz/themes
 			</h1>
 
 			<p
-				className="mt-4 max-w-sm text-sm leading-relaxed text-fd-muted-foreground sm:mt-5 sm:max-w-md sm:text-base"
+				className="mt-5 max-w-sm text-sm leading-relaxed text-fd-muted-foreground sm:max-w-md sm:text-base"
 				style={{ textWrap: "pretty" } as React.CSSProperties}
 			>
-				Modern theme management for Next.js 16+ and React 19+. Fixes every known bug in
-				next-themes and adds the features that were missing.
+				Modern theme management for Next.js 16+ and React 19+. Every bug fixed. Every
+				missing feature added.
 			</p>
 
-			<div className="mt-6 flex w-full max-w-xs flex-col items-stretch gap-2 sm:mt-8 sm:w-auto sm:flex-row sm:items-center sm:justify-center sm:gap-3">
-				<Button href="/docs">
+			<div className="mt-8 flex items-center gap-3">
+				<Link
+					href="/docs"
+					className="inline-flex items-center gap-2 rounded-lg bg-fd-foreground px-5 py-2.5 text-sm font-semibold text-fd-background transition-opacity hover:opacity-80 active:scale-[0.97]"
+				>
 					Get started
-					<HugeiconsIcon
-						icon={ArrowRight01Icon}
-						size={14}
-						color="currentColor"
-						strokeWidth={2.5}
-					/>
-				</Button>
-				<Button
+				</Link>
+				<Link
 					href={`https://github.com/${gitConfig.user}/${gitConfig.repo}`}
 					target="_blank"
 					rel="noopener noreferrer"
-					variant="secondary"
+					className="inline-flex items-center gap-2 rounded-lg border border-fd-border bg-fd-card px-5 py-2.5 text-sm font-medium text-fd-foreground transition-colors hover:bg-fd-accent active:scale-[0.97]"
 				>
 					<HugeiconsIcon
 						icon={GithubIcon}
@@ -64,7 +69,24 @@ export async function Hero() {
 							{formatStars(stars)}
 						</>
 					)}
-				</Button>
+				</Link>
+			</div>
+
+			<div className="mt-5 flex items-center gap-5">
+				{trustItems.map(({ icon, label }) => (
+					<span
+						key={label}
+						className="flex items-center gap-1.5 text-xs text-fd-muted-foreground/50"
+					>
+						<HugeiconsIcon
+							icon={icon}
+							size={12}
+							color="currentColor"
+							strokeWidth={1.5}
+						/>
+						{label}
+					</span>
+				))}
 			</div>
 		</section>
 	);

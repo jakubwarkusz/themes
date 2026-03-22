@@ -4,7 +4,7 @@ import Link from "next/link";
 
 function Bug() {
 	return (
-		<span className="inline-flex items-center gap-1 rounded-full bg-[oklch(0.75_0.17_55/12%)] px-2 py-0.5 text-xs font-medium text-[oklch(0.62_0.15_55)]">
+		<span className="inline-flex items-center gap-1 rounded-md border border-red-500/15 bg-red-500/8 px-2 py-0.5 text-xs font-medium text-red-400">
 			<HugeiconsIcon icon={Bug01Icon} size={10} color="currentColor" strokeWidth={2} />
 			<span className="hidden sm:inline">Bug</span>
 		</span>
@@ -13,7 +13,7 @@ function Bug() {
 
 function No() {
 	return (
-		<span className="inline-flex items-center gap-1 rounded-full bg-[oklch(0.65_0.22_25/10%)] px-2 py-0.5 text-xs font-medium text-[oklch(0.58_0.18_25)]">
+		<span className="inline-flex items-center gap-1 rounded-md border border-fd-border bg-fd-muted px-2 py-0.5 text-xs font-medium text-fd-muted-foreground">
 			<HugeiconsIcon icon={Cancel01Icon} size={10} color="currentColor" strokeWidth={2} />
 			<span className="hidden sm:inline">No</span>
 		</span>
@@ -22,7 +22,7 @@ function No() {
 
 function Fixed({ note }: { note?: string }) {
 	return (
-		<span className="inline-flex items-center gap-1 rounded-full bg-[oklch(0.541_0.247_293/12%)] px-2 py-0.5 text-xs font-medium text-[oklch(0.65_0.2_293)]">
+		<span className="inline-flex items-center gap-1 rounded-md border border-fd-primary/20 bg-fd-primary/8 px-2 py-0.5 text-xs font-medium text-fd-primary">
 			<HugeiconsIcon icon={Tick02Icon} size={10} color="currentColor" strokeWidth={2} />
 			<span className="hidden sm:inline">{note ? `Fixed (${note})` : "Fixed"}</span>
 			<span className="sm:hidden">Fixed</span>
@@ -32,7 +32,7 @@ function Fixed({ note }: { note?: string }) {
 
 function Yes({ note }: { note?: string }) {
 	return (
-		<span className="inline-flex items-center gap-1 rounded-full bg-[oklch(0.72_0.18_145/12%)] px-2 py-0.5 text-xs font-medium text-[oklch(0.62_0.18_145)]">
+		<span className="inline-flex items-center gap-1 rounded-md border border-green-500/15 bg-green-500/8 px-2 py-0.5 text-xs font-medium text-green-400">
 			<HugeiconsIcon icon={Tick02Icon} size={10} color="currentColor" strokeWidth={2} />
 			<span className="hidden sm:inline">{note ?? "Yes"}</span>
 			<span className="sm:hidden">Yes</span>
@@ -109,8 +109,9 @@ const rows = [
 export function Comparison() {
 	return (
 		<section className="w-full max-w-4xl pb-16 sm:pb-24">
-			<div className="mb-8 text-center">
-				<h2 className="text-lg font-semibold text-fd-foreground sm:text-xl">
+			<div className="mb-10 text-center">
+				<p className="mb-2 text-xs font-semibold text-fd-muted-foreground/40">Comparison</p>
+				<h2 className="text-xl font-semibold tracking-tight text-fd-foreground sm:text-2xl">
 					Why not next-themes?
 				</h2>
 				<p className="mt-2 text-sm text-fd-muted-foreground">
@@ -118,13 +119,13 @@ export function Comparison() {
 				</p>
 			</div>
 
-			<div className="overflow-hidden rounded-xl border border-fd-border bg-fd-card sm:hidden">
+			<div className="overflow-hidden rounded-xl border border-fd-border sm:hidden">
 				{rows.map((row, i) => (
 					<div
 						key={row.label}
-						className={`flex items-center justify-between gap-4 px-4 py-3 ${i < rows.length - 1 ? "border-b border-fd-border/60" : ""}`}
+						className={`flex items-center justify-between gap-4 px-4 py-3 ${i < rows.length - 1 ? "border-b border-fd-border" : ""}`}
 					>
-						<span className="text-xs text-fd-foreground">{row.label}</span>
+						<span className="text-xs text-fd-muted-foreground">{row.label}</span>
 						{row.wrksz}
 					</div>
 				))}
@@ -133,25 +134,23 @@ export function Comparison() {
 			<div className="hidden overflow-hidden rounded-xl border border-fd-border sm:block">
 				<table className="w-full text-sm">
 					<thead>
-						<tr className="border-b border-fd-border bg-fd-muted/40">
-							<th className="px-4 py-2.5 text-left text-xs font-medium text-fd-muted-foreground" />
-							<th className="px-4 py-2.5 text-center text-xs font-medium text-fd-muted-foreground">
+						<tr className="border-b border-fd-border">
+							<th className="px-4 py-2.5 text-left text-xs font-medium text-fd-muted-foreground/50" />
+							<th className="px-4 py-2.5 text-center text-xs font-medium text-fd-muted-foreground/50">
 								next-themes
 							</th>
-							<th className="px-4 py-2.5 text-center text-xs font-medium text-fd-muted-foreground">
+							<th className="px-4 py-2.5 text-center text-xs font-medium text-fd-muted-foreground/50">
 								@wrksz/themes
 							</th>
 						</tr>
 					</thead>
-					<tbody className="bg-fd-card">
+					<tbody>
 						{rows.map((row, i) => (
 							<tr
 								key={row.label}
-								className={
-									i < rows.length - 1 ? "border-b border-fd-border/60" : ""
-								}
+								className={`transition-colors hover:bg-fd-muted/30 ${i < rows.length - 1 ? "border-b border-fd-border" : ""}`}
 							>
-								<td className="px-4 py-3 text-xs text-fd-foreground">
+								<td className="px-4 py-3 text-xs text-fd-muted-foreground">
 									{row.label}
 								</td>
 								<td className="px-4 py-3 text-center">{row.next}</td>
@@ -165,7 +164,7 @@ export function Comparison() {
 			<div className="mt-4 text-center">
 				<Link
 					href="/docs/why-not-next-themes"
-					className="text-xs text-fd-muted-foreground underline-offset-4 hover:text-fd-foreground hover:underline"
+					className="text-xs text-fd-muted-foreground/50 underline-offset-4 transition-colors hover:text-fd-muted-foreground hover:underline"
 				>
 					Read the full breakdown
 				</Link>

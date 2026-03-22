@@ -1,7 +1,7 @@
 import {
 	ArrowReloadHorizontalIcon,
 	CheckmarkBadge01Icon,
-	FolderFileStorageIcon,
+	CookieIcon,
 	Layers01Icon,
 	ReactIcon,
 	Typescript01Icon,
@@ -11,7 +11,11 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import type { ReactNode } from "react";
 
 function C({ children }: { children: string }) {
-	return <code className="font-mono text-[0.72rem] text-fd-foreground">{children}</code>;
+	return (
+		<code className="rounded bg-fd-muted px-1 py-0.5 font-mono text-[0.72rem] text-fd-foreground/80">
+			{children}
+		</code>
+	);
 }
 
 type Feature = {
@@ -42,6 +46,16 @@ const features: Feature[] = [
 		),
 	},
 	{
+		icon: CookieIcon,
+		title: "Cookie SSR",
+		description: (
+			<>
+				Zero-flash SSR with <C>storage="cookie"</C>. Reads server-side automatically - no
+				boilerplate.
+			</>
+		),
+	},
+	{
 		icon: Layers01Icon,
 		title: "Nested providers",
 		description:
@@ -58,16 +72,6 @@ const features: Feature[] = [
 		),
 	},
 	{
-		icon: FolderFileStorageIcon,
-		title: "Flexible storage",
-		description: (
-			<>
-				<C>localStorage</C>, <C>sessionStorage</C>, or <C>none</C>. Disable persistence for
-				forced or server-driven themes.
-			</>
-		),
-	},
-	{
 		icon: CheckmarkBadge01Icon,
 		title: "Zero runtime deps",
 		description:
@@ -78,29 +82,26 @@ const features: Feature[] = [
 export function FeaturesGrid() {
 	return (
 		<section className="w-full max-w-4xl pb-16 sm:pb-24">
-			<div className="mb-8 text-center">
-				<h2 className="text-lg font-semibold text-fd-foreground sm:text-xl">
+			<div className="mb-10 text-center">
+				<p className="mb-2 text-xs font-semibold text-fd-muted-foreground/40">Features</p>
+				<h2 className="text-xl font-semibold tracking-tight text-fd-foreground sm:text-2xl">
 					Everything next-themes should have been
 				</h2>
-				<p className="mt-2 text-sm text-fd-muted-foreground">
-					Bug fixes and new features, zero API changes.
-				</p>
 			</div>
 
-			<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+			<div
+				className="grid grid-cols-1 overflow-hidden rounded-xl border border-fd-border bg-fd-border sm:grid-cols-2 lg:grid-cols-3"
+				style={{ gap: "1px" }}
+			>
 				{features.map((feature) => (
 					<div
 						key={feature.title}
-						className="group relative overflow-hidden rounded-xl border border-fd-border bg-fd-card p-5 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_2px_8px_oklch(0_0_0/0.1),0_8px_32px_oklch(0_0_0/0.1)]"
+						className="bg-fd-background p-6 transition-colors hover:bg-fd-card"
 					>
-						<div
-							aria-hidden
-							className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[oklch(0.541_0.247_293.009/40%)] to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-						/>
-						<div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg bg-[oklch(0.541_0.247_293.009/10%)] text-fd-primary ring-1 ring-inset ring-[oklch(0.541_0.247_293.009/20%)]">
+						<div className="mb-3 inline-flex size-8 items-center justify-center rounded-lg bg-fd-muted text-fd-muted-foreground ring-1 ring-fd-border">
 							<HugeiconsIcon
 								icon={feature.icon}
-								size={18}
+								size={16}
 								color="currentColor"
 								strokeWidth={1.5}
 							/>

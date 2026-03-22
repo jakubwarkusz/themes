@@ -21,6 +21,7 @@
         "fumadocs-core": "16.7.4",
         "fumadocs-mdx": "14.2.11",
         "fumadocs-ui": "16.7.4",
+        "motion": "^12.38.0",
         "next": "16.2.1",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
