@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { getScript } from "../core/script.js";
+import { clearCookies } from "./setup.js";
 
 beforeEach(() => {
 	document.documentElement.className = "";
@@ -10,11 +11,13 @@ beforeEach(() => {
 	}
 	localStorage.clear();
 	sessionStorage.clear();
+	clearCookies();
 });
 
 afterEach(() => {
 	localStorage.clear();
 	sessionStorage.clear();
+	clearCookies();
 });
 
 function runScript(config: Parameters<typeof getScript>[0]): void {
@@ -242,5 +245,43 @@ describe("themeScript - initialTheme", () => {
 		window.matchMedia = () => ({ matches: false }) as MediaQueryList;
 		runScript({ ...base, initialTheme: "invalid" as "light" });
 		expect(document.documentElement.classList.contains("light")).toBe(true);
+	});
+});
+
+describe("themeScript - cookie storage", () => {
+	test("reads theme from cookie", () => {
+		document.cookie = "theme=dark; path=/";
+		runScript({ ...base, storage: "cookie" });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("reads theme from cookie with custom storageKey", () => {
+		document.cookie = "color-scheme=dark; path=/";
+		runScript({ ...base, storage: "cookie", storageKey: "color-scheme" });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("falls back to defaultTheme when no cookie set", () => {
+		runScript({ ...base, storage: "cookie", enableSystem: false, defaultTheme: "light" });
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+	});
+
+	test("ignores invalid cookie value, falls back to defaultTheme", () => {
+		document.cookie = "theme=hacked; path=/";
+		runScript({ ...base, storage: "cookie", enableSystem: false, defaultTheme: "light" });
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+	});
+
+	test("initialTheme takes priority over cookie", () => {
+		document.cookie = "theme=light; path=/";
+		runScript({ ...base, storage: "cookie", initialTheme: "dark" });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+		expect(document.documentElement.classList.contains("light")).toBe(false);
+	});
+
+	test("cookie value with encoded characters is decoded correctly", () => {
+		document.cookie = "theme=dark; path=/";
+		runScript({ ...base, storage: "cookie" });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});
 });

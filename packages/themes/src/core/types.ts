@@ -6,7 +6,7 @@ export type Attribute = "class" | `data-${string}`;
 
 export type ValueObject = Record<string, string>;
 
-export type StorageType = "localStorage" | "sessionStorage" | "none";
+export type StorageType = "localStorage" | "sessionStorage" | "cookie" | "none";
 
 /** Per-theme colors for meta theme-color, or a single string for all themes */
 export type ThemeColor = string | Partial<Record<string, string>>;

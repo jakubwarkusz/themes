@@ -1,12 +1,18 @@
 import { GlobalWindow } from "happy-dom";
 
-const win = new GlobalWindow();
+const win = new GlobalWindow({ url: "http://localhost/" });
 
 Object.defineProperties(globalThis, {
 	window: { value: win, writable: true, configurable: true },
 	document: { value: win.document, writable: true, configurable: true },
 	localStorage: { value: win.localStorage, writable: true, configurable: true },
 	sessionStorage: { value: win.sessionStorage, writable: true, configurable: true },
+	location: {
+		get() {
+			return win.location;
+		},
+		configurable: true,
+	},
 	matchMedia: {
 		// Getter delegates to win.matchMedia so tests can patch window.matchMedia
 		get() {
@@ -15,3 +21,11 @@ Object.defineProperties(globalThis, {
 		configurable: true,
 	},
 });
+
+export function clearCookies(): void {
+	const cookies = document.cookie.split(";");
+	for (const cookie of cookies) {
+		const name = cookie.split("=")[0]?.trim();
+		if (name) document.cookie = `${name}=; max-age=0; path=/`;
+	}
+}

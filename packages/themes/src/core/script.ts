@@ -43,7 +43,11 @@ function themeScript(
 		let stored: string | null = null;
 
 		try {
-			if (storage !== "none") {
+			if (storage === "cookie") {
+				const re = new RegExp("(?:^|;\\s*)" + storageKey + "=([^;]*)");
+				const match = document.cookie.match(re);
+				stored = match?.[1] != null ? decodeURIComponent(match[1]) : null;
+			} else if (storage !== "none") {
 				const store = storage === "localStorage" ? localStorage : sessionStorage;
 				stored = store.getItem(storageKey);
 			}
