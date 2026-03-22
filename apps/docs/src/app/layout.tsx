@@ -9,6 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+	metadataBase: new URL("https://themes.wrksz.dev"),
 	title: {
 		default: "@wrksz/themes",
 		template: "%s | @wrksz/themes",
