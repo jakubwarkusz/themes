@@ -8,6 +8,7 @@ export default defineConfig({
 		"src/providers/client-next-provider.tsx",
 	],
 	format: ["esm"],
+	target: "browser",
 	dts: true,
 	external: ["next/headers"],
 	env: { NODE_ENV: "production" },
