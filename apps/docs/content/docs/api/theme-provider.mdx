@@ -28,8 +28,33 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-<Callout type="info">
-  For nested providers inside Client Components, use [`ClientThemeProvider`](/docs/api/client-theme-provider) instead - it skips the script injection.
+<Callout type="warn">
+  `ThemeProvider` from `@wrksz/themes/next` is an async Server Component. It must be used directly in a server component (e.g. `layout.tsx`) - it cannot be wrapped in a `"use client"` component. If you are migrating from `next-themes` and have a wrapper like this, remove it and use `ThemeProvider` directly in your layout.
+
+  ```tsx
+  // ❌ will throw: async Client Component error
+  "use client";
+  import { ThemeProvider } from "@wrksz/themes/next";
+  export function Providers({ children }) {
+    return <ThemeProvider>{children}</ThemeProvider>;
+  }
+  ```
+
+  ```tsx
+  // ✅ use directly in layout.tsx
+  import { ThemeProvider } from "@wrksz/themes/next";
+  export default function RootLayout({ children }) {
+    return (
+      <html suppressHydrationWarning>
+        <body>
+          <ThemeProvider>{children}</ThemeProvider>
+        </body>
+      </html>
+    );
+  }
+  ```
+
+  For nested providers inside Client Components, use [`ClientThemeProvider`](/docs/api/client-theme-provider) instead.
 </Callout>
 
 ## Props
