@@ -11,8 +11,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "bunup src/index.ts src/client.ts src/next.ts --env.NODE_ENV=production --external next/headers",
-    "dev": "bunup src/index.ts src/client.ts src/next.ts --watch",
+    "build": "bunup",
+    "dev": "bunup --watch",
     "type-check": "tsc --noEmit",
     "lint": "biome check src",
     "lint:fix": "biome check --write src",
