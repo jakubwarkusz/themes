@@ -64,6 +64,11 @@ const rows = [
 	},
 	{ label: "sessionStorage support", next: <No />, wrksz: <Yes /> },
 	{
+		label: "cookie storage (zero-flash SSR)",
+		next: <No />,
+		wrksz: <Yes note='storage="cookie"' />,
+	},
+	{
 		label: "Disable storage",
 		next: <No />,
 		wrksz: <Yes note='storage="none"' />,
@@ -77,6 +82,16 @@ const rows = [
 		label: "Server-provided theme",
 		next: <No />,
 		wrksz: <Yes note="initialTheme prop" />,
+	},
+	{
+		label: "disableTransitionOnChange per property",
+		next: <No />,
+		wrksz: <Yes note="pass a CSS string" />,
+	},
+	{
+		label: "Read theme outside React",
+		next: <No />,
+		wrksz: <Yes note="getTheme()" />,
 	},
 	{
 		label: "Generic types",
@@ -98,7 +113,6 @@ export function Comparison() {
 				</p>
 			</div>
 
-			{/* Mobile: feature list (wrksz only) */}
 			<div className="overflow-hidden rounded-xl border border-fd-border bg-fd-card sm:hidden">
 				{rows.map((row, i) => (
 					<div
@@ -111,7 +125,6 @@ export function Comparison() {
 				))}
 			</div>
 
-			{/* Desktop: table */}
 			<div className="hidden overflow-hidden rounded-xl border border-fd-border sm:block">
 				<table className="w-full text-sm">
 					<thead>

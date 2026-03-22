@@ -85,6 +85,36 @@ Initialize the theme from a server-side source (database, session, cookie) on ev
 >
 ```
 
+### `disableTransitionOnChange` per property
+
+`next-themes` only supports `disableTransitionOnChange={true}` which disables all transitions. `@wrksz/themes` accepts a CSS `transition` string to suppress only specific properties:
+
+```tsx
+// Disable all transitions (same as next-themes)
+<ThemeProvider disableTransitionOnChange>
+
+// Suppress only color properties, keep transform/opacity transitions
+<ThemeProvider disableTransitionOnChange="background-color 0s, color 0s, border-color 0s">
+```
+
+The string is injected as `*,*::before,*::after{transition:<value>!important}` for exactly two frames, then removed.
+
+### Read theme outside React
+
+`getTheme()` reads the current theme from a cookie without React context - useful in proxy functions or layouts where you need the theme before rendering:
+
+```ts
+// proxy.ts
+import { getTheme } from "@wrksz/themes/next";
+
+export function proxy(request: Request) {
+  const theme = getTheme(request, { defaultTheme: "dark" });
+}
+
+// layout.tsx
+const theme = await getTheme({ defaultTheme: "dark" });
+```
+
 ### Generic types
 
 ```tsx
@@ -105,5 +135,7 @@ const { theme, setTheme } = useTheme<"light" | "dark" | "high-contrast">();
 | Disable storage | <No /> | <Yes note='storage="none"' /> |
 | `meta theme-color` support | <No /> | <Yes note="themeColor prop" /> |
 | Server-provided theme | <No /> | <Yes note="initialTheme prop" /> |
+| `disableTransitionOnChange` per property | <No /> | <Yes note="pass a CSS string" /> |
+| Read theme outside React | <No /> | <Yes note="getTheme()" /> |
 | Generic types | <No /> | <Yes note="useTheme<AppTheme>()" /> |
 | Zero runtime dependencies | <Yes /> | <Yes /> |
