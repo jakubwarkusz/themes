@@ -6,6 +6,7 @@
     "client-theme-provider",
     "use-theme",
     "use-theme-value",
-    "themed-image"
+    "themed-image",
+    "get-theme"
   ]
 }

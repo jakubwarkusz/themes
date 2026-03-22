@@ -1,0 +1,59 @@
+---
+title: getTheme
+description: Read the current theme from a cookie outside React - in proxy, layouts, or server actions.
+---
+
+`getTheme` reads the current theme from a cookie. Available in `@wrksz/themes/next`.
+
+Two variants depending on context:
+
+| Call | Returns | Use when |
+|------|---------|----------|
+| `getTheme(request)` | `string` | `proxy.ts`, edge functions |
+| `await getTheme()` | `Promise<string>` | Server Components, layouts |
+
+## Proxy
+
+```ts title="proxy.ts"
+import { NextResponse } from "next/server";
+import { getTheme } from "@wrksz/themes/next";
+
+export function proxy(request: Request) {
+  const theme = getTheme(request, { defaultTheme: "dark" });
+  const response = NextResponse.next();
+  response.headers.set("x-theme", theme);
+  return response;
+}
+```
+
+## Layout - apply class directly on `<html>`
+
+The most reliable way to eliminate SSR theme flash when your CSS uses class-based selectors:
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider, getTheme } from "@wrksz/themes/next";
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const theme = await getTheme({ defaultTheme: "dark" });
+
+  return (
+    <html lang="en" className={theme} suppressHydrationWarning>
+      <body>
+        <ThemeProvider storage="cookie" defaultTheme="dark">
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+Setting `className` directly on `<html>` from the server guarantees the correct class is present before any CSS or JS runs - no flash even when system preference differs from stored theme.
+
+## Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `storageKey` | `string` | `"theme"` | Cookie name to read from |
+| `defaultTheme` | `string` | `"system"` | Returned when no valid theme is found |
+| `themes` | `string[]` | - | When provided, stored values not in the list are ignored and `defaultTheme` is returned |
