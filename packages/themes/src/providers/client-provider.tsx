@@ -148,7 +148,11 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			let stored: string | null = null;
 			try {
 				if (storage === "cookie") {
-					const re = new RegExp("(?:^|;\\s*)" + storageKey + "=([^;]*)");
+					const re = new RegExp(
+						"(?:^|;\\s*)" +
+							storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") +
+							"=([^;]*)",
+					);
 					const match = document.cookie.match(re);
 					stored = match?.[1] != null ? decodeURIComponent(match[1]) : null;
 				} else if (storage !== "none") {
