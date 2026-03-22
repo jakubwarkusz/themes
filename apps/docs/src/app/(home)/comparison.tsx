@@ -84,9 +84,14 @@ const rows = [
 		wrksz: <Yes note="initialTheme prop" />,
 	},
 	{
+		label: "Always follow system preference",
+		next: <No />,
+		wrksz: <Yes note="followSystem prop" />,
+	},
+	{
 		label: "disableTransitionOnChange per property",
 		next: <No />,
-		wrksz: <Yes note="pass a CSS string" />,
+		wrksz: <Yes note="CSS string + inline script" />,
 	},
 	{
 		label: "Read theme outside React",

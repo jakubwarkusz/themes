@@ -85,6 +85,16 @@ Initialize the theme from a server-side source (database, session, cookie) on ev
 >
 ```
 
+### Always follow system preference
+
+`next-themes` has no way to force the theme to always track the OS setting. `@wrksz/themes` adds `followSystem` - it ignores any stored value on mount and always applies `prefers-color-scheme`:
+
+```tsx
+<ThemeProvider followSystem>
+```
+
+Unlike `defaultTheme="system"` (which stores the resolved value after first visit), `followSystem` never reads from storage.
+
 ### `disableTransitionOnChange` per property
 
 `next-themes` only supports `disableTransitionOnChange={true}` which disables all transitions. `@wrksz/themes` accepts a CSS `transition` string to suppress only specific properties:
@@ -135,7 +145,8 @@ const { theme, setTheme } = useTheme<"light" | "dark" | "high-contrast">();
 | Disable storage | <No /> | <Yes note='storage="none"' /> |
 | `meta theme-color` support | <No /> | <Yes note="themeColor prop" /> |
 | Server-provided theme | <No /> | <Yes note="initialTheme prop" /> |
-| `disableTransitionOnChange` per property | <No /> | <Yes note="pass a CSS string" /> |
+| Always follow system preference | <No /> | <Yes note="followSystem prop" /> |
+| `disableTransitionOnChange` per property | <No /> | <Yes note="CSS string + inline script" /> |
 | Read theme outside React | <No /> | <Yes note="getTheme()" /> |
 | Generic types | <No /> | <Yes note="useTheme<AppTheme>()" /> |
 | Zero runtime dependencies | <Yes /> | <Yes /> |
