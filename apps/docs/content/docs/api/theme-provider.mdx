@@ -72,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `target` | `string` | `"html"` | Element to apply theme to (`"html"`, `"body"`, or a CSS selector) |
 | `storageKey` | `string` | `"theme"` | Key used for storage |
 | `storage` | `"localStorage" \| "sessionStorage" \| "cookie" \| "none"` | `"localStorage"` | Where to persist the theme. `"cookie"` reads/writes `document.cookie` and with `@wrksz/themes/next` also reads server-side - zero-flash SSR without boilerplate. <Since version="0.7.0" /> |
-| `disableTransitionOnChange` | `boolean \| string` | `false` | Temporarily suppress CSS transitions when switching themes. `true` disables all transitions. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties while keeping others (transforms, opacity, etc.) intact. |
+| `disableTransitionOnChange` | `boolean \| string` | `false` | Temporarily suppress CSS transitions when switching themes. `true` disables all transitions. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties while keeping others (transforms, opacity, etc.) intact. <Since version="0.7.2" /> |
 | `followSystem` | `boolean` | `false` | Always follow system preference, ignores stored value on mount |
 | `themeColor` | `string \| Record<string, string>` | - | Update `<meta name="theme-color">` on theme change |
 | `nonce` | `string` | - | CSP nonce for the inline script |
@@ -176,6 +176,8 @@ The provider reads `document.cookie` on the client and `cookies()` from `next/he
 </Callout>
 
 ### Suppress transitions on theme change
+
+<Since version="0.7.2" />
 
 Disable all transitions briefly when switching themes to prevent visual jank:
 
