@@ -3,8 +3,9 @@
 # @wrksz/themes
 
 [![npm version](https://img.shields.io/npm/v/@wrksz/themes)](https://www.npmjs.com/package/@wrksz/themes)
+[![docs](https://img.shields.io/badge/docs-themes.wrksz.dev-7c3aed)](https://themes.wrksz.dev)
 
-Modern theme management for Next.js 16+ and React 19+. Drop-in replacement for `next-themes` - fixes every known bug and adds missing features.
+Modern theme management for Next.js 16+ and React 19+. Near drop-in replacement for `next-themes` - fixes every known bug and adds missing features.
 
 ```bash
 bun add @wrksz/themes
@@ -18,7 +19,7 @@ Add the provider to your root layout. Add `suppressHydrationWarning` to `<html>`
 
 ```tsx
 // app/layout.tsx
-import { ThemeProvider } from "@wrksz/themes";
+import { ThemeProvider } from "@wrksz/themes/next";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
