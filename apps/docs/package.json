@@ -12,10 +12,11 @@
 		"format": "biome format --write"
 	},
 	"dependencies": {
-		"@wrksz/themes": "workspace:*",
 		"@hugeicons/core-free-icons": "^4.0.0",
 		"@hugeicons/react": "^1.1.6",
 		"@takumi-rs/image-response": "^0.73.1",
+		"@vercel/analytics": "^2.0.1",
+		"@wrksz/themes": "workspace:*",
 		"fumadocs-core": "16.7.4",
 		"fumadocs-mdx": "14.2.11",
 		"fumadocs-ui": "16.7.4",
