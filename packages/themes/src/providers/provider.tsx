@@ -44,6 +44,7 @@ export function ThemeProvider<Themes extends string = DefaultTheme>({
 						storage,
 						themeColors: themeColor,
 						initialTheme: initialTheme as string | undefined,
+						disableTransitionOnChange,
 					}),
 				}}
 				nonce={nonce}

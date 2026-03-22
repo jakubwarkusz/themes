@@ -38,6 +38,7 @@ const base = {
 	storage: "localStorage" as const,
 	themeColors: undefined,
 	initialTheme: undefined,
+	disableTransitionOnChange: false,
 };
 
 describe("themeScript - class attribute", () => {
@@ -283,5 +284,46 @@ describe("themeScript - cookie storage", () => {
 		document.cookie = "theme=dark; path=/";
 		runScript({ ...base, storage: "cookie" });
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+});
+
+describe("themeScript - disableTransitionOnChange", () => {
+	test("injects style element into head when true", () => {
+		window.matchMedia = () => ({ matches: false }) as MediaQueryList;
+		const captured = { content: null as string | null };
+		const origAppend = document.head.appendChild.bind(document.head);
+		document.head.appendChild = <T extends Node>(node: T): T => {
+			if ((node as unknown as Element).tagName === "STYLE")
+				captured.content = (node as unknown as Element).textContent;
+			return origAppend(node) as T;
+		};
+
+		runScript({ ...base, disableTransitionOnChange: true });
+
+		document.head.appendChild = origAppend;
+		expect(captured.content).toContain("transition:none");
+	});
+
+	test("injects style with custom CSS string", () => {
+		window.matchMedia = () => ({ matches: false }) as MediaQueryList;
+		const captured = { content: null as string | null };
+		const origAppend = document.head.appendChild.bind(document.head);
+		document.head.appendChild = <T extends Node>(node: T): T => {
+			if ((node as unknown as Element).tagName === "STYLE")
+				captured.content = (node as unknown as Element).textContent;
+			return origAppend(node) as T;
+		};
+
+		runScript({ ...base, disableTransitionOnChange: "background-color 0s, color 0s" });
+
+		document.head.appendChild = origAppend;
+		expect(captured.content).toContain("background-color 0s, color 0s");
+	});
+
+	test("does not inject style when false", () => {
+		window.matchMedia = () => ({ matches: false }) as MediaQueryList;
+		const stylesBefore = document.head.querySelectorAll("style").length;
+		runScript({ ...base, disableTransitionOnChange: false });
+		expect(document.head.querySelectorAll("style").length).toBe(stylesBefore);
 	});
 });

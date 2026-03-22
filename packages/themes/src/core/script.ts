@@ -13,6 +13,7 @@ export type ScriptConfig = {
 	storage: StorageType;
 	themeColors: string | Partial<Record<string, string>> | undefined;
 	initialTheme: string | undefined;
+	disableTransitionOnChange: boolean | string;
 };
 
 /**
@@ -32,7 +33,17 @@ function themeScript(
 	storage: string,
 	themeColors: string | Record<string, string> | null,
 	initialTheme: string | null,
+	disableTransitionOnChange: boolean | string,
 ): void {
+	if (disableTransitionOnChange) {
+		const css =
+			typeof disableTransitionOnChange === "string" ? disableTransitionOnChange : "none";
+		const style = document.createElement("style");
+		style.textContent = `*,*::before,*::after{transition:${css}!important}`;
+		document.head.appendChild(style);
+		requestAnimationFrame(() => requestAnimationFrame(() => document.head.removeChild(style)));
+	}
+
 	let theme: string;
 
 	if (forcedTheme) {
@@ -85,7 +96,11 @@ function themeScript(
 			el.classList.remove(...toRemove);
 			el.classList.add(...attrValue.split(" "));
 		} else {
-			el.setAttribute(attr, attrValue);
+			if (attrValue) {
+				el.setAttribute(attr, attrValue);
+			} else {
+				el.removeAttribute(attr);
+			}
 		}
 	}
 
@@ -126,6 +141,7 @@ export function getScript(config: ScriptConfig): string {
 		JSON.stringify(config.storage),
 		JSON.stringify(config.themeColors ?? null),
 		JSON.stringify(config.initialTheme ?? null),
+		JSON.stringify(config.disableTransitionOnChange),
 	].join(",");
 
 	return `(${fn})(${args})`;

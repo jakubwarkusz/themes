@@ -14,6 +14,7 @@ const base = {
 	storage: "localStorage" as const,
 	themeColors: undefined,
 	initialTheme: undefined,
+	disableTransitionOnChange: false,
 };
 
 describe("getScript", () => {

@@ -45,6 +45,7 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>({
 					storage,
 					themeColors: themeColor,
 					initialTheme: initialTheme as string | undefined,
+					disableTransitionOnChange,
 				}),
 			}}
 			nonce={nonce}
