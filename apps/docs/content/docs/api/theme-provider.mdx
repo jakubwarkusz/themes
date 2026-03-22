@@ -197,6 +197,18 @@ To keep some transitions intact (e.g. hover effects, animations) while only supp
 
 The string is injected as `transition: <value> !important` on all elements for two animation frames during the switch.
 
+### Always follow system preference
+
+Use `followSystem` to ignore any stored value and always apply the system preference. Useful for apps where you want the theme to stay in sync with the OS without letting users override it:
+
+```tsx
+<ThemeProvider followSystem>
+  {children}
+</ThemeProvider>
+```
+
+Unlike `defaultTheme="system"`, which applies the system preference only on first visit and then stores the resolved value, `followSystem` re-reads `prefers-color-scheme` on every mount and ignores the stored value entirely.
+
 ### Disable storage
 
 ```tsx

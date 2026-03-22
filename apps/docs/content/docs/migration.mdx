@@ -1,0 +1,126 @@
+---
+title: Migrating from next-themes
+description: Step-by-step guide for migrating from next-themes to @wrksz/themes.
+---
+
+`@wrksz/themes` is a near drop-in replacement for `next-themes`. For most apps, migration is a single import change. This page covers that change and any behavioral differences to be aware of.
+
+## Step 1: Install
+
+<Tabs items={["bun", "npm", "pnpm", "yarn"]}>
+  <Tab value="bun">
+    ```bash
+    bun add @wrksz/themes
+    ```
+  </Tab>
+  <Tab value="npm">
+    ```bash
+    npm install @wrksz/themes
+    ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash
+    pnpm add @wrksz/themes
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn add @wrksz/themes
+    ```
+  </Tab>
+</Tabs>
+
+## Step 2: Update the provider import
+
+```diff
+- import { ThemeProvider } from "next-themes";
++ import { ThemeProvider } from "@wrksz/themes/next";
+```
+
+That's it for most apps.
+
+## Step 3: Remove the "use client" wrapper
+
+`ThemeProvider` from `@wrksz/themes/next` is an async Server Component. If you have a client wrapper (common in Next.js `next-themes` setups), remove it:
+
+```diff
+- "use client";
+- import { ThemeProvider } from "next-themes";
+- export function Providers({ children }) {
+-   return <ThemeProvider>{children}</ThemeProvider>;
+- }
+```
+
+```diff
+// app/layout.tsx
++ import { ThemeProvider } from "@wrksz/themes/next";
+  export default function RootLayout({ children }) {
+    return (
+      <html suppressHydrationWarning>
+        <body>
++         <ThemeProvider>{children}</ThemeProvider>
+        </body>
+      </html>
+    );
+  }
+```
+
+If you need a nested provider inside a Client Component, use [`ClientThemeProvider`](/docs/api/client-theme-provider) instead.
+
+## Step 4: Update client hook imports
+
+```diff
+- import { useTheme } from "next-themes";
++ import { useTheme } from "@wrksz/themes/client";
+```
+
+## API differences
+
+All `next-themes` props are supported. The following props have changed behavior or are new:
+
+### `onThemeChange`
+
+In `next-themes`, `onThemeChange` fires with the resolved theme (e.g. `"dark"`) even when `setTheme("system")` is called.
+
+In `@wrksz/themes`, `onThemeChange` fires with the selected value - which may be `"system"`. System preference changes while the theme is `"system"` still fire with the resolved value.
+
+```tsx
+// next-themes: setTheme("system") fires onThemeChange("dark")
+// @wrksz/themes: setTheme("system") fires onThemeChange("system")
+```
+
+If you are persisting the theme server-side via `onThemeChange`, handle `"system"` explicitly:
+
+```tsx
+<ThemeProvider
+  onThemeChange={(theme) => {
+    if (theme !== "system") saveTheme(theme);
+  }}
+>
+```
+
+### `disableTransitionOnChange`
+
+Accepts `boolean | string`. Passing a CSS `transition` string suppresses only those specific properties, keeping other transitions intact.
+
+```tsx
+// next-themes
+<ThemeProvider disableTransitionOnChange>
+
+// @wrksz/themes - also accepts a CSS string
+<ThemeProvider disableTransitionOnChange="background-color 0s, color 0s">
+```
+
+## New features
+
+After migrating, these features are available without any additional configuration:
+
+- **`storage="cookie"`** - zero-flash SSR without boilerplate. Pass `storage="cookie"` to `ThemeProvider` from `@wrksz/themes/next`.
+- **`storage="sessionStorage"`** - persists theme only for the current tab.
+- **`storage="none"`** - no persistence, useful for scoped or forced themes.
+- **`themeColor`** - updates `<meta name="theme-color">` on theme change.
+- **`initialTheme`** - initialize theme from a server-side source.
+- **`followSystem`** - always follow system preference, ignoring stored value.
+- **`getTheme()`** - read the current theme from a cookie outside React.
+
+See [Why not next-themes?](/docs/why-not-next-themes) for the full comparison.
