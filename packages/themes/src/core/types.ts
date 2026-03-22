@@ -27,8 +27,8 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	value?: ValueObject;
 	/** Target element to apply theme to, defaults to <html> */
 	target?: "html" | "body" | string;
-	/** Disable CSS transitions on theme change */
-	disableTransitionOnChange?: boolean;
+	/** Disable CSS transitions on theme change. Pass `true` to disable all transitions, or a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to disable only specific properties while keeping others. */
+	disableTransitionOnChange?: boolean | string;
 	/** Where to persist theme */
 	storage?: StorageType;
 	/** Storage key */

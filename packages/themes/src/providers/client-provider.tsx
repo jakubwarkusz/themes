@@ -86,8 +86,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			const attrs = Array.isArray(attribute) ? attribute : [attribute];
 
 			if (disableTransitionOnChange) {
+				const transitionValue =
+					typeof disableTransitionOnChange === "string"
+						? disableTransitionOnChange
+						: "none";
 				const style = document.createElement("style");
-				style.textContent = "*,*::before,*::after{transition:none!important}";
+				style.textContent = `*,*::before,*::after{transition:${transitionValue}!important}`;
 				document.head.appendChild(style);
 				requestAnimationFrame(() =>
 					requestAnimationFrame(() => document.head.removeChild(style)),

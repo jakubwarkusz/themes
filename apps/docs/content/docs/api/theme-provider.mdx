@@ -72,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `target` | `string` | `"html"` | Element to apply theme to (`"html"`, `"body"`, or a CSS selector) |
 | `storageKey` | `string` | `"theme"` | Key used for storage |
 | `storage` | `"localStorage" \| "sessionStorage" \| "cookie" \| "none"` | `"localStorage"` | Where to persist the theme. `"cookie"` reads/writes `document.cookie` and with `@wrksz/themes/next` also reads server-side - zero-flash SSR without boilerplate. <Since version="0.7.0" /> |
-| `disableTransitionOnChange` | `boolean` | `false` | Disable CSS transitions when switching themes |
+| `disableTransitionOnChange` | `boolean \| string` | `false` | Temporarily suppress CSS transitions when switching themes. `true` disables all transitions. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties while keeping others (transforms, opacity, etc.) intact. |
 | `followSystem` | `boolean` | `false` | Always follow system preference, ignores stored value on mount |
 | `themeColor` | `string \| Record<string, string>` | - | Update `<meta name="theme-color">` on theme change |
 | `nonce` | `string` | - | CSP nonce for the inline script |
@@ -174,6 +174,26 @@ The provider reads `document.cookie` on the client and `cookies()` from `next/he
 <Callout type="warn">
   Cookie storage does not support cross-tab theme sync. If you need cross-tab sync, use `localStorage` with [`initialTheme`](/docs/examples/server-theme).
 </Callout>
+
+### Suppress transitions on theme change
+
+Disable all transitions briefly when switching themes to prevent visual jank:
+
+```tsx
+<ThemeProvider disableTransitionOnChange>
+  {children}
+</ThemeProvider>
+```
+
+To keep some transitions intact (e.g. hover effects, animations) while only suppressing color-related ones:
+
+```tsx
+<ThemeProvider disableTransitionOnChange="background-color 0s, color 0s, border-color 0s, fill 0s, stroke 0s">
+  {children}
+</ThemeProvider>
+```
+
+The string is injected as `transition: <value> !important` on all elements for two animation frames during the switch.
 
 ### Disable storage
 
