@@ -6,7 +6,7 @@ on:
       - "v*"
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 jobs:
@@ -42,8 +42,19 @@ jobs:
       - name: Type check
         run: bun type-check
 
+      - name: Test
+        run: bun test
+
       - name: Build
         run: bun run build
 
       - name: Publish to NPM registry
         run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          make_latest: true
