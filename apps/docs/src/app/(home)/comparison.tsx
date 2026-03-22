@@ -1,6 +1,20 @@
+"use client";
+
 import { Bug01Icon, Cancel01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { motion } from "motion/react";
 import Link from "next/link";
+
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
+const fadeUp = {
+	hidden: { opacity: 0, transform: "translateY(20px)" },
+	show: {
+		opacity: 1,
+		transform: "translateY(0px)",
+		transition: { duration: 0.5, ease: EASE_OUT },
+	},
+};
 
 function Bug() {
 	return (
@@ -109,7 +123,13 @@ const rows = [
 export function Comparison() {
 	return (
 		<section className="w-full max-w-4xl pb-16 sm:pb-24">
-			<div className="mb-10 text-center">
+			<motion.div
+				className="mb-10 text-center"
+				variants={fadeUp}
+				initial="hidden"
+				whileInView="show"
+				viewport={{ once: true, margin: "-80px" }}
+			>
 				<p className="mb-2 text-xs font-semibold text-fd-muted-foreground/40">Comparison</p>
 				<h2 className="text-xl font-semibold tracking-tight text-fd-foreground sm:text-2xl">
 					Why not next-themes?
@@ -117,9 +137,16 @@ export function Comparison() {
 				<p className="mt-2 text-sm text-fd-muted-foreground">
 					43 open issues, 16 open PRs, React 19 bugs unresolved.
 				</p>
-			</div>
+			</motion.div>
 
-			<div className="overflow-hidden rounded-xl border border-fd-border sm:hidden">
+			<motion.div
+				className="overflow-hidden rounded-xl border border-fd-border sm:hidden"
+				variants={fadeUp}
+				initial="hidden"
+				whileInView="show"
+				viewport={{ once: true, margin: "-80px" }}
+				transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.08 }}
+			>
 				{rows.map((row, i) => (
 					<div
 						key={row.label}
@@ -129,9 +156,16 @@ export function Comparison() {
 						{row.wrksz}
 					</div>
 				))}
-			</div>
+			</motion.div>
 
-			<div className="hidden overflow-hidden rounded-xl border border-fd-border sm:block">
+			<motion.div
+				className="hidden overflow-hidden rounded-xl border border-fd-border sm:block"
+				variants={fadeUp}
+				initial="hidden"
+				whileInView="show"
+				viewport={{ once: true, margin: "-80px" }}
+				transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.08 }}
+			>
 				<table className="w-full text-sm">
 					<thead>
 						<tr className="border-b border-fd-border">
@@ -159,16 +193,23 @@ export function Comparison() {
 						))}
 					</tbody>
 				</table>
-			</div>
+			</motion.div>
 
-			<div className="mt-4 text-center">
+			<motion.div
+				className="mt-4 text-center"
+				variants={fadeUp}
+				initial="hidden"
+				whileInView="show"
+				viewport={{ once: true, margin: "-80px" }}
+				transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.12 }}
+			>
 				<Link
 					href="/docs/why-not-next-themes"
 					className="text-xs text-fd-muted-foreground/50 underline-offset-4 transition-colors hover:text-fd-muted-foreground hover:underline"
 				>
 					Read the full breakdown
 				</Link>
-			</div>
+			</motion.div>
 		</section>
 	);
 }

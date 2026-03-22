@@ -1,3 +1,5 @@
+"use client";
+
 import {
 	ArrowReloadHorizontalIcon,
 	CheckmarkBadge01Icon,
@@ -8,7 +10,19 @@ import {
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { motion } from "motion/react";
 import type { ReactNode } from "react";
+
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
+const fadeUp = {
+	hidden: { opacity: 0, transform: "translateY(20px)" },
+	show: {
+		opacity: 1,
+		transform: "translateY(0px)",
+		transition: { duration: 0.5, ease: EASE_OUT },
+	},
+};
 
 function C({ children }: { children: string }) {
 	return (
@@ -82,16 +96,27 @@ const features: Feature[] = [
 export function FeaturesGrid() {
 	return (
 		<section className="w-full max-w-4xl pb-16 sm:pb-24">
-			<div className="mb-10 text-center">
+			<motion.div
+				className="mb-10 text-center"
+				variants={fadeUp}
+				initial="hidden"
+				whileInView="show"
+				viewport={{ once: true, margin: "-80px" }}
+			>
 				<p className="mb-2 text-xs font-semibold text-fd-muted-foreground/40">Features</p>
 				<h2 className="text-xl font-semibold tracking-tight text-fd-foreground sm:text-2xl">
 					Everything next-themes should have been
 				</h2>
-			</div>
+			</motion.div>
 
-			<div
+			<motion.div
 				className="grid grid-cols-1 overflow-hidden rounded-xl border border-fd-border bg-fd-border sm:grid-cols-2 lg:grid-cols-3"
 				style={{ gap: "1px" }}
+				variants={fadeUp}
+				initial="hidden"
+				whileInView="show"
+				viewport={{ once: true, margin: "-80px" }}
+				transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.08 }}
 			>
 				{features.map((feature) => (
 					<div
@@ -114,7 +139,7 @@ export function FeaturesGrid() {
 						</p>
 					</div>
 				))}
-			</div>
+			</motion.div>
 		</section>
 	);
 }

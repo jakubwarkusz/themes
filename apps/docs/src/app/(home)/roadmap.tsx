@@ -1,6 +1,27 @@
+"use client";
+
 import { Globe02Icon, PlugIcon, SparklesIcon } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { motion } from "motion/react";
+
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
+const container = {
+	hidden: {},
+	show: {
+		transition: { staggerChildren: 0.07 },
+	},
+};
+
+const item = {
+	hidden: { opacity: 0, transform: "translateY(20px)" },
+	show: {
+		opacity: 1,
+		transform: "translateY(0px)",
+		transition: { duration: 0.5, ease: EASE_OUT },
+	},
+};
 
 type Plan = {
 	icon: IconSvgElement;
@@ -29,18 +50,30 @@ const plans: Plan[] = [
 export function Roadmap() {
 	return (
 		<section className="w-full max-w-4xl pb-16 sm:pb-24">
-			<div className="mb-10 text-center">
+			<motion.div
+				className="mb-10 text-center"
+				variants={item}
+				initial="hidden"
+				whileInView="show"
+				viewport={{ once: true, margin: "-80px" }}
+			>
 				<p className="mb-2 text-xs font-semibold text-fd-muted-foreground/40">
 					What&apos;s next
 				</p>
 				<h2 className="text-xl font-semibold tracking-tight text-fd-foreground sm:text-2xl">
 					Actively developed and growing
 				</h2>
-			</div>
+			</motion.div>
 
-			<div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+			<motion.div
+				className="grid grid-cols-1 gap-8 sm:grid-cols-3"
+				variants={container}
+				initial="hidden"
+				whileInView="show"
+				viewport={{ once: true, margin: "-80px" }}
+			>
 				{plans.map((plan) => (
-					<div key={plan.label} className="flex flex-col gap-3">
+					<motion.div key={plan.label} className="flex flex-col gap-3" variants={item}>
 						<div className="inline-flex size-8 items-center justify-center rounded-lg bg-fd-muted text-fd-muted-foreground ring-1 ring-fd-border">
 							<HugeiconsIcon
 								icon={plan.icon}
@@ -53,9 +86,9 @@ export function Roadmap() {
 						<p className="text-xs leading-relaxed text-fd-muted-foreground">
 							{plan.description}
 						</p>
-					</div>
+					</motion.div>
 				))}
-			</div>
+			</motion.div>
 		</section>
 	);
 }
