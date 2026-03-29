@@ -66,7 +66,10 @@ function themeScript(
 			}
 		} catch {}
 
-		theme = stored && themes.includes(stored) ? stored : defaultTheme;
+		theme =
+			stored && (themes.includes(stored) || (enableSystem && stored === "system"))
+				? stored
+				: defaultTheme;
 	}
 
 	if (theme === "system") {

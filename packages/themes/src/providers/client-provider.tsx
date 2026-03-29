@@ -166,7 +166,9 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			} catch {}
 
 			const initial =
-				!followSystem && stored && (themes as string[]).includes(stored)
+				!followSystem &&
+				stored &&
+				((themes as string[]).includes(stored) || (enableSystem && stored === "system"))
 					? (stored as Themes | "system")
 					: resolvedDefault;
 

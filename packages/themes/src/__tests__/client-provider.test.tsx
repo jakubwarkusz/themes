@@ -127,6 +127,21 @@ describe("ClientThemeProvider - basic", () => {
 		wrap(<ThemeConsumer />);
 		expect(document.documentElement.classList.contains("light")).toBe(true);
 	});
+
+	test("restores system theme from localStorage even when defaultTheme is set", () => {
+		mockMatchMedia(false);
+		localStorage.setItem("theme", "system");
+		wrap(<ThemeConsumer />, { defaultTheme: "dark", enableSystem: true });
+		expect(screen.getByTestId("theme").textContent).toBe("system");
+		expect(screen.getByTestId("resolved").textContent).toBe("light");
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+	});
+
+	test("does not restore system theme from localStorage when enableSystem=false", () => {
+		localStorage.setItem("theme", "system");
+		wrap(<ThemeConsumer />, { defaultTheme: "dark", enableSystem: false });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
 });
 
 describe("ClientThemeProvider - setTheme", () => {
