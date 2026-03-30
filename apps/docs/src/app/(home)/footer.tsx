@@ -25,9 +25,9 @@ export function Footer() {
 					<Image
 						src="/wrksz.svg"
 						alt="@wrksz"
-						width={30}
-						height={14}
-						className="dark:invert opacity-60"
+						width={22}
+						height={12}
+						className="invert dark:invert-0 opacity-60"
 					/>
 					<span className="text-xs text-fd-muted-foreground">/</span>
 					<span className="text-xs font-medium text-fd-muted-foreground">themes</span>

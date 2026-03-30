@@ -54,9 +54,9 @@ export function baseOptions(version?: string): BaseLayoutProps {
 					<Image
 						src="/wrksz.svg"
 						alt="@wrksz"
-						width={38}
-						height={18}
-						className="dark:invert"
+						width={28}
+						height={16}
+						className="invert dark:invert-0"
 					/>
 					<span className="text-fd-muted-foreground">/</span>
 					<span className="font-medium">themes</span>
