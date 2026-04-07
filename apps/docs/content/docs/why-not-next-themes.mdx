@@ -113,15 +113,15 @@ The style is also injected by the inline script on initial page load - not just 
 
 `getTheme()` reads the current theme from a cookie without React context - useful in proxy functions or layouts where you need the theme before rendering:
 
-```ts
-// proxy.ts
+```ts title="proxy.ts"
 import { getTheme } from "@wrksz/themes/next";
 
 export function proxy(request: Request) {
   const theme = getTheme(request, { defaultTheme: "dark" });
 }
+```
 
-// layout.tsx
+```tsx title="layout.tsx"
 const theme = await getTheme({ defaultTheme: "dark" });
 ```
 
