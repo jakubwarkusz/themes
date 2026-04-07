@@ -2,6 +2,7 @@
 
 import { type ReactElement, useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import { ThemeContext } from "../core/context.js";
+import { writeCookie } from "../core/cookie.js";
 import { createThemeStore } from "../core/store.js";
 import type {
 	DefaultTheme,
@@ -45,6 +46,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	followSystem = false,
 	onThemeChange,
 	initialTheme,
+	cookieOptions,
 }: ThemeProviderProps<Themes>): ReactElement {
 	const resolvedDefault = (defaultTheme ?? (enableSystem ? "system" : "light")) as
 		| Themes
@@ -142,7 +144,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			applyToDom(initialTheme === "system" ? (sys ?? "light") : (initialTheme as string));
 			try {
 				if (storage === "cookie") {
-					document.cookie = `${storageKey}=${encodeURIComponent(String(initialTheme))}; path=/; max-age=31536000; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
+					writeCookie(storageKey, String(initialTheme), cookieOptions);
 				} else if (storage !== "none") {
 					const s = storage === "localStorage" ? localStorage : sessionStorage;
 					s.setItem(storageKey, String(initialTheme));
@@ -192,6 +194,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		mq.addEventListener("change", handler);
 		return () => mq.removeEventListener("change", handler);
 	}, [
+		cookieOptions,
 		forcedTheme,
 		initialTheme,
 		resolvedDefault,
@@ -259,14 +262,14 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 			try {
 				if (storage === "cookie") {
-					document.cookie = `${storageKey}=${encodeURIComponent(newTheme)}; path=/; max-age=31536000; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
+					writeCookie(storageKey, newTheme, cookieOptions);
 				} else if (storage !== "none") {
 					const store = storage === "localStorage" ? localStorage : sessionStorage;
 					store.setItem(storageKey, newTheme);
 				}
 			} catch {}
 		},
-		[applyToDom, forcedTheme, storage, storageKey, getSnapshot, setStoreTheme],
+		[applyToDom, cookieOptions, forcedTheme, storage, storageKey, getSnapshot, setStoreTheme],
 	);
 
 	const contextValue: ThemeContextValue<string> = {
