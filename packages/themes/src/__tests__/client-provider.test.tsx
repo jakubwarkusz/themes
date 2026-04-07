@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { useTheme } from "../core/context.js";
+import { serializeCookie, writeCookie } from "../core/cookie.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
 import { clearCookies } from "./setup.js";
 
@@ -400,7 +401,7 @@ describe("ClientThemeProvider - cross-tab storage sync", () => {
 
 describe("ClientThemeProvider - cookie storage", () => {
 	test("reads stored theme from cookie on mount", () => {
-		document.cookie = "theme=dark; path=/";
+		writeCookie("theme", "dark");
 		wrap(<ThemeConsumer />, { storage: "cookie" });
 		expect(screen.getByTestId("theme").textContent).toBe("dark");
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
@@ -415,13 +416,13 @@ describe("ClientThemeProvider - cookie storage", () => {
 	});
 
 	test("ignores cookie value not in themes list", () => {
-		document.cookie = "theme=purple; path=/";
+		writeCookie("theme", "purple");
 		wrap(<ThemeConsumer />, { storage: "cookie", defaultTheme: "light", enableSystem: false });
 		expect(document.documentElement.classList.contains("light")).toBe(true);
 	});
 
 	test("respects custom storageKey for cookie name", () => {
-		document.cookie = "app-theme=dark; path=/";
+		writeCookie("app-theme", "dark");
 		wrap(<ThemeConsumer />, { storage: "cookie", storageKey: "app-theme" });
 		expect(screen.getByTestId("theme").textContent).toBe("dark");
 	});
@@ -432,7 +433,7 @@ describe("ClientThemeProvider - cookie storage", () => {
 	});
 
 	test("does not react to localStorage storage events when storage='cookie'", () => {
-		document.cookie = "theme=light; path=/";
+		writeCookie("theme", "light");
 		wrap(<ThemeConsumer />, { storage: "cookie" });
 
 		act(() => {
@@ -440,6 +441,23 @@ describe("ClientThemeProvider - cookie storage", () => {
 		});
 
 		expect(screen.getByTestId("theme").textContent).toBe("light");
+	});
+
+	test("cookieOptions.maxAge: cookie written with custom maxAge", () => {
+		wrap(<ThemeConsumer />, { storage: "cookie", cookieOptions: { maxAge: 3600 } });
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		expect(document.cookie).toContain("theme=dark");
+	});
+
+	test("cookieOptions used when writing initialTheme to cookie", () => {
+		wrap(<ThemeConsumer />, {
+			storage: "cookie",
+			initialTheme: "dark",
+			cookieOptions: { maxAge: 3600, sameSite: "Strict" },
+		});
+		expect(document.cookie).toContain("theme=dark");
 	});
 });
 
@@ -483,5 +501,58 @@ describe("ClientThemeProvider - disableTransitionOnChange", () => {
 
 		document.head.appendChild = origAppend;
 		expect(captured.content).toContain("background-color 0s, color 0s");
+	});
+});
+
+describe("serializeCookie", () => {
+	test("default options", () => {
+		const result = serializeCookie("theme", "dark");
+		expect(result).toContain("theme=dark");
+		expect(result).toContain("path=/");
+		expect(result).toContain("max-age=31536000");
+		expect(result).toContain("SameSite=Lax");
+	});
+
+	test("domain option", () => {
+		const result = serializeCookie("theme", "dark", { domain: ".example.com" });
+		expect(result).toContain("domain=.example.com");
+	});
+
+	test("domain not present when not specified", () => {
+		const result = serializeCookie("theme", "dark");
+		expect(result).not.toContain("domain=");
+	});
+
+	test("maxAge override", () => {
+		const result = serializeCookie("theme", "dark", { maxAge: 3600 });
+		expect(result).toContain("max-age=3600");
+		expect(result).not.toContain("max-age=31536000");
+	});
+
+	test("sameSite override", () => {
+		const result = serializeCookie("theme", "dark", { sameSite: "Strict" });
+		expect(result).toContain("SameSite=Strict");
+	});
+
+	test("sameSite None with secure", () => {
+		const result = serializeCookie("theme", "dark", { sameSite: "None", secure: true });
+		expect(result).toContain("SameSite=None");
+		expect(result).toContain("Secure");
+	});
+
+	test("path override", () => {
+		const result = serializeCookie("theme", "dark", { path: "/app" });
+		expect(result).toContain("path=/app");
+		expect(result).not.toContain("path=/;");
+	});
+
+	test("secure=false excludes Secure flag", () => {
+		const result = serializeCookie("theme", "dark", { secure: false });
+		expect(result).not.toContain("Secure");
+	});
+
+	test("encodes special characters in value", () => {
+		const result = serializeCookie("theme", "my theme");
+		expect(result).toContain("theme=my%20theme");
 	});
 });
