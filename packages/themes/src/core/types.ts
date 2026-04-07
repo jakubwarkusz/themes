@@ -8,6 +8,19 @@ export type ValueObject = Record<string, string>;
 
 export type StorageType = "localStorage" | "sessionStorage" | "cookie" | "none";
 
+export type CookieOptions = {
+	/** Cookie domain, defaults to the current domain */
+	domain?: string;
+	/** Max age in seconds. Defaults to 31536000 (1 year) */
+	maxAge?: number;
+	/** SameSite attribute. Defaults to "Lax" */
+	sameSite?: "Strict" | "Lax" | "None";
+	/** Secure flag. Defaults to true on HTTPS */
+	secure?: boolean;
+	/** Cookie path. Defaults to "/" */
+	path?: string;
+};
+
 /** Per-theme colors for meta theme-color, or a single string for all themes */
 export type ThemeColor = string | Partial<Record<string, string>>;
 
@@ -45,6 +58,8 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	followSystem?: boolean;
 	/** Server-provided theme that overrides storage on mount (e.g. from a database). User can still call setTheme to change it. */
 	initialTheme?: Themes | "system";
+	/** Cookie options, only used when storage="cookie" */
+	cookieOptions?: CookieOptions;
 };
 
 export type ThemeContextValue<Themes extends string = DefaultTheme> = {
