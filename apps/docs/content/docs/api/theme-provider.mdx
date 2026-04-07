@@ -112,8 +112,7 @@ Map a theme to multiple CSS classes using a space-separated value:
 
 ### Force a theme per page
 
-```tsx
-// app/dashboard/layout.tsx
+```tsx title="app/dashboard/layout.tsx"
 <ThemeProvider forcedTheme="dark">
   {children}
 </ThemeProvider>
@@ -123,8 +122,7 @@ Map a theme to multiple CSS classes using a space-separated value:
 
 Use `initialTheme` to initialize from a server-side source (database, session, cookie) on every mount:
 
-```tsx
-// app/layout.tsx
+```tsx title="app/layout.tsx"
 export default async function RootLayout({ children }) {
   const userTheme = await getUserTheme();
 

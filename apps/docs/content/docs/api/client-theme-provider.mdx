@@ -40,8 +40,7 @@ Accepts the same props as [`ThemeProvider`](/docs/api/theme-provider#props), wit
 
 Apply an independent theme to a specific section of your app by combining `target` and `storage="none"`:
 
-```tsx
-// app/landing/layout.tsx
+```tsx title="app/landing/layout.tsx"
 export default function LandingLayout({ children }) {
   return (
     <ThemeProvider forcedTheme="dark" target="#landing-root" storage="none">
@@ -49,8 +48,9 @@ export default function LandingLayout({ children }) {
     </ThemeProvider>
   );
 }
+```
 
-// app/dashboard/layout.tsx
+```tsx title="app/dashboard/layout.tsx"
 export default function DashboardLayout({ children }) {
   return (
     <ThemeProvider forcedTheme="light" target="#dashboard-root" storage="none">
