@@ -66,7 +66,7 @@ export type ThemeContextValue<Themes extends string = DefaultTheme> = {
 	/** Current theme (may be "system") */
 	theme: Themes | "system" | undefined;
 	/** Resolved theme - never "system" */
-	resolvedTheme: Themes | undefined;
+	resolvedTheme: Exclude<Themes, "system"> | undefined;
 	/** System preference */
 	systemTheme: "light" | "dark" | undefined;
 	/** Forced theme if set */
