@@ -69,6 +69,26 @@ export function ThemeToggle() {
 }
 ```
 
+## What's new in v0.9.0
+
+<Since version="0.9.0" />
+
+- `storage="hybrid"` combines cookie SSR correctness with `localStorage` cross-tab sync.
+- `createThemes(...)` gives a typed factory so your theme union is inferred once and reused everywhere.
+- `useThemeEffect(...)` runs theme side effects after mount when theme/resolvedTheme changes.
+
+```tsx title="app/theme.ts"
+"use client";
+import { createThemes } from "@wrksz/themes/client";
+
+export const { ThemeProvider, useTheme, useThemeValue, useThemeEffect } = createThemes({
+  themes: ["light", "dark", "high-contrast"] as const,
+  defaultTheme: "system",
+  storage: "hybrid",
+  attribute: "class",
+});
+```
+
 ## Import paths
 
 <Since version="0.6.0" />
@@ -76,8 +96,8 @@ export function ThemeToggle() {
 | Import | Use for |
 |--------|---------|
 | `@wrksz/themes/next` | `ThemeProvider` in Next.js (recommended) |
-| `@wrksz/themes/client` | `useTheme`, `useThemeValue`, `ThemedImage`, `ClientThemeProvider` |
-| `@wrksz/themes` | `ThemeProvider` for non-Next.js frameworks |
+| `@wrksz/themes/client` | `useTheme`, `useThemeValue`, `useThemeEffect`, `ThemedImage`, `ClientThemeProvider`, `createThemes` |
+| `@wrksz/themes` | `ThemeProvider`, `createThemes` for non-Next.js frameworks |
 
 <Callout type="info">
   The API is identical to `next-themes`. Migrating requires changing one import line: `@wrksz/themes/next` instead of `next-themes`. See [Why not next-themes?](/docs/why-not-next-themes) for a full comparison.

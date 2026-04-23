@@ -1,0 +1,57 @@
+---
+title: createThemes
+description: Typed factory for ThemeProvider and theme hooks.
+---
+
+`createThemes` lets you define your themes once and get typed provider/hooks everywhere.
+
+<Since version="0.9.0" />
+
+```tsx title="app/theme.ts"
+"use client";
+import { createThemes } from "@wrksz/themes/client";
+
+export const { ThemeProvider, useTheme, useThemeValue, useThemeEffect, ThemedImage } =
+  createThemes({
+    themes: ["light", "dark", "high-contrast"] as const,
+    defaultTheme: "system",
+    attribute: "class",
+    storage: "hybrid",
+    disableTransitionOnChange: true,
+    themeColor: { light: "#ffffff", dark: "#0f1115" },
+  });
+```
+
+## Why use it
+
+- You define the theme tuple once, and type inference propagates to all consumers.
+- `setTheme` accepts only valid values from your configured theme union.
+- `useThemeValue` maps are checked against your union (plus optional `default`).
+- Provider defaults can still be overridden per usage.
+
+## Return value
+
+`createThemes(config)` returns:
+
+- `ThemeProvider`
+- `useTheme`
+- `useThemeValue`
+- `useThemeEffect`
+- `ThemedImage`
+
+## Per-usage overrides
+
+Factory defaults are just defaults. You can override them per mount:
+
+```tsx
+import { ThemeProvider } from "@/app/theme";
+
+export function AuthLayout({ children }: { children: React.ReactNode }) {
+  return <ThemeProvider defaultTheme="light">{children}</ThemeProvider>;
+}
+```
+
+## Generic `useTheme<T>()` vs `createThemes`
+
+- Use `createThemes` for shipped app code with one canonical theme configuration.
+- Use `useTheme<T>()` for quick experiments and local prototypes.

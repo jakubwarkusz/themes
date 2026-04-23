@@ -1,0 +1,36 @@
+---
+title: useThemeEffect
+description: Side-effect hook that reacts to theme changes.
+---
+
+`useThemeEffect` works like `useEffect`, but for theme transitions.
+
+<Since version="0.9.0" />
+
+- Skips the very first render.
+- Runs when `theme` or `resolvedTheme` changes.
+- Supports cleanup functions.
+- Supports dependency arrays for caller-specific values.
+
+```tsx
+"use client";
+import { useThemeEffect } from "@wrksz/themes/client";
+
+export function ThemeAnalytics() {
+  useThemeEffect((theme, resolvedTheme) => {
+    trackThemeChange(theme, resolvedTheme);
+    return () => cancelPendingRequests();
+  }, []);
+
+  return null;
+}
+```
+
+## Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `effect` | `(theme, resolvedTheme) => void \| (() => void)` | Callback run after mount on theme changes |
+| `deps` | `DependencyList` | Optional dependency list, same semantics as `useEffect` |
+
+`theme` may be `"system"`, while `resolvedTheme` is the concrete applied value.

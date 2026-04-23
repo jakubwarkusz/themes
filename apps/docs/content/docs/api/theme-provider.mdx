@@ -71,7 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `value` | `Record<string, string>` | - | Map theme names to attribute values |
 | `target` | `string` | `"html"` | Element to apply theme to (`"html"`, `"body"`, or a CSS selector) |
 | `storageKey` | `string` | `"theme"` | Key used for storage |
-| `storage` | `"localStorage" \| "sessionStorage" \| "cookie" \| "none"` | `"localStorage"` | Where to persist the theme. `"cookie"` reads/writes `document.cookie` and with `@wrksz/themes/next` also reads server-side - zero-flash SSR without boilerplate. <Since version="0.7.0" /> |
+| `storage` | `"localStorage" \| "sessionStorage" \| "cookie" \| "hybrid" \| "none"` | `"localStorage"` | Where to persist the theme. `"hybrid"` reads from cookie first (SSR-safe) and mirrors to `localStorage` for cross-tab sync. `"cookie"` reads/writes `document.cookie` and with `@wrksz/themes/next` also reads server-side. <Since version="0.9.0" /> |
 | `cookieOptions` | `CookieOptions` | - | Cookie attributes applied when writing the theme cookie. Only used when `storage="cookie"`. See [CookieOptions](#cookieoptions). <Since version="0.8.0" /> |
 | `disableTransitionOnChange` | `boolean \| string` | `false` | Suppress CSS transitions on initial load and when switching themes. `true` disables all transitions. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties while keeping others (transforms, opacity, etc.) intact. <Since version="0.7.4" /> |
 | `followSystem` | `boolean` | `false` | Always follow system preference, ignores stored value on mount |
@@ -174,13 +174,42 @@ The provider reads `document.cookie` on the client and `cookies()` from `next/he
   Cookie storage does not support cross-tab theme sync. If you need cross-tab sync, use `localStorage` with [`initialTheme`](/docs/examples/server-theme).
 </Callout>
 
+### Hybrid storage (SSR + cross-tab sync)
+
+<Since version="0.9.0" />
+
+`storage="hybrid"` combines the best parts of cookie and local storage:
+
+- **Read priority:** cookie first, then `localStorage`
+- **Writes:** cookie and `localStorage`
+- **SSR:** cookie is available server-side with `@wrksz/themes/next`
+- **Cross-tab:** changes propagate through the `storage` event
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider } from "@wrksz/themes/next";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider storage="hybrid" defaultTheme="system">
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
 ### Sharing cookie across subdomains
 
-Use `cookieOptions.domain` to share the theme preference between subdomains (e.g. `app.example.com` and `api.example.com`):
+Use `cookieOptions.domain` to share the theme preference between subdomains (e.g. `app.example.com` and `api.example.com`).
+
+Works with both `storage="cookie"` and `storage="hybrid"`:
 
 ```tsx title="app/layout.tsx"
 <ThemeProvider
-  storage="cookie"
+  storage="hybrid"
   cookieOptions={{ domain: ".example.com" }}
 >
   {children}

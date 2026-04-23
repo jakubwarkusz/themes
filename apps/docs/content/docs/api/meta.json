@@ -4,7 +4,9 @@
   "pages": [
     "theme-provider",
     "client-theme-provider",
+    "create-themes",
     "use-theme",
+    "use-theme-effect",
     "use-theme-value",
     "themed-image",
     "get-theme"
