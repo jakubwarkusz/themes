@@ -61,11 +61,11 @@ const features: Feature[] = [
 	},
 	{
 		icon: CookieIcon,
-		title: "Cookie SSR",
+		title: "Hybrid storage",
 		description: (
 			<>
-				Zero-flash SSR with <C>storage="cookie"</C>. Reads server-side automatically - no
-				boilerplate.
+				Use <C>storage="hybrid"</C> for cookie-first SSR correctness plus cross-tab sync via{" "}
+				<C>localStorage</C>.
 			</>
 		),
 	},
@@ -80,8 +80,8 @@ const features: Feature[] = [
 		title: "Full type safety",
 		description: (
 			<>
-				Generic <C>{"useTheme<AppTheme>()"}</C> constrains <C>setTheme</C> to your exact
-				theme union. No casting needed.
+				<C>createThemes(...)</C> infers your theme union once and types <C>useTheme</C>,{" "}
+				<C>useThemeValue</C>, and <C>setTheme</C> everywhere.
 			</>
 		),
 	},

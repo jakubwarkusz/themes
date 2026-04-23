@@ -114,6 +114,7 @@ Accepts `boolean | string`. Passing a CSS `transition` string suppresses only th
 
 After migrating, these features are available without any additional configuration:
 
+- **`storage="hybrid"`** - cookie-first reads for SSR + `localStorage` mirror for cross-tab sync. <Since version="0.9.0" />
 - **`storage="cookie"`** - zero-flash SSR without boilerplate. Pass `storage="cookie"` to `ThemeProvider` from `@wrksz/themes/next`.
 - **`storage="sessionStorage"`** - persists theme only for the current tab.
 - **`storage="none"`** - no persistence, useful for scoped or forced themes.
@@ -121,5 +122,7 @@ After migrating, these features are available without any additional configurati
 - **`initialTheme`** - initialize theme from a server-side source.
 - **`followSystem`** - always follow system preference, ignoring stored value.
 - **`getTheme()`** - read the current theme from a cookie outside React.
+- **`createThemes(...)`** - typed factory for provider + hooks from one canonical theme tuple. <Since version="0.9.0" />
+- **`useThemeEffect(...)`** - side effects that run on theme changes after mount. <Since version="0.9.0" />
 
 See [Why not next-themes?](/docs/why-not-next-themes) for the full comparison.
