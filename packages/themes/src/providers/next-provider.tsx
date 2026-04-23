@@ -7,7 +7,7 @@ export async function ThemeProvider<Themes extends string = DefaultTheme>(
 ): Promise<ReactElement> {
 	let serverTheme: string | undefined;
 
-	if (props.storage === "cookie") {
+	if (props.storage === "cookie" || props.storage === "hybrid") {
 		try {
 			const { cookies } = await import("next/headers");
 			const cookieStore = await cookies();

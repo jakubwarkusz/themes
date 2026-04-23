@@ -100,6 +100,11 @@ describe("getScript", () => {
 		expect(script).toContain('"sessionStorage"');
 	});
 
+	test("inlines hybrid storage", () => {
+		const script = getScript({ ...base, storage: "hybrid" });
+		expect(script).toContain('"hybrid"');
+	});
+
 	test("inlines storage none", () => {
 		const script = getScript({ ...base, storage: "none" });
 		expect(script).toContain('"none"');

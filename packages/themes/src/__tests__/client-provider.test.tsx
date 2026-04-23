@@ -461,6 +461,48 @@ describe("ClientThemeProvider - cookie storage", () => {
 	});
 });
 
+describe("ClientThemeProvider - hybrid storage", () => {
+	test("prefers cookie over localStorage on mount", () => {
+		localStorage.setItem("theme", "light");
+		writeCookie("theme", "dark");
+		wrap(<ThemeConsumer />, { storage: "hybrid" });
+		expect(screen.getByTestId("theme").textContent).toBe("dark");
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("falls back to localStorage when cookie is absent", () => {
+		localStorage.setItem("theme", "dark");
+		wrap(<ThemeConsumer />, { storage: "hybrid" });
+		expect(screen.getByTestId("theme").textContent).toBe("dark");
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("writes to cookie and localStorage when setTheme is called", () => {
+		wrap(<ThemeConsumer />, { storage: "hybrid" });
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		expect(document.cookie).toContain("theme=dark");
+		expect(localStorage.getItem("theme")).toBe("dark");
+	});
+
+	test("reacts to localStorage storage events", () => {
+		writeCookie("theme", "light");
+		wrap(<ThemeConsumer />, { storage: "hybrid" });
+		act(() => {
+			dispatchStorageEvent("theme", "dark");
+		});
+		expect(screen.getByTestId("theme").textContent).toBe("dark");
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("syncs initialTheme to cookie and localStorage", () => {
+		wrap(<ThemeConsumer />, { storage: "hybrid", initialTheme: "dark" });
+		expect(document.cookie).toContain("theme=dark");
+		expect(localStorage.getItem("theme")).toBe("dark");
+	});
+});
+
 describe("ClientThemeProvider - disableTransitionOnChange", () => {
 	test("injected style contains 'none' for boolean true", () => {
 		wrap(<ThemeConsumer />, { disableTransitionOnChange: true, defaultTheme: "dark" });

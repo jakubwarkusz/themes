@@ -6,7 +6,7 @@ export type Attribute = "class" | `data-${string}`;
 
 export type ValueObject = Record<string, string>;
 
-export type StorageType = "localStorage" | "sessionStorage" | "cookie" | "none";
+export type StorageType = "localStorage" | "sessionStorage" | "cookie" | "hybrid" | "none";
 
 export type CookieOptions = {
 	/** Cookie domain, defaults to the current domain */
