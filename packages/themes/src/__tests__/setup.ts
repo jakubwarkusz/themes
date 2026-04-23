@@ -34,6 +34,7 @@ export function clearCookies(): void {
 	const cookies = document.cookie.split(";");
 	for (const cookie of cookies) {
 		const name = cookie.split("=")[0]?.trim();
+		// biome-ignore lint/suspicious/noDocumentCookie: test helper intentionally clears cookies via document.cookie
 		if (name) document.cookie = `${name}=; max-age=0; path=/`;
 	}
 }

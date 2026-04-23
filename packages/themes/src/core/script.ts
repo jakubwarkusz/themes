@@ -56,10 +56,19 @@ function themeScript(
 		try {
 			if (storage === "cookie") {
 				const re = new RegExp(
-					"(?:^|;\\s*)" + storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "=([^;]*)",
+					`(?:^|;\\s*)${storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`,
 				);
 				const match = document.cookie.match(re);
-				stored = match?.[1] != null ? decodeURIComponent(match[1]) : null;
+				const decoded = match?.[1] != null ? decodeURIComponent(match[1]) : null;
+				stored = decoded ? decoded : null;
+			} else if (storage === "hybrid") {
+				const re = new RegExp(
+					`(?:^|;\\s*)${storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`,
+				);
+				const match = document.cookie.match(re);
+				const decoded = match?.[1] != null ? decodeURIComponent(match[1]) : null;
+				const fromCookie = decoded ? decoded : null;
+				stored = fromCookie ?? localStorage.getItem(storageKey);
 			} else if (storage !== "none") {
 				const store = storage === "localStorage" ? localStorage : sessionStorage;
 				stored = store.getItem(storageKey);

@@ -9,6 +9,7 @@ export type ThemeStore = {
 	subscribe(listener: () => void): () => void;
 	getSnapshot(): ThemeState;
 	getServerSnapshot(): ThemeState;
+	setState(nextState: ThemeState): void;
 	setTheme(theme: string | undefined): void;
 	setSystemTheme(systemTheme: "light" | "dark" | undefined): void;
 };
@@ -19,6 +20,12 @@ export function createThemeStore(): ThemeStore {
 
 	function emit(): void {
 		for (const listener of listeners) listener();
+	}
+
+	function setState(nextState: ThemeState): void {
+		if (state.theme === nextState.theme && state.systemTheme === nextState.systemTheme) return;
+		state = nextState;
+		emit();
 	}
 
 	return {
@@ -37,16 +44,16 @@ export function createThemeStore(): ThemeStore {
 			return SERVER_SNAPSHOT;
 		},
 
+		setState(nextState: ThemeState): void {
+			setState(nextState);
+		},
+
 		setTheme(theme: string | undefined): void {
-			if (state.theme === theme) return;
-			state = { ...state, theme };
-			emit();
+			setState({ ...state, theme });
 		},
 
 		setSystemTheme(systemTheme: "light" | "dark" | undefined): void {
-			if (state.systemTheme === systemTheme) return;
-			state = { ...state, systemTheme };
-			emit();
+			setState({ ...state, systemTheme });
 		},
 	};
 }

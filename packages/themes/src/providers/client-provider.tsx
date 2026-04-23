@@ -29,6 +29,53 @@ function updateMetaThemeColor(color: string | undefined): void {
 	meta.content = color;
 }
 
+function getDomWindow(): (Window & typeof globalThis) | null {
+	if (typeof document === "undefined") return null;
+	return document.defaultView;
+}
+
+function readCookieValue(key: string): string | null {
+	const re = new RegExp(`(?:^|;\\s*)${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`);
+	const match = document.cookie.match(re);
+	const decoded = match?.[1] != null ? decodeURIComponent(match[1]) : null;
+	return decoded ? decoded : null;
+}
+
+function readStoredTheme(
+	storage: ThemeProviderProps["storage"],
+	storageKey: string,
+): string | null {
+	if (storage === "none") return null;
+	if (storage === "cookie") return readCookieValue(storageKey);
+	if (storage === "hybrid")
+		return readCookieValue(storageKey) ?? localStorage.getItem(storageKey);
+	if (storage === "localStorage") return localStorage.getItem(storageKey);
+	return sessionStorage.getItem(storageKey);
+}
+
+function writeStoredTheme(
+	storage: ThemeProviderProps["storage"],
+	storageKey: string,
+	theme: string,
+	cookieOptions: ThemeProviderProps["cookieOptions"],
+): void {
+	if (storage === "none") return;
+	if (storage === "cookie") {
+		writeCookie(storageKey, theme, cookieOptions);
+		return;
+	}
+	if (storage === "hybrid") {
+		writeCookie(storageKey, theme, cookieOptions);
+		localStorage.setItem(storageKey, theme);
+		return;
+	}
+	if (storage === "localStorage") {
+		localStorage.setItem(storageKey, theme);
+		return;
+	}
+	sessionStorage.setItem(storageKey, theme);
+}
+
 export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	children,
 	themes = DEFAULT_THEMES as Themes[],
@@ -54,7 +101,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 	const storeRef = useRef(createThemeStore());
 	const store = storeRef.current;
-	const { getSnapshot, setTheme: setStoreTheme, setSystemTheme: setStoreSystemTheme } = store;
+	const {
+		getSnapshot,
+		setState: setStoreState,
+		setTheme: setStoreTheme,
+		setSystemTheme: setStoreSystemTheme,
+	} = store;
 
 	const { theme, systemTheme } = useSyncExternalStore(
 		store.subscribe,
@@ -132,9 +184,16 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	);
 
 	useEffect(() => {
-		const mq = enableSystem ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+		const domWindow = getDomWindow();
+		if (!domWindow) return;
+		const mq =
+			enableSystem && typeof domWindow.matchMedia === "function"
+				? domWindow.matchMedia("(prefers-color-scheme: dark)")
+				: null;
 		const sys: "light" | "dark" | undefined = mq ? (mq.matches ? "dark" : "light") : undefined;
-		if (sys) setStoreSystemTheme(sys);
+		if (sys) {
+			setStoreSystemTheme(sys);
+		}
 
 		if (forcedTheme) {
 			setStoreTheme(forcedTheme);
@@ -143,28 +202,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			setStoreTheme(initialTheme);
 			applyToDom(initialTheme === "system" ? (sys ?? "light") : (initialTheme as string));
 			try {
-				if (storage === "cookie") {
-					writeCookie(storageKey, String(initialTheme), cookieOptions);
-				} else if (storage !== "none") {
-					const s = storage === "localStorage" ? localStorage : sessionStorage;
-					s.setItem(storageKey, String(initialTheme));
-				}
+				writeStoredTheme(storage, storageKey, String(initialTheme), cookieOptions);
 			} catch {}
 		} else {
 			let stored: string | null = null;
 			try {
-				if (storage === "cookie") {
-					const re = new RegExp(
-						"(?:^|;\\s*)" +
-							storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") +
-							"=([^;]*)",
-					);
-					const match = document.cookie.match(re);
-					stored = match?.[1] != null ? decodeURIComponent(match[1]) : null;
-				} else if (storage !== "none") {
-					const s = storage === "localStorage" ? localStorage : sessionStorage;
-					stored = s.getItem(storageKey);
-				}
+				stored = readStoredTheme(storage, storageKey);
 			} catch {}
 
 			const initial =
@@ -174,7 +217,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 					? (stored as Themes | "system")
 					: resolvedDefault;
 
-			setStoreTheme(initial);
+			setStoreState({ theme: initial, systemTheme: sys });
 			applyToDom(initial === "system" ? (sys ?? "light") : (initial as string));
 		}
 
@@ -205,32 +248,40 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		followSystem,
 		applyToDom,
 		getSnapshot,
+		setStoreState,
 		setStoreTheme,
 		setStoreSystemTheme,
 	]);
 
 	// Re-apply theme on bfcache restore (pageshow) and history navigation (popstate)
 	useEffect(() => {
+		const domWindow = getDomWindow();
+		if (!domWindow) return;
 		const handler = () => {
 			const { theme, systemTheme } = getSnapshot();
 			const resolved =
 				forcedTheme ?? (theme === "system" || theme === undefined ? systemTheme : theme);
 			if (resolved) applyToDom(resolved);
 		};
-		window.addEventListener("pageshow", handler);
-		window.addEventListener("popstate", handler);
+		domWindow.addEventListener("pageshow", handler);
+		domWindow.addEventListener("popstate", handler);
 		return () => {
-			window.removeEventListener("pageshow", handler);
-			window.removeEventListener("popstate", handler);
+			domWindow.removeEventListener("pageshow", handler);
+			domWindow.removeEventListener("popstate", handler);
 		};
 	}, [applyToDom, forcedTheme, getSnapshot]);
 
 	useEffect(() => {
+		const domWindow = getDomWindow();
+		if (!domWindow) return;
 		if (storage === "none" || storage === "sessionStorage" || storage === "cookie") return;
 
 		const handler = (e: StorageEvent) => {
 			if (e.storageArea !== localStorage || e.key !== storageKey || !e.newValue) return;
-			if ((themes as string[]).includes(e.newValue)) {
+			if (
+				(themes as string[]).includes(e.newValue) ||
+				(enableSystem && e.newValue === "system")
+			) {
 				const newTheme = e.newValue as Themes | "system";
 				const resolved =
 					newTheme === "system" ? (getSnapshot().systemTheme ?? "light") : newTheme;
@@ -238,9 +289,9 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				applyToDom(resolved);
 			}
 		};
-		window.addEventListener("storage", handler);
-		return () => window.removeEventListener("storage", handler);
-	}, [storage, storageKey, themes, applyToDom, getSnapshot, setStoreTheme]);
+		domWindow.addEventListener("storage", handler);
+		return () => domWindow.removeEventListener("storage", handler);
+	}, [storage, storageKey, themes, enableSystem, applyToDom, getSnapshot, setStoreTheme]);
 
 	const setTheme = useCallback(
 		(
@@ -261,12 +312,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			onThemeChangeRef.current?.(newTheme as Themes);
 
 			try {
-				if (storage === "cookie") {
-					writeCookie(storageKey, newTheme, cookieOptions);
-				} else if (storage !== "none") {
-					const store = storage === "localStorage" ? localStorage : sessionStorage;
-					store.setItem(storageKey, newTheme);
-				}
+				writeStoredTheme(storage, storageKey, newTheme, cookieOptions);
 			} catch {}
 		},
 		[applyToDom, cookieOptions, forcedTheme, storage, storageKey, getSnapshot, setStoreTheme],

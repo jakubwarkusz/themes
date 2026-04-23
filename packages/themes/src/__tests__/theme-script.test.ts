@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import { writeCookie } from "../core/cookie.js";
 import { getScript } from "../core/script.js";
 import { clearCookies } from "./setup.js";
 
@@ -169,6 +170,22 @@ describe("themeScript - #308 (from next-themes) enableSystem + defaultTheme", ()
 	});
 });
 
+describe("themeScript - hybrid storage", () => {
+	test("prefers cookie over localStorage", () => {
+		writeCookie("theme", "dark");
+		localStorage.setItem("theme", "light");
+		runScript({ ...base, storage: "hybrid" });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+		expect(document.documentElement.classList.contains("light")).toBe(false);
+	});
+
+	test("falls back to localStorage when cookie is missing", () => {
+		localStorage.setItem("theme", "dark");
+		runScript({ ...base, storage: "hybrid" });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+});
+
 describe("themeScript - themeColor", () => {
 	test("creates meta theme-color tag", () => {
 		localStorage.setItem("theme", "dark");
@@ -251,13 +268,13 @@ describe("themeScript - initialTheme", () => {
 
 describe("themeScript - cookie storage", () => {
 	test("reads theme from cookie", () => {
-		document.cookie = "theme=dark; path=/";
+		writeCookie("theme", "dark");
 		runScript({ ...base, storage: "cookie" });
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});
 
 	test("reads theme from cookie with custom storageKey", () => {
-		document.cookie = "color-scheme=dark; path=/";
+		writeCookie("color-scheme", "dark");
 		runScript({ ...base, storage: "cookie", storageKey: "color-scheme" });
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});
@@ -268,20 +285,20 @@ describe("themeScript - cookie storage", () => {
 	});
 
 	test("ignores invalid cookie value, falls back to defaultTheme", () => {
-		document.cookie = "theme=hacked; path=/";
+		writeCookie("theme", "hacked");
 		runScript({ ...base, storage: "cookie", enableSystem: false, defaultTheme: "light" });
 		expect(document.documentElement.classList.contains("light")).toBe(true);
 	});
 
 	test("initialTheme takes priority over cookie", () => {
-		document.cookie = "theme=light; path=/";
+		writeCookie("theme", "light");
 		runScript({ ...base, storage: "cookie", initialTheme: "dark" });
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 		expect(document.documentElement.classList.contains("light")).toBe(false);
 	});
 
 	test("cookie value with encoded characters is decoded correctly", () => {
-		document.cookie = "theme=dark; path=/";
+		writeCookie("theme", "dark");
 		runScript({ ...base, storage: "cookie" });
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});

@@ -12,7 +12,8 @@
 		"prepare": "[ \"$CI\" = \"true\" ] || lefthook install"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.8",
+		"@biomejs/biome": "^2.4.13",
+		"@biomejs/cli-linux-x64": "^2.4.13",
 		"lefthook": "^2.1.4"
 	}
 }

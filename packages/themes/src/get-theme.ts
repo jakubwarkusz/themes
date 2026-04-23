@@ -14,7 +14,7 @@ function readFromCookieString(
 	themes: string[] | undefined,
 ): string {
 	const re = new RegExp(
-		"(?:^|;\\s*)" + storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "=([^;]*)",
+		`(?:^|;\\s*)${storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`,
 	);
 	const match = cookieString.match(re);
 	const stored = match?.[1] != null ? decodeURIComponent(match[1]) : null;

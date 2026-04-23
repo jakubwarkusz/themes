@@ -29,5 +29,6 @@ export function ThemedImage({
 
 	const resolvedSrc = (resolvedTheme && src[resolvedTheme]) || fallback;
 
+	// biome-ignore lint/performance/noImgElement: component is framework-agnostic and cannot depend on next/image
 	return <img src={resolvedSrc} alt={alt} {...props} />;
 }
