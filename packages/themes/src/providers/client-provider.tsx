@@ -29,6 +29,11 @@ function updateMetaThemeColor(color: string | undefined): void {
 	meta.content = color;
 }
 
+function getDomWindow(): (Window & typeof globalThis) | null {
+	if (typeof document === "undefined") return null;
+	return document.defaultView;
+}
+
 function readCookieValue(key: string): string | null {
 	const re = new RegExp(`(?:^|;\\s*)${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`);
 	const match = document.cookie.match(re);
@@ -179,7 +184,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	);
 
 	useEffect(() => {
-		const mq = enableSystem ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+		const domWindow = getDomWindow();
+		if (!domWindow) return;
+		const mq =
+			enableSystem && typeof domWindow.matchMedia === "function"
+				? domWindow.matchMedia("(prefers-color-scheme: dark)")
+				: null;
 		const sys: "light" | "dark" | undefined = mq ? (mq.matches ? "dark" : "light") : undefined;
 		if (sys) {
 			setStoreSystemTheme(sys);
@@ -245,21 +255,25 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 	// Re-apply theme on bfcache restore (pageshow) and history navigation (popstate)
 	useEffect(() => {
+		const domWindow = getDomWindow();
+		if (!domWindow) return;
 		const handler = () => {
 			const { theme, systemTheme } = getSnapshot();
 			const resolved =
 				forcedTheme ?? (theme === "system" || theme === undefined ? systemTheme : theme);
 			if (resolved) applyToDom(resolved);
 		};
-		window.addEventListener("pageshow", handler);
-		window.addEventListener("popstate", handler);
+		domWindow.addEventListener("pageshow", handler);
+		domWindow.addEventListener("popstate", handler);
 		return () => {
-			window.removeEventListener("pageshow", handler);
-			window.removeEventListener("popstate", handler);
+			domWindow.removeEventListener("pageshow", handler);
+			domWindow.removeEventListener("popstate", handler);
 		};
 	}, [applyToDom, forcedTheme, getSnapshot]);
 
 	useEffect(() => {
+		const domWindow = getDomWindow();
+		if (!domWindow) return;
 		if (storage === "none" || storage === "sessionStorage" || storage === "cookie") return;
 
 		const handler = (e: StorageEvent) => {
@@ -275,8 +289,8 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				applyToDom(resolved);
 			}
 		};
-		window.addEventListener("storage", handler);
-		return () => window.removeEventListener("storage", handler);
+		domWindow.addEventListener("storage", handler);
+		return () => domWindow.removeEventListener("storage", handler);
 	}, [storage, storageKey, themes, enableSystem, applyToDom, getSnapshot, setStoreTheme]);
 
 	const setTheme = useCallback(
