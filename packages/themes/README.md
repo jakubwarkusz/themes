@@ -2,8 +2,8 @@
 
 # @wrksz/themes
 
-[npm version](https://www.npmjs.com/package/@wrksz/themes)
-[docs](https://themes.wrksz.dev)
+[![npm version](https://img.shields.io/npm/v/@wrksz/themes)](https://www.npmjs.com/package/@wrksz/themes)
+[![docs](https://img.shields.io/badge/docs-themes.wrksz.dev-7c3aed)](https://themes.wrksz.dev)
 
 Modern theme management for Next.js 16+ and React 19+. Near drop-in replacement for `next-themes` - fixes every known bug and adds missing features. Migrating requires changing one import line.
 
