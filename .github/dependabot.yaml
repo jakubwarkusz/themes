@@ -1,0 +1,35 @@
+---
+version: 2
+updates:
+    - package-ecosystem: "bun"
+      directory: "/"
+      target-branch: "development"
+      open-pull-requests-limit: 10
+      schedule:
+          timezone: "Europe/Warsaw"
+          interval: "semiannually"
+      commit-message:
+          prefix: "chore(deps->root):"
+      labels: ["🔄 dependencies"]
+    
+    - package-ecosystem: "bun"
+      directory: "/packages/themes"
+      target-branch: "development"
+      open-pull-requests-limit: 10
+      schedule:
+          timezone: "Europe/Warsaw"
+          interval: "semiannually"
+      commit-message:
+          prefix: "chore(deps->themes):"
+      labels: ["🔄 dependencies"]
+
+    - package-ecosystem: "bun"
+      directory: "/apps/docs"
+      target-branch: "development"
+      open-pull-requests-limit: 10
+      schedule:
+          timezone: "Europe/Warsaw"
+          interval: "semiannually"
+      commit-message:
+          prefix: "chore(deps->docs):"
+      labels: ["🔄 dependencies"]
