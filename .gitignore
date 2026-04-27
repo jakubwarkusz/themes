@@ -19,3 +19,4 @@ yarn-error.log*
 .env.production.local
 .turbo
 .next
+packages/themes/benchmarks/.bundle-size/
