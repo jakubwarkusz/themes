@@ -107,7 +107,7 @@ Unlike `defaultTheme="system"` (which stores the resolved value after first visi
 <ThemeProvider disableTransitionOnChange="background-color 0s, color 0s, border-color 0s">
 ```
 
-The style is also injected by the inline script on initial page load - not just when the user switches themes. This means there is no transition flash on first paint either.
+The inline script can also suppress transitions on initial page load when it needs to correct the SSR-applied theme. If the server markup already matches, hydration stays a no-op and no transition override is reinserted.
 
 ### Read theme outside React
 

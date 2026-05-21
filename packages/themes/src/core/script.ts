@@ -37,15 +37,6 @@ function themeScript(
 	disableTransitionOnChange: boolean | string,
 	followSystem: boolean,
 ): void {
-	if (disableTransitionOnChange) {
-		const css =
-			typeof disableTransitionOnChange === "string" ? disableTransitionOnChange : "none";
-		const style = document.createElement("style");
-		style.textContent = `*,*::before,*::after{transition:${css}!important}`;
-		document.head.appendChild(style);
-		requestAnimationFrame(() => requestAnimationFrame(() => document.head.removeChild(style)));
-	}
-
 	let theme: string;
 
 	if (forcedTheme) {
@@ -105,18 +96,47 @@ function themeScript(
 	if (!el) return;
 
 	const attrs = Array.isArray(attribute) ? attribute : [attribute];
+	let changed = false;
 
 	for (const attr of attrs) {
 		if (attr === "class") {
 			const toRemove = themes.flatMap((t) => (value?.[t] || t).split(" "));
-			el.classList.remove(...toRemove);
-			el.classList.add(...attrValue.split(" "));
+			const toAdd = attrValue.split(" ");
+			changed =
+				changed ||
+				toRemove.some((token) => !toAdd.includes(token) && el.classList.contains(token)) ||
+				toAdd.some((token) => !el.classList.contains(token));
 		} else {
-			if (attrValue) {
-				el.setAttribute(attr, attrValue);
-			} else {
-				el.removeAttribute(attr);
+			changed = changed || el.getAttribute(attr) !== attrValue;
+		}
+	}
+
+	if (changed && disableTransitionOnChange) {
+		const css =
+			typeof disableTransitionOnChange === "string" ? disableTransitionOnChange : "none";
+		const style = document.createElement("style");
+		style.textContent = `*,*::before,*::after{transition:${css}!important}`;
+		document.head.appendChild(style);
+		requestAnimationFrame(() => requestAnimationFrame(() => document.head.removeChild(style)));
+	}
+
+	for (const attr of attrs) {
+		if (attr === "class") {
+			const toRemove = themes.flatMap((t) => (value?.[t] || t).split(" "));
+			const toAdd = attrValue.split(" ");
+			if (
+				toRemove.some((token) => !toAdd.includes(token) && el.classList.contains(token)) ||
+				toAdd.some((token) => !el.classList.contains(token))
+			) {
+				el.classList.remove(...toRemove);
+				el.classList.add(...toAdd);
 			}
+		} else if (attrValue) {
+			if (el.getAttribute(attr) !== attrValue) {
+				el.setAttribute(attr, attrValue);
+			}
+		} else {
+			el.removeAttribute(attr);
 		}
 	}
 

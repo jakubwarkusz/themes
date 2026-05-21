@@ -316,6 +316,23 @@ describe("themeScript - cookie storage", () => {
 });
 
 describe("themeScript - disableTransitionOnChange", () => {
+	test("does not inject style when the target already has the resolved class", () => {
+		window.matchMedia = () => ({ matches: false }) as MediaQueryList;
+		document.documentElement.classList.add("light");
+		const appendedStyles: string[] = [];
+		const origAppend = document.head.appendChild.bind(document.head);
+		document.head.appendChild = <T extends Node>(node: T): T => {
+			if ((node as unknown as Element).tagName === "STYLE")
+				appendedStyles.push((node as unknown as Element).textContent ?? "");
+			return origAppend(node) as T;
+		};
+
+		runScript({ ...base, disableTransitionOnChange: true });
+
+		document.head.appendChild = origAppend;
+		expect(appendedStyles).toHaveLength(0);
+	});
+
 	test("injects style element into head when true", () => {
 		window.matchMedia = () => ({ matches: false }) as MediaQueryList;
 		const captured = { content: null as string | null };
