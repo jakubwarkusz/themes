@@ -222,7 +222,7 @@ All `cookieOptions` fields have sensible defaults - you only need to specify wha
 
 <Since version="0.7.4" />
 
-Suppress CSS transitions on two occasions: when the inline script applies the theme on initial load, and whenever the user switches themes. This prevents both first-paint flash and animated jank:
+Suppress CSS transitions only when the library actually changes the applied theme: during the inline script's initial run when SSR markup needs correction, and whenever the user switches themes. This prevents first-paint flash and animated jank without reinserting a transition override during no-op hydration:
 
 ```tsx
 <ThemeProvider disableTransitionOnChange>
@@ -238,7 +238,7 @@ To keep some transitions intact (e.g. hover effects, animations) while only supp
 </ThemeProvider>
 ```
 
-The string is injected as `transition: <value> !important` on all elements for two animation frames - both during the initial script run and on each subsequent theme change.
+The string is injected as `transition: <value> !important` on all elements for two animation frames, but only around a real DOM theme update.
 
 ### Always follow system preference
 

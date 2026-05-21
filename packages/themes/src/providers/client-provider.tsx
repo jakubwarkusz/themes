@@ -29,6 +29,18 @@ function updateMetaThemeColor(color: string | undefined): void {
 	meta.content = color;
 }
 
+function classAttributeNeedsUpdate(
+	el: Element,
+	currentValues: string[],
+	nextValues: string[],
+): boolean {
+	return (
+		currentValues.some(
+			(token) => !nextValues.includes(token) && el.classList.contains(token),
+		) || nextValues.some((token) => !el.classList.contains(token))
+	);
+}
+
 function getDomWindow(): (Window & typeof globalThis) | null {
 	if (typeof document === "undefined") return null;
 	return document.defaultView;
@@ -138,8 +150,17 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 			const attrValue = valueMap?.[resolved] ?? resolved;
 			const attrs = Array.isArray(attribute) ? attribute : [attribute];
+			const classValues = (themes as string[]).flatMap((t) =>
+				(valueMap?.[t] ?? t).split(" "),
+			);
+			const nextClassValues = attrValue.split(" ");
+			const needsUpdate = attrs.some((attr) =>
+				attr === "class"
+					? classAttributeNeedsUpdate(el, classValues, nextClassValues)
+					: el.getAttribute(attr) !== attrValue,
+			);
 
-			if (disableTransitionOnChange) {
+			if (needsUpdate && disableTransitionOnChange) {
 				const transitionValue =
 					typeof disableTransitionOnChange === "string"
 						? disableTransitionOnChange
@@ -154,13 +175,14 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 			for (const attr of attrs) {
 				if (attr === "class") {
-					const toRemove = (themes as string[]).flatMap((t) =>
-						(valueMap?.[t] ?? t).split(" "),
-					);
-					el.classList.remove(...toRemove);
-					el.classList.add(...attrValue.split(" "));
+					if (classAttributeNeedsUpdate(el, classValues, nextClassValues)) {
+						el.classList.remove(...classValues);
+						el.classList.add(...nextClassValues);
+					}
 				} else {
-					el.setAttribute(attr, attrValue);
+					if (el.getAttribute(attr) !== attrValue) {
+						el.setAttribute(attr, attrValue);
+					}
 				}
 			}
 

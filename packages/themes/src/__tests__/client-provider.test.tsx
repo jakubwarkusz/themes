@@ -504,6 +504,22 @@ describe("ClientThemeProvider - hybrid storage", () => {
 });
 
 describe("ClientThemeProvider - disableTransitionOnChange", () => {
+	test("does not inject style while hydrating an already-applied theme", () => {
+		document.documentElement.classList.add("dark");
+		const appendedStyles: string[] = [];
+		const origAppend = document.head.appendChild.bind(document.head);
+		document.head.appendChild = <T extends Node>(node: T): T => {
+			if ((node as unknown as Element).tagName === "STYLE")
+				appendedStyles.push((node as unknown as Element).textContent ?? "");
+			return origAppend(node) as T;
+		};
+
+		wrap(<ThemeConsumer />, { disableTransitionOnChange: true, defaultTheme: "dark" });
+
+		document.head.appendChild = origAppend;
+		expect(appendedStyles).toHaveLength(0);
+	});
+
 	test("injected style contains 'none' for boolean true", () => {
 		wrap(<ThemeConsumer />, { disableTransitionOnChange: true, defaultTheme: "dark" });
 
