@@ -69,26 +69,6 @@ export function ThemeToggle() {
 }
 ```
 
-## What's new in v0.9.0
-
-<Since version="0.9.0" />
-
-- `storage="hybrid"` combines cookie SSR correctness with `localStorage` cross-tab sync.
-- `createThemes(...)` gives a typed factory so your theme union is inferred once and reused everywhere.
-- `useThemeEffect(...)` runs theme side effects after mount when theme/resolvedTheme changes.
-
-```tsx title="app/theme.ts"
-"use client";
-import { createThemes } from "@wrksz/themes/client";
-
-export const { ThemeProvider, useTheme, useThemeValue, useThemeEffect } = createThemes({
-  themes: ["light", "dark", "high-contrast"] as const,
-  defaultTheme: "system",
-  storage: "hybrid",
-  attribute: "class",
-});
-```
-
 ## Import paths
 
 <Since version="0.9.2" />

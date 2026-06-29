@@ -1,0 +1,86 @@
+---
+title: Hybrid storage
+description: Use cookies for SSR and localStorage for cross-tab sync.
+---
+
+`storage="hybrid"` stores the theme in a cookie and mirrors it to `localStorage`. The cookie lets `@wrksz/themes/next` read the theme on the server, while `localStorage` keeps other tabs in sync.
+
+## Root layout
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider } from "@wrksz/themes/next";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider
+          storage="hybrid"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+Use `@wrksz/themes/next` in App Router layouts so the anti-flash script is injected through `useServerInsertedHTML`.
+
+## Theme toggle
+
+```tsx title="app/theme-toggle.tsx"
+"use client";
+
+import { useTheme } from "@wrksz/themes/client";
+
+export function ThemeToggle() {
+  const { theme, resolvedTheme, setTheme } = useTheme();
+
+  return (
+    <div>
+      <p>
+        Selected: {theme}
+        <br />
+        Resolved: {resolvedTheme}
+      </p>
+      <button type="button" onClick={() => setTheme("light")}>
+        Light
+      </button>
+      <button type="button" onClick={() => setTheme("dark")}>
+        Dark
+      </button>
+      <button type="button" onClick={() => setTheme("system")}>
+        System
+      </button>
+    </div>
+  );
+}
+```
+
+Open the same app in two tabs, switch the theme in one tab, and the other tab updates through the `storage` event.
+
+## CSS
+
+```css title="app/globals.css"
+:root {
+  --bg: #ffffff;
+  --fg: #0a0a0a;
+}
+
+:root.dark {
+  --bg: #0a0a0a;
+  --fg: #fafafa;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+```
+
+Avoid mixing this with a broad `@media (prefers-color-scheme: dark)` fallback for the same tokens. The provider sets the correct class before hydration.
+

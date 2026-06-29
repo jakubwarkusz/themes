@@ -1,0 +1,106 @@
+---
+title: Typed themes
+description: Define your theme tuple once and get typed providers, hooks, values, and images.
+---
+
+Use `createThemes` when your app has one canonical theme list. The tuple becomes the source of truth for the provider, hooks, `useThemeValue`, and `ThemedImage`.
+
+## Create a typed theme module
+
+```tsx title="app/theme.ts"
+"use client";
+
+import { createThemes } from "@wrksz/themes/client";
+
+export const themes = ["light", "dark", "dim"] as const;
+export type AppTheme = (typeof themes)[number];
+
+export const { ThemeProvider, useTheme, useThemeValue, useThemeEffect, ThemedImage } =
+  createThemes({
+    themes,
+    defaultTheme: "system",
+    storage: "hybrid",
+    attribute: "class",
+    disableTransitionOnChange: true,
+  });
+```
+
+## Use the typed provider
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider } from "@/app/theme";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+The `themes` tuple is fixed by the factory. Per-use props like `defaultTheme`, `forcedTheme`, `storageKey`, and `themeColor` can still be overridden, but the theme union remains consistent across the app.
+
+## Build typed UI
+
+```tsx title="app/theme-toggle.tsx"
+"use client";
+
+import { ThemedImage, useTheme, useThemeValue } from "@/app/theme";
+
+export function ThemeToggle() {
+  const { theme, resolvedTheme, setTheme } = useTheme();
+  const label = useThemeValue({
+    light: "Use dark",
+    dark: "Use dim",
+    dim: "Use light",
+    default: "Change theme",
+  });
+
+  const nextTheme = resolvedTheme === "light" ? "dark" : resolvedTheme === "dark" ? "dim" : "light";
+
+  return (
+    <div>
+      <button type="button" onClick={() => setTheme(nextTheme)}>
+        {label}
+      </button>
+      <span>Selected: {theme}</span>
+      <ThemedImage
+        src={{
+          light: "/logo-light.svg",
+          dark: "/logo-dark.svg",
+          dim: "/logo-dim.svg",
+        }}
+        alt="Logo"
+        width={120}
+        height={40}
+      />
+    </div>
+  );
+}
+```
+
+TypeScript now rejects unknown theme names in `setTheme`, missing image sources, and invalid keys in `useThemeValue`.
+
+## Reuse exported helper types
+
+```ts title="app/theme-types.ts"
+import type {
+  CreateThemesConfig,
+  ThemeValueMap,
+  TypedThemedImageProps,
+} from "@wrksz/themes/client";
+import { themes, type AppTheme } from "@/app/theme";
+
+export const themeConfig = {
+  themes,
+  defaultTheme: "system",
+  storage: "hybrid",
+} satisfies CreateThemesConfig<typeof themes>;
+
+export type AppThemeValueMap<Value> = ThemeValueMap<AppTheme, Value>;
+export type AppThemedImageProps = TypedThemedImageProps<AppTheme>;
+```
+
