@@ -2,7 +2,7 @@ import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
 import "./global.css";
 import { Analytics } from "@vercel/analytics/next";
-import { ThemeProvider } from "@wrksz/themes";
+import { ThemeProvider } from "@wrksz/themes/next";
 import { Inter } from "next/font/google";
 
 const inter = Inter({
