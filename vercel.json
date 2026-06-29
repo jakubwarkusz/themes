@@ -1,0 +1,5 @@
+{
+	"buildCommand": "bun run build:docs",
+	"outputDirectory": "apps/docs/.next",
+	"installCommand": "bun install"
+}
