@@ -2,8 +2,11 @@
 
 # @wrksz/themes
 
-[![npm version](https://img.shields.io/npm/v/@wrksz/themes)](https://www.npmjs.com/package/@wrksz/themes)
-[![docs](https://img.shields.io/badge/docs-themes.wrksz.dev-7c3aed)](https://themes.wrksz.dev)
+[![npm](https://shieldcn.dev/badge/npm-%40wrksz%2Fthemes-CB3837.png?logo=npm&variant=secondary&size=sm)](https://www.npmjs.com/package/@wrksz/themes)
+[![docs](https://shieldcn.dev/badge/docs-themes.wrksz.dev-7C3AED.png?logo=readthedocs&variant=secondary&size=sm)](https://themes.wrksz.dev)
+![Next.js](https://shieldcn.dev/badge/Next.js-16-000000.png?logo=nextdotjs&variant=secondary&size=sm)
+![React](https://shieldcn.dev/badge/React-19-087EA4.png?logo=react&variant=secondary&size=sm)
+![TypeScript](https://shieldcn.dev/badge/TypeScript-5.9-3178C6.png?logo=typescript&variant=secondary&size=sm)
 
 Modern theme management for Next.js 16+ and React 19+. Near drop-in replacement for `next-themes` - fixes every known bug and adds missing features. Migrating requires changing one import line.
 
@@ -12,12 +15,6 @@ bun add @wrksz/themes
 # or
 npm install @wrksz/themes
 ```
-
-## What's new in v0.9.0
-
-- `storage="hybrid"`: cookie-first read for SSR + `localStorage` mirror for cross-tab sync.
-- `createThemes(...)`: typed factory for provider and hooks from one canonical tuple.
-- `useThemeEffect(...)`: side effects on theme changes after initial render.
 
 ## Why not `next-themes`?
 
@@ -197,12 +194,22 @@ const theme = await getTheme({ defaultTheme: "dark" });
 return <html className={theme}>...</html>;
 ```
 
+Pass `themes` as a readonly tuple to infer the return type:
+
+```ts
+const theme = getTheme(request, {
+  themes: ["light", "dark", "high-contrast"] as const,
+  defaultTheme: "light",
+});
+// theme: "light" | "dark" | "high-contrast"
+```
+
 
 | Option         | Type       | Default    | Description                                                              |
 | -------------- | ---------- | ---------- | ------------------------------------------------------------------------ |
 | `storageKey`   | `string`   | `"theme"`  | Cookie name to read from                                                 |
 | `defaultTheme` | `string`   | `"system"` | Returned when no valid theme is found                                    |
-| `themes`       | `string[]` | -          | When provided, stored values not in the list fall back to `defaultTheme` |
+| `themes`       | `readonly string[]` | -          | When provided, stored values not in the list fall back to `defaultTheme`. Use `as const` for return type inference |
 
 
 ### `useThemeValue`

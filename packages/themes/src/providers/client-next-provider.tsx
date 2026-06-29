@@ -45,7 +45,7 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>({
 						enableSystem,
 						enableColorScheme,
 						forcedTheme: forcedTheme as string | undefined,
-						themes: themes as string[],
+						themes,
 						value: valueMap,
 						target,
 						storage,

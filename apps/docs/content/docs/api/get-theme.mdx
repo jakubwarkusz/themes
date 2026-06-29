@@ -11,8 +11,8 @@ Two variants depending on context:
 
 | Call | Returns | Use when |
 |------|---------|----------|
-| `getTheme(request)` | `string` | `proxy.ts`, edge functions |
-| `await getTheme()` | `Promise<string>` | Server Components, layouts |
+| `getTheme(request)` | `string` or inferred theme union | `proxy.ts`, edge functions |
+| `await getTheme()` | `Promise<string>` or inferred theme union | Server Components, layouts |
 
 ## Proxy
 
@@ -27,6 +27,36 @@ export function proxy(request: Request) {
   return response;
 }
 ```
+
+## Typed themes
+
+Pass your theme list as a readonly tuple to get a narrowed return type:
+
+```ts title="proxy.ts"
+import { getTheme } from "@wrksz/themes/next";
+
+const themes = ["light", "dark", "high-contrast"] as const;
+
+export function proxy(request: Request) {
+  const theme = getTheme(request, {
+    themes,
+    defaultTheme: "light",
+  });
+  // theme: "light" | "dark" | "high-contrast"
+}
+```
+
+Async usage in layouts works the same way:
+
+```tsx title="app/layout.tsx"
+const theme = await getTheme({
+  themes: ["light", "dark"] as const,
+  defaultTheme: "system",
+});
+// theme: "light" | "dark" | "system"
+```
+
+When `themes` is omitted, `getTheme` returns `string` because an existing cookie can contain any stored value.
 
 ## Layout - apply class directly on `<html>`
 
@@ -57,5 +87,5 @@ Setting `className` directly on `<html>` from the server guarantees the correct 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `storageKey` | `string` | `"theme"` | Cookie name to read from |
-| `defaultTheme` | `string` | `"system"` | Returned when no valid theme is found |
-| `themes` | `string[]` | - | When provided, stored values not in the list are ignored and `defaultTheme` is returned |
+| `defaultTheme` | `string` | `"system"` | Returned when no valid theme is found. When `themes` is a readonly tuple, this must be one of those themes or `"system"` |
+| `themes` | `readonly string[]` | - | When provided, stored values not in the list are ignored and `defaultTheme` is returned. Use `as const` for return type inference |

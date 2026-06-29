@@ -4,33 +4,40 @@ import type { DependencyList, EffectCallback, ReactElement } from "react";
 import type { ThemedImageProps } from "../components/themed-image.js";
 import { ThemedImage } from "../components/themed-image.js";
 import { useTheme } from "../core/context.js";
-import type { ThemeContextValue, ThemeProviderProps } from "../core/types.js";
+import type {
+	ResolvedTheme,
+	ThemeContextValue,
+	ThemeProviderProps,
+	ThemeSelection,
+} from "../core/types.js";
 import { useThemeEffect } from "../hooks/use-theme-effect.js";
 import { ThemeProvider } from "../providers/provider.js";
 
-type ThemeValueMap<Themes extends string, Value> = Partial<Record<Themes | "system", Value>> & {
+export type ThemeValueMap<Themes extends string, Value> = Partial<
+	Record<ThemeSelection<Themes>, Value>
+> & {
 	default?: Value;
 };
 
-type TypedThemedImageProps<Themes extends string> = Omit<ThemedImageProps, "src"> & {
-	src: Record<Themes, string>;
+export type TypedThemedImageProps<Themes extends string> = Omit<ThemedImageProps, "src"> & {
+	src: Record<ResolvedTheme<Themes>, string>;
 };
 
-type CreateThemesConfig<Themes extends readonly string[]> = Omit<
+export type CreateThemesConfig<Themes extends readonly string[]> = Omit<
 	ThemeProviderProps<Themes[number]>,
 	"children" | "themes"
 > & {
 	themes: Themes;
 };
 
-type FactoryResult<Themes extends readonly string[]> = {
-	ThemeProvider: (props: ThemeProviderProps<Themes[number]>) => ReactElement;
+export type CreateThemesResult<Themes extends readonly string[]> = {
+	ThemeProvider: (props: Omit<ThemeProviderProps<Themes[number]>, "themes">) => ReactElement;
 	useTheme: () => ThemeContextValue<Themes[number]>;
 	useThemeValue: <Value>(map: ThemeValueMap<Themes[number], Value>) => Value | undefined;
 	useThemeEffect: (
 		effect: (
-			theme: Themes[number] | "system" | undefined,
-			resolvedTheme: Exclude<Themes[number], "system"> | undefined,
+			theme: ThemeSelection<Themes[number]> | undefined,
+			resolvedTheme: ResolvedTheme<Themes[number]> | undefined,
 		) => ReturnType<EffectCallback>,
 		deps?: DependencyList,
 	) => void;
@@ -39,15 +46,17 @@ type FactoryResult<Themes extends readonly string[]> = {
 
 export function createThemes<const Themes extends readonly [string, ...string[]]>(
 	config: CreateThemesConfig<Themes>,
-): FactoryResult<Themes> {
+): CreateThemesResult<Themes> {
 	const defaults = config;
 	type ThemeName = Themes[number];
 
-	function TypedThemeProvider(props: ThemeProviderProps<ThemeName>): ReactElement {
+	function TypedThemeProvider(
+		props: Omit<ThemeProviderProps<ThemeName>, "themes">,
+	): ReactElement {
 		const merged = {
 			...defaults,
 			...props,
-			themes: (props.themes ?? defaults.themes) as ThemeName[],
+			themes: defaults.themes,
 		} satisfies ThemeProviderProps<ThemeName>;
 		return <ThemeProvider {...merged} />;
 	}
@@ -65,15 +74,15 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 
 	function useTypedThemeEffect(
 		effect: (
-			theme: ThemeName | "system" | undefined,
-			resolvedTheme: Exclude<ThemeName, "system"> | undefined,
+			theme: ThemeSelection<ThemeName> | undefined,
+			resolvedTheme: ResolvedTheme<ThemeName> | undefined,
 		) => ReturnType<EffectCallback>,
 		deps: DependencyList = [],
 	): void {
 		useThemeEffect((theme, resolvedTheme) => {
 			return effect(
-				theme as ThemeName | "system" | undefined,
-				resolvedTheme as Exclude<ThemeName, "system"> | undefined,
+				theme as ThemeSelection<ThemeName> | undefined,
+				resolvedTheme as ResolvedTheme<ThemeName> | undefined,
 			);
 		}, deps);
 	}

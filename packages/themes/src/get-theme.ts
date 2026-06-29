@@ -1,17 +1,28 @@
-export type GetThemeOptions = {
+import type { ThemeName, ThemeSelection } from "./core/types.js";
+
+export type GetThemeOptions<Themes extends readonly string[] = readonly string[]> = {
 	/** Storage key used for the theme cookie. Defaults to `"theme"`. */
 	storageKey?: string;
 	/** Returned when no valid theme is found in the cookie. Defaults to `"system"`. */
-	defaultTheme?: string;
+	defaultTheme?: ThemeSelection<ThemeName<Themes>>;
 	/** Valid theme names. When provided, stored values not in the list are ignored. */
-	themes?: string[];
+	themes?: Themes;
+};
+
+export type GetThemeResult<
+	Themes extends readonly string[],
+	DefaultThemeValue extends string = "system",
+> = ThemeName<Themes> | DefaultThemeValue;
+
+type UntypedGetThemeOptions = Omit<GetThemeOptions, "themes"> & {
+	themes?: undefined;
 };
 
 function readFromCookieString(
 	cookieString: string,
 	storageKey: string,
 	defaultTheme: string,
-	themes: string[] | undefined,
+	themes: readonly string[] | undefined,
 ): string {
 	const re = new RegExp(
 		`(?:^|;\\s*)${storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`,
@@ -41,8 +52,21 @@ function readFromCookieString(
  * const theme = await getTheme({ defaultTheme: "dark" });
  * return <html className={theme}>...</html>;
  */
-export function getTheme(request: Request, options?: GetThemeOptions): string;
-export function getTheme(options?: GetThemeOptions): Promise<string>;
+export function getTheme<
+	const Themes extends readonly [string, ...string[]],
+	const DefaultThemeValue extends ThemeSelection<ThemeName<Themes>> = "system",
+>(
+	request: Request,
+	options: GetThemeOptions<Themes> & { themes: Themes; defaultTheme?: DefaultThemeValue },
+): GetThemeResult<Themes, DefaultThemeValue>;
+export function getTheme(request: Request, options?: UntypedGetThemeOptions): string;
+export function getTheme<
+	const Themes extends readonly [string, ...string[]],
+	const DefaultThemeValue extends ThemeSelection<ThemeName<Themes>> = "system",
+>(
+	options: GetThemeOptions<Themes> & { themes: Themes; defaultTheme?: DefaultThemeValue },
+): Promise<GetThemeResult<Themes, DefaultThemeValue>>;
+export function getTheme(options?: UntypedGetThemeOptions): Promise<string>;
 export function getTheme(
 	requestOrOptions?: Request | GetThemeOptions,
 	options?: GetThemeOptions,

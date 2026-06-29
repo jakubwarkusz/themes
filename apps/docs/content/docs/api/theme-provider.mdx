@@ -61,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `themes` | `string[]` | `["light", "dark"]` | Available themes |
+| `themes` | `readonly string[]` | `["light", "dark"]` | Available themes. Use `as const` to preserve custom theme unions in TypeScript |
 | `defaultTheme` | `string` | `"system"` | Theme used when no preference is stored |
 | `forcedTheme` | `string` | - | Force a specific theme, ignoring user preference |
 | `initialTheme` | `string` | - | Server-provided theme that overrides storage on mount. User can still call `setTheme` to change it |
@@ -84,10 +84,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ### Custom themes
 
 ```tsx
-<ThemeProvider themes={["light", "dark", "high-contrast"]}>
+const themes = ["light", "dark", "high-contrast"] as const;
+
+<ThemeProvider themes={themes} defaultTheme="high-contrast">
   {children}
 </ThemeProvider>
 ```
+
+For full end-to-end inference across `setTheme`, `useThemeValue`, and theme-aware components, use [`createThemes`](/docs/api/create-themes) with the same tuple.
 
 ### Data attribute instead of class
 

@@ -5,8 +5,6 @@ description: Typed factory for ThemeProvider and theme hooks.
 
 `createThemes` lets you define your themes once and get typed provider/hooks everywhere.
 
-<Since version="0.9.0" />
-
 ```tsx title="app/theme.ts"
 "use client";
 import { createThemes } from "@wrksz/themes/client";
@@ -27,7 +25,36 @@ export const { ThemeProvider, useTheme, useThemeValue, useThemeEffect, ThemedIma
 - You define the theme tuple once, and type inference propagates to all consumers.
 - `setTheme` accepts only valid values from your configured theme union.
 - `useThemeValue` maps are checked against your union (plus optional `default`).
-- Provider defaults can still be overridden per usage.
+- `ThemedImage` requires a source for every configured theme.
+- Provider defaults can still be overridden per usage, while the theme tuple stays fixed.
+
+```tsx title="app/theme-toggle.tsx"
+"use client";
+import { ThemedImage, useTheme, useThemeValue } from "@/app/theme";
+
+export function ThemeToggle() {
+  const { setTheme } = useTheme();
+  const label = useThemeValue({
+    light: "Use dark",
+    dark: "Use high contrast",
+    "high-contrast": "Use light",
+  });
+
+  return (
+    <>
+      <button onClick={() => setTheme("high-contrast")}>{label}</button>
+      <ThemedImage
+        src={{
+          light: "/logo-light.svg",
+          dark: "/logo-dark.svg",
+          "high-contrast": "/logo-high-contrast.svg",
+        }}
+        alt="Logo"
+      />
+    </>
+  );
+}
+```
 
 ## Return value
 
@@ -39,9 +66,37 @@ export const { ThemeProvider, useTheme, useThemeValue, useThemeEffect, ThemedIma
 - `useThemeEffect`
 - `ThemedImage`
 
+## Exported types
+
+The factory exports helper types when you want to type local wrappers or shared maps:
+
+```ts title="app/theme.ts"
+import {
+  createThemes,
+  type CreateThemesConfig,
+  type CreateThemesResult,
+  type ThemeValueMap,
+  type TypedThemedImageProps,
+} from "@wrksz/themes/client";
+
+const themes = ["light", "dark", "high-contrast"] as const;
+type AppTheme = (typeof themes)[number];
+
+const config = {
+  themes,
+  defaultTheme: "system",
+  storage: "hybrid",
+} satisfies CreateThemesConfig<typeof themes>;
+
+export const themeApi = createThemes(config);
+export type AppThemeApi = CreateThemesResult<typeof themes>;
+export type AppThemeValueMap<Value> = ThemeValueMap<AppTheme, Value>;
+export type AppThemedImageProps = TypedThemedImageProps<AppTheme>;
+```
+
 ## Per-usage overrides
 
-Factory defaults are just defaults. You can override them per mount:
+Factory defaults are just defaults. You can override runtime props per mount:
 
 ```tsx
 import { ThemeProvider } from "@/app/theme";
@@ -50,6 +105,8 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
   return <ThemeProvider defaultTheme="light">{children}</ThemeProvider>;
 }
 ```
+
+The configured `themes` tuple remains the source of truth, so the typed provider does not accept a per-use `themes` override. Create another factory if a subtree genuinely needs a different theme union.
 
 ## Generic `useTheme<T>()` vs `createThemes`
 

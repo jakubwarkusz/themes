@@ -148,11 +148,10 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			const el = getTargetEl();
 			if (!el) return;
 
-			const attrValue = valueMap?.[resolved] ?? resolved;
+			const values: Partial<Record<string, string>> | undefined = valueMap;
+			const attrValue = values?.[resolved] ?? resolved;
 			const attrs = Array.isArray(attribute) ? attribute : [attribute];
-			const classValues = (themes as string[]).flatMap((t) =>
-				(valueMap?.[t] ?? t).split(" "),
-			);
+			const classValues = themes.flatMap((t) => (values?.[t] ?? t).split(" "));
 			const nextClassValues = attrValue.split(" ");
 			const needsUpdate = attrs.some((attr) =>
 				attr === "class"
@@ -235,7 +234,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			const initial =
 				!followSystem &&
 				stored &&
-				((themes as string[]).includes(stored) || (enableSystem && stored === "system"))
+				(themes.includes(stored as Themes) || (enableSystem && stored === "system"))
 					? (stored as Themes | "system")
 					: resolvedDefault;
 
@@ -301,7 +300,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		const handler = (e: StorageEvent) => {
 			if (e.storageArea !== localStorage || e.key !== storageKey || !e.newValue) return;
 			if (
-				(themes as string[]).includes(e.newValue) ||
+				themes.includes(e.newValue as Themes) ||
 				(enableSystem && e.newValue === "system")
 			) {
 				const newTheme = e.newValue as Themes | "system";
@@ -345,7 +344,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		resolvedTheme,
 		systemTheme,
 		forcedTheme,
-		themes: themes as string[],
+		themes,
 		setTheme: setTheme as ThemeContextValue<string>["setTheme"],
 	};
 

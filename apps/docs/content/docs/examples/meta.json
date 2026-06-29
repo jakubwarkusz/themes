@@ -3,9 +3,11 @@
   "description": "Integration examples for common use cases.",
   "pages": [
     "tailwind",
+    "typed-themes",
     "data-attribute",
     "scoped-theming",
     "forced-theme",
+    "hybrid-storage",
     "server-theme",
     "meta-theme-color"
   ]
