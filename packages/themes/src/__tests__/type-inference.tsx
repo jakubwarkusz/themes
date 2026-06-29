@@ -1,5 +1,13 @@
 import type { ReactNode } from "react";
-import { createThemes, ThemeProvider, type ThemeProviderProps } from "../index.js";
+import {
+	type CreateThemesConfig,
+	type CreateThemesResult,
+	createThemes,
+	ThemeProvider,
+	type ThemeProviderProps,
+	type ThemeValueMap,
+	type TypedThemedImageProps,
+} from "../index.js";
 import { getTheme } from "../next.js";
 
 function expectType<T>(_value: T): void {}
@@ -62,11 +70,26 @@ function ProviderUsage(): ReactNode {
 }
 expectType<() => ReactNode>(ProviderUsage);
 
+const validCreateThemesConfig = {
+	themes: appThemes,
+	storage: "hybrid",
+	defaultTheme: "system",
+} satisfies CreateThemesConfig<typeof appThemes>;
+expectType<typeof appThemes>(validCreateThemesConfig.themes);
+
+const invalidCreateThemesConfig = {
+	themes: appThemes,
+	// @ts-expect-error createThemes defaultTheme must be one of the configured themes or "system"
+	defaultTheme: "sepia",
+} satisfies CreateThemesConfig<typeof appThemes>;
+expectType<typeof appThemes>(invalidCreateThemesConfig.themes);
+
 const typed = createThemes({
 	themes: appThemes,
 	storage: "hybrid",
 	defaultTheme: "system",
 });
+expectType<CreateThemesResult<typeof appThemes>>(typed);
 
 function TypedUsage(): ReactNode {
 	const { theme, resolvedTheme, setTheme } = typed.useTheme();
@@ -89,6 +112,12 @@ function TypedUsage(): ReactNode {
 		sepia: "Nope",
 	});
 
+	const values = {
+		light: "Light",
+		default: "Fallback",
+	} satisfies ThemeValueMap<AppTheme, string>;
+	expectType<string>(values.default);
+
 	return (
 		<typed.ThemedImage
 			src={{
@@ -101,6 +130,28 @@ function TypedUsage(): ReactNode {
 	);
 }
 expectType<() => ReactNode>(TypedUsage);
+
+const imageProps = {
+	src: {
+		light: "/logo-light.png",
+		dark: "/logo-dark.png",
+		"high-contrast": "/logo-high-contrast.png",
+	},
+	alt: "Logo",
+} satisfies TypedThemedImageProps<AppTheme>;
+expectType<string>(imageProps.src.dark);
+
+function InvalidTypedProviderOverride(): ReactNode {
+	return (
+		<typed.ThemeProvider
+			// @ts-expect-error typed ThemeProvider keeps the configured theme tuple fixed
+			themes={["light", "dark"] as const}
+		>
+			children
+		</typed.ThemeProvider>
+	);
+}
+expectType<() => ReactNode>(InvalidTypedProviderOverride);
 
 function InvalidTypedImage(): ReactNode {
 	return (

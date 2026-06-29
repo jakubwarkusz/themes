@@ -13,23 +13,25 @@ import type {
 import { useThemeEffect } from "../hooks/use-theme-effect.js";
 import { ThemeProvider } from "../providers/provider.js";
 
-type ThemeValueMap<Themes extends string, Value> = Partial<Record<Themes | "system", Value>> & {
+export type ThemeValueMap<Themes extends string, Value> = Partial<
+	Record<ThemeSelection<Themes>, Value>
+> & {
 	default?: Value;
 };
 
-type TypedThemedImageProps<Themes extends string> = Omit<ThemedImageProps, "src"> & {
-	src: Record<Themes, string>;
+export type TypedThemedImageProps<Themes extends string> = Omit<ThemedImageProps, "src"> & {
+	src: Record<ResolvedTheme<Themes>, string>;
 };
 
-type CreateThemesConfig<Themes extends readonly string[]> = Omit<
+export type CreateThemesConfig<Themes extends readonly string[]> = Omit<
 	ThemeProviderProps<Themes[number]>,
 	"children" | "themes"
 > & {
 	themes: Themes;
 };
 
-type FactoryResult<Themes extends readonly string[]> = {
-	ThemeProvider: (props: ThemeProviderProps<Themes[number]>) => ReactElement;
+export type CreateThemesResult<Themes extends readonly string[]> = {
+	ThemeProvider: (props: Omit<ThemeProviderProps<Themes[number]>, "themes">) => ReactElement;
 	useTheme: () => ThemeContextValue<Themes[number]>;
 	useThemeValue: <Value>(map: ThemeValueMap<Themes[number], Value>) => Value | undefined;
 	useThemeEffect: (
@@ -44,15 +46,17 @@ type FactoryResult<Themes extends readonly string[]> = {
 
 export function createThemes<const Themes extends readonly [string, ...string[]]>(
 	config: CreateThemesConfig<Themes>,
-): FactoryResult<Themes> {
+): CreateThemesResult<Themes> {
 	const defaults = config;
 	type ThemeName = Themes[number];
 
-	function TypedThemeProvider(props: ThemeProviderProps<ThemeName>): ReactElement {
+	function TypedThemeProvider(
+		props: Omit<ThemeProviderProps<ThemeName>, "themes">,
+	): ReactElement {
 		const merged = {
 			...defaults,
 			...props,
-			themes: (props.themes ?? defaults.themes) as ThemeName[],
+			themes: defaults.themes,
 		} satisfies ThemeProviderProps<ThemeName>;
 		return <ThemeProvider {...merged} />;
 	}

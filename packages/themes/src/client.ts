@@ -16,6 +16,12 @@ export type {
 	ThemeValueObject,
 	ValueObject,
 } from "./core/types.js";
+export type {
+	CreateThemesConfig,
+	CreateThemesResult,
+	ThemeValueMap,
+	TypedThemedImageProps,
+} from "./factory/create-themes.js";
 export { createThemes } from "./factory/create-themes.js";
 export { useThemeEffect } from "./hooks/use-theme-effect.js";
 export { useThemeValue } from "./hooks/use-theme-value.js";
