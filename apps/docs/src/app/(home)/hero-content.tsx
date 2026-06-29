@@ -48,7 +48,7 @@ function InstallSnippet() {
 	}
 
 	return (
-		<div className="w-[296px] overflow-hidden rounded-lg border border-fd-border bg-fd-card">
+		<div className="w-[296px] max-w-full overflow-hidden rounded-lg border border-fd-border bg-fd-card">
 			<div className="flex border-b border-fd-border">
 				{PKG_MANAGERS.map((mgr) => (
 					<button
@@ -138,7 +138,7 @@ export function HeroContent({ stars }: { stars: number | null }) {
 	return (
 		<>
 			<motion.h1
-				className="bg-linear-to-b from-fd-foreground to-fd-muted-foreground bg-clip-text text-transparent text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
+				className="bg-linear-to-b from-fd-foreground to-fd-muted-foreground bg-clip-text text-transparent text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
 				style={{ textWrap: "balance", lineHeight: 1.15 } as React.CSSProperties}
 				{...fadeUp(0)}
 			>
@@ -194,7 +194,7 @@ export function HeroContent({ stars }: { stars: number | null }) {
 				<InstallSnippet />
 			</motion.div>
 
-			<div className="mt-5 flex items-center gap-5">
+			<div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
 				{trustItems.map(({ icon, label }, i) => (
 					<motion.span
 						key={label}
