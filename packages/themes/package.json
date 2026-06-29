@@ -21,6 +21,8 @@
     "test": "bun test",
     "size": "bun run build && bun scripts/bundle-size.ts",
     "size:json": "bun run build >/dev/null && bun scripts/bundle-size.ts --json",
+    "size:compare": "bun run build >/dev/null && bun scripts/bundle-size.ts --compare",
+    "size:update-baseline": "bun run build >/dev/null && bun scripts/bundle-size.ts --update-baseline",
     "prepare": "[ \"$CI\" = \"true\" ] || lefthook install"
   },
   "devDependencies": {

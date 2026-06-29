@@ -43,4 +43,7 @@ jobs:
         run: bun run build
 
       - name: Bundle size
-        run: bun scripts/bundle-size.ts
+        run: bun run size
+
+      - name: Bundle size baseline
+        run: bun run size:compare benchmarks/baseline.json

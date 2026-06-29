@@ -1,5 +1,5 @@
 import { Buffer } from "node:buffer";
-import { mkdir, readFile, rm } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { gzipSync } from "node:zlib";
 
@@ -12,9 +12,20 @@ export type BundleReport = {
 export type BundleThreshold = {
 	maxBytes: number;
 	maxGzipBytes: number;
+	maxDeltaBytes?: number;
+	maxDeltaGzipBytes?: number;
 };
 
 export type BundleThresholds = Record<string, BundleThreshold>;
+
+export type BundleComparison = BundleReport & {
+	baseBytes: number | null;
+	baseGzipBytes: number | null;
+	deltaBytes: number | null;
+	deltaGzipBytes: number | null;
+	deltaPercent: number | null;
+	deltaGzipPercent: number | null;
+};
 
 type BundleCase = {
 	name: string;
@@ -25,6 +36,7 @@ const rootDir = resolve(import.meta.dir, "..");
 const benchmarkDir = join(rootDir, "benchmarks");
 const outputDir = join(benchmarkDir, ".bundle-size");
 const thresholdsPath = join(benchmarkDir, "bundle-size-thresholds.json");
+const baselinePath = join(benchmarkDir, "baseline.json");
 
 const cases: BundleCase[] = [
 	{ name: "use-theme", entry: "entries/use-theme.tsx" },
@@ -43,8 +55,57 @@ export function formatBytes(bytes: number): string {
 	return `${(bytes / 1024).toFixed(2)} KiB`;
 }
 
-export function compareReports(reports: BundleReport[], thresholds: BundleThresholds): string[] {
+export function formatDeltaBytes(bytes: number | null): string {
+	if (bytes === null) return "missing";
+	if (bytes === 0) return "0 B";
+	return `${bytes > 0 ? "+" : "-"}${formatBytes(Math.abs(bytes))}`;
+}
+
+export function formatPercent(value: number | null): string {
+	if (value === null) return "missing";
+	if (value === 0) return "0.00%";
+	return `${value > 0 ? "+" : ""}${value.toFixed(2)}%`;
+}
+
+export function compareWithBaseline(
+	reports: BundleReport[],
+	baseline: BundleReport[],
+): BundleComparison[] {
+	const baselineByName = new Map(baseline.map((report) => [report.name, report]));
+
+	return reports.map((report) => {
+		const base = baselineByName.get(report.name);
+		const deltaBytes = base ? report.bytes - base.bytes : null;
+		const deltaGzipBytes = base ? report.gzipBytes - base.gzipBytes : null;
+		const deltaPercent =
+			base && base.bytes > 0 ? ((report.bytes - base.bytes) / base.bytes) * 100 : null;
+		const deltaGzipPercent =
+			base && base.gzipBytes > 0
+				? ((report.gzipBytes - base.gzipBytes) / base.gzipBytes) * 100
+				: null;
+
+		return {
+			...report,
+			baseBytes: base?.bytes ?? null,
+			baseGzipBytes: base?.gzipBytes ?? null,
+			deltaBytes,
+			deltaGzipBytes,
+			deltaPercent,
+			deltaGzipPercent,
+		};
+	});
+}
+
+export function compareReports(
+	reports: BundleReport[],
+	thresholds: BundleThresholds,
+	baseline?: BundleReport[],
+): string[] {
 	const failures: string[] = [];
+	const comparisons = baseline ? compareWithBaseline(reports, baseline) : [];
+	const comparisonByName = new Map(
+		comparisons.map((comparison) => [comparison.name, comparison]),
+	);
 
 	for (const report of reports) {
 		const threshold = thresholds[report.name];
@@ -68,6 +129,33 @@ export function compareReports(reports: BundleReport[], thresholds: BundleThresh
 				)}`,
 			);
 		}
+
+		const comparison = comparisonByName.get(report.name);
+		if (!comparison) continue;
+
+		if (
+			threshold.maxDeltaBytes !== undefined &&
+			comparison.deltaBytes !== null &&
+			comparison.deltaBytes > threshold.maxDeltaBytes
+		) {
+			failures.push(
+				`${report.name} raw delta ${formatDeltaBytes(
+					comparison.deltaBytes,
+				)} exceeds delta budget ${formatBytes(threshold.maxDeltaBytes)}`,
+			);
+		}
+
+		if (
+			threshold.maxDeltaGzipBytes !== undefined &&
+			comparison.deltaGzipBytes !== null &&
+			comparison.deltaGzipBytes > threshold.maxDeltaGzipBytes
+		) {
+			failures.push(
+				`${report.name} gzip delta ${formatDeltaBytes(
+					comparison.deltaGzipBytes,
+				)} exceeds delta budget ${formatBytes(threshold.maxDeltaGzipBytes)}`,
+			);
+		}
 	}
 
 	return failures;
@@ -75,6 +163,14 @@ export function compareReports(reports: BundleReport[], thresholds: BundleThresh
 
 async function readThresholds(): Promise<BundleThresholds> {
 	return JSON.parse(await readFile(thresholdsPath, "utf-8")) as BundleThresholds;
+}
+
+async function readBaseline(path: string): Promise<BundleReport[]> {
+	return JSON.parse(await readFile(resolve(path), "utf-8")) as BundleReport[];
+}
+
+async function writeBaseline(reports: BundleReport[]): Promise<void> {
+	await writeFile(baselinePath, `${JSON.stringify(reports, null, "\t")}\n`);
 }
 
 async function bundleCase(bundleCase: BundleCase): Promise<BundleReport> {
@@ -130,25 +226,76 @@ function printReport(reports: BundleReport[], thresholds: BundleThresholds): voi
 	console.log(`Bundled fixtures written to ${relative(rootDir, outputDir)}`);
 }
 
+function printComparison(comparisons: BundleComparison[], thresholds: BundleThresholds): void {
+	const rows = comparisons.map((comparison) => {
+		const threshold = thresholds[comparison.name];
+		return {
+			case: comparison.name,
+			raw: formatBytes(comparison.bytes),
+			"raw base":
+				comparison.baseBytes === null ? "missing" : formatBytes(comparison.baseBytes),
+			"raw delta": formatDeltaBytes(comparison.deltaBytes),
+			"raw delta %": formatPercent(comparison.deltaPercent),
+			"raw budget": threshold ? formatBytes(threshold.maxBytes) : "missing",
+			gzip: formatBytes(comparison.gzipBytes),
+			"gzip base":
+				comparison.baseGzipBytes === null
+					? "missing"
+					: formatBytes(comparison.baseGzipBytes),
+			"gzip delta": formatDeltaBytes(comparison.deltaGzipBytes),
+			"gzip delta %": formatPercent(comparison.deltaGzipPercent),
+			"gzip budget": threshold ? formatBytes(threshold.maxGzipBytes) : "missing",
+		};
+	});
+
+	console.table(rows);
+	console.log(`Bundled fixtures written to ${relative(rootDir, outputDir)}`);
+}
+
+function getArgValue(name: string): string | undefined {
+	const index = process.argv.indexOf(name);
+	if (index === -1) return undefined;
+	return process.argv[index + 1];
+}
+
 async function main(): Promise<void> {
 	const json = process.argv.includes("--json");
+	const updateBaseline = process.argv.includes("--update-baseline");
+	const comparePath = getArgValue("--compare");
+	if (process.argv.includes("--compare") && !comparePath) {
+		throw new Error("Missing baseline path after --compare");
+	}
 
 	await rm(outputDir, { recursive: true, force: true });
 
 	const thresholds = await readThresholds();
+	const baseline = comparePath ? await readBaseline(comparePath) : undefined;
 	const reports: BundleReport[] = [];
 
 	for (const currentCase of cases) {
 		reports.push(await bundleCase(currentCase));
 	}
 
-	if (json) {
-		console.log(JSON.stringify(reports, null, 2));
-	} else {
-		printReport(reports, thresholds);
+	if (updateBaseline) {
+		await writeBaseline(reports);
+		console.log(`Updated ${relative(rootDir, baselinePath)}`);
 	}
 
-	const failures = compareReports(reports, thresholds);
+	if (json) {
+		if (baseline) {
+			console.log(JSON.stringify(compareWithBaseline(reports, baseline), null, 2));
+		} else {
+			console.log(JSON.stringify(reports, null, 2));
+		}
+	} else {
+		if (baseline) {
+			printComparison(compareWithBaseline(reports, baseline), thresholds);
+		} else {
+			printReport(reports, thresholds);
+		}
+	}
+
+	const failures = compareReports(reports, thresholds, baseline);
 	if (failures.length > 0) {
 		for (const failure of failures) {
 			console.error(`Bundle size regression: ${failure}`);
