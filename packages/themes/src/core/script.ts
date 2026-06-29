@@ -2,13 +2,13 @@ import type { Attribute, StorageType } from "./types.js";
 
 export type ScriptConfig = {
 	storageKey: string;
-	attribute: Attribute | Attribute[];
+	attribute: Attribute | readonly Attribute[];
 	defaultTheme: string;
 	enableSystem: boolean;
 	enableColorScheme: boolean;
 	forcedTheme: string | undefined;
-	themes: string[];
-	value: Record<string, string> | undefined;
+	themes: readonly string[];
+	value: Partial<Record<string, string>> | undefined;
 	target: string;
 	storage: StorageType;
 	themeColors: string | Partial<Record<string, string>> | undefined;

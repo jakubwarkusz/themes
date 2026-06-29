@@ -39,7 +39,7 @@ export function ThemeProvider<Themes extends string = DefaultTheme>({
 						enableSystem,
 						enableColorScheme,
 						forcedTheme: forcedTheme as string | undefined,
-						themes: themes as string[],
+						themes,
 						value: valueMap,
 						target,
 						storage,

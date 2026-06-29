@@ -27,7 +27,36 @@ export const { ThemeProvider, useTheme, useThemeValue, useThemeEffect, ThemedIma
 - You define the theme tuple once, and type inference propagates to all consumers.
 - `setTheme` accepts only valid values from your configured theme union.
 - `useThemeValue` maps are checked against your union (plus optional `default`).
+- `ThemedImage` requires a source for every configured theme.
 - Provider defaults can still be overridden per usage.
+
+```tsx title="app/theme-toggle.tsx"
+"use client";
+import { ThemedImage, useTheme, useThemeValue } from "@/app/theme";
+
+export function ThemeToggle() {
+  const { setTheme } = useTheme();
+  const label = useThemeValue({
+    light: "Use dark",
+    dark: "Use high contrast",
+    "high-contrast": "Use light",
+  });
+
+  return (
+    <>
+      <button onClick={() => setTheme("high-contrast")}>{label}</button>
+      <ThemedImage
+        src={{
+          light: "/logo-light.svg",
+          dark: "/logo-dark.svg",
+          "high-contrast": "/logo-high-contrast.svg",
+        }}
+        alt="Logo"
+      />
+    </>
+  );
+}
+```
 
 ## Return value
 
