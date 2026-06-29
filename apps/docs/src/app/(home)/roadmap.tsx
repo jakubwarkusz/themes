@@ -3,25 +3,7 @@
 import { Globe02Icon, PlugIcon, SparklesIcon } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { motion } from "motion/react";
-
-const EASE_OUT = [0.23, 1, 0.32, 1] as const;
-
-const container = {
-	hidden: {},
-	show: {
-		transition: { staggerChildren: 0.07 },
-	},
-};
-
-const item = {
-	hidden: { opacity: 0, transform: "translateY(20px)" },
-	show: {
-		opacity: 1,
-		transform: "translateY(0px)",
-		transition: { duration: 0.5, ease: EASE_OUT },
-	},
-};
+import { motion, useReducedMotion } from "motion/react";
 
 type Plan = {
 	icon: IconSvgElement;
@@ -48,6 +30,29 @@ const plans: Plan[] = [
 ];
 
 export function Roadmap() {
+	const shouldReduceMotion = useReducedMotion();
+
+	const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
+	const container = {
+		hidden: {},
+		show: {
+			transition: { staggerChildren: shouldReduceMotion ? 0 : 0.07 },
+		},
+	};
+
+	const item = {
+		hidden: {
+			opacity: 0,
+			transform: shouldReduceMotion ? "translateY(0px)" : "translateY(20px)",
+		},
+		show: {
+			opacity: 1,
+			transform: "translateY(0px)",
+			transition: { duration: 0.5, ease: EASE_OUT },
+		},
+	};
+
 	return (
 		<section className="w-full max-w-4xl pb-16 sm:pb-24">
 			<motion.div

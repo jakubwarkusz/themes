@@ -2,19 +2,10 @@
 
 import { Bug01Icon, Cancel01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
-
-const fadeUp = {
-	hidden: { opacity: 0, transform: "translateY(20px)" },
-	show: {
-		opacity: 1,
-		transform: "translateY(0px)",
-		transition: { duration: 0.5, ease: EASE_OUT },
-	},
-};
 
 function Bug() {
 	return (
@@ -121,6 +112,20 @@ const rows = [
 ];
 
 export function Comparison() {
+	const shouldReduceMotion = useReducedMotion();
+
+	const fadeUp = {
+		hidden: {
+			opacity: 0,
+			transform: shouldReduceMotion ? "translateY(0px)" : "translateY(20px)",
+		},
+		show: {
+			opacity: 1,
+			transform: "translateY(0px)",
+			transition: { duration: 0.5, ease: EASE_OUT },
+		},
+	};
+
 	return (
 		<section className="w-full max-w-4xl pb-16 sm:pb-24">
 			<motion.div

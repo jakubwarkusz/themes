@@ -10,19 +10,10 @@ import {
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
-
-const fadeUp = {
-	hidden: { opacity: 0, transform: "translateY(20px)" },
-	show: {
-		opacity: 1,
-		transform: "translateY(0px)",
-		transition: { duration: 0.5, ease: EASE_OUT },
-	},
-};
 
 function C({ children }: { children: string }) {
 	return (
@@ -94,11 +85,49 @@ const features: Feature[] = [
 ];
 
 export function FeaturesGrid() {
+	const shouldReduceMotion = useReducedMotion();
+
+	const headingVariants = {
+		hidden: {
+			opacity: 0,
+			transform: shouldReduceMotion ? "translateY(0px)" : "translateY(20px)",
+		},
+		show: {
+			opacity: 1,
+			transform: "translateY(0px)",
+			transition: { duration: 0.5, ease: EASE_OUT },
+		},
+	};
+
+	const gridVariants = {
+		hidden: { opacity: 0 },
+		show: {
+			opacity: 1,
+			transition: {
+				duration: 0.4,
+				ease: EASE_OUT,
+				delay: 0.08,
+				staggerChildren: shouldReduceMotion ? 0 : 0.05,
+				delayChildren: 0.1,
+			},
+		},
+	};
+
+	const cardVariants = {
+		hidden: {
+			transform: shouldReduceMotion ? "translateY(0px)" : "translateY(12px)",
+		},
+		show: {
+			transform: "translateY(0px)",
+			transition: { duration: 0.45, ease: EASE_OUT },
+		},
+	};
+
 	return (
 		<section className="w-full max-w-4xl pb-16 sm:pb-24">
 			<motion.div
 				className="mb-10 text-center"
-				variants={fadeUp}
+				variants={headingVariants}
 				initial="hidden"
 				whileInView="show"
 				viewport={{ once: true, margin: "-80px" }}
@@ -112,16 +141,16 @@ export function FeaturesGrid() {
 			<motion.div
 				className="grid grid-cols-1 overflow-hidden rounded-xl border border-fd-border bg-fd-border sm:grid-cols-2 lg:grid-cols-3"
 				style={{ gap: "1px" }}
-				variants={fadeUp}
+				variants={gridVariants}
 				initial="hidden"
 				whileInView="show"
 				viewport={{ once: true, margin: "-80px" }}
-				transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.08 }}
 			>
 				{features.map((feature) => (
-					<div
+					<motion.div
 						key={feature.title}
 						className="bg-fd-background p-6 transition-colors hover:bg-fd-card"
+						variants={cardVariants}
 					>
 						<div className="mb-3 inline-flex size-8 items-center justify-center rounded-lg bg-fd-muted text-fd-muted-foreground ring-1 ring-fd-border">
 							<HugeiconsIcon
@@ -137,7 +166,7 @@ export function FeaturesGrid() {
 						<p className="text-xs leading-relaxed text-fd-muted-foreground">
 							{feature.description}
 						</p>
-					</div>
+					</motion.div>
 				))}
 			</motion.div>
 		</section>
