@@ -45,8 +45,7 @@ const features: Feature[] = [
 		title: "Drop-in replacement",
 		description: (
 			<>
-				Same API as <C>next-themes</C>. Swap the import and you are done. No migration
-				needed.
+				Same API as <C>next-themes</C>. Change one import.
 			</>
 		),
 	},
@@ -63,8 +62,7 @@ const features: Feature[] = [
 	{
 		icon: Layers01Icon,
 		title: "Nested providers",
-		description:
-			"Independent theme instances per section. Each provider manages its own state with a per-instance store.",
+		description: "Independent theme instances per section. No shared state between them.",
 	},
 	{
 		icon: Typescript01Icon,
@@ -80,7 +78,7 @@ const features: Feature[] = [
 		icon: CheckmarkBadge01Icon,
 		title: "Zero runtime deps",
 		description:
-			"No runtime dependencies. Ships only what the browser needs: a tiny inline script and React hooks.",
+			"No runtime dependencies. A tiny inline script plus React hooks, nothing more.",
 	},
 ];
 
@@ -134,7 +132,7 @@ export function FeaturesGrid() {
 			>
 				<p className="mb-2 text-xs font-semibold text-fd-muted-foreground/40">Features</p>
 				<h2 className="text-xl font-semibold tracking-tight text-fd-foreground sm:text-2xl">
-					Everything next-themes should have been
+					What you&apos;re getting.
 				</h2>
 			</motion.div>
 

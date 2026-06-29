@@ -137,10 +137,10 @@ export function Comparison() {
 			>
 				<p className="mb-2 text-xs font-semibold text-fd-muted-foreground/40">Comparison</p>
 				<h2 className="text-xl font-semibold tracking-tight text-fd-foreground sm:text-2xl">
-					Why not next-themes?
+					How it compares.
 				</h2>
 				<p className="mt-2 text-sm text-fd-muted-foreground">
-					43 open issues, 16 open PRs, React 19 bugs unresolved.
+					next-themes still has React 19 bugs open.
 				</p>
 			</motion.div>
 

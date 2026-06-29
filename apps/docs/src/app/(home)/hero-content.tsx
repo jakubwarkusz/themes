@@ -150,8 +150,8 @@ export function HeroContent({ stars }: { stars: number | null }) {
 				style={{ textWrap: "pretty" } as React.CSSProperties}
 				{...fadeUp(0.08)}
 			>
-				Modern theme management for Next.js 16+ and React 19+. Every bug fixed. Every
-				missing feature added.
+				Drop-in replacement for next-themes. React 19 hydration fixed, full TypeScript
+				types, zero dependencies.
 			</motion.p>
 
 			<motion.div className="mt-8 flex items-center gap-3" {...fadeUp(0.16)}>

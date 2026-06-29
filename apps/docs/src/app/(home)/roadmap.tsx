@@ -15,12 +15,12 @@ const plans: Plan[] = [
 	{
 		icon: Globe02Icon,
 		label: "Framework agnostic",
-		description: "Remix, Vite, SvelteKit, and any React-based framework. Not just Next.js.",
+		description: "Remix, Vite, SvelteKit, and other React-based frameworks.",
 	},
 	{
 		icon: SparklesIcon,
 		label: "More features",
-		description: "New APIs, more storage adapters, and deeper control over theme resolution.",
+		description: "More storage adapters and finer-grained resolution options.",
 	},
 	{
 		icon: PlugIcon,
@@ -62,11 +62,9 @@ export function Roadmap() {
 				whileInView="show"
 				viewport={{ once: true, margin: "-80px" }}
 			>
-				<p className="mb-2 text-xs font-semibold text-fd-muted-foreground/40">
-					What&apos;s next
-				</p>
+				<p className="mb-2 text-xs font-semibold text-fd-muted-foreground/40">Roadmap</p>
 				<h2 className="text-xl font-semibold tracking-tight text-fd-foreground sm:text-2xl">
-					Actively developed and growing
+					What&apos;s next.
 				</h2>
 			</motion.div>
 
