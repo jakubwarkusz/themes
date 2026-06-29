@@ -6,6 +6,17 @@ export type Attribute = "class" | `data-${string}`;
 
 export type ValueObject = Record<string, string>;
 
+export type ThemeName<Themes extends readonly string[] | string = DefaultTheme> =
+	Themes extends readonly (infer Theme extends string)[] ? Theme : Themes;
+
+export type ThemeSelection<Themes extends string = DefaultTheme> = Themes | "system";
+
+export type ResolvedTheme<Themes extends string = DefaultTheme> = Exclude<Themes, "system">;
+
+export type ThemeValueObject<Themes extends string = string> = Partial<
+	Record<ResolvedTheme<Themes>, string>
+>;
+
 export type StorageType = "localStorage" | "sessionStorage" | "cookie" | "hybrid" | "none";
 
 export type CookieOptions = {
@@ -27,7 +38,7 @@ export type ThemeColor = string | Partial<Record<string, string>>;
 export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	children: ReactNode;
 	/** All available themes */
-	themes?: Themes[];
+	themes?: readonly Themes[];
 	/** Forced theme, overrides everything */
 	forcedTheme?: Themes;
 	/** Enable system preference via prefers-color-scheme */
@@ -35,9 +46,9 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	/** Default theme when no preference stored */
 	defaultTheme?: Themes | "system";
 	/** HTML attribute(s) to set on target element */
-	attribute?: Attribute | Attribute[];
+	attribute?: Attribute | readonly Attribute[];
 	/** Map theme name to attribute value */
-	value?: ValueObject;
+	value?: ThemeValueObject<Themes>;
 	/** Target element to apply theme to, defaults to <html> */
 	target?: "html" | "body" | string;
 	/** Disable CSS transitions on theme change. Pass `true` to disable all transitions, or a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to disable only specific properties while keeping others. */
@@ -51,30 +62,32 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	/** Nonce for CSP */
 	nonce?: string;
 	/** Called when theme changes. Receives the selected theme (may be "system"), not the resolved value. When the system preference changes while the theme is set to "system", fires with the resolved value ("light" | "dark"). */
-	onThemeChange?: (theme: Themes | "system") => void;
+	onThemeChange?: (theme: ThemeSelection<Themes>) => void;
 	/** Colors for meta theme-color tag, per theme or a single value */
 	themeColor?: ThemeColor;
 	/** Always follow system preference changes, even after setTheme was called */
 	followSystem?: boolean;
 	/** Server-provided theme that overrides storage on mount (e.g. from a database). User can still call setTheme to change it. */
-	initialTheme?: Themes | "system";
+	initialTheme?: ThemeSelection<Themes>;
 	/** Cookie options, only used when storage="cookie" */
 	cookieOptions?: CookieOptions;
 };
 
 export type ThemeContextValue<Themes extends string = DefaultTheme> = {
 	/** Current theme (may be "system") */
-	theme: Themes | "system" | undefined;
+	theme: ThemeSelection<Themes> | undefined;
 	/** Resolved theme - never "system" */
-	resolvedTheme: Exclude<Themes, "system"> | undefined;
+	resolvedTheme: ResolvedTheme<Themes> | undefined;
 	/** System preference */
 	systemTheme: "light" | "dark" | undefined;
 	/** Forced theme if set */
 	forcedTheme: Themes | undefined;
 	/** All available themes */
-	themes: Themes[];
+	themes: readonly Themes[];
 	/** Set theme */
 	setTheme: (
-		theme: Themes | "system" | ((current: Themes | "system" | undefined) => Themes | "system"),
+		theme:
+			| ThemeSelection<Themes>
+			| ((current: ThemeSelection<Themes> | undefined) => ThemeSelection<Themes>),
 	) => void;
 };
