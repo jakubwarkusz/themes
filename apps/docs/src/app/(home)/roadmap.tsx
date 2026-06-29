@@ -3,7 +3,8 @@
 import { Globe02Icon, PlugIcon, SparklesIcon } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 
 type Plan = {
 	icon: IconSvgElement;
@@ -29,10 +30,10 @@ const plans: Plan[] = [
 	},
 ];
 
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
 export function Roadmap() {
 	const shouldReduceMotion = useReducedMotion();
-
-	const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
 	const container = {
 		hidden: {},
@@ -55,7 +56,7 @@ export function Roadmap() {
 
 	return (
 		<section className="w-full max-w-4xl pb-16 sm:pb-24">
-			<motion.div
+			<m.div
 				className="mb-10 text-center"
 				variants={item}
 				initial="hidden"
@@ -66,9 +67,9 @@ export function Roadmap() {
 				<h2 className="text-xl font-semibold tracking-tight text-fd-foreground sm:text-2xl">
 					What&apos;s next.
 				</h2>
-			</motion.div>
+			</m.div>
 
-			<motion.div
+			<m.div
 				className="grid grid-cols-1 gap-8 sm:grid-cols-3"
 				variants={container}
 				initial="hidden"
@@ -76,7 +77,7 @@ export function Roadmap() {
 				viewport={{ once: true, margin: "-80px" }}
 			>
 				{plans.map((plan) => (
-					<motion.div key={plan.label} className="flex flex-col gap-3" variants={item}>
+					<m.div key={plan.label} className="flex flex-col gap-3" variants={item}>
 						<div className="inline-flex size-8 items-center justify-center rounded-lg bg-fd-muted text-fd-muted-foreground ring-1 ring-fd-border">
 							<HugeiconsIcon
 								icon={plan.icon}
@@ -89,9 +90,9 @@ export function Roadmap() {
 						<p className="text-xs leading-relaxed text-fd-muted-foreground">
 							{plan.description}
 						</p>
-					</motion.div>
+					</m.div>
 				))}
-			</motion.div>
+			</m.div>
 		</section>
 	);
 }

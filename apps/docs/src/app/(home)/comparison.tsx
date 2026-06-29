@@ -2,7 +2,8 @@
 
 import { Bug01Icon, Cancel01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import Link from "next/link";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
@@ -128,7 +129,7 @@ export function Comparison() {
 
 	return (
 		<section className="w-full max-w-4xl pb-16 sm:pb-24">
-			<motion.div
+			<m.div
 				className="mb-10 text-center"
 				variants={fadeUp}
 				initial="hidden"
@@ -142,9 +143,9 @@ export function Comparison() {
 				<p className="mt-2 text-sm text-fd-muted-foreground">
 					next-themes still has React 19 bugs open.
 				</p>
-			</motion.div>
+			</m.div>
 
-			<motion.div
+			<m.div
 				className="overflow-hidden rounded-xl border border-fd-border sm:hidden"
 				variants={fadeUp}
 				initial="hidden"
@@ -161,9 +162,9 @@ export function Comparison() {
 						{row.wrksz}
 					</div>
 				))}
-			</motion.div>
+			</m.div>
 
-			<motion.div
+			<m.div
 				className="hidden overflow-hidden rounded-xl border border-fd-border sm:block"
 				variants={fadeUp}
 				initial="hidden"
@@ -174,7 +175,12 @@ export function Comparison() {
 				<table className="w-full text-sm">
 					<thead>
 						<tr className="border-b border-fd-border">
-							<th className="px-4 py-2.5 text-left text-xs font-medium text-fd-muted-foreground/50" />
+							<th
+								scope="col"
+								className="px-4 py-2.5 text-left text-xs font-medium text-fd-muted-foreground/50"
+							>
+								<span className="sr-only">Feature</span>
+							</th>
 							<th className="px-4 py-2.5 text-center text-xs font-medium text-fd-muted-foreground/50">
 								next-themes
 							</th>
@@ -198,9 +204,9 @@ export function Comparison() {
 						))}
 					</tbody>
 				</table>
-			</motion.div>
+			</m.div>
 
-			<motion.div
+			<m.div
 				className="mt-4 text-center"
 				variants={fadeUp}
 				initial="hidden"
@@ -214,7 +220,7 @@ export function Comparison() {
 				>
 					Read the full breakdown
 				</Link>
-			</motion.div>
+			</m.div>
 		</section>
 	);
 }

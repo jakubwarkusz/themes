@@ -10,7 +10,8 @@ import {
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import type { ReactNode } from "react";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
@@ -123,7 +124,7 @@ export function FeaturesGrid() {
 
 	return (
 		<section className="w-full max-w-4xl pb-16 sm:pb-24">
-			<motion.div
+			<m.div
 				className="mb-10 text-center"
 				variants={headingVariants}
 				initial="hidden"
@@ -134,9 +135,9 @@ export function FeaturesGrid() {
 				<h2 className="text-xl font-semibold tracking-tight text-fd-foreground sm:text-2xl">
 					What you&apos;re getting.
 				</h2>
-			</motion.div>
+			</m.div>
 
-			<motion.div
+			<m.div
 				className="grid grid-cols-1 overflow-hidden rounded-xl border border-fd-border bg-fd-border sm:grid-cols-2 lg:grid-cols-3"
 				style={{ gap: "1px" }}
 				variants={gridVariants}
@@ -145,7 +146,7 @@ export function FeaturesGrid() {
 				viewport={{ once: true, margin: "-80px" }}
 			>
 				{features.map((feature) => (
-					<motion.div
+					<m.div
 						key={feature.title}
 						className="bg-fd-background p-6 transition-colors hover:bg-fd-card"
 						variants={cardVariants}
@@ -164,9 +165,9 @@ export function FeaturesGrid() {
 						<p className="text-xs leading-relaxed text-fd-muted-foreground">
 							{feature.description}
 						</p>
-					</motion.div>
+					</m.div>
 				))}
-			</motion.div>
+			</m.div>
 		</section>
 	);
 }

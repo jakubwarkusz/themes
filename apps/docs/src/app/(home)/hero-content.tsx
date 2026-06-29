@@ -11,7 +11,8 @@ import {
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
@@ -63,7 +64,7 @@ function InstallSnippet() {
 						)}
 					>
 						{pm === mgr.label && (
-							<motion.span
+							<m.span
 								layoutId="pm-tab"
 								className="absolute inset-x-0 bottom-0 h-px bg-fd-foreground"
 								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
@@ -137,24 +138,24 @@ export function HeroContent({ stars }: { stars: number | null }) {
 
 	return (
 		<>
-			<motion.h1
+			<m.h1
 				className="bg-linear-to-b from-fd-foreground to-fd-muted-foreground bg-clip-text text-transparent text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
 				style={{ textWrap: "balance", lineHeight: 1.15 } as React.CSSProperties}
 				{...fadeUp(0)}
 			>
 				@wrksz/themes
-			</motion.h1>
+			</m.h1>
 
-			<motion.p
+			<m.p
 				className="mt-5 max-w-sm text-sm leading-relaxed text-fd-muted-foreground sm:max-w-md sm:text-base"
 				style={{ textWrap: "pretty" } as React.CSSProperties}
 				{...fadeUp(0.08)}
 			>
 				Drop-in replacement for next-themes. React 19 hydration fixed, full TypeScript
 				types, zero dependencies.
-			</motion.p>
+			</m.p>
 
-			<motion.div className="mt-8 flex items-center gap-3" {...fadeUp(0.16)}>
+			<m.div className="mt-8 flex items-center gap-3" {...fadeUp(0.16)}>
 				<Link
 					href="/docs"
 					className="inline-flex items-center gap-2 rounded-lg bg-fd-foreground px-5 py-2.5 text-sm font-semibold text-fd-background transition-[transform,opacity] duration-150 hover:opacity-80 active:scale-[0.97]"
@@ -188,15 +189,15 @@ export function HeroContent({ stars }: { stars: number | null }) {
 						</>
 					)}
 				</Link>
-			</motion.div>
+			</m.div>
 
-			<motion.div className="mt-5" {...fadeUp(0.24)}>
+			<m.div className="mt-5" {...fadeUp(0.24)}>
 				<InstallSnippet />
-			</motion.div>
+			</m.div>
 
 			<div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
 				{trustItems.map(({ icon, label }, i) => (
-					<motion.span
+					<m.span
 						key={label}
 						className="flex items-center gap-1.5 text-xs text-fd-muted-foreground/50"
 						{...fadeUp(0.32 + i * 0.05)}
@@ -208,7 +209,7 @@ export function HeroContent({ stars }: { stars: number | null }) {
 							strokeWidth={1.5}
 						/>
 						{label}
-					</motion.span>
+					</m.span>
 				))}
 			</div>
 		</>

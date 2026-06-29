@@ -1,0 +1,11 @@
+{
+	"$schema": "https://react.doctor/schema/config.json",
+	"ignore": {
+		"overrides": [
+			{
+				"files": ["src/lib/next-themes-compat.ts"],
+				"rules": ["deslop/unused-file"]
+			}
+		]
+	}
+}
