@@ -627,6 +627,23 @@ describe("serializeCookie", () => {
 		);
 	});
 
+	test("rejects invalid cookie maxAge values", () => {
+		expect(() => serializeCookie("theme", "dark", { maxAge: Number.NaN })).toThrow(
+			"Invalid cookie maxAge",
+		);
+		expect(() => serializeCookie("theme", "dark", { maxAge: 1.5 })).toThrow(
+			"Invalid cookie maxAge",
+		);
+	});
+
+	test("rejects invalid cookie sameSite values at runtime", () => {
+		expect(() =>
+			serializeCookie("theme", "dark", {
+				sameSite: "Lax; Secure" as "Lax",
+			}),
+		).toThrow("Invalid cookie sameSite");
+	});
+
 	test("rejects cookie domain containing control characters or semicolons", () => {
 		expect(() => serializeCookie("theme", "dark", { domain: "example.com; Secure" })).toThrow(
 			"Invalid cookie domain",

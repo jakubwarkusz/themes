@@ -49,7 +49,10 @@ function getDomWindow(): (Window & typeof globalThis) | null {
 function readCookieValue(key: string): string | null {
 	const re = new RegExp(`(?:^|;\\s*)${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`);
 	const match = document.cookie.match(re);
-	const decoded = match?.[1] != null ? decodeURIComponent(match[1]) : null;
+	let decoded: string | null = null;
+	try {
+		decoded = match?.[1] != null ? decodeURIComponent(match[1]) : null;
+	} catch {}
 	return decoded ? decoded : null;
 }
 

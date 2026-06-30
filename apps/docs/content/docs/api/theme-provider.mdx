@@ -79,6 +79,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `nonce` | `string` | - | CSP nonce for the inline script |
 | `onThemeChange` | `(theme: string) => void` | - | Called whenever the theme changes. Receives the selected value (may be `"system"`). When system preference changes while theme is `"system"`, fires with the resolved value (`"light"` or `"dark"`). |
 
+## Security notes
+
+`ThemeProvider` injects a small inline script to apply the initial theme before React hydrates.
+Configuration values are escaped for the `<script>` context, including `themeColor`, `value`,
+`themes`, `forcedTheme`, and `initialTheme`.
+
+When your app uses a Content Security Policy, pass a request-scoped `nonce` and include the
+same value in `script-src`.
+
+Cookie storage treats cookies as untrusted input. Stored values are validated against `themes`
+when provided, malformed cookie encoding falls back to `defaultTheme`, and cookie attributes
+are validated before writes.
+
 ## Examples
 
 ### Custom themes

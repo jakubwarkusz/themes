@@ -17,6 +17,18 @@ function assertCookieAttributeValue(value: string, label: string): void {
 	}
 }
 
+function assertCookieMaxAge(value: number): void {
+	if (!Number.isFinite(value) || !Number.isInteger(value)) {
+		throw new TypeError("Invalid cookie maxAge");
+	}
+}
+
+function assertCookieSameSite(value: string): void {
+	if (value !== "Strict" && value !== "Lax" && value !== "None") {
+		throw new TypeError("Invalid cookie sameSite");
+	}
+}
+
 export function serializeCookie(key: string, value: string, options: CookieOptions = {}): string {
 	const {
 		domain,
@@ -28,6 +40,8 @@ export function serializeCookie(key: string, value: string, options: CookieOptio
 
 	assertCookieName(key);
 	assertCookieAttributeValue(path, "path");
+	assertCookieMaxAge(maxAge);
+	assertCookieSameSite(sameSite);
 	if (domain) assertCookieAttributeValue(domain, "domain");
 
 	let cookie = `${key}=${encodeURIComponent(value)}; path=${path}; max-age=${maxAge}; SameSite=${sameSite}`;

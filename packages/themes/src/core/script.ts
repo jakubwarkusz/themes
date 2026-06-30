@@ -48,21 +48,17 @@ function themeScript(
 
 		if (!followSystem) {
 			try {
-				if (storage === "cookie") {
-					const re = new RegExp(
-						`(?:^|;\\s*)${storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`,
-					);
-					const match = document.cookie.match(re);
-					const decoded = match?.[1] != null ? decodeURIComponent(match[1]) : null;
-					stored = decoded ? decoded : null;
-				} else if (storage === "hybrid") {
+				if (storage === "cookie" || storage === "hybrid") {
 					const re = new RegExp(
 						`(?:^|;\\s*)${storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`,
 					);
 					const match = document.cookie.match(re);
 					const decoded = match?.[1] != null ? decodeURIComponent(match[1]) : null;
 					const fromCookie = decoded ? decoded : null;
-					stored = fromCookie ?? localStorage.getItem(storageKey);
+					stored =
+						storage === "hybrid"
+							? (fromCookie ?? localStorage.getItem(storageKey))
+							: fromCookie;
 				} else if (storage !== "none") {
 					const store = storage === "localStorage" ? localStorage : sessionStorage;
 					stored = store.getItem(storageKey);
@@ -96,12 +92,12 @@ function themeScript(
 	if (!el) return;
 
 	const attrs = Array.isArray(attribute) ? attribute : [attribute];
+	const toRemove = themes.flatMap((t) => (value?.[t] || t).split(" "));
+	const toAdd = attrValue.split(" ");
 	let changed = false;
 
 	for (const attr of attrs) {
 		if (attr === "class") {
-			const toRemove = themes.flatMap((t) => (value?.[t] || t).split(" "));
-			const toAdd = attrValue.split(" ");
 			changed =
 				changed ||
 				toRemove.some((token) => !toAdd.includes(token) && el.classList.contains(token)) ||
@@ -122,8 +118,6 @@ function themeScript(
 
 	for (const attr of attrs) {
 		if (attr === "class") {
-			const toRemove = themes.flatMap((t) => (value?.[t] || t).split(" "));
-			const toAdd = attrValue.split(" ");
 			if (
 				toRemove.some((token) => !toAdd.includes(token) && el.classList.contains(token)) ||
 				toAdd.some((token) => !el.classList.contains(token))
@@ -161,23 +155,30 @@ function themeScript(
 /**
  * Serializes themeScript into an IIFE string safe for injection into <script>.
  */
+function safeJson(value: unknown): string {
+	return (JSON.stringify(value) as string)
+		.replace(/</g, "\\u003c")
+		.replace(/\u2028/g, "\\u2028")
+		.replace(/\u2029/g, "\\u2029");
+}
+
 export function getScript(config: ScriptConfig): string {
 	const fn = themeScript.toString().replace(/\s*__name\s*\([^)]*\)\s*;?\s*/g, "");
 
 	const args = [
-		JSON.stringify(config.storageKey),
-		JSON.stringify(config.attribute),
-		JSON.stringify(config.defaultTheme),
+		safeJson(config.storageKey),
+		safeJson(config.attribute),
+		safeJson(config.defaultTheme),
 		String(config.enableSystem),
 		String(config.enableColorScheme),
-		JSON.stringify(config.forcedTheme ?? null),
-		JSON.stringify(config.themes),
-		JSON.stringify(config.value ?? null),
-		JSON.stringify(config.target),
-		JSON.stringify(config.storage),
-		JSON.stringify(config.themeColors ?? null),
-		JSON.stringify(config.initialTheme ?? null),
-		JSON.stringify(config.disableTransitionOnChange),
+		safeJson(config.forcedTheme ?? null),
+		safeJson(config.themes),
+		safeJson(config.value ?? null),
+		safeJson(config.target),
+		safeJson(config.storage),
+		safeJson(config.themeColors ?? null),
+		safeJson(config.initialTheme ?? null),
+		safeJson(config.disableTransitionOnChange),
 		String(config.followSystem),
 	].join(",");
 

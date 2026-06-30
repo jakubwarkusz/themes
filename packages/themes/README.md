@@ -45,6 +45,7 @@ npm install @wrksz/themes
 - [Setup](#setup)
 - [Usage](#usage)
 - [Zero-flash SSR with cookie storage](#zero-flash-ssr-with-cookie-storage)
+- [Security model](#security-model)
 - [API](#api)
   - [ThemeProvider](#themeprovider)
   - [useTheme](#usetheme)
@@ -128,6 +129,21 @@ For apps using CSS media queries (`@media (prefers-color-scheme: dark)`) alongsi
 ```
 
 > Cookie storage does not support cross-tab theme sync. Use `localStorage` with `initialTheme` if you need it.
+
+## Security model
+
+`@wrksz/themes` injects a small inline script so the correct theme can be applied before
+React hydrates. Script config is serialized with script-context escaping, so values such as
+`themeColor`, `value`, `themes`, `forcedTheme`, and `initialTheme` cannot break out of the
+`<script>` tag via `</script>` payloads.
+
+If your app uses a Content Security Policy, pass a request-scoped `nonce` to `ThemeProvider`
+and include the same nonce in your `script-src` policy.
+
+Cookie storage treats cookies as untrusted input: stored values are validated against
+`themes` when a theme list is provided, malformed cookie encoding falls back to
+`defaultTheme`, and cookie attributes are validated before writes. Releases are published
+with npm provenance from GitHub Actions.
 
 ## API
 
