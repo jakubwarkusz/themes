@@ -222,6 +222,15 @@ describe("themeScript - themeColor", () => {
 		const meta = document.querySelector('meta[name="theme-color"]');
 		expect(meta?.getAttribute("content")).toBe("var(--bg)");
 	});
+
+	test("preserves escaped themeColor values at runtime", () => {
+		const payload = "</script><script>globalThis.__themeXss = true</script>";
+		localStorage.setItem("theme", "dark");
+		runScript({ ...base, themeColors: { light: "#fff", dark: payload } });
+		const meta = document.querySelector('meta[name="theme-color"]');
+		expect(meta?.getAttribute("content")).toBe(payload);
+		expect((globalThis as { __themeXss?: boolean }).__themeXss).toBeUndefined();
+	});
 });
 
 describe("themeScript - multiple classes via value map", () => {

@@ -1,6 +1,7 @@
 import type { CookieOptions } from "./types.js";
 
 const COOKIE_NAME_RE = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/;
+const SAME_SITE_VALUES = new Set(["Strict", "Lax", "None"]);
 
 function assertCookieName(key: string): void {
 	if (!COOKIE_NAME_RE.test(key)) {
@@ -17,6 +18,18 @@ function assertCookieAttributeValue(value: string, label: string): void {
 	}
 }
 
+function assertCookieMaxAge(value: number): void {
+	if (!Number.isFinite(value) || !Number.isInteger(value)) {
+		throw new TypeError("Invalid cookie maxAge");
+	}
+}
+
+function assertCookieSameSite(value: string): void {
+	if (!SAME_SITE_VALUES.has(value)) {
+		throw new TypeError("Invalid cookie sameSite");
+	}
+}
+
 export function serializeCookie(key: string, value: string, options: CookieOptions = {}): string {
 	const {
 		domain,
@@ -28,6 +41,8 @@ export function serializeCookie(key: string, value: string, options: CookieOptio
 
 	assertCookieName(key);
 	assertCookieAttributeValue(path, "path");
+	assertCookieMaxAge(maxAge);
+	assertCookieSameSite(sameSite);
 	if (domain) assertCookieAttributeValue(domain, "domain");
 
 	let cookie = `${key}=${encodeURIComponent(value)}; path=${path}; max-age=${maxAge}; SameSite=${sameSite}`;

@@ -161,23 +161,32 @@ function themeScript(
 /**
  * Serializes themeScript into an IIFE string safe for injection into <script>.
  */
+function safeJson(value: unknown): string {
+	const json = JSON.stringify(value);
+	if (json === undefined) return "undefined";
+	return json
+		.replace(/</g, "\\u003c")
+		.replace(/\u2028/g, "\\u2028")
+		.replace(/\u2029/g, "\\u2029");
+}
+
 export function getScript(config: ScriptConfig): string {
 	const fn = themeScript.toString().replace(/\s*__name\s*\([^)]*\)\s*;?\s*/g, "");
 
 	const args = [
-		JSON.stringify(config.storageKey),
-		JSON.stringify(config.attribute),
-		JSON.stringify(config.defaultTheme),
+		safeJson(config.storageKey),
+		safeJson(config.attribute),
+		safeJson(config.defaultTheme),
 		String(config.enableSystem),
 		String(config.enableColorScheme),
-		JSON.stringify(config.forcedTheme ?? null),
-		JSON.stringify(config.themes),
-		JSON.stringify(config.value ?? null),
-		JSON.stringify(config.target),
-		JSON.stringify(config.storage),
-		JSON.stringify(config.themeColors ?? null),
-		JSON.stringify(config.initialTheme ?? null),
-		JSON.stringify(config.disableTransitionOnChange),
+		safeJson(config.forcedTheme ?? null),
+		safeJson(config.themes),
+		safeJson(config.value ?? null),
+		safeJson(config.target),
+		safeJson(config.storage),
+		safeJson(config.themeColors ?? null),
+		safeJson(config.initialTheme ?? null),
+		safeJson(config.disableTransitionOnChange),
 		String(config.followSystem),
 	].join(",");
 

@@ -96,6 +96,28 @@ describe("getScript", () => {
 		expect(script).toContain('"#000"');
 	});
 
+	test("escapes config values that could break out of the script tag", () => {
+		const payload = "</script><script>globalThis.__themeXss = true</script>";
+		const script = getScript({
+			...base,
+			forcedTheme: payload,
+			themes: ["light", "dark", payload],
+			value: { [payload]: payload },
+			themeColors: { light: payload, dark: "line\u2028paragraph\u2029" },
+			disableTransitionOnChange: "opacity 0s\u2028color 0s",
+		});
+		const wrapper = document.createElement("div");
+
+		wrapper.innerHTML = `<script>${script}</script>`;
+
+		expect(script).not.toContain("</script>");
+		expect(script).toContain("\\u003c/script>");
+		expect(script).toContain("\\u2028");
+		expect(script).toContain("\\u2029");
+		expect(wrapper.querySelectorAll("script")).toHaveLength(1);
+		expect(wrapper.textContent).not.toContain("globalThis.__themeXss = true</script>");
+	});
+
 	test("inlines sessionStorage", () => {
 		const script = getScript({ ...base, storage: "sessionStorage" });
 		expect(script).toContain('"sessionStorage"');

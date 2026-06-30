@@ -41,6 +41,10 @@ describe("getTheme - sync (Request)", () => {
 		expect(getTheme(makeRequest("theme=high%2Dcontrast"))).toBe("high-contrast");
 	});
 
+	test("ignores malformed URL-encoded cookie values", () => {
+		expect(getTheme(makeRequest("theme=%E0%A4%A"), { defaultTheme: "dark" })).toBe("dark");
+	});
+
 	test("handles multiple cookies", () => {
 		expect(getTheme(makeRequest("other=value; theme=dark; another=foo"))).toBe("dark");
 	});

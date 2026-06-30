@@ -18,6 +18,14 @@ type UntypedGetThemeOptions = Omit<GetThemeOptions, "themes"> & {
 	themes?: undefined;
 };
 
+function safeDecodeURIComponent(value: string): string | null {
+	try {
+		return decodeURIComponent(value);
+	} catch {
+		return null;
+	}
+}
+
 function readFromCookieString(
 	cookieString: string,
 	storageKey: string,
@@ -28,7 +36,7 @@ function readFromCookieString(
 		`(?:^|;\\s*)${storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`,
 	);
 	const match = cookieString.match(re);
-	const stored = match?.[1] != null ? decodeURIComponent(match[1]) : null;
+	const stored = match?.[1] != null ? safeDecodeURIComponent(match[1]) : null;
 	if (!stored) return defaultTheme;
 	if (themes && !themes.includes(stored)) return defaultTheme;
 	return stored;
