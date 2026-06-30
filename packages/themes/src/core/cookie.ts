@@ -1,7 +1,6 @@
 import type { CookieOptions } from "./types.js";
 
 const COOKIE_NAME_RE = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/;
-const SAME_SITE_VALUES = new Set(["Strict", "Lax", "None"]);
 
 function assertCookieName(key: string): void {
 	if (!COOKIE_NAME_RE.test(key)) {
@@ -25,7 +24,7 @@ function assertCookieMaxAge(value: number): void {
 }
 
 function assertCookieSameSite(value: string): void {
-	if (!SAME_SITE_VALUES.has(value)) {
+	if (value !== "Strict" && value !== "Lax" && value !== "None") {
 		throw new TypeError("Invalid cookie sameSite");
 	}
 }

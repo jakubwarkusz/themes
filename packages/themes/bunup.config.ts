@@ -11,7 +11,6 @@ export default defineConfig({
 		"src/client/provider.ts",
 		"src/client/create-themes.ts",
 		"src/next.ts",
-		"src/providers/client-next-provider.tsx",
 	],
 	format: ["esm"],
 	target: "browser",
