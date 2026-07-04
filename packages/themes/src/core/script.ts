@@ -49,12 +49,9 @@ function themeScript(
 		if (!followSystem) {
 			try {
 				if (storage === "cookie" || storage === "hybrid") {
-					const re = new RegExp(
-						`(?:^|;\\s*)${storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`,
-					);
-					const match = document.cookie.match(re);
-					const decoded = match?.[1] != null ? decodeURIComponent(match[1]) : null;
-					const fromCookie = decoded ? decoded : null;
+					const parts = `; ${document.cookie}`.split(`; ${storageKey}=`);
+					const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
+					const fromCookie = encoded ? decodeURIComponent(encoded) : null;
 					stored =
 						storage === "hybrid"
 							? (fromCookie ?? localStorage.getItem(storageKey))
@@ -95,13 +92,14 @@ function themeScript(
 	const toRemove = themes.flatMap((t) => (value?.[t] || t).split(" "));
 	const toAdd = attrValue.split(" ");
 	let changed = false;
+	let classChanged = false;
 
 	for (const attr of attrs) {
 		if (attr === "class") {
-			changed =
-				changed ||
+			classChanged =
 				toRemove.some((token) => !toAdd.includes(token) && el.classList.contains(token)) ||
 				toAdd.some((token) => !el.classList.contains(token));
+			changed = changed || classChanged;
 		} else {
 			changed = changed || el.getAttribute(attr) !== attrValue;
 		}
@@ -118,10 +116,7 @@ function themeScript(
 
 	for (const attr of attrs) {
 		if (attr === "class") {
-			if (
-				toRemove.some((token) => !toAdd.includes(token) && el.classList.contains(token)) ||
-				toAdd.some((token) => !el.classList.contains(token))
-			) {
+			if (classChanged) {
 				el.classList.remove(...toRemove);
 				el.classList.add(...toAdd);
 			}

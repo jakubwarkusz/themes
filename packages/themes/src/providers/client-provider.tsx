@@ -47,11 +47,11 @@ function getDomWindow(): (Window & typeof globalThis) | null {
 }
 
 function readCookieValue(key: string): string | null {
-	const re = new RegExp(`(?:^|;\\s*)${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`);
-	const match = document.cookie.match(re);
+	const parts = `; ${document.cookie}`.split(`; ${key}=`);
+	const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
 	let decoded: string | null = null;
 	try {
-		decoded = match?.[1] != null ? decodeURIComponent(match[1]) : null;
+		decoded = encoded ? decodeURIComponent(encoded) : null;
 	} catch {}
 	return decoded ? decoded : null;
 }
@@ -156,11 +156,16 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			const attrs = Array.isArray(attribute) ? attribute : [attribute];
 			const classValues = themes.flatMap((t) => (values?.[t] ?? t).split(" "));
 			const nextClassValues = attrValue.split(" ");
-			const needsUpdate = attrs.some((attr) =>
-				attr === "class"
-					? classAttributeNeedsUpdate(el, classValues, nextClassValues)
-					: el.getAttribute(attr) !== attrValue,
-			);
+			let needsUpdate = false;
+			let classChanged = false;
+			for (const attr of attrs) {
+				if (attr === "class") {
+					classChanged = classAttributeNeedsUpdate(el, classValues, nextClassValues);
+					needsUpdate = needsUpdate || classChanged;
+				} else {
+					needsUpdate = needsUpdate || el.getAttribute(attr) !== attrValue;
+				}
+			}
 
 			if (needsUpdate && disableTransitionOnChange) {
 				const transitionValue =
@@ -177,7 +182,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 			for (const attr of attrs) {
 				if (attr === "class") {
-					if (classAttributeNeedsUpdate(el, classValues, nextClassValues)) {
+					if (classChanged) {
 						el.classList.remove(...classValues);
 						el.classList.add(...nextClassValues);
 					}
@@ -258,8 +263,8 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				onThemeChangeRef.current?.(next as Themes);
 			}
 		};
-		mq.addEventListener("change", handler);
-		return () => mq.removeEventListener("change", handler);
+		mq.addEventListener?.("change", handler);
+		return () => mq.removeEventListener?.("change", handler);
 	}, [
 		cookieOptions,
 		forcedTheme,
