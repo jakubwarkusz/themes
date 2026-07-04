@@ -17,6 +17,17 @@ export default defineConfig({
 	target: "browser",
 	sourceBase: "./src",
 	dts: {
+		entry: [
+			"src/index.ts",
+			"src/client.ts",
+			"src/client/use-theme.ts",
+			"src/client/use-theme-value.ts",
+			"src/client/use-theme-effect.ts",
+			"src/client/themed-image.ts",
+			"src/client/provider.ts",
+			"src/client/create-themes.ts",
+			"src/next.ts",
+		],
 		splitting: true,
 	},
 	external: ["next/headers"],
