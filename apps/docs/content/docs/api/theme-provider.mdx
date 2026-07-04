@@ -7,8 +7,6 @@ description: API reference for the ThemeProvider component.
 
 Two variants are available depending on your framework:
 
-<Since version="0.6.0" />
-
 | Import | Mechanism | Use when |
 |--------|-----------|----------|
 | `@wrksz/themes/next` | `useServerInsertedHTML` | Next.js 16+ (no React 19 warning) |
@@ -71,9 +69,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `value` | `Record<string, string>` | - | Map theme names to attribute values |
 | `target` | `string` | `"html"` | Element to apply theme to (`"html"`, `"body"`, or a CSS selector) |
 | `storageKey` | `string` | `"theme"` | Key used for storage |
-| `storage` | `"localStorage" \| "sessionStorage" \| "cookie" \| "hybrid" \| "none"` | `"localStorage"` | Where to persist the theme. `"hybrid"` reads from cookie first (SSR-safe) and mirrors to `localStorage` for cross-tab sync. `"cookie"` reads/writes `document.cookie` and with `@wrksz/themes/next` also reads server-side. <Since version="0.9.0" /> |
-| `cookieOptions` | `CookieOptions` | - | Cookie attributes applied when writing the theme cookie. Only used when `storage="cookie"`. See [CookieOptions](#cookieoptions). <Since version="0.8.0" /> |
-| `disableTransitionOnChange` | `boolean \| string` | `false` | Suppress CSS transitions on initial load and when switching themes. `true` disables all transitions. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties while keeping others (transforms, opacity, etc.) intact. <Since version="0.7.4" /> |
+| `storage` | `"localStorage" \| "sessionStorage" \| "cookie" \| "hybrid" \| "none"` | `"localStorage"` | Where to persist the theme. `"hybrid"` reads from cookie first (SSR-safe) and mirrors to `localStorage` for cross-tab sync. `"cookie"` reads/writes `document.cookie` and with `@wrksz/themes/next` also reads server-side. |
+| `cookieOptions` | `CookieOptions` | - | Cookie attributes applied when writing the theme cookie. Only used when `storage="cookie"`. See [CookieOptions](#cookieoptions). |
+| `disableTransitionOnChange` | `boolean \| string` | `false` | Suppress CSS transitions on initial load and when switching themes. `true` disables all transitions. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties while keeping others (transforms, opacity, etc.) intact. |
 | `followSystem` | `boolean` | `false` | Always follow system preference, ignores stored value on mount |
 | `themeColor` | `string \| Record<string, string>` | - | Update `<meta name="theme-color">` on theme change |
 | `nonce` | `string` | - | CSP nonce for the inline script |
@@ -160,8 +158,6 @@ export default async function RootLayout({ children }) {
 
 ### Cookie storage (zero-flash SSR)
 
-<Since version="0.7.0" />
-
 When using `@wrksz/themes/next`, `storage="cookie"` automatically reads the theme cookie server-side and renders the correct class on `<html>` from the first byte - no flash for any user, no boilerplate:
 
 ```tsx title="app/layout.tsx"
@@ -192,8 +188,6 @@ The provider reads `document.cookie` on the client and `cookies()` from `next/he
 </Callout>
 
 ### Hybrid storage (SSR + cross-tab sync)
-
-<Since version="0.9.0" />
 
 `storage="hybrid"` combines the best parts of cookie and local storage:
 
@@ -236,8 +230,6 @@ Works with both `storage="cookie"` and `storage="hybrid"`:
 All `cookieOptions` fields have sensible defaults - you only need to specify what you want to override.
 
 ### Suppress transitions on theme change
-
-<Since version="0.7.4" />
 
 Suppress CSS transitions only when the library actually changes the applied theme: during the inline script's initial run when SSR markup needs correction, and whenever the user switches themes. This prevents first-paint flash and animated jank without reinserting a transition override during no-op hydration:
 
@@ -294,8 +286,6 @@ Works with CSS variables too:
 ```
 
 ## CookieOptions
-
-<Since version="0.8.0" />
 
 Options applied when writing the theme cookie. Only relevant when `storage="cookie"`.
 

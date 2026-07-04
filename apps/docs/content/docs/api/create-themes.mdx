@@ -3,7 +3,7 @@ title: createThemes
 description: Typed factory for ThemeProvider and theme hooks.
 ---
 
-`createThemes` lets you define your themes once and get typed provider/hooks everywhere.
+`createThemes` lets you define your themes once and get typed client provider/hooks everywhere.
 
 ```tsx title="app/theme.ts"
 "use client";
@@ -27,6 +27,7 @@ export const { ThemeProvider, useTheme, useThemeValue, useThemeEffect, ThemedIma
 - `useThemeValue` maps are checked against your union (plus optional `default`).
 - `ThemedImage` requires a source for every configured theme.
 - Provider defaults can still be overridden per usage, while the theme tuple stays fixed.
+- The returned `ThemeProvider` is a client provider. Use `@wrksz/themes/next` for the root Next.js provider that injects the anti-flash script.
 
 ```tsx title="app/theme-toggle.tsx"
 "use client";
@@ -99,9 +100,11 @@ export type AppThemedImageProps = TypedThemedImageProps<AppTheme>;
 Factory defaults are just defaults. You can override runtime props per mount:
 
 ```tsx
+"use client";
+
 import { ThemeProvider } from "@/app/theme";
 
-export function AuthLayout({ children }: { children: React.ReactNode }) {
+export function AuthSection({ children }: { children: React.ReactNode }) {
   return <ThemeProvider defaultTheme="light">{children}</ThemeProvider>;
 }
 ```
