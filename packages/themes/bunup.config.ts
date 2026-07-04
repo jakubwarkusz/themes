@@ -16,7 +16,9 @@ export default defineConfig({
 	format: ["esm"],
 	target: "browser",
 	sourceBase: "./src",
-	dts: true,
+	dts: {
+		splitting: true,
+	},
 	external: ["next/headers"],
 	env: { NODE_ENV: "production" },
 });
