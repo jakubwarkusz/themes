@@ -1,95 +1,17 @@
 "use client";
 
 import { type ReactElement, useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import {
+	applyThemeToDom,
+	getDomWindow,
+	readStoredTheme,
+	writeStoredTheme,
+} from "../core/client-dom.js";
 import { ThemeContext } from "../core/context.js";
-import { writeCookie } from "../core/cookie.js";
 import { createThemeStore } from "../core/store.js";
-import type {
-	DefaultTheme,
-	ThemeColor,
-	ThemeContextValue,
-	ThemeProviderProps,
-} from "../core/types.js";
+import type { DefaultTheme, ThemeContextValue, ThemeProviderProps } from "../core/types.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
-
-function resolveThemeColor(themeColor: ThemeColor, resolved: string): string | undefined {
-	if (typeof themeColor === "string") return themeColor;
-	return themeColor[resolved];
-}
-
-function updateMetaThemeColor(color: string | undefined): void {
-	if (!color) return;
-	let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-	if (!meta) {
-		meta = document.createElement("meta");
-		meta.name = "theme-color";
-		document.head.appendChild(meta);
-	}
-	meta.content = color;
-}
-
-function classAttributeNeedsUpdate(
-	el: Element,
-	currentValues: string[],
-	nextValues: string[],
-): boolean {
-	return (
-		currentValues.some(
-			(token) => !nextValues.includes(token) && el.classList.contains(token),
-		) || nextValues.some((token) => !el.classList.contains(token))
-	);
-}
-
-function getDomWindow(): (Window & typeof globalThis) | null {
-	if (typeof document === "undefined") return null;
-	return document.defaultView;
-}
-
-function readCookieValue(key: string): string | null {
-	const parts = `; ${document.cookie}`.split(`; ${key}=`);
-	const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
-	let decoded: string | null = null;
-	try {
-		decoded = encoded ? decodeURIComponent(encoded) : null;
-	} catch {}
-	return decoded ? decoded : null;
-}
-
-function readStoredTheme(
-	storage: ThemeProviderProps["storage"],
-	storageKey: string,
-): string | null {
-	if (storage === "none") return null;
-	if (storage === "cookie") return readCookieValue(storageKey);
-	if (storage === "hybrid")
-		return readCookieValue(storageKey) ?? localStorage.getItem(storageKey);
-	if (storage === "localStorage") return localStorage.getItem(storageKey);
-	return sessionStorage.getItem(storageKey);
-}
-
-function writeStoredTheme(
-	storage: ThemeProviderProps["storage"],
-	storageKey: string,
-	theme: string,
-	cookieOptions: ThemeProviderProps["cookieOptions"],
-): void {
-	if (storage === "none") return;
-	if (storage === "cookie") {
-		writeCookie(storageKey, theme, cookieOptions);
-		return;
-	}
-	if (storage === "hybrid") {
-		writeCookie(storageKey, theme, cookieOptions);
-		localStorage.setItem(storageKey, theme);
-		return;
-	}
-	if (storage === "localStorage") {
-		localStorage.setItem(storageKey, theme);
-		return;
-	}
-	sessionStorage.setItem(storageKey, theme);
-}
 
 export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	children,
@@ -140,72 +62,24 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		onThemeChangeRef.current = onThemeChange;
 	});
 
-	const getTargetEl = useCallback((): Element | null => {
-		if (target === "html") return document.documentElement;
-		if (target === "body") return document.body;
-		return document.querySelector(target);
-	}, [target]);
-
 	const applyToDom = useCallback(
 		(resolved: string) => {
-			const el = getTargetEl();
-			if (!el) return;
-
-			const values: Partial<Record<string, string>> | undefined = valueMap;
-			const attrValue = values?.[resolved] ?? resolved;
-			const attrs = Array.isArray(attribute) ? attribute : [attribute];
-			const classValues = themes.flatMap((t) => (values?.[t] ?? t).split(" "));
-			const nextClassValues = attrValue.split(" ");
-			let needsUpdate = false;
-			let classChanged = false;
-			for (const attr of attrs) {
-				if (attr === "class") {
-					classChanged = classAttributeNeedsUpdate(el, classValues, nextClassValues);
-					needsUpdate = needsUpdate || classChanged;
-				} else {
-					needsUpdate = needsUpdate || el.getAttribute(attr) !== attrValue;
-				}
-			}
-
-			if (needsUpdate && disableTransitionOnChange) {
-				const transitionValue =
-					typeof disableTransitionOnChange === "string"
-						? disableTransitionOnChange
-						: "none";
-				const style = document.createElement("style");
-				style.textContent = `*,*::before,*::after{transition:${transitionValue}!important}`;
-				document.head.appendChild(style);
-				requestAnimationFrame(() =>
-					requestAnimationFrame(() => document.head.removeChild(style)),
-				);
-			}
-
-			for (const attr of attrs) {
-				if (attr === "class") {
-					if (classChanged) {
-						el.classList.remove(...classValues);
-						el.classList.add(...nextClassValues);
-					}
-				} else {
-					if (el.getAttribute(attr) !== attrValue) {
-						el.setAttribute(attr, attrValue);
-					}
-				}
-			}
-
-			if (enableColorScheme && (resolved === "light" || resolved === "dark")) {
-				(el as HTMLElement).style.colorScheme = resolved;
-			}
-
-			if (themeColor) {
-				updateMetaThemeColor(resolveThemeColor(themeColor, resolved));
-			}
+			applyThemeToDom({
+				resolved,
+				attribute,
+				themes,
+				valueMap,
+				target,
+				disableTransitionOnChange,
+				enableColorScheme,
+				themeColor,
+			});
 		},
 		[
 			attribute,
 			disableTransitionOnChange,
 			enableColorScheme,
-			getTargetEl,
+			target,
 			themes,
 			valueMap,
 			themeColor,
