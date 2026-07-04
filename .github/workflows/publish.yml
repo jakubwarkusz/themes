@@ -49,7 +49,17 @@ jobs:
         run: bun run build
 
       - name: Publish to NPM registry
-        run: npm publish --provenance --access public
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          PRERELEASE="${VERSION#*-}"
+          if [ "$VERSION" != "$PRERELEASE" ]; then
+            NPM_TAG="${PRERELEASE%%.*}"
+            echo "Publishing prerelease ${VERSION} with dist-tag ${NPM_TAG}"
+            npm publish --provenance --access public --tag "${NPM_TAG}"
+          else
+            echo "Publishing stable release ${VERSION} to latest"
+            npm publish --provenance --access public
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -57,4 +67,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          make_latest: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          make_latest: ${{ !contains(github.ref_name, '-') }}
