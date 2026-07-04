@@ -71,7 +71,6 @@ export function ThemeToggle() {
 
 ## Import paths
 
-<Since version="0.9.2" />
 
 | Import | Use for |
 |--------|---------|
@@ -83,7 +82,7 @@ export function ThemeToggle() {
 | `@wrksz/themes/client/themed-image` | Direct `ThemedImage` import |
 | `@wrksz/themes/client/provider` | Direct `ClientThemeProvider` import |
 | `@wrksz/themes/client/create-themes` | Direct `createThemes` import |
-| `@wrksz/themes` | `ThemeProvider`, `createThemes` for non-Next.js frameworks |
+| `@wrksz/themes` | Client-safe `ThemeProvider` alias and `createThemes` for framework-neutral React usage |
 
 <Callout type="info">
   The API is identical to `next-themes`. Migrating requires changing one import line: `@wrksz/themes/next` instead of `next-themes`. See [Why not next-themes?](/docs/why-not-next-themes) for a full comparison.

@@ -1,3 +1,5 @@
+"use client";
+
 export type {
 	Attribute,
 	DefaultTheme,
@@ -18,4 +20,4 @@ export type {
 	TypedThemedImageProps,
 } from "./factory/create-themes.js";
 export { createThemes } from "./factory/create-themes.js";
-export { ThemeProvider } from "./providers/provider.js";
+export { ClientThemeProvider as ThemeProvider } from "./providers/client-provider.js";

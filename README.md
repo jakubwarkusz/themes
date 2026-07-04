@@ -422,7 +422,7 @@ import { createThemes } from "@wrksz/themes/client/create-themes";
 | `@wrksz/themes/client/themed-image` | Direct `ThemedImage` import |
 | `@wrksz/themes/client/provider` | Direct `ClientThemeProvider` import |
 | `@wrksz/themes/client/create-themes` | Direct `createThemes` import |
-| `@wrksz/themes`        | `ThemeProvider`, `createThemes` for non-Next.js frameworks                                          |
+| `@wrksz/themes`        | Client-safe `ThemeProvider` alias and `createThemes` for framework-neutral React usage              |
 
 
 ## License

@@ -3,7 +3,7 @@ title: Typed themes
 description: Define your theme tuple once and get typed providers, hooks, values, and images.
 ---
 
-Use `createThemes` when your app has one canonical theme list. The tuple becomes the source of truth for the provider, hooks, `useThemeValue`, and `ThemedImage`.
+Use `createThemes` when your app has one canonical theme list. The tuple becomes the source of truth for the typed client provider, hooks, `useThemeValue`, and `ThemedImage`.
 
 ## Create a typed theme module
 
@@ -25,23 +25,21 @@ export const { ThemeProvider, useTheme, useThemeValue, useThemeEffect, ThemedIma
   });
 ```
 
-## Use the typed provider
+## Use the typed provider in client UI
 
-```tsx title="app/layout.tsx"
+```tsx title="app/theme-scope.tsx"
+"use client";
+
 import { ThemeProvider } from "@/app/theme";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
-      </body>
-    </html>
-  );
+export function ThemeScope({ children }: { children: React.ReactNode }) {
+  return <ThemeProvider>{children}</ThemeProvider>;
 }
 ```
 
 The `themes` tuple is fixed by the factory. Per-use props like `defaultTheme`, `forcedTheme`, `storageKey`, and `themeColor` can still be overridden, but the theme union remains consistent across the app.
+
+For a Next.js root layout with the anti-flash script, keep using `ThemeProvider` from `@wrksz/themes/next`.
 
 ## Build typed UI
 
@@ -103,4 +101,3 @@ export const themeConfig = {
 export type AppThemeValueMap<Value> = ThemeValueMap<AppTheme, Value>;
 export type AppThemedImageProps = TypedThemedImageProps<AppTheme>;
 ```
-

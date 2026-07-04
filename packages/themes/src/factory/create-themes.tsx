@@ -11,7 +11,7 @@ import type {
 	ThemeSelection,
 } from "../core/types.js";
 import { useThemeEffect } from "../hooks/use-theme-effect.js";
-import { ThemeProvider } from "../providers/provider.js";
+import { ClientThemeProvider } from "../providers/client-provider.js";
 
 export type ThemeValueMap<Themes extends string, Value> = Partial<
 	Record<ThemeSelection<Themes>, Value>
@@ -58,7 +58,7 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 			...props,
 			themes: defaults.themes,
 		} satisfies ThemeProviderProps<ThemeName>;
-		return <ThemeProvider {...merged} />;
+		return <ClientThemeProvider {...merged} />;
 	}
 
 	function useTypedTheme(): ThemeContextValue<ThemeName> {
