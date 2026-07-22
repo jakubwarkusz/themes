@@ -1,6 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import {
+	DECLARATION_BUILD_ENTRIES,
+	INTERNAL_RUNTIME_BUILD_ENTRIES,
+	PUBLIC_BUILD_ENTRIES,
+	RUNTIME_BUILD_ENTRIES,
+} from "../../build-entries.js";
 
 const rootDir = resolve(import.meta.dir, "../..");
 
@@ -30,14 +36,6 @@ describe("client subpath exports", () => {
 		}
 	});
 
-	test("build config includes every client subpath entrypoint", () => {
-		const config = readFileSync(resolve(rootDir, "bunup.config.ts"), "utf-8");
-
-		for (const subpath of clientSubpaths) {
-			expect(config).toContain(`"src/client/${subpath}.ts`);
-		}
-	});
-
 	test("exposes the framework-neutral script entrypoint", () => {
 		const packageJson = JSON.parse(readFileSync(resolve(rootDir, "package.json"), "utf-8")) as {
 			exports: Record<string, { import?: { types?: string; default?: string } }>;
@@ -54,8 +52,8 @@ describe("client subpath exports", () => {
 		const packageJson = JSON.parse(readFileSync(resolve(rootDir, "package.json"), "utf-8")) as {
 			exports: Record<string, { import?: { types?: string; default?: string } } | string>;
 		};
-		const config = readFileSync(resolve(rootDir, "bunup.config.ts"), "utf-8");
 		const smoke = readFileSync(resolve(rootDir, "scripts/smoke-exports.ts"), "utf-8");
+		const publicSourceEntries: string[] = [];
 
 		for (const [subpath, exported] of Object.entries(packageJson.exports)) {
 			if (subpath === "./package.json" || typeof exported === "string") continue;
@@ -65,10 +63,22 @@ describe("client subpath exports", () => {
 			expect(declarationPath).toBeDefined();
 
 			const sourceEntry = subpath === "." ? "src/index.ts" : `src/${subpath.slice(2)}.ts`;
-			expect(config).toContain(`"${sourceEntry}"`);
+			publicSourceEntries.push(sourceEntry);
 			const importSpecifier =
 				subpath === "." ? '"@wrksz/themes"' : `"@wrksz/themes/${subpath.slice(2)}"`;
 			expect(smoke).toContain(importSpecifier);
 		}
+
+		const publicEntries: string[] = [...PUBLIC_BUILD_ENTRIES];
+		const declarationEntries: string[] = [...DECLARATION_BUILD_ENTRIES];
+		const runtimeEntries: string[] = [...RUNTIME_BUILD_ENTRIES];
+		expect(publicEntries.sort()).toEqual(publicSourceEntries.sort());
+		expect(declarationEntries.sort()).toEqual(publicSourceEntries.sort());
+		expect([...INTERNAL_RUNTIME_BUILD_ENTRIES]).toEqual([
+			"src/providers/client-next-provider.tsx",
+		]);
+		expect(runtimeEntries.sort()).toEqual(
+			[...publicSourceEntries, ...INTERNAL_RUNTIME_BUILD_ENTRIES].sort(),
+		);
 	});
 });

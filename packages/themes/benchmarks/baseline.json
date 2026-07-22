@@ -45,8 +45,8 @@
 		"gzipBytes": 3517
 	},
 	{
-		"name": "get-script",
-		"bytes": 2657,
-		"gzipBytes": 1250
+		"name": "generated-script",
+		"bytes": 1950,
+		"gzipBytes": 950
 	}
 ]

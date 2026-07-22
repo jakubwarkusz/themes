@@ -2,6 +2,7 @@ import { Buffer } from "node:buffer";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { gzipSync } from "node:zlib";
+import { getScript } from "../src/core/script.js";
 
 export type BundleReport = {
 	name: string;
@@ -48,8 +49,9 @@ const cases: BundleCase[] = [
 	{ name: "next-provider", entry: "entries/next-provider.tsx" },
 	{ name: "script", entry: "entries/script.tsx" },
 	{ name: "client-provider", entry: "entries/client-provider.tsx" },
-	{ name: "get-script", entry: "entries/get-script.ts" },
 ];
+
+export const GENERATED_SCRIPT_REPORT_NAME = "generated-script";
 
 /**
  * Literal dynamic-import edges so dead-code analysis can see these fixtures as
@@ -67,8 +69,11 @@ export function bundleEntryModuleLoaders(): ReadonlyArray<() => Promise<unknown>
 		() => import("../benchmarks/entries/next-provider.tsx"),
 		() => import("../benchmarks/entries/script.tsx"),
 		() => import("../benchmarks/entries/client-provider.tsx"),
-		() => import("../benchmarks/entries/get-script.ts"),
 	];
+}
+
+export function bundleReportNames(): readonly string[] {
+	return [...cases.map(({ name }) => name), GENERATED_SCRIPT_REPORT_NAME];
 }
 
 const externals = ["react", "react-dom", "react/jsx-runtime", "next/headers", "next/navigation"];
@@ -233,6 +238,37 @@ async function bundleCase(bundleCase: BundleCase): Promise<BundleReport> {
 	};
 }
 
+export function measureText(name: string, text: string): BundleReport {
+	return {
+		name,
+		bytes: Buffer.byteLength(text),
+		gzipBytes: gzipSync(text, { level: 9 }).byteLength,
+	};
+}
+
+async function generatedScriptCase(): Promise<BundleReport> {
+	const source = getScript({
+		storageKey: "theme",
+		attribute: ["class", "data-theme"],
+		defaultTheme: "system",
+		enableSystem: true,
+		enableColorScheme: true,
+		forcedTheme: undefined,
+		themes: ["light", "dark"],
+		value: { dark: "dark dark-palette" },
+		target: "html",
+		storage: "hybrid",
+		themeColors: { light: "#fff", dark: "#000" },
+		initialTheme: undefined,
+		disableTransitionOnChange: true,
+		followSystem: false,
+		systemThemeMap: undefined,
+	});
+	await mkdir(outputDir, { recursive: true });
+	await Bun.write(join(outputDir, `${GENERATED_SCRIPT_REPORT_NAME}.js`), source);
+	return measureText(GENERATED_SCRIPT_REPORT_NAME, source);
+}
+
 function printReport(reports: BundleReport[], thresholds: BundleThresholds): void {
 	const rows = reports.map((report) => {
 		const threshold = thresholds[report.name];
@@ -298,6 +334,7 @@ async function main(): Promise<void> {
 	for (const currentCase of cases) {
 		reports.push(await bundleCase(currentCase));
 	}
+	reports.push(await generatedScriptCase());
 
 	if (updateBaseline) {
 		await writeBaseline(reports);

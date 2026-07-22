@@ -1,38 +1,14 @@
 import { defineConfig } from "bunup";
+import { DECLARATION_BUILD_ENTRIES, RUNTIME_BUILD_ENTRIES } from "./build-entries.js";
 
 export default defineConfig({
-	entry: [
-		"src/index.ts",
-		"src/client.ts",
-		"src/client/use-theme.ts",
-		"src/client/use-theme-value.ts",
-		"src/client/use-theme-effect.ts",
-		"src/client/use-hydrated.ts",
-		"src/client/themed-image.ts",
-		"src/client/provider.ts",
-		"src/client/create-themes.ts",
-		"src/next.ts",
-		"src/script.ts",
-		"src/providers/client-next-provider.tsx",
-	],
+	entry: RUNTIME_BUILD_ENTRIES,
 	format: ["esm"],
 	splitting: true,
 	target: "browser",
 	sourceBase: "./src",
 	dts: {
-		entry: [
-			"src/index.ts",
-			"src/client.ts",
-			"src/client/use-theme.ts",
-			"src/client/use-theme-value.ts",
-			"src/client/use-theme-effect.ts",
-			"src/client/use-hydrated.ts",
-			"src/client/themed-image.ts",
-			"src/client/provider.ts",
-			"src/client/create-themes.ts",
-			"src/next.ts",
-			"src/script.ts",
-		],
+		entry: DECLARATION_BUILD_ENTRIES,
 		splitting: true,
 	},
 	external: ["next/headers"],
