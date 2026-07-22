@@ -4,6 +4,7 @@ import type { DependencyList, EffectCallback, ReactElement } from "react";
 import type { ThemedImageProps } from "../components/themed-image.js";
 import { ThemedImage } from "../components/themed-image.js";
 import { useTheme } from "../core/context.js";
+import { resolveThemeValue, type ThemeValueMap } from "../core/theme-value.js";
 import type {
 	ResolvedTheme,
 	ThemeContextValue,
@@ -13,11 +14,7 @@ import type {
 import { useThemeEffect } from "../hooks/use-theme-effect.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
 
-export type ThemeValueMap<Themes extends string, Value> = Partial<
-	Record<ThemeSelection<Themes>, Value>
-> & {
-	default?: Value;
-};
+export type { ThemeValueMap } from "../core/theme-value.js";
 
 export type TypedThemedImageProps<Themes extends string> = Omit<ThemedImageProps, "src"> & {
 	src: Record<ResolvedTheme<Themes>, string>;
@@ -67,9 +64,7 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 
 	function useTypedThemeValue<Value>(map: ThemeValueMap<ThemeName, Value>): Value | undefined {
 		const { theme, resolvedTheme } = useTypedTheme();
-		if (resolvedTheme && map[resolvedTheme] !== undefined) return map[resolvedTheme];
-		if (theme && map[theme] !== undefined) return map[theme];
-		return map.default;
+		return resolveThemeValue(map, theme, resolvedTheme);
 	}
 
 	function useTypedThemeEffect(
