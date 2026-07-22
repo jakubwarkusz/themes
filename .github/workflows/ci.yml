@@ -22,13 +22,15 @@ on:
       - "biome.json"
       - ".github/workflows/ci.yml"
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  check:
-    name: Lint, type-check & build
+  quality:
+    name: Repository quality
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/themes
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
 
@@ -38,25 +40,41 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
-        working-directory: .
 
       - name: Lint
-        run: bunx biome check src
+        run: bun run lint
+
+      - name: Audit high severity dependencies
+        run: bun audit --audit-level=high
+
+  library:
+    name: Library
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.9
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
       - name: Type check
-        run: bun type-check
+        run: bun run --cwd packages/themes type-check
 
       - name: Test
-        run: bun test
+        run: bun run --cwd packages/themes test
 
       - name: Build
-        run: bun run build
+        run: bun run --cwd packages/themes build
 
       - name: Bundle size
-        run: bun run size
+        run: bun run --cwd packages/themes size
 
       - name: Bundle size baseline
-        run: bun run size:compare benchmarks/baseline.json
+        run: bun run --cwd packages/themes size:compare
 
   react-compatibility:
     name: React ${{ matrix.react }}
@@ -121,6 +139,29 @@ jobs:
 
       - name: Check source and published package
         run: bun run --cwd packages/themes ${{ matrix.script }}
+
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.9
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Test
+        run: bun run --cwd apps/docs test
+
+      - name: Type check
+        run: bun run --cwd apps/docs types:check
+
+      - name: Build
+        run: bun run build:docs
 
   next-16-3:
     name: Next.js 16.3 Instant Navigations

@@ -5,10 +5,13 @@
 	"scripts": {
 		"build": "bun run --cwd packages/themes build",
 		"test": "bun run --cwd packages/themes test",
+		"test:docs": "bun run --cwd apps/docs test",
+		"type-check": "bun run --cwd packages/themes type-check && bun run --cwd apps/docs types:check",
 		"dev:docs": "bun run --cwd apps/docs dev",
 		"build:docs": "bun run --cwd apps/docs build",
 		"lint": "biome check packages apps",
 		"format": "biome format --write packages apps",
+		"verify": "bun run lint && bun run type-check && bun run test && bun run test:docs && bun run --cwd packages/themes size:compare && bun run build:docs",
 		"prepare": "[ \"$CI\" = \"true\" ] || lefthook install"
 	},
 	"devDependencies": {
