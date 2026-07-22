@@ -1,0 +1,50 @@
+---
+title: Other React frameworks
+description: First-paint theming in TanStack Start, Remix, and other SSR frameworks.
+---
+
+Use the client provider for state and render `ThemeScript` in your framework's server-controlled document head.
+
+```tsx
+import { ThemeScript } from "@wrksz/themes/script";
+import { ThemeProvider } from "@wrksz/themes";
+
+export function Document({ children }: { children: React.ReactNode }) {
+  return (
+    <html suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+`ThemeScript` uses deterministic source that bundlers cannot rewrite through `Function#toString()`. Keep its configuration equal to the provider configuration.
+
+## Cloudflare
+
+If Rocket Loader is enabled, exclude the bootstrap script from deferral:
+
+```tsx
+<ThemeScript scriptProps={{ "data-cfasync": "false" }} />
+```
+
+A flash without Rocket Loader generally means the script was emitted after blocking styles or outside the initial server response. Inspect the generated HTML and ensure the script is in `<head>` before application CSS.
+
+## Base paths
+
+The bootstrap has no route or asset dependency, so a Next.js `basePath` does not require configuration. A base-path-only flash points to document caching, delayed CSS, or a layout that omitted the root provider/script.
+
+## Content Security Policy
+
+Pass the same request-scoped nonce used by your `script-src` policy:
+
+```tsx
+<ThemeScript nonce={nonce} />
+```
+
+The script requires inline-script authorization but never requires `unsafe-eval`.
