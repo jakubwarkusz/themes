@@ -20,9 +20,10 @@
 		"declaration": true,
 		"isolatedDeclarations": true,
 
-		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@wrksz/themes": ["./src/index.ts"],
+			"@wrksz/themes/*": ["./src/*"]
 		},
 
 		"noUnusedLocals": false,
