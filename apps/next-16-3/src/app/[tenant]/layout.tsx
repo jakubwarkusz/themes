@@ -1,7 +1,13 @@
 import { ThemeProvider } from "@wrksz/themes/next";
+import type { Metadata } from "next";
 import { tenant } from "next/root-params";
 import { type ReactNode, Suspense } from "react";
 import "../globals.css";
+
+export const metadata: Metadata = {
+	title: "wrksz themes — Next.js fixture",
+	description: "Multi-tenant fixture app for verifying @wrksz/themes with Next.js App Router.",
+};
 
 export function generateStaticParams() {
 	return [{ tenant: "alpha" }, { tenant: "beta" }];
