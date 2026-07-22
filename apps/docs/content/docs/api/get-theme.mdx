@@ -58,10 +58,12 @@ When `themes` is omitted, `getTheme` returns `string` because an existing cookie
 
 ## Layout - apply class directly on `<html>`
 
-The most reliable way to eliminate SSR theme flash when your CSS uses class-based selectors:
+Use this pattern when server-rendered markup itself must depend on the theme:
 
 ```tsx title="app/layout.tsx"
 import { ThemeProvider, getTheme } from "@wrksz/themes/next";
+
+export const instant = false;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const theme = await getTheme({ defaultTheme: "dark" });
@@ -78,7 +80,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 }
 ```
 
-Setting `className` directly on `<html>` from the server guarantees the correct class is present before any CSS or JS runs - no flash even when system preference differs from stored theme.
+`getTheme()` calls the request-time `cookies()` API. With Cache Components enabled, reading it
+for the root `<html>` class blocks prerendering, so this example opts out with
+`export const instant = false`. For Instant Navigations, keep `ThemeProvider` static and let its
+bootstrap read the cookie before paint. If only a subtree needs server theme data, move the
+`getTheme()` call into an async child wrapped in `<Suspense>` so the rest of the App Shell remains
+prefetchable.
 
 ## Options
 

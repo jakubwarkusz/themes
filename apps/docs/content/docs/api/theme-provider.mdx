@@ -27,10 +27,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 <Callout type="warn">
-  `ThemeProvider` from `@wrksz/themes/next` is an async Server Component. It must be used directly in a server component (e.g. `layout.tsx`) - it cannot be wrapped in a `"use client"` component. If you are migrating from `next-themes` and have a wrapper like this, remove it and use `ThemeProvider` directly in your layout.
+  Use `ThemeProvider` from `@wrksz/themes/next` directly in a server layout. The `next` entry also exports the server-only `getTheme` helper, so it is not a client-module entry. For nested providers inside Client Components, use [`ClientThemeProvider`](/docs/api/client-theme-provider).
 
   ```tsx
-  // ❌ will throw: async Client Component error
+  // ❌ do not import the Next server entry from a client module
   "use client";
   import { ThemeProvider } from "@wrksz/themes/next";
   export function Providers({ children }) {
@@ -51,8 +51,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     );
   }
   ```
-
-  For nested providers inside Client Components, use [`ClientThemeProvider`](/docs/api/client-theme-provider) instead.
 </Callout>
 
 ## Props
@@ -69,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `value` | `Record<string, string>` | - | Map theme names to attribute values |
 | `target` | `string` | `"html"` | Element to apply theme to (`"html"`, `"body"`, or a CSS selector) |
 | `storageKey` | `string` | `"theme"` | Key used for storage |
-| `storage` | `"localStorage" \| "sessionStorage" \| "cookie" \| "hybrid" \| "none"` | `"localStorage"` | Where to persist the theme. `"hybrid"` reads from cookie first (SSR-safe) and mirrors to `localStorage` for cross-tab sync. `"cookie"` reads/writes `document.cookie` and with `@wrksz/themes/next` also reads server-side. |
+| `storage` | `"localStorage" \| "sessionStorage" \| "cookie" \| "hybrid" \| "none"` | `"localStorage"` | Where to persist the theme. The bootstrap reads cookies synchronously before paint. `"hybrid"` prefers the cookie and mirrors writes to `localStorage` for cross-tab sync. |
 | `cookieOptions` | `CookieOptions` | - | Cookie attributes applied when writing the theme cookie. Only used when `storage="cookie"`. See [CookieOptions](#cookieoptions). |
 | `disableTransitionOnChange` | `boolean \| string` | `false` | Suppress CSS transitions on initial load and when switching themes. `true` disables all transitions. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties while keeping others (transforms, opacity, etc.) intact. |
 | `followSystem` | `boolean` | `false` | Always follow system preference, ignores stored value on mount |
@@ -158,7 +156,7 @@ export default async function RootLayout({ children }) {
 
 ### Cookie storage (zero-flash SSR)
 
-When using `@wrksz/themes/next`, `storage="cookie"` automatically reads the theme cookie server-side and renders the correct class on `<html>` from the first byte - no flash for any user, no boilerplate:
+When using `@wrksz/themes/next`, `storage="cookie"` keeps the provider in the static App Shell. Its bootstrap reads `document.cookie` synchronously and applies the class before the first paint:
 
 ```tsx title="app/layout.tsx"
 import { ThemeProvider } from "@wrksz/themes/next";
@@ -181,7 +179,7 @@ export default function RootLayout({ children }) {
 }
 ```
 
-The provider reads `document.cookie` on the client and `cookies()` from `next/headers` on the server. Theme changes are written to the cookie automatically.
+Theme changes are written to the cookie automatically. If server-rendered markup must also depend on the theme, use [`getTheme`](/docs/api/get-theme) explicitly.
 
 <Callout type="warn">
   Cookie storage does not support cross-tab theme sync. If you need cross-tab sync, use `localStorage` with [`initialTheme`](/docs/examples/server-theme).
@@ -193,7 +191,7 @@ The provider reads `document.cookie` on the client and `cookies()` from `next/he
 
 - **Read priority:** cookie first, then `localStorage`
 - **Writes:** cookie and `localStorage`
-- **SSR:** cookie is available server-side with `@wrksz/themes/next`
+- **App Shell:** the bootstrap reads the cookie without making the layout request-time dynamic
 - **Cross-tab:** changes propagate through the `storage` event
 
 ```tsx title="app/layout.tsx"
@@ -208,6 +206,30 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </ThemeProvider>
       </body>
     </html>
+  );
+}
+```
+
+### Next.js 16.3 Instant Navigations
+
+`ThemeProvider` does not call request-time APIs, so it can stay in a reusable App Shell when
+`cacheComponents` and `partialPrefetching` are enabled. Prefetches only render the static
+provider configuration; they never write theme cookies.
+
+`next/root-params` is available by default in Next.js 16.3. Themes do not require a root-param
+integration. If your product intentionally stores a different theme per tenant or locale, scope
+the key in your app:
+
+```tsx title="app/[tenant]/layout.tsx"
+import { tenant } from "next/root-params";
+import { ThemeProvider } from "@wrksz/themes/next";
+
+export default async function TenantLayout({ children }) {
+  const currentTenant = await tenant();
+  return (
+    <ThemeProvider storageKey={`theme-${currentTenant}`}>
+      {children}
+    </ThemeProvider>
   );
 }
 ```

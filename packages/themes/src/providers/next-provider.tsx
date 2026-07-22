@@ -1,30 +1,9 @@
-import { cookies } from "next/headers";
 import type { ReactElement } from "react";
-import { isThemeSelection } from "../core/theme-validation.js";
 import type { DefaultTheme, ThemeProviderProps } from "../core/types.js";
 import { ClientNextThemeProvider } from "./client-next-provider.js";
 
-export async function ThemeProvider<Themes extends string = DefaultTheme>(
+export function ThemeProvider<Themes extends string = DefaultTheme>(
 	props: ThemeProviderProps<Themes>,
-): Promise<ReactElement> {
-	let serverTheme: string | undefined;
-
-	if (props.storage === "cookie" || props.storage === "hybrid") {
-		try {
-			const cookieStore = await cookies();
-			const stored = cookieStore.get(props.storageKey ?? "theme")?.value;
-			if (stored && isThemeSelection(stored, props.themes, props.enableSystem ?? true)) {
-				serverTheme = stored;
-			}
-		} catch {
-			// Static generation or out-of-request context
-		}
-	}
-
-	const initialTheme = props.initialTheme ?? (serverTheme as Themes | undefined);
-	return initialTheme === undefined ? (
-		<ClientNextThemeProvider {...props} />
-	) : (
-		<ClientNextThemeProvider {...props} initialTheme={initialTheme} />
-	);
+): ReactElement {
+	return <ClientNextThemeProvider {...props} />;
 }

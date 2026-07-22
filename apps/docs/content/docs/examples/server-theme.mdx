@@ -5,7 +5,7 @@ description: Eliminate SSR theme flash with cookie storage or a custom server-si
 
 ## Cookie storage
 
-The simplest way to eliminate SSR theme flash. Use `storage="cookie"` with `@wrksz/themes/next` - the provider reads the cookie server-side automatically, no boilerplate required:
+The simplest way to eliminate theme flash. Use `storage="cookie"` with `@wrksz/themes/next` - its static bootstrap reads the cookie synchronously before paint:
 
 ```tsx title="app/layout.tsx"
 import { ThemeProvider } from "@wrksz/themes/next";
@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-Theme changes are written to `document.cookie` automatically. On subsequent requests the server reads the cookie via `cookies()` from `next/headers` and injects the correct class before the first paint.
+Theme changes are written to `document.cookie` automatically. On subsequent documents the bootstrap applies the stored class before React hydrates, without making the App Shell request-time dynamic.
 
 <Callout type="info">
   Flash may still appear in Next.js development mode - this is expected. Next.js dev mode does not fully replicate SSR behavior. The flash disappears in production builds.

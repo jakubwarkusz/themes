@@ -41,7 +41,7 @@ That's it for most apps.
 
 ## Step 3: Remove the "use client" wrapper
 
-`ThemeProvider` from `@wrksz/themes/next` is an async Server Component. If you have a client wrapper (common in Next.js `next-themes` setups), remove it:
+`@wrksz/themes/next` is the server-layout entry and also exports the server-only `getTheme` helper. If you have a client wrapper (common in Next.js `next-themes` setups), remove it:
 
 ```diff
 - "use client";

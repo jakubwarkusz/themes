@@ -74,7 +74,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-> **Note:** `ThemeProvider` from `@wrksz/themes/next` is an async Server Component. Use it directly in `layout.tsx` - it cannot be wrapped in a `"use client"` component. For nested providers inside Client Components, use `[ClientThemeProvider](#nested-provider-in-a-client-component)`.
+> **Note:** Use `ThemeProvider` from `@wrksz/themes/next` directly in a server `layout.tsx`. For nested providers inside Client Components, use [`ClientThemeProvider`](#nested-provider-in-a-client-component).
+
+The Next provider is static and compatible with Next.js 16.3 Instant Navigations,
+`cacheComponents`, and Partial Prefetching. It does not mutate cookies during prefetches.
+Use `getTheme()` only when server-rendered markup must depend on the cookie; under Cache
+Components, isolate that request-time read with `Suspense` or opt the route out with
+`export const instant = false`.
 
 ## Usage
 
@@ -96,7 +102,7 @@ export function ThemeToggle() {
 
 ## Zero-flash SSR with cookie storage
 
-Use `storage="cookie"` with `@wrksz/themes/next` to eliminate SSR theme flash. The provider reads the cookie server-side automatically - no boilerplate required:
+Use `storage="cookie"` with `@wrksz/themes/next` to eliminate theme flash. The static bootstrap reads the cookie synchronously before paint, so the provider remains compatible with Next.js 16.3 App Shells and Partial Prefetching:
 
 ```tsx
 // app/layout.tsx
@@ -162,7 +168,7 @@ with npm provenance from GitHub Actions.
 | `value`                     | `Record<string, string>`                                           | -                   | Map theme names to attribute values                                                                                                                                                                                                |
 | `target`                    | `string`                                                           | `"html"`            | Element to apply theme to (`"html"`, `"body"`, or a CSS selector)                                                                                                                                                                  |
 | `storageKey`                | `string`                                                           | `"theme"`           | Key used for storage                                                                                                                                                                                                               |
-| `storage`                   | `"localStorage" \| "sessionStorage" \| "cookie" \| "hybrid" \| "none"` | `"localStorage"`    | Where to persist the theme. `"hybrid"` reads from cookie first and mirrors to `localStorage` for cross-tab sync. `"cookie"` reads/writes `document.cookie` and with `@wrksz/themes/next` also reads server-side for zero-flash SSR |
+| `storage`                   | `"localStorage" \| "sessionStorage" \| "cookie" \| "hybrid" \| "none"` | `"localStorage"`    | Where to persist the theme. The bootstrap reads cookies before paint; `"hybrid"` prefers the cookie and mirrors writes to `localStorage` for cross-tab sync |
 | `disableTransitionOnChange` | `boolean \| string`                                                 | `false`             | Suppress CSS transitions when switching themes. `true` disables all. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties                                                   |
 | `followSystem`              | `boolean`                                                          | `false`             | Always follow system preference, ignores stored value on mount                                                                                                                                                                     |
 | `themeColor`                | `string \| Record<string, string>`                                  | -                   | Update `<meta name="theme-color">` on theme change                                                                                                                                                                                 |
