@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, ScriptHTMLAttributes } from "react";
 
 export type DefaultTheme = "light" | "dark" | "system";
 
@@ -35,6 +35,17 @@ export type CookieOptions = {
 /** Per-theme colors for meta theme-color, or a single string for all themes */
 export type ThemeColor = string | Partial<Record<string, string>>;
 
+export type ThemeScriptAttributes = ScriptHTMLAttributes<HTMLScriptElement> & {
+	[key: `data-${string}`]: string | undefined;
+};
+
+export type SystemThemeMap<Themes extends string = string> =
+	| {
+		light: Themes;
+		dark: Themes;
+	}
+	| Partial<Record<Themes, { light: Themes; dark: Themes }>>;
+
 export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	children: ReactNode;
 	/** All available themes */
@@ -61,6 +72,10 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	enableColorScheme?: boolean;
 	/** Nonce for CSP */
 	nonce?: string;
+	/** Additional attributes for the pre-hydration script */
+	scriptProps?: ThemeScriptAttributes;
+	/** Reports storage read/write failures without interrupting theme updates */
+	onStorageError?: (error: unknown) => void;
 	/** Called when theme changes. Receives the selected theme (may be "system"), not the resolved value. When the system preference changes while the theme is set to "system", fires with the resolved value ("light" | "dark"). */
 	onThemeChange?: (theme: ThemeSelection<Themes>) => void;
 	/** Colors for meta theme-color tag, per theme or a single value */
@@ -71,6 +86,10 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	initialTheme?: ThemeSelection<Themes>;
 	/** Cookie options, only used when storage="cookie" */
 	cookieOptions?: CookieOptions;
+	/** Serializable mapping used to resolve custom variants when the system theme changes */
+	systemThemeMap?: SystemThemeMap<Themes>;
+	/** Client-only Element or ShadowRoot target. Use `target` for pre-hydration SSR support. */
+	themeRoot?: Element | ShadowRoot;
 };
 
 export type ThemeContextValue<Themes extends string = DefaultTheme> = {
