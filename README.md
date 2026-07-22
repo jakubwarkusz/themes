@@ -218,7 +218,6 @@ import { ClientThemeProvider } from "@wrksz/themes/client/extended-provider";
   maps system preferences to custom names or preserves variant families.
 - `themeRoot?: Element | ShadowRoot` targets a client-owned element or a ShadowRoot host.
 
-
 ### `useTheme`
 
 ```tsx
