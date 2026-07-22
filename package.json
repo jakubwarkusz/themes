@@ -12,6 +12,8 @@
 		"lint": "biome check packages apps",
 		"format": "biome format --write packages apps",
 		"verify": "bun run lint && bun run type-check && bun run test && bun run test:docs && bun run --cwd packages/themes size:compare && bun run build:docs",
+		"verify:fixture": "bun run --cwd apps/next-16-3 type-check && bun run --cwd apps/next-16-3 build && bun run --cwd apps/next-16-3 test:e2e",
+		"verify:full": "bun run lint && bun run type-check && bun run test && bun run test:docs && bun run --cwd packages/themes type-check:compat && bun run --cwd packages/themes size:compare && bun run build:docs && bun run verify:fixture && bun audit --audit-level=high",
 		"prepare": "[ \"$CI\" = \"true\" ] || lefthook install"
 	},
 	"devDependencies": {
