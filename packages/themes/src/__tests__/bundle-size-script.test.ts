@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
 	type BundleReport,
 	type BundleThresholds,
+	bundleEntryModuleLoaders,
 	compareReports,
 	compareWithBaseline,
 	formatBytes,
@@ -10,6 +11,10 @@ import {
 } from "../../scripts/bundle-size.ts";
 
 describe("bundle-size script helpers", () => {
+	test("keeps every benchmark fixture statically reachable", () => {
+		expect(bundleEntryModuleLoaders()).toHaveLength(10);
+	});
+
 	test("formatBytes formats bytes and kibibytes", () => {
 		expect(formatBytes(512)).toBe("512 B");
 		expect(formatBytes(1536)).toBe("1.50 KiB");

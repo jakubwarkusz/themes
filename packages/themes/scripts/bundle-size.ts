@@ -46,6 +46,9 @@ const cases: BundleCase[] = [
 	{ name: "themed-image", entry: "entries/themed-image.tsx" },
 	{ name: "themed-image-subpath", entry: "entries/themed-image-subpath.tsx" },
 	{ name: "next-provider", entry: "entries/next-provider.tsx" },
+	{ name: "script", entry: "entries/script.tsx" },
+	{ name: "client-provider", entry: "entries/client-provider.tsx" },
+	{ name: "get-script", entry: "entries/get-script.ts" },
 ];
 
 /**
@@ -62,6 +65,9 @@ export function bundleEntryModuleLoaders(): ReadonlyArray<() => Promise<unknown>
 		() => import("../benchmarks/entries/themed-image.tsx"),
 		() => import("../benchmarks/entries/themed-image-subpath.tsx"),
 		() => import("../benchmarks/entries/next-provider.tsx"),
+		() => import("../benchmarks/entries/script.tsx"),
+		() => import("../benchmarks/entries/client-provider.tsx"),
+		() => import("../benchmarks/entries/get-script.ts"),
 	];
 }
 

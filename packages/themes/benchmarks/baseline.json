@@ -11,13 +11,13 @@
 	},
 	{
 		"name": "use-theme-value",
-		"bytes": 497,
-		"gzipBytes": 311
+		"bytes": 595,
+		"gzipBytes": 353
 	},
 	{
 		"name": "use-theme-value-subpath",
-		"bytes": 504,
-		"gzipBytes": 317
+		"bytes": 602,
+		"gzipBytes": 360
 	},
 	{
 		"name": "themed-image",
@@ -31,7 +31,22 @@
 	},
 	{
 		"name": "next-provider",
-		"bytes": 11594,
-		"gzipBytes": 4302
+		"bytes": 12292,
+		"gzipBytes": 4644
+	},
+	{
+		"name": "script",
+		"bytes": 3248,
+		"gzipBytes": 1465
+	},
+	{
+		"name": "client-provider",
+		"bytes": 8643,
+		"gzipBytes": 3517
+	},
+	{
+		"name": "get-script",
+		"bytes": 2657,
+		"gzipBytes": 1250
 	}
 ]
