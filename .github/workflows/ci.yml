@@ -8,7 +8,8 @@ on:
       - "apps/docs/**"
       - "apps/next-16-3/**"
       - "package.json"
-      - "bun.lock"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
       - "oxlint.config.ts"
       - "oxfmt.config.ts"
       - ".github/workflows/ci.yml"
@@ -19,7 +20,8 @@ on:
       - "apps/docs/**"
       - "apps/next-16-3/**"
       - "package.json"
-      - "bun.lock"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
       - "oxlint.config.ts"
       - "oxfmt.config.ts"
       - ".github/workflows/ci.yml"
@@ -36,21 +38,28 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.9
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Format check
-        run: bun run format:check
+        run: pnpm format:check
 
       - name: Lint
-        run: bun run lint
+        run: pnpm lint
 
       - name: Audit high severity dependencies
-        run: bun audit --audit-level=high
+        run: pnpm audit:high
 
   library:
     name: Library
@@ -59,27 +68,34 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.9
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Type check
-        run: bun run --cwd packages/themes type-check
+        run: pnpm --filter @wrksz/themes type-check
 
       - name: Test
-        run: bun run --cwd packages/themes test
+        run: pnpm --filter @wrksz/themes test
 
       - name: Build
-        run: bun run --cwd packages/themes build
+        run: pnpm --filter @wrksz/themes build
 
       - name: Bundle size
-        run: bun run --cwd packages/themes size
+        run: pnpm --filter @wrksz/themes size
 
       - name: Bundle size baseline
-        run: bun run --cwd packages/themes size:compare
+        run: pnpm --filter @wrksz/themes size:compare
 
   react-compatibility:
     name: React ${{ matrix.react }}
@@ -97,26 +113,47 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.9
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Select React version
-        run: >-
-          bun add --no-save --dev
-          react@${{ matrix.react }}
-          react-dom@${{ matrix.react }}
-          @types/react@${{ matrix.react-types }}
-          @types/react-dom@${{ matrix.react-dom-types }}
+        env:
+          REACT: ${{ matrix.react }}
+          REACT_TYPES: ${{ matrix.react-types }}
+          REACT_DOM_TYPES: ${{ matrix.react-dom-types }}
+        run: |
+          # Force one React version across the workspace (apps pin their own range),
+          # then reinstall so peer links under packages/* are rewritten.
+          printf '\n  react: %s\n  react-dom: %s\n' "${REACT}" "${REACT}" >> pnpm-workspace.yaml
+          pnpm add --workspace-root --save-dev \
+            "react@${REACT}" \
+            "react-dom@${REACT}" \
+            "@types/react@${REACT_TYPES}" \
+            "@types/react-dom@${REACT_DOM_TYPES}"
+          pnpm --filter theme-docs --filter next-16-3-compat add \
+            "react@${REACT}" \
+            "react-dom@${REACT}"
+          pnpm --filter theme-docs --filter next-16-3-compat add --save-dev \
+            "@types/react@${REACT_TYPES}" \
+            "@types/react-dom@${REACT_DOM_TYPES}"
+          pnpm install
 
       - name: Test effect event compatibility
-        run: bun run --cwd packages/themes test src/__tests__/use-effect-event-compat.test.tsx
+        run: pnpm --filter @wrksz/themes test src/__tests__/use-effect-event-compat.test.tsx
 
       - name: Build
-        run: bun run --cwd packages/themes build
+        run: pnpm --filter @wrksz/themes build
 
   typescript-compatibility:
     name: TypeScript ${{ matrix.version }}
@@ -135,15 +172,22 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.9
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Check source and published package
-        run: bun run --cwd packages/themes ${{ matrix.script }}
+        run: pnpm --filter @wrksz/themes ${{ matrix.script }}
 
   docs:
     name: Documentation
@@ -152,24 +196,31 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.9
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Build library
-        run: bun run --cwd packages/themes build
+        run: pnpm --filter @wrksz/themes build
 
       - name: Test
-        run: bun run --cwd apps/docs test
+        run: pnpm --filter theme-docs test
 
       - name: Type check
-        run: bun run --cwd apps/docs types:check
+        run: pnpm --filter theme-docs types:check
 
       - name: Build
-        run: bun run build:docs
+        run: pnpm build:docs
 
   next-16-3:
     name: Next.js 16.3 Instant Navigations
@@ -178,25 +229,31 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.9
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Build library
-        run: bun run --cwd packages/themes build
+        run: pnpm --filter @wrksz/themes build
 
       - name: Type check
-        run: bun run --cwd apps/next-16-3 type-check
+        run: pnpm --filter next-16-3-compat type-check
 
       - name: Build fixture
-        run: bun run --cwd apps/next-16-3 build
+        run: pnpm --filter next-16-3-compat build
 
       - name: Install Chromium
-        working-directory: apps/next-16-3
-        run: bunx playwright install --with-deps chromium
+        run: pnpm --filter next-16-3-compat exec playwright install --with-deps chromium
 
       - name: Test Instant Navigations
-        run: bun run --cwd apps/next-16-3 test:e2e
+        run: pnpm --filter next-16-3-compat test:e2e

@@ -2,14 +2,14 @@
 
 ## Setup
 
-Install Bun 1.3.x, then run:
+Install pnpm 11.x and Bun 1.3.x (pnpm manages dependencies; Bun runs tests and builds), then run:
 
 ```sh
-CI=true bun install --frozen-lockfile
-bun run verify
+CI=true pnpm install --frozen-lockfile
+pnpm verify
 ```
 
-Use `bun run verify:full` before requesting release review. It adds TypeScript 5.9/6/7 declaration checks, bundle comparison, production builds, dependency audit, and the Next.js Playwright fixture.
+Use `pnpm verify:full` before requesting release review. It adds TypeScript 5.9/6/7 declaration checks, bundle comparison, production builds, dependency audit, and the Next.js Playwright fixture.
 
 ## Change expectations
 

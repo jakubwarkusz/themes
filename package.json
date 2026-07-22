@@ -1,25 +1,27 @@
 {
 	"name": "@wrksz/themes-monorepo",
 	"private": true,
-	"workspaces": [
-		"packages/*",
-		"apps/*"
-	],
 	"type": "module",
+	"packageManager": "pnpm@11.15.1",
+	"engines": {
+		"node": ">=24",
+		"pnpm": ">=11.0.0"
+	},
 	"scripts": {
-		"build": "bun run --cwd packages/themes build",
-		"test": "bun run --cwd packages/themes test",
-		"test:docs": "bun run --cwd apps/docs test",
-		"type-check": "bun run --cwd packages/themes type-check && bun run --cwd apps/docs types:check",
-		"dev:docs": "bun run --cwd apps/docs dev",
-		"build:docs": "bun run --cwd apps/docs build",
+		"build": "pnpm --filter @wrksz/themes build",
+		"test": "pnpm --filter @wrksz/themes test",
+		"test:docs": "pnpm --filter theme-docs test",
+		"type-check": "pnpm --filter @wrksz/themes type-check && pnpm --filter theme-docs types:check",
+		"dev:docs": "pnpm --filter theme-docs dev",
+		"build:docs": "pnpm --filter theme-docs build",
 		"lint": "oxlint --config ./oxlint.config.ts --deny-warnings packages apps",
 		"lint:fix": "oxlint --config ./oxlint.config.ts --deny-warnings --fix packages apps",
 		"format": "oxfmt --config ./oxfmt.config.ts packages apps oxlint.config.ts oxfmt.config.ts",
 		"format:check": "oxfmt --config ./oxfmt.config.ts --check packages apps oxlint.config.ts oxfmt.config.ts",
-		"verify": "bun run format:check && bun run lint && bun run type-check && bun run test && bun run build && bun run test:docs && bun run --cwd packages/themes size:compare && bun run build:docs",
-		"verify:fixture": "bun run --cwd apps/next-16-3 type-check && bun run --cwd apps/next-16-3 build && bun run --cwd apps/next-16-3 test:e2e",
-		"verify:full": "bun run format:check && bun run lint && bun run type-check && bun run test && bun run build && bun run test:docs && bun run --cwd packages/themes type-check:compat && bun run --cwd packages/themes size:compare && bun run build:docs && bun run verify:fixture && bun audit --audit-level=high",
+		"audit:high": "pnpm audit --audit-level high",
+		"verify": "pnpm format:check && pnpm lint && pnpm type-check && pnpm test && pnpm build && pnpm test:docs && pnpm --filter @wrksz/themes size:compare && pnpm build:docs",
+		"verify:fixture": "pnpm --filter next-16-3-compat type-check && pnpm --filter next-16-3-compat build && pnpm --filter next-16-3-compat test:e2e",
+		"verify:full": "pnpm format:check && pnpm lint && pnpm type-check && pnpm test && pnpm build && pnpm test:docs && pnpm --filter @wrksz/themes type-check:compat && pnpm --filter @wrksz/themes size:compare && pnpm build:docs && pnpm verify:fixture && pnpm audit:high",
 		"prepare": "[ \"$CI\" = \"true\" ] || lefthook install"
 	},
 	"devDependencies": {
@@ -36,11 +38,5 @@
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
 		"typescript": "^5.9.3"
-	},
-	"overrides": {
-		"nanoid": "3.3.18",
-		"postcss": "8.5.26",
-		"sharp": "0.35.3"
-	},
-	"packageManager": "bun@1.3.9"
+	}
 }
