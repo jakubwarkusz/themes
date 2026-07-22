@@ -18,7 +18,7 @@ import {
 import { ThemeContext, type ThemeContextInstance } from "../core/context.js";
 import { createThemeStore } from "../core/store.js";
 import { publishThemeChannel } from "../core/sync.js";
-import { isThemeSelection } from "../core/theme-validation.js";
+import { isThemeSelection, resolveDefaultTheme } from "../core/theme-validation.js";
 import type {
 	DefaultTheme,
 	ResolvedTheme,
@@ -83,13 +83,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	themeRoot,
 	themeContext = ThemeContext as ThemeContextInstance<Themes>,
 }: ClientThemeProviderProps<Themes>): ReactElement {
-	const requestedDefault = defaultTheme ?? (enableSystem ? "system" : themes[0]);
-	const resolvedDefault = (
-		themes.includes(requestedDefault as Themes) ||
-		(enableSystem && requestedDefault === "system")
-			? requestedDefault
-			: themes[0]
-	) as Themes | "system";
+	const resolvedDefault = resolveDefaultTheme(themes, enableSystem, defaultTheme);
 
 	const storeRef = useRef<ReturnType<typeof createThemeStore> | null>(null);
 	if (storeRef.current === null) {
@@ -157,6 +151,58 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		onThemeChange?.(next);
 	});
 	const applyToDomEvent = useEffectEvent(applyToDom);
+	const initializeEvent = useEffectEvent(() => {
+		const domWindow = getDomWindow();
+		if (!domWindow) return;
+		const mq =
+			enableSystem && typeof domWindow.matchMedia === "function"
+				? domWindow.matchMedia("(prefers-color-scheme: dark)")
+				: null;
+		const system = mq ? (mq.matches ? "dark" : "light") : undefined;
+		let initial: Themes | "system";
+
+		if (initialTheme && isValidTheme(initialTheme)) {
+			initial = initialTheme;
+			writeStoredTheme(
+				storage,
+				storageKey,
+				String(initialTheme),
+				cookieOptions,
+				onStorageError,
+			);
+		} else {
+			const stored = readStoredTheme(storage, storageKey, onStorageError);
+			initial =
+				!followSystem && stored && isValidTheme(stored)
+					? (stored as Themes | "system")
+					: resolvedDefault;
+		}
+
+		setStoreState({ theme: initial, systemTheme: system });
+	});
+	const handleSystemChangeEvent = useEffectEvent((next: "light" | "dark") => {
+		setStoreSystemTheme(next);
+		const current = getSnapshot().theme;
+		if (current === "system" || current === undefined || followSystem) {
+			const followsVariant =
+				followSystem && Boolean(systemThemeMap) && !isDirectSystemMap(systemThemeMap);
+			if (followSystem && !followsVariant) {
+				setStoreTheme("system");
+			}
+			applyToDomEvent(
+				resolveSelection(
+					followsVariant
+						? (current ?? resolvedDefault)
+						: followSystem
+							? "system"
+							: (current ?? "system"),
+					next,
+					systemThemeMap as SystemThemeMap<string> | undefined,
+				) ?? next,
+			);
+			onThemeChangeEvent(next as Themes);
+		}
+	});
 
 	useThemeExternalSync({
 		storage,
@@ -173,105 +219,24 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	});
 
 	useEffect(() => {
+		initializeEvent();
+	}, []);
+
+	useEffect(() => {
+		if (resolvedTheme) applyToDom(resolvedTheme);
+	}, [resolvedTheme, applyToDom]);
+
+	useEffect(() => {
 		const domWindow = getDomWindow();
-		if (!domWindow) return;
-		const mq =
-			enableSystem && typeof domWindow.matchMedia === "function"
-				? domWindow.matchMedia("(prefers-color-scheme: dark)")
-				: null;
-		const sys: "light" | "dark" | undefined = mq ? (mq.matches ? "dark" : "light") : undefined;
-		if (sys) {
-			setStoreSystemTheme(sys);
-		}
-
-		if (validForcedTheme) {
-			setStoreTheme(validForcedTheme);
-			applyToDom(
-				resolveSelection(
-					validForcedTheme,
-					sys,
-					systemThemeMap as SystemThemeMap<string> | undefined,
-				) ?? validForcedTheme,
-			);
-		} else if (initialTheme && isValidTheme(initialTheme)) {
-			setStoreTheme(initialTheme);
-			applyToDom(
-				resolveSelection(
-					initialTheme,
-					sys,
-					systemThemeMap as SystemThemeMap<string> | undefined,
-				) ?? "light",
-			);
-			writeStoredTheme(
-				storage,
-				storageKey,
-				String(initialTheme),
-				cookieOptions,
-				onStorageError,
-			);
-		} else {
-			const stored = readStoredTheme(storage, storageKey, onStorageError);
-
-			const initial =
-				!followSystem && stored && isValidTheme(stored)
-					? (stored as Themes | "system")
-					: resolvedDefault;
-
-			setStoreState({ theme: initial, systemTheme: sys });
-			applyToDom(
-				resolveSelection(
-					initial,
-					sys,
-					systemThemeMap as SystemThemeMap<string> | undefined,
-				) ?? "light",
-			);
-		}
-
-		if (!mq) return;
-		const handler = (e: MediaQueryListEvent) => {
-			const next = e.matches ? "dark" : "light";
-			setStoreSystemTheme(next);
-			const current = getSnapshot().theme;
-			if (current === "system" || current === undefined || followSystem) {
-				const followsVariant =
-					followSystem && Boolean(systemThemeMap) && !isDirectSystemMap(systemThemeMap);
-				if (followSystem && !followsVariant) {
-					setStoreTheme("system");
-				}
-				applyToDomEvent(
-					resolveSelection(
-						followsVariant
-							? (current ?? resolvedDefault)
-							: followSystem
-								? "system"
-								: (current ?? "system"),
-						next,
-						systemThemeMap as SystemThemeMap<string> | undefined,
-					) ?? next,
-				);
-				onThemeChangeEvent(next as Themes);
-			}
+		if (!enableSystem || !domWindow || typeof domWindow.matchMedia !== "function") return;
+		const mq = domWindow.matchMedia("(prefers-color-scheme: dark)");
+		setStoreSystemTheme(mq.matches ? "dark" : "light");
+		const handler = (event: MediaQueryListEvent) => {
+			handleSystemChangeEvent(event.matches ? "dark" : "light");
 		};
 		mq.addEventListener?.("change", handler);
 		return () => mq.removeEventListener?.("change", handler);
-	}, [
-		cookieOptions,
-		validForcedTheme,
-		initialTheme,
-		resolvedDefault,
-		storage,
-		storageKey,
-		enableSystem,
-		followSystem,
-		isValidTheme,
-		onStorageError,
-		systemThemeMap,
-		applyToDom,
-		getSnapshot,
-		setStoreState,
-		setStoreTheme,
-		setStoreSystemTheme,
-	]);
+	}, [enableSystem, setStoreSystemTheme]);
 
 	const setTheme = useCallback(
 		(

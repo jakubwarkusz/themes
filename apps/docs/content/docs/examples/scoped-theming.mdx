@@ -7,6 +7,8 @@ By default `ThemeProvider` applies the theme to `<html>`. Use the `target` prop 
 
 Use `ClientThemeProvider` for nested providers - the inline anti-flash script is only needed in the root layout. `ClientThemeProvider` handles state without rendering an extra script.
 
+For a server-rendered root scope that targets `"body"` or a descendant selector, use `ThemeProvider` from `@wrksz/themes/next`. It emits the parser-blocking bootstrap immediately after the provider subtree so the target already exists when the script runs, while the default `"html"` target continues to use `useServerInsertedHTML`.
+
 ## Setup
 
 ```tsx title="app/landing/layout.tsx"

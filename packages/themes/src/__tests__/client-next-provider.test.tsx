@@ -42,4 +42,55 @@ describe("ClientNextThemeProvider", () => {
 		expect((script as ScriptElement).props.dangerouslySetInnerHTML?.__html).toContain('"dark"');
 		expect(callback?.()).toBeNull();
 	});
+
+	test("normalizes defaults against custom themes", () => {
+		render(
+			<ClientNextThemeProvider
+				themes={["paper", "midnight"]}
+				enableSystem={false}
+				defaultTheme={"invalid" as "paper"}
+			>
+				<span>content</span>
+			</ClientNextThemeProvider>,
+		);
+
+		const script = insertedHtmlCallbacks[0]?.() as ScriptElement;
+		expect(script.props.dangerouslySetInnerHTML?.__html).toContain('"paper",false');
+	});
+
+	test("rejects system default when system mode is disabled", () => {
+		render(
+			<ClientNextThemeProvider
+				themes={["paper", "midnight"]}
+				enableSystem={false}
+				defaultTheme="system"
+			>
+				<span>content</span>
+			</ClientNextThemeProvider>,
+		);
+
+		const script = insertedHtmlCallbacks[0]?.() as ScriptElement;
+		expect(script.props.dangerouslySetInnerHTML?.__html).toContain('"paper",false');
+	});
+
+	test("renders non-html target scripts after the provider subtree", () => {
+		const view = render(
+			<ClientNextThemeProvider
+				target="body"
+				nonce="body-nonce"
+				scriptProps={{ "data-theme-bootstrap": "body" }}
+			>
+				<span data-testid="target-content">content</span>
+			</ClientNextThemeProvider>,
+		);
+
+		expect(insertedHtmlCallbacks[0]?.()).toBeNull();
+		const content = view.getByTestId("target-content");
+		const script = view.container.querySelector<HTMLScriptElement>(
+			'script[data-theme-bootstrap="body"]',
+		);
+		expect(script).not.toBeNull();
+		expect(script?.getAttribute("nonce")).toBe("body-nonce");
+		expect(content.compareDocumentPosition(script as Node) & 4).toBe(4);
+	});
 });

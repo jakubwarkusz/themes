@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import type { ReactElement } from "react";
 import { writeCookie } from "../core/cookie.js";
 import { getScript } from "../core/script.js";
+import { ThemeScript } from "../theme-script.js";
 import { clearCookies } from "./setup.js";
 
 beforeEach(() => {
@@ -24,6 +26,13 @@ afterEach(() => {
 function runScript(config: Parameters<typeof getScript>[0]): void {
 	// biome-ignore lint/security/noGlobalEval: intentional in test - runs inline theme script in happy-dom context
 	eval(getScript(config));
+}
+
+function getThemeScriptSource(props: Parameters<typeof ThemeScript>[0]): string | undefined {
+	const script = ThemeScript(props) as ReactElement<{
+		dangerouslySetInnerHTML?: { __html?: string };
+	}>;
+	return script.props.dangerouslySetInnerHTML?.__html;
 }
 
 const base = {
@@ -88,6 +97,35 @@ describe("themeScript - class attribute", () => {
 	test("uses defaultTheme when storage is empty", () => {
 		runScript({ ...base, enableSystem: false, defaultTheme: "dark" });
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("does not query matchMedia when system resolution is unnecessary", () => {
+		let calls = 0;
+		window.matchMedia = () => {
+			calls += 1;
+			return { matches: true } as MediaQueryList;
+		};
+		runScript({ ...base, enableSystem: false, defaultTheme: "dark" });
+		expect(calls).toBe(0);
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("falls back to the first custom theme for an invalid explicit default", () => {
+		const source = getThemeScriptSource({
+			themes: ["paper", "midnight"],
+			enableSystem: false,
+			defaultTheme: "invalid" as "paper",
+		});
+		expect(source).toContain('"paper",false');
+	});
+
+	test("falls back to light for an empty runtime theme array", () => {
+		const source = getThemeScriptSource({
+			themes: [],
+			enableSystem: false,
+			defaultTheme: "system",
+		});
+		expect(source).toContain('"light",false');
 	});
 });
 
