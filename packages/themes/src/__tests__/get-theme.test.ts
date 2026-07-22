@@ -142,3 +142,28 @@ describe("Next ThemeProvider App Shell behavior", () => {
 		expect((element.props as { initialTheme?: string }).initialTheme).toBe("dark");
 	});
 });
+
+describe("Extended Next ThemeProvider cookie validation", () => {
+	test("passes valid stored themes and rejects unknown values", async () => {
+		const { ExtendedThemeProvider } = await import("../providers/extended-next-provider.js");
+
+		nextCookieValue = "midnight";
+		const valid = await ExtendedThemeProvider({
+			children: null,
+			storage: "cookie",
+			themes: ["paper", "midnight"],
+			systemThemeMap: { light: "paper", dark: "midnight" },
+		});
+
+		nextCookieValue = "unknown";
+		const invalid = await ExtendedThemeProvider({
+			children: null,
+			storage: "cookie",
+			themes: ["paper", "midnight"],
+			systemThemeMap: { light: "paper", dark: "midnight" },
+		});
+
+		expect((valid.props as { initialTheme?: string }).initialTheme).toBe("midnight");
+		expect((invalid.props as { initialTheme?: string }).initialTheme).toBeUndefined();
+	});
+});

@@ -181,8 +181,43 @@ with npm provenance from GitHub Actions.
 | `nonce`                     | `string`                                                           | -                   | CSP nonce for the inline script                                                                                                                                                                                                    |
 | `onThemeChange`             | `(theme: string) => void`                                          | -                   | Called when theme changes. Receives the selected value (may be `"system"`). When system preference changes while theme is `"system"`, fires with the resolved value                                                                |
 | `onStorageError`            | `(error: unknown) => void`                                         | -                   | Reports storage failures without interrupting in-memory theme updates |
-| `systemThemeMap`            | serializable light/dark mapping                                    | -                   | Resolve system preferences to custom theme variants in both bootstrap and client runtime |
 | `scriptProps`               | `ScriptHTMLAttributes<HTMLScriptElement>`                           | -                   | Extra bootstrap script attributes |
+
+### Opt-in extended provider
+
+The default provider stays intentionally small. Import the extended provider only when you need
+same-document synchronization, custom system mappings, or a client-owned `Element`/`ShadowRoot`:
+
+```tsx
+import { ThemeProvider } from "@wrksz/themes/next/extended";
+
+<ThemeProvider
+  themes={["paper", "midnight"]}
+  systemThemeMap={{ light: "paper", dark: "midnight" }}
+  enableSameDocumentSync
+>
+  {children}
+</ThemeProvider>;
+```
+
+The Next.js extended provider supports the serializable `systemThemeMap` and
+`enableSameDocumentSync` props. For a DOM object, use the client-only entry:
+
+```tsx
+"use client";
+
+import { ClientThemeProvider } from "@wrksz/themes/client/extended-provider";
+
+<ClientThemeProvider themeRoot={shadowRoot} storage="none" defaultTheme="dark">
+  {children}
+</ClientThemeProvider>;
+```
+
+- `enableSameDocumentSync?: boolean` synchronizes providers with the same storage key.
+- `systemThemeMap?: { light: Theme; dark: Theme } | Record<Theme, { light: Theme; dark: Theme }>`
+  maps system preferences to custom names or preserves variant families.
+- `themeRoot?: Element | ShadowRoot` targets a client-owned element or a ShadowRoot host.
+
 
 ### `useTheme`
 
@@ -422,6 +457,7 @@ import { useThemeEffect } from "@wrksz/themes/client/use-theme-effect";
 import { useHydrated } from "@wrksz/themes/client/use-hydrated";
 import { ThemedImage } from "@wrksz/themes/client/themed-image";
 import { ClientThemeProvider } from "@wrksz/themes/client/provider";
+import { ClientThemeProvider as ExtendedClientThemeProvider } from "@wrksz/themes/client/extended-provider";
 import { createThemes } from "@wrksz/themes/client/create-themes";
 ```
 
@@ -435,7 +471,9 @@ import { createThemes } from "@wrksz/themes/client/create-themes";
 | `@wrksz/themes/client/use-hydrated` | Direct `useHydrated` import |
 | `@wrksz/themes/client/themed-image` | Direct `ThemedImage` import |
 | `@wrksz/themes/client/provider` | Direct `ClientThemeProvider` import |
+| `@wrksz/themes/client/extended-provider` | Opt-in `ClientThemeProvider` with synchronization, mapping, and ShadowRoot support |
 | `@wrksz/themes/client/create-themes` | Direct `createThemes` import |
+| `@wrksz/themes/next/extended` | Opt-in Next.js `ThemeProvider` with synchronization and system mapping |
 | `@wrksz/themes`        | Client-safe `ThemeProvider` alias and `createThemes` for framework-neutral React usage              |
 | `@wrksz/themes/script` | Server-safe `ThemeScript` for non-Next SSR frameworks |
 

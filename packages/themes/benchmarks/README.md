@@ -9,6 +9,8 @@ These fixtures measure small, realistic `@wrksz/themes` consumption cases:
 - `themed-image`: imports `ThemedImage` from `@wrksz/themes/client`
 - `themed-image-subpath`: imports `ThemedImage` from `@wrksz/themes/client/themed-image`
 - `next-provider`: imports `ThemeProvider` from `@wrksz/themes/next`
+- `extended-next-provider`: imports the opt-in `ThemeProvider` from
+  `@wrksz/themes/next/extended` with system mapping and same-document synchronization enabled
 
 Run the benchmark from the repository root:
 

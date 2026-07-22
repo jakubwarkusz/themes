@@ -49,6 +49,7 @@ const cases: BundleCase[] = [
 	{ name: "next-provider", entry: "entries/next-provider.tsx" },
 	{ name: "script", entry: "entries/script.tsx" },
 	{ name: "client-provider", entry: "entries/client-provider.tsx" },
+	{ name: "extended-next-provider", entry: "entries/extended-next-provider.tsx" },
 ];
 
 export const GENERATED_SCRIPT_REPORT_NAME = "generated-script";
@@ -69,6 +70,7 @@ export function bundleEntryModuleLoaders(): ReadonlyArray<() => Promise<unknown>
 		() => import("../benchmarks/entries/next-provider.tsx"),
 		() => import("../benchmarks/entries/script.tsx"),
 		() => import("../benchmarks/entries/client-provider.tsx"),
+		() => import("../benchmarks/entries/extended-next-provider.tsx"),
 	];
 }
 

@@ -12,6 +12,9 @@ mock.module("next/navigation", () => ({
 }));
 
 const { ClientNextThemeProvider } = await import("../providers/client-next-provider.js");
+const { ExtendedClientNextThemeProvider } = await import(
+	"../providers/extended-client-next-provider.js"
+);
 
 type ScriptElement = ReactElement<{
 	dangerouslySetInnerHTML?: { __html?: string };
@@ -106,5 +109,25 @@ describe("ClientNextThemeProvider", () => {
 		expect(script).not.toBeNull();
 		expect(script?.getAttribute("nonce")).toBe("body-nonce");
 		expect(content.compareDocumentPosition(script as Node) & 4).toBe(4);
+	});
+});
+
+describe("ExtendedClientNextThemeProvider", () => {
+	test("injects mapped system themes before hydration", () => {
+		render(
+			<ExtendedClientNextThemeProvider
+				themes={["paper", "midnight"]}
+				systemThemeMap={{ light: "paper", dark: "midnight" }}
+			>
+				<span>content</span>
+			</ExtendedClientNextThemeProvider>,
+		);
+
+		const script = insertedHtml[0];
+		expect(isValidElement(script)).toBe(true);
+		expect((script as ScriptElement).props.suppressHydrationWarning).toBe(true);
+		expect((script as ScriptElement).props.dangerouslySetInnerHTML?.__html).toContain(
+			'"midnight"',
+		);
 	});
 });
