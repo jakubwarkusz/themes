@@ -26,6 +26,7 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>({
 	followSystem = false,
 	initialTheme,
 	cookieOptions,
+	onStorageError,
 }: ThemeProviderProps<Themes>): ReactElement {
 	const resolvedDefault = (defaultTheme ?? (enableSystem ? "system" : "light")) as string;
 	const inserted = useRef(false);
@@ -78,6 +79,7 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>({
 			onThemeChange={onThemeChange}
 			initialTheme={initialTheme}
 			cookieOptions={cookieOptions}
+			onStorageError={onStorageError}
 		>
 			{children}
 		</ClientThemeProvider>
