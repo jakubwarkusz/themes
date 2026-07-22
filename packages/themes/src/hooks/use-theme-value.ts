@@ -11,7 +11,9 @@ import { resolveThemeValue, type ThemeValueMap } from "../core/theme-value.js";
  * const label = useThemeValue({ light: "Switch to dark", dark: "Switch to light" });
  * const color = useThemeValue({ light: "#fff", dark: "#000", purple: "#1a0a2e" });
  */
-export function useThemeValue<Value>(map: ThemeValueMap<string, Value>): Value | undefined {
+export function useThemeValue<const Map extends ThemeValueMap<string, unknown>>(
+	map: Map,
+): Map[keyof Map] | undefined {
 	const { theme, resolvedTheme } = useTheme<string>();
-	return resolveThemeValue(map, theme, resolvedTheme);
+	return resolveThemeValue(map, theme, resolvedTheme) as Map[keyof Map] | undefined;
 }

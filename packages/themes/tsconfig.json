@@ -10,12 +10,24 @@
 		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
 		"noEmit": true,
+		"rootDir": ".",
+		"types": ["bun"],
 
 		"strict": true,
 		"skipLibCheck": true,
+		"exactOptionalPropertyTypes": true,
 		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
 		"noUncheckedIndexedAccess": true,
 		"noImplicitOverride": true,
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"noPropertyAccessFromIndexSignature": false,
+		"noUncheckedSideEffectImports": true,
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+		"isolatedModules": true,
+		"erasableSyntaxOnly": true,
 
 		"declaration": true,
 		"isolatedDeclarations": true,
@@ -24,11 +36,7 @@
 			"@/*": ["./src/*"],
 			"@wrksz/themes": ["./src/index.ts"],
 			"@wrksz/themes/*": ["./src/*"]
-		},
-
-		"noUnusedLocals": false,
-		"noUnusedParameters": false,
-		"noPropertyAccessFromIndexSignature": false
+		}
 	},
 
 	"include": ["src/**/*"],

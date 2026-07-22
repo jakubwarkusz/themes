@@ -1,17 +1,27 @@
 import type { ReactNode } from "react";
-import { useThemeValue as useStandaloneThemeValue } from "../client.js";
 import {
+	useThemeEffect as useStandaloneThemeEffect,
+	useThemeValue as useStandaloneThemeValue,
+} from "../client.js";
+import {
+	type CookieOptions,
 	type CreateThemesConfig,
 	type CreateThemesResult,
 	createThemes,
+	type ThemeColor,
 	ThemeProvider,
 	type ThemeProviderProps,
 	type ThemeValueMap,
 	type TypedThemedImageProps,
 } from "../index.js";
-import { getTheme } from "../next.js";
+import { type GetThemeOptions, getTheme } from "../next.js";
 
 function expectType<T>(_value: T): void {}
+
+type Equal<Left, Right> =
+	(<Value>() => Value extends Left ? 1 : 2) extends <Value>() => Value extends Right ? 1 : 2
+		? true
+		: false;
 
 const request = new Request("https://example.com", {
 	headers: { cookie: "theme=dark" },
@@ -25,6 +35,7 @@ const syncTheme = getTheme(request, {
 	defaultTheme: "light",
 });
 expectType<AppTheme>(syncTheme);
+expectType<Equal<typeof syncTheme, AppTheme>>(true);
 
 const asyncTheme = getTheme({
 	themes: ["light", "dark"] as const,
@@ -34,11 +45,12 @@ expectType<Promise<"light" | "dark" | "system">>(asyncTheme);
 const looseTheme = getTheme(request, { defaultTheme: "dark" });
 expectType<string>(looseTheme);
 
-// @ts-expect-error defaultTheme must be one of the configured themes or "system"
-getTheme(request, {
+const invalidGetThemeOptions = {
 	themes: appThemes,
+	// @ts-expect-error defaultTheme must be one of the configured themes or "system"
 	defaultTheme: "sepia",
-});
+} satisfies GetThemeOptions<typeof appThemes>;
+expectType<readonly AppTheme[]>(invalidGetThemeOptions.themes);
 
 const validProviderProps = {
 	children: null,
@@ -53,6 +65,31 @@ const validProviderProps = {
 	},
 } satisfies ThemeProviderProps<AppTheme>;
 expectType<readonly AppTheme[] | undefined>(validProviderProps.themes);
+
+const cookieOptions = {
+	maxAge: 3600,
+	sameSite: "Strict",
+	secure: true,
+} satisfies CookieOptions;
+expectType<CookieOptions>(cookieOptions);
+
+// @ts-expect-error exact optional properties reject explicitly undefined cookie flags
+const invalidCookieOptions: CookieOptions = { secure: undefined };
+expectType<CookieOptions>(invalidCookieOptions);
+
+const themeColor = {
+	light: "#fff",
+	dark: "#000",
+	"high-contrast": "#ff0",
+} satisfies ThemeColor<AppTheme>;
+expectType<ThemeColor<AppTheme>>(themeColor);
+
+const invalidThemeColor = {
+	light: "#fff",
+	// @ts-expect-error themeColor keys must be configured themes
+	sepia: "#704214",
+} satisfies ThemeColor<AppTheme>;
+expectType<ThemeColor<AppTheme>>(invalidThemeColor);
 
 const invalidProviderProps = {
 	children: null,
@@ -125,6 +162,14 @@ function TypedUsage(): ReactNode {
 		default: "Fallback",
 	});
 	expectType<string | undefined>(standaloneValue);
+	expectType<Equal<typeof standaloneValue, "Light" | "High contrast" | "Fallback" | undefined>>(
+		true,
+	);
+
+	useStandaloneThemeEffect<AppTheme>((selectedTheme, resolvedTheme) => {
+		expectType<Equal<typeof selectedTheme, AppTheme | "system" | undefined>>(true);
+		expectType<Equal<typeof resolvedTheme, AppTheme | undefined>>(true);
+	});
 
 	return (
 		<typed.ThemedImage
