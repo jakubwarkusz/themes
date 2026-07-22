@@ -1,37 +1,37 @@
 [
 	{
 		"name": "use-theme",
-		"bytes": 404,
-		"gzipBytes": 280
+		"bytes": 464,
+		"gzipBytes": 302
 	},
 	{
 		"name": "use-theme-subpath",
-		"bytes": 411,
-		"gzipBytes": 286
+		"bytes": 471,
+		"gzipBytes": 307
 	},
 	{
 		"name": "use-theme-value",
-		"bytes": 437,
-		"gzipBytes": 289
+		"bytes": 497,
+		"gzipBytes": 311
 	},
 	{
 		"name": "use-theme-value-subpath",
-		"bytes": 444,
-		"gzipBytes": 294
+		"bytes": 504,
+		"gzipBytes": 317
 	},
 	{
 		"name": "themed-image",
-		"bytes": 625,
-		"gzipBytes": 411
+		"bytes": 678,
+		"gzipBytes": 439
 	},
 	{
 		"name": "themed-image-subpath",
-		"bytes": 632,
-		"gzipBytes": 420
+		"bytes": 685,
+		"gzipBytes": 450
 	},
 	{
 		"name": "next-provider",
-		"bytes": 9571,
-		"gzipBytes": 3607
+		"bytes": 11594,
+		"gzipBytes": 4302
 	}
 ]

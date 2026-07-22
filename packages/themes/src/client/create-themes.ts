@@ -1,3 +1,5 @@
 "use client";
 
-export { createThemes } from "../factory/create-themes.js";
+import { createThemes as createThemesImplementation } from "../factory/create-themes.js";
+
+export const createThemes: typeof createThemesImplementation = createThemesImplementation;

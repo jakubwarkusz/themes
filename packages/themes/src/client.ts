@@ -1,17 +1,28 @@
 "use client";
 
+import { ThemedImage as ThemedImageImplementation } from "./components/themed-image.js";
+import {
+	ThemeContext as themeContextImplementation,
+	useTheme as useThemeImplementation,
+} from "./core/context.js";
+import { createThemes as createThemesImplementation } from "./factory/create-themes.js";
+import { useHydrated as useHydratedImplementation } from "./hooks/use-hydrated.js";
+import { useThemeEffect as useThemeEffectImplementation } from "./hooks/use-theme-effect.js";
+import { useThemeValue as useThemeValueImplementation } from "./hooks/use-theme-value.js";
+import { ClientThemeProvider as ClientThemeProviderImplementation } from "./providers/client-provider.js";
+
 export type { ThemedImageProps } from "./components/themed-image.js";
-export { ThemedImage } from "./components/themed-image.js";
-export { useTheme } from "./core/context.js";
 export type {
 	Attribute,
 	DefaultTheme,
 	ResolvedTheme,
 	StorageType,
+	SystemThemeMap,
 	ThemeColor,
 	ThemeContextValue,
 	ThemeName,
 	ThemeProviderProps,
+	ThemeScriptAttributes,
 	ThemeSelection,
 	ThemeValueObject,
 	ValueObject,
@@ -22,7 +33,13 @@ export type {
 	ThemeValueMap,
 	TypedThemedImageProps,
 } from "./factory/create-themes.js";
-export { createThemes } from "./factory/create-themes.js";
-export { useThemeEffect } from "./hooks/use-theme-effect.js";
-export { useThemeValue } from "./hooks/use-theme-value.js";
-export { ClientThemeProvider } from "./providers/client-provider.js";
+
+export const ClientThemeProvider: typeof ClientThemeProviderImplementation =
+	ClientThemeProviderImplementation;
+export const ThemedImage: typeof ThemedImageImplementation = ThemedImageImplementation;
+export const ThemeContext: typeof themeContextImplementation = themeContextImplementation;
+export const createThemes: typeof createThemesImplementation = createThemesImplementation;
+export const useHydrated: typeof useHydratedImplementation = useHydratedImplementation;
+export const useTheme: typeof useThemeImplementation = useThemeImplementation;
+export const useThemeEffect: typeof useThemeEffectImplementation = useThemeEffectImplementation;
+export const useThemeValue: typeof useThemeValueImplementation = useThemeValueImplementation;
