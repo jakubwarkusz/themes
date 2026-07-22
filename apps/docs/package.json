@@ -6,6 +6,7 @@
 		"build": "bun run --cwd ../../packages/themes build && next build",
 		"dev": "next dev",
 		"start": "next start",
+		"test": "bun test src/__tests__",
 		"types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
 		"postinstall": "fumadocs-mdx",
 		"lint": "biome check",
