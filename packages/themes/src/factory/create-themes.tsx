@@ -5,6 +5,7 @@ import {
 	type EffectCallback,
 	type ReactElement,
 	useEffect,
+	useEffectEvent,
 	useRef,
 } from "react";
 import type { ThemedImageProps } from "../components/themed-image.js";
@@ -80,13 +81,14 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 	): void {
 		const { theme, resolvedTheme } = useTypedTheme();
 		const isFirstRender = useRef(true);
+		const onEffect = useEffectEvent(effect);
 		useEffect(() => {
 			if (isFirstRender.current) {
 				isFirstRender.current = false;
 				return;
 			}
-			return effect(theme, resolvedTheme);
-		}, [theme, resolvedTheme, effect, ...deps]);
+			return onEffect(theme, resolvedTheme);
+		}, [theme, resolvedTheme, ...deps]);
 	}
 
 	function TypedThemedImage(props: TypedThemedImageProps<ThemeName>): ReactElement {
