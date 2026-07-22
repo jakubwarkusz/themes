@@ -3,9 +3,7 @@
 import { createThemes } from "@wrksz/themes/client";
 import { appThemes, themeProviderDefaults } from "@/lib/theme-config";
 
-export const { ThemeProvider, ThemedImage, useTheme, useThemeEffect, useThemeValue } = createThemes(
-	{
-		...themeProviderDefaults,
-		themes: appThemes,
-	},
-);
+export const { ThemeProvider, useTheme } = createThemes({
+	...themeProviderDefaults,
+	themes: appThemes,
+});
