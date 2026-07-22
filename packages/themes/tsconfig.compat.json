@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"lib": ["ES2023", "DOM"],
+		"target": "ES2023",
+		"module": "Preserve",
+		"moduleResolution": "bundler",
+		"moduleDetection": "force",
+		"jsx": "react-jsx",
+		"strict": true,
+		"exactOptionalPropertyTypes": true,
+		"noEmit": true,
+		"noUncheckedIndexedAccess": true,
+		"noUncheckedSideEffectImports": true,
+		"skipLibCheck": false,
+		"types": ["react", "react-dom"],
+		"verbatimModuleSyntax": true
+	},
+	"include": ["test-d/**/*.ts", "test-d/**/*.tsx"]
+}
