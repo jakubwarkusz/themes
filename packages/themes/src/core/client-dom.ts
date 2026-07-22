@@ -68,10 +68,10 @@ function classAttributeNeedsUpdate(
 	currentValues: string[],
 	nextValues: string[],
 ): boolean {
+	const nextValueSet = new Set(nextValues);
 	return (
-		currentValues.some(
-			(token) => !nextValues.includes(token) && el.classList.contains(token),
-		) || nextValues.some((token) => !el.classList.contains(token))
+		currentValues.some((token) => !nextValueSet.has(token) && el.classList.contains(token)) ||
+		nextValues.some((token) => !el.classList.contains(token))
 	);
 }
 
@@ -172,7 +172,9 @@ export function applyThemeToDom({
 	const attrs = Array.isArray(attribute) ? attribute : [attribute];
 	const classValues = themes.flatMap((t) => (valueMap?.[t] ?? t).split(" "));
 	const nextClassValues = attrValue.split(" ");
+	const nextClassValueSet = new Set(nextClassValues);
 	const nextDataAttributes = attrs.filter((attr) => attr !== "class");
+	const nextDataAttributeSet = new Set(nextDataAttributes);
 
 	if (previous) {
 		if (previous.element !== el) {
@@ -182,11 +184,11 @@ export function applyThemeToDom({
 				(previous.element as HTMLElement).style.colorScheme = "";
 		} else {
 			const obsoleteClasses = previous.classTokens.filter(
-				(token) => !nextClassValues.includes(token),
+				(token) => !nextClassValueSet.has(token),
 			);
 			if (obsoleteClasses.length > 0) el.classList.remove(...obsoleteClasses);
 			for (const attr of previous.dataAttributes) {
-				if (!nextDataAttributes.includes(attr as Attribute)) el.removeAttribute(attr);
+				if (!nextDataAttributeSet.has(attr as Attribute)) el.removeAttribute(attr);
 			}
 		}
 	}

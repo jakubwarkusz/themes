@@ -1,7 +1,7 @@
-import React from "react";
+import type { ReactElement } from "react";
 import { ThemedImage } from "@wrksz/themes/client/themed-image";
 
-export function ThemedImageSubpathFixture() {
+export function ThemedImageSubpathFixture(): ReactElement {
 	return (
 		<ThemedImage
 			src={{
