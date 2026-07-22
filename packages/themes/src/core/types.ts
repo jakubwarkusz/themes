@@ -41,9 +41,9 @@ export type ThemeScriptAttributes = ScriptHTMLAttributes<HTMLScriptElement> & {
 
 export type SystemThemeMap<Themes extends string = string> =
 	| {
-		light: Themes;
-		dark: Themes;
-	}
+			light: Themes;
+			dark: Themes;
+	  }
 	| Partial<Record<Themes, { light: Themes; dark: Themes }>>;
 
 export type ThemeProviderProps<Themes extends string = DefaultTheme> = {

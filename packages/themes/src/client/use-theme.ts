@@ -1,8 +1,8 @@
 "use client";
 
 import {
-    ThemeContext as themeContextImplementation,
-    useTheme as useThemeImplementation,
+	ThemeContext as themeContextImplementation,
+	useTheme as useThemeImplementation,
 } from "../core/context.js";
 
 export type { DefaultTheme, ThemeContextValue } from "../core/types.js";

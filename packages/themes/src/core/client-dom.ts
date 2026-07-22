@@ -20,12 +20,12 @@ export type AppliedThemeState = {
 	dataAttributes: string[];
 	colorSchemeApplied: boolean;
 	themeColorMeta:
-	| {
-		element: HTMLMetaElement;
-		created: boolean;
-		previousContent: string | null;
-	}
-	| undefined;
+		| {
+				element: HTMLMetaElement;
+				created: boolean;
+				previousContent: string | null;
+		  }
+		| undefined;
 };
 
 function resolveThemeColor(themeColor: ThemeColor, resolved: string): string | undefined {
@@ -89,7 +89,7 @@ function reportStorageError(
 ): void {
 	try {
 		onStorageError?.(error);
-	} catch { }
+	} catch {}
 }
 
 function readCookieValue(key: string): string | null {
@@ -98,7 +98,7 @@ function readCookieValue(key: string): string | null {
 	let decoded: string | null = null;
 	try {
 		decoded = encoded ? decodeURIComponent(encoded) : null;
-	} catch { }
+	} catch {}
 	return decoded ? decoded : null;
 }
 
