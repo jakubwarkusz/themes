@@ -10,22 +10,6 @@ type ApplyThemeOptions = {
 	disableTransitionOnChange: boolean | string;
 	enableColorScheme: boolean;
 	themeColor: ThemeColor | undefined;
-	themeRoot?: Element | ShadowRoot;
-	previous?: AppliedThemeState;
-};
-
-export type AppliedThemeState = {
-	element: Element;
-	classTokens: string[];
-	dataAttributes: string[];
-	colorSchemeApplied: boolean;
-	themeColorMeta:
-	| {
-		element: HTMLMetaElement;
-		created: boolean;
-		previousContent: string | null;
-	}
-	| undefined;
 };
 
 function resolveThemeColor(themeColor: ThemeColor, resolved: string): string | undefined {
@@ -33,34 +17,15 @@ function resolveThemeColor(themeColor: ThemeColor, resolved: string): string | u
 	return themeColor[resolved];
 }
 
-function updateMetaThemeColor(
-	color: string,
-	previous: AppliedThemeState["themeColorMeta"],
-): NonNullable<AppliedThemeState["themeColorMeta"]> {
+function updateMetaThemeColor(color: string | undefined): void {
+	if (!color) return;
 	let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-	const created = !meta;
 	if (!meta) {
 		meta = document.createElement("meta");
 		meta.name = "theme-color";
 		document.head.appendChild(meta);
 	}
-	const state = previous ?? {
-		element: meta,
-		created,
-		previousContent: created ? null : meta.getAttribute("content"),
-	};
 	meta.content = color;
-	return state;
-}
-
-function restoreMetaThemeColor(state: AppliedThemeState["themeColorMeta"]): void {
-	if (!state) return;
-	if (state.created) {
-		state.element.remove();
-		return;
-	}
-	if (state.previousContent === null) state.element.removeAttribute("content");
-	else state.element.setAttribute("content", state.previousContent);
 }
 
 function classAttributeNeedsUpdate(
@@ -75,9 +40,7 @@ function classAttributeNeedsUpdate(
 	);
 }
 
-function getTargetEl(target: string, themeRoot?: Element | ShadowRoot): Element | null {
-	if (themeRoot && "host" in themeRoot) return themeRoot.host;
-	if (typeof Element !== "undefined" && themeRoot instanceof Element) return themeRoot;
+function getTargetEl(target: string): Element | null {
 	if (target === "html") return document.documentElement;
 	if (target === "body") return document.body;
 	return document.querySelector(target);
@@ -89,7 +52,7 @@ function reportStorageError(
 ): void {
 	try {
 		onStorageError?.(error);
-	} catch { }
+	} catch {}
 }
 
 function readCookieValue(key: string): string | null {
@@ -98,7 +61,7 @@ function readCookieValue(key: string): string | null {
 	let decoded: string | null = null;
 	try {
 		decoded = encoded ? decodeURIComponent(encoded) : null;
-	} catch { }
+	} catch {}
 	return decoded ? decoded : null;
 }
 
@@ -162,37 +125,14 @@ export function applyThemeToDom({
 	disableTransitionOnChange,
 	enableColorScheme,
 	themeColor,
-	themeRoot,
-	previous,
-}: ApplyThemeOptions): AppliedThemeState | undefined {
-	const el = getTargetEl(target, themeRoot);
-	if (!el) return previous;
+}: ApplyThemeOptions): void {
+	const el = getTargetEl(target);
+	if (!el) return;
 
 	const attrValue = valueMap?.[resolved] ?? resolved;
 	const attrs = Array.isArray(attribute) ? attribute : [attribute];
 	const classValues = themes.flatMap((t) => (valueMap?.[t] ?? t).split(" "));
 	const nextClassValues = attrValue.split(" ");
-	const nextClassValueSet = new Set(nextClassValues);
-	const nextDataAttributes = attrs.filter((attr) => attr !== "class");
-	const nextDataAttributeSet = new Set(nextDataAttributes);
-
-	if (previous) {
-		if (previous.element !== el) {
-			previous.element.classList.remove(...previous.classTokens);
-			for (const attr of previous.dataAttributes) previous.element.removeAttribute(attr);
-			if (previous.colorSchemeApplied)
-				(previous.element as HTMLElement).style.colorScheme = "";
-		} else {
-			const obsoleteClasses = previous.classTokens.filter(
-				(token) => !nextClassValueSet.has(token),
-			);
-			if (obsoleteClasses.length > 0) el.classList.remove(...obsoleteClasses);
-			for (const attr of previous.dataAttributes) {
-				if (!nextDataAttributeSet.has(attr as Attribute)) el.removeAttribute(attr);
-			}
-		}
-	}
-
 	let needsUpdate = false;
 	let classChanged = false;
 	for (const attr of attrs) {
@@ -209,9 +149,8 @@ export function applyThemeToDom({
 			typeof disableTransitionOnChange === "string" ? disableTransitionOnChange : "none";
 		const style = document.createElement("style");
 		style.textContent = `*,*::before,*::after{transition:${transitionValue}!important}`;
-		const styleRoot = themeRoot && "host" in themeRoot ? themeRoot : document.head;
-		styleRoot.appendChild(style);
-		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
+		document.head.appendChild(style);
+		requestAnimationFrame(() => requestAnimationFrame(() => document.head.removeChild(style)));
 	}
 
 	for (const attr of attrs) {
@@ -227,28 +166,9 @@ export function applyThemeToDom({
 
 	if (enableColorScheme && (resolved === "light" || resolved === "dark")) {
 		(el as HTMLElement).style.colorScheme = resolved;
-	} else if (previous?.colorSchemeApplied) {
-		(el as HTMLElement).style.colorScheme = "";
 	}
 
-	let themeColorMeta = previous?.themeColorMeta;
 	if (themeColor) {
-		const color = resolveThemeColor(themeColor, resolved);
-		if (color) themeColorMeta = updateMetaThemeColor(color, themeColorMeta);
-		else {
-			restoreMetaThemeColor(themeColorMeta);
-			themeColorMeta = undefined;
-		}
-	} else {
-		restoreMetaThemeColor(themeColorMeta);
-		themeColorMeta = undefined;
+		updateMetaThemeColor(resolveThemeColor(themeColor, resolved));
 	}
-
-	return {
-		element: el,
-		classTokens: nextClassValues,
-		dataAttributes: nextDataAttributes,
-		colorSchemeApplied: enableColorScheme && (resolved === "light" || resolved === "dark"),
-		themeColorMeta,
-	};
 }

@@ -2,7 +2,6 @@
 
 import { type ReactElement, useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import {
-	type AppliedThemeState,
 	applyThemeToDom,
 	getDomWindow,
 	readStoredTheme,
@@ -10,41 +9,10 @@ import {
 } from "../core/client-dom.js";
 import { ThemeContext } from "../core/context.js";
 import { createThemeStore } from "../core/store.js";
-import { publishThemeChannel, subscribeThemeChannel } from "../core/sync.js";
 import { isThemeSelection } from "../core/theme-validation.js";
-import type {
-	DefaultTheme,
-	SystemThemeMap,
-	ThemeContextValue,
-	ThemeProviderProps,
-} from "../core/types.js";
+import type { DefaultTheme, ThemeContextValue, ThemeProviderProps } from "../core/types.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
-
-function isDirectSystemMap(
-	systemThemeMap: SystemThemeMap<string> | undefined,
-): systemThemeMap is { light: string; dark: string } {
-	if (!systemThemeMap) return false;
-	const directMap = systemThemeMap as { light?: unknown; dark?: unknown };
-	return typeof directMap.light === "string" && typeof directMap.dark === "string";
-}
-
-function resolveSelection(
-	selection: string,
-	systemTheme: "light" | "dark" | undefined,
-	systemThemeMap: SystemThemeMap<string> | undefined,
-): string | undefined {
-	if (!systemTheme) return selection === "system" ? undefined : selection;
-	if (!systemThemeMap) return selection === "system" ? systemTheme : selection;
-
-	if (isDirectSystemMap(systemThemeMap)) {
-		return selection === "system" ? systemThemeMap[systemTheme] : selection;
-	}
-
-	const variantMap = systemThemeMap as Partial<Record<string, { light: string; dark: string }>>;
-	const variants = selection === "system" ? undefined : variantMap[selection];
-	return variants?.[systemTheme] ?? (selection === "system" ? systemTheme : selection);
-}
 
 export type ClientThemeProviderProps<Themes extends string = DefaultTheme> =
 	ThemeProviderProps<Themes>;
@@ -68,8 +36,6 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	initialTheme,
 	cookieOptions,
 	onStorageError,
-	systemThemeMap,
-	themeRoot,
 }: ClientThemeProviderProps<Themes>): ReactElement {
 	const requestedDefault = defaultTheme ?? (enableSystem ? "system" : themes[0]);
 	const resolvedDefault = (
@@ -81,7 +47,6 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 	const storeRef = useRef(createThemeStore());
 	const store = storeRef.current;
-	const appliedThemeRef = useRef<AppliedThemeState | undefined>(undefined);
 	const {
 		getSnapshot,
 		setState: setStoreState,
@@ -97,14 +62,10 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 	const validForcedTheme = forcedTheme && themes.includes(forcedTheme) ? forcedTheme : undefined;
 	const selectedTheme = validForcedTheme ?? theme;
-	const resolvedTheme = selectedTheme
-		? (resolveSelection(
-				selectedTheme,
-				systemTheme,
-				systemThemeMap as SystemThemeMap<string> | undefined,
-			) as Themes | undefined)
-		: undefined;
-	const channel = `${storage ?? "localStorage"}:${storageKey}:${target}`;
+	const resolvedTheme =
+		selectedTheme === "system" || selectedTheme === undefined
+			? (systemTheme as Themes | undefined)
+			: (selectedTheme as Themes);
 
 	const isValidTheme = useCallback(
 		(candidate: string): candidate is Themes | "system" =>
@@ -119,7 +80,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 	const applyToDom = useCallback(
 		(resolved: string) => {
-			appliedThemeRef.current = applyThemeToDom({
+			applyThemeToDom({
 				resolved,
 				attribute,
 				themes,
@@ -128,8 +89,6 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				disableTransitionOnChange,
 				enableColorScheme,
 				themeColor,
-				themeRoot,
-				previous: appliedThemeRef.current,
 			});
 		},
 		[
@@ -140,7 +99,6 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			themes,
 			valueMap,
 			themeColor,
-			themeRoot,
 		],
 	);
 
@@ -158,22 +116,10 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 		if (validForcedTheme) {
 			setStoreTheme(validForcedTheme);
-			applyToDom(
-				resolveSelection(
-					validForcedTheme,
-					sys,
-					systemThemeMap as SystemThemeMap<string> | undefined,
-				) ?? validForcedTheme,
-			);
+			applyToDom(validForcedTheme);
 		} else if (initialTheme && isValidTheme(initialTheme)) {
 			setStoreTheme(initialTheme);
-			applyToDom(
-				resolveSelection(
-					initialTheme,
-					sys,
-					systemThemeMap as SystemThemeMap<string> | undefined,
-				) ?? "light",
-			);
+			applyToDom(initialTheme === "system" ? (sys ?? "light") : initialTheme);
 			writeStoredTheme(
 				storage,
 				storageKey,
@@ -190,13 +136,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 					: resolvedDefault;
 
 			setStoreState({ theme: initial, systemTheme: sys });
-			applyToDom(
-				resolveSelection(
-					initial,
-					sys,
-					systemThemeMap as SystemThemeMap<string> | undefined,
-				) ?? "light",
-			);
+			applyToDom(initial === "system" ? (sys ?? "light") : initial);
 		}
 
 		if (!mq) return;
@@ -205,22 +145,10 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			setStoreSystemTheme(next);
 			const current = getSnapshot().theme;
 			if (current === "system" || current === undefined || followSystem) {
-				const followsVariant =
-					followSystem && Boolean(systemThemeMap) && !isDirectSystemMap(systemThemeMap);
-				if (followSystem && !followsVariant) {
+				if (followSystem) {
 					setStoreTheme("system");
 				}
-				applyToDom(
-					resolveSelection(
-						followsVariant
-							? (current ?? resolvedDefault)
-							: followSystem
-								? "system"
-								: (current ?? "system"),
-						next,
-						systemThemeMap as SystemThemeMap<string> | undefined,
-					) ?? next,
-				);
+				applyToDom(next);
 				onThemeChangeRef.current?.(next as Themes);
 			}
 		};
@@ -237,7 +165,6 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		followSystem,
 		isValidTheme,
 		onStorageError,
-		systemThemeMap,
 		applyToDom,
 		getSnapshot,
 		setStoreState,
@@ -251,14 +178,9 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		if (!domWindow) return;
 		const handler = () => {
 			const { theme, systemTheme } = getSnapshot();
-			const selection = validForcedTheme ?? theme;
-			const resolved = selection
-				? resolveSelection(
-						selection,
-						systemTheme,
-						systemThemeMap as SystemThemeMap<string> | undefined,
-					)
-				: undefined;
+			const resolved =
+				validForcedTheme ??
+				(theme === "system" || theme === undefined ? systemTheme : theme);
 			if (resolved) applyToDom(resolved);
 		};
 		domWindow.addEventListener("pageshow", handler);
@@ -267,7 +189,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			domWindow.removeEventListener("pageshow", handler);
 			domWindow.removeEventListener("popstate", handler);
 		};
-	}, [applyToDom, validForcedTheme, getSnapshot, systemThemeMap]);
+	}, [applyToDom, validForcedTheme, getSnapshot]);
 
 	useEffect(() => {
 		const domWindow = getDomWindow();
@@ -278,13 +200,10 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			if (e.storageArea !== localStorage || e.key !== storageKey) return;
 			const newTheme = e.newValue ?? resolvedDefault;
 			if (!isValidTheme(newTheme)) return;
-			const resolved = resolveSelection(
-				newTheme,
-				getSnapshot().systemTheme,
-				systemThemeMap as SystemThemeMap<string> | undefined,
-			);
+			const resolved =
+				newTheme === "system" ? (getSnapshot().systemTheme ?? "light") : newTheme;
 			setStoreTheme(newTheme);
-			if (!validForcedTheme && resolved) applyToDom(resolved);
+			if (!validForcedTheme) applyToDom(resolved);
 		};
 		domWindow.addEventListener("storage", handler);
 		return () => domWindow.removeEventListener("storage", handler);
@@ -293,30 +212,6 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		storageKey,
 		resolvedDefault,
 		isValidTheme,
-		systemThemeMap,
-		validForcedTheme,
-		applyToDom,
-		getSnapshot,
-		setStoreTheme,
-	]);
-
-	useEffect(() => {
-		if (storage === "none") return;
-		return subscribeThemeChannel(channel, (newTheme) => {
-			if (!isValidTheme(newTheme)) return;
-			setStoreTheme(newTheme);
-			const resolved = resolveSelection(
-				newTheme,
-				getSnapshot().systemTheme,
-				systemThemeMap as SystemThemeMap<string> | undefined,
-			);
-			if (!validForcedTheme && resolved) applyToDom(resolved);
-		});
-	}, [
-		storage,
-		channel,
-		isValidTheme,
-		systemThemeMap,
 		validForcedTheme,
 		applyToDom,
 		getSnapshot,
@@ -335,18 +230,14 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			const current = getSnapshot().theme as Themes | "system" | undefined;
 			const newTheme = typeof next === "function" ? next(current) : next;
 			if (!isValidTheme(newTheme)) return;
-			const resolved = resolveSelection(
-				newTheme,
-				getSnapshot().systemTheme,
-				systemThemeMap as SystemThemeMap<string> | undefined,
-			);
+			const resolved =
+				newTheme === "system" ? (getSnapshot().systemTheme ?? "light") : newTheme;
 
 			setStoreTheme(newTheme);
-			if (resolved) applyToDom(resolved);
+			applyToDom(resolved);
 			onThemeChangeRef.current?.(newTheme as Themes);
 
 			writeStoredTheme(storage, storageKey, newTheme, cookieOptions, onStorageError);
-			if (storage !== "none") publishThemeChannel(channel, newTheme);
 		},
 		[
 			applyToDom,
@@ -355,9 +246,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			storage,
 			storageKey,
 			onStorageError,
-			channel,
 			isValidTheme,
-			systemThemeMap,
 			getSnapshot,
 			setStoreTheme,
 		],

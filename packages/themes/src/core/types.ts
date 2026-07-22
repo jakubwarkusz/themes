@@ -39,13 +39,6 @@ export type ThemeScriptAttributes = ScriptHTMLAttributes<HTMLScriptElement> & {
 	[key: `data-${string}`]: string | undefined;
 };
 
-export type SystemThemeMap<Themes extends string = string> =
-	| {
-		light: Themes;
-		dark: Themes;
-	}
-	| Partial<Record<Themes, { light: Themes; dark: Themes }>>;
-
 export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	children: ReactNode;
 	/** All available themes */
@@ -86,10 +79,6 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	initialTheme?: ThemeSelection<Themes>;
 	/** Cookie options, only used when storage="cookie" */
 	cookieOptions?: CookieOptions;
-	/** Serializable mapping used to resolve custom variants when the system theme changes */
-	systemThemeMap?: SystemThemeMap<Themes>;
-	/** Client-only Element or ShadowRoot target. Use `target` for pre-hydration SSR support. */
-	themeRoot?: Element | ShadowRoot;
 };
 
 export type ThemeContextValue<Themes extends string = DefaultTheme> = {
