@@ -1,14 +1,19 @@
 "use client";
 
+import { createThemes as createThemesImplementation } from "./factory/create-themes.js";
+import { ClientThemeProvider as ThemeProviderImplementation } from "./providers/client-provider.js";
+
 export type {
 	Attribute,
 	DefaultTheme,
 	ResolvedTheme,
 	StorageType,
+	SystemThemeMap,
 	ThemeColor,
 	ThemeContextValue,
 	ThemeName,
 	ThemeProviderProps,
+	ThemeScriptAttributes,
 	ThemeSelection,
 	ThemeValueObject,
 	ValueObject,
@@ -19,5 +24,6 @@ export type {
 	ThemeValueMap,
 	TypedThemedImageProps,
 } from "./factory/create-themes.js";
-export { createThemes } from "./factory/create-themes.js";
-export { ClientThemeProvider as ThemeProvider } from "./providers/client-provider.js";
+
+export const ThemeProvider: typeof ThemeProviderImplementation = ThemeProviderImplementation;
+export const createThemes: typeof createThemesImplementation = createThemesImplementation;

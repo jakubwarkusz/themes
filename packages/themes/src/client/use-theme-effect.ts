@@ -1,3 +1,5 @@
 "use client";
 
-export { useThemeEffect } from "../hooks/use-theme-effect.js";
+import { useThemeEffect as useThemeEffectImplementation } from "../hooks/use-theme-effect.js";
+
+export const useThemeEffect: typeof useThemeEffectImplementation = useThemeEffectImplementation;

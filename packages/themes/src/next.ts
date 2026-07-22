@@ -1,12 +1,17 @@
+import { getTheme as getThemeImplementation } from "./get-theme.js";
+import { ThemeProvider as ThemeProviderImplementation } from "./providers/next-provider.js";
+
 export type {
 	Attribute,
 	DefaultTheme,
 	ResolvedTheme,
 	StorageType,
+	SystemThemeMap,
 	ThemeColor,
 	ThemeContextValue,
 	ThemeName,
 	ThemeProviderProps,
+	ThemeScriptAttributes,
 	ThemeSelection,
 	ThemeValueObject,
 	ValueObject,
@@ -18,5 +23,6 @@ export type {
 	TypedThemedImageProps,
 } from "./factory/create-themes.js";
 export type { GetThemeOptions, GetThemeResult } from "./get-theme.js";
-export { getTheme } from "./get-theme.js";
-export { ThemeProvider } from "./providers/next-provider.js";
+
+export const ThemeProvider: typeof ThemeProviderImplementation = ThemeProviderImplementation;
+export const getTheme: typeof getThemeImplementation = getThemeImplementation;

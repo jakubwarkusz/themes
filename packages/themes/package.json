@@ -69,6 +69,12 @@
         "default": "./dist/client/use-theme-effect.js"
       }
     },
+    "./client/use-hydrated": {
+      "import": {
+        "types": "./dist/client/use-hydrated.d.ts",
+        "default": "./dist/client/use-hydrated.js"
+      }
+    },
     "./client/themed-image": {
       "import": {
         "types": "./dist/client/themed-image.d.ts",
@@ -91,6 +97,12 @@
       "import": {
         "types": "./dist/next.d.ts",
         "default": "./dist/next.js"
+      }
+    },
+    "./script": {
+      "import": {
+        "types": "./dist/script.d.ts",
+        "default": "./dist/script.js"
       }
     },
     "./package.json": "./package.json"
