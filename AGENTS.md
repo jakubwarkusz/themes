@@ -13,7 +13,8 @@
 - Preserve bootstrap/runtime parity: changes to the inline script, DOM applier, or providers need equivalent tests.
 - Keep package exports, Bunup runtime/declaration entries, and smoke imports in lockstep.
 - Do not increase bundle budgets merely to make CI pass.
-- Public support starts at React/React DOM 19.2, Next.js 16, and TypeScript 5.9.
+- Public support starts at React/React DOM 18, Next.js 16, and TypeScript 5.9.
+- React 19.2+ uses the native `useEffectEvent`; React 18 and earlier React 19 releases use the compatibility fallback.
 
 ## Verification
 

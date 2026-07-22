@@ -9,15 +9,15 @@ describe("support metadata", () => {
 		const packageJson = JSON.parse(
 			readFileSync(resolve(repositoryRoot, "packages/themes/package.json"), "utf-8"),
 		) as { peerDependencies: { react: string; "react-dom": string } };
-		expect(packageJson.peerDependencies.react).toBe("^19.2.0");
-		expect(packageJson.peerDependencies["react-dom"]).toBe("^19.2.0");
+		expect(packageJson.peerDependencies.react).toBe("^18.0.0 || ^19.0.0");
+		expect(packageJson.peerDependencies["react-dom"]).toBe("^18.0.0 || ^19.0.0");
 
 		for (const path of [
 			"README.md",
 			"apps/docs/content/docs/index.mdx",
 			".github/ISSUE_TEMPLATE/framework_support.yml",
 		]) {
-			expect(readFileSync(resolve(repositoryRoot, path), "utf-8")).toContain("React 19.2+");
+			expect(readFileSync(resolve(repositoryRoot, path), "utf-8")).toContain("React 18+");
 		}
 	});
 });
