@@ -3,7 +3,10 @@
   "description": "Integration examples for common use cases.",
   "pages": [
     "tailwind",
+    "framework-agnostic",
+    "hydration-and-consent",
     "typed-themes",
+    "system-variants",
     "data-attribute",
     "scoped-theming",
     "forced-theme",

@@ -18,13 +18,13 @@ Use the Next.js entry in `app/layout.tsx`:
 import { ThemeProvider } from "@wrksz/themes/next";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-	return (
-		<html lang="en" suppressHydrationWarning>
-			<body>
-				<ThemeProvider>{children}</ThemeProvider>
-			</body>
-		</html>
-	);
+ return (
+  <html lang="en" suppressHydrationWarning>
+   <body>
+    <ThemeProvider>{children}</ThemeProvider>
+   </body>
+  </html>
+ );
 }
 ```
 
@@ -36,13 +36,13 @@ Use client hooks from the client entry:
 import { useTheme } from "@wrksz/themes/client";
 
 export function ThemeToggle() {
-	const { resolvedTheme, setTheme } = useTheme();
+ const { resolvedTheme, setTheme } = useTheme();
 
-	return (
-		<button onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
-			Toggle theme
-		</button>
-	);
+ return (
+  <button onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
+   Toggle theme
+  </button>
+ );
 }
 ```
 
@@ -52,7 +52,8 @@ export function ThemeToggle() {
 - `localStorage`, `sessionStorage`, `cookie`, `hybrid`, and disabled storage modes.
 - Zero-flash SSR when using cookie storage with `@wrksz/themes/next`.
 - `initialTheme`, `themeColor`, nested providers, scoped targets, and multi-class theme values.
-- Typed `useTheme`, `useThemeValue`, `useThemeEffect`, `ThemedImage`, and `createThemes`.
+- Typed `useTheme`, `useThemeValue`, `useThemeEffect`, `useHydrated`, `ThemedImage`, and isolated `createThemes` factories.
+- Deterministic `ThemeScript` export for non-Next SSR frameworks.
 - Fine-grained client subpath exports for smaller app bundles.
 - No runtime dependencies.
 
@@ -62,15 +63,15 @@ export function ThemeToggle() {
 import { ThemeProvider } from "@wrksz/themes/next";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-	return (
-		<html lang="en" suppressHydrationWarning>
-			<body>
-				<ThemeProvider storage="cookie" defaultTheme="dark" disableTransitionOnChange>
-					{children}
-				</ThemeProvider>
-			</body>
-		</html>
-	);
+ return (
+  <html lang="en" suppressHydrationWarning>
+   <body>
+    <ThemeProvider storage="cookie" defaultTheme="dark" disableTransitionOnChange>
+     {children}
+    </ThemeProvider>
+   </body>
+  </html>
+ );
 }
 ```
 
@@ -79,13 +80,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```tsx
 import { ThemeProvider, getTheme } from "@wrksz/themes/next";
 import {
-	ClientThemeProvider,
-	ThemedImage,
-	createThemes,
-	useTheme,
-	useThemeEffect,
-	useThemeValue,
+ ClientThemeProvider,
+ ThemedImage,
+ createThemes,
+ useTheme,
+ useThemeEffect,
+ useHydrated,
+ useThemeValue,
 } from "@wrksz/themes/client";
+import { ThemeScript } from "@wrksz/themes/script";
 ```
 
 Fine-grained client modules are also available:
@@ -94,6 +97,7 @@ Fine-grained client modules are also available:
 import { useTheme } from "@wrksz/themes/client/use-theme";
 import { useThemeValue } from "@wrksz/themes/client/use-theme-value";
 import { useThemeEffect } from "@wrksz/themes/client/use-theme-effect";
+import { useHydrated } from "@wrksz/themes/client/use-hydrated";
 import { ThemedImage } from "@wrksz/themes/client/themed-image";
 import { ClientThemeProvider } from "@wrksz/themes/client/provider";
 import { createThemes } from "@wrksz/themes/client/create-themes";

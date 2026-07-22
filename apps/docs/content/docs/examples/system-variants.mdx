@@ -1,0 +1,53 @@
+---
+title: System variants and contrast
+description: Resolve custom variants and model independent accessibility preferences.
+---
+
+## Custom system resolution
+
+Use a serializable `systemThemeMap` when the system preference should resolve to custom names:
+
+```tsx
+<ThemeProvider
+  themes={["light-red", "dark-red", "light-blue", "dark-blue"]}
+  defaultTheme="light-red"
+  followSystem
+  systemThemeMap={{
+    "light-red": { light: "light-red", dark: "dark-red" },
+    "dark-red": { light: "light-red", dark: "dark-red" },
+    "light-blue": { light: "light-blue", dark: "dark-blue" },
+    "dark-blue": { light: "light-blue", dark: "dark-blue" },
+  }}
+>
+  {children}
+</ThemeProvider>
+```
+
+A data map is used instead of a callback because the same resolution must run in the pre-hydration script and in React without serializing executable application code.
+
+For a simple custom system pair:
+
+```tsx
+<ThemeProvider
+  themes={["paper", "midnight"]}
+  defaultTheme="system"
+  systemThemeMap={{ light: "paper", dark: "midnight" }}
+>
+  {children}
+</ThemeProvider>
+```
+
+## Contrast as an independent axis
+
+Contrast is not a color theme. Model it as a separate `createThemes()` factory using `data-contrast`, or use CSS directly when it only follows the operating system:
+
+```css
+@media (prefers-contrast: more) {
+  :root {
+    --border-strength: 2px;
+    --muted-opacity: 1;
+  }
+}
+```
+
+Keeping contrast separate avoids duplicating every palette as `light-high-contrast`, `dark-high-contrast`, and so on. If users can override contrast, persist that factory under a distinct storage key and expose a separate control.

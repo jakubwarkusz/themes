@@ -1,0 +1,59 @@
+---
+title: Hydration, consent, and no-JS
+description: Render theme controls safely and choose when preferences may be persisted.
+---
+
+## Hydration-safe controls
+
+Theme state is unknown in server HTML when it comes from browser storage. Use `useHydrated()` instead of setting mount state inside an effect:
+
+```tsx
+"use client";
+
+import { useHydrated, useTheme } from "@wrksz/themes/client";
+
+export function ThemeSelect() {
+  const hydrated = useHydrated();
+  const { theme, setTheme } = useTheme();
+
+  if (!hydrated) return <div className="h-9" aria-hidden />;
+
+  return (
+    <select value={theme} onChange={(event) => setTheme(event.target.value)}>
+      <option value="system">System</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  );
+}
+```
+
+This avoids `react-hooks/set-state-in-effect` and keeps server/client snapshots explicit.
+
+CSS-driven `dark:` utilities do not make JavaScript-rendered values hydration-safe. They only avoid conditional component markup by keeping both theme styles in CSS.
+
+## Preference consent
+
+Connect persistence to your existing consent source:
+
+```tsx
+<ThemeProvider storage={preferenceConsent ? "localStorage" : "none"}>
+  {children}
+</ThemeProvider>
+```
+
+Before consent, the provider neither reads nor writes theme storage. If consent is revoked, delete any previously stored `theme` key or cookie through the same consent workflow.
+
+## JavaScript disabled
+
+Stored or user-selected themes cannot be applied when JavaScript is disabled. Provide a CSS system fallback when no-JS behavior matters:
+
+```css
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+  }
+}
+```
+
+Do not combine this fallback with persisted class variables unless selectors ensure the stored class wins; otherwise it can produce a first-paint flash when JavaScript is enabled.
