@@ -1,5 +1,4 @@
 
-
 # @wrksz/themes
 
 [![npm](https://shieldcn.dev/badge/npm-%40wrksz%2Fthemes-CB3837.png?logo=npm&variant=secondary&size=sm)](https://www.npmjs.com/package/@wrksz/themes)
@@ -20,7 +19,6 @@ npm install @wrksz/themes
 
 ## Why not `next-themes`?
 
-
 |                                                 | next-themes | @wrksz/themes             |
 | ----------------------------------------------- | ----------- | ------------------------- |
 | React 19 script warning                         | ❌           | ✅ `useServerInsertedHTML` |
@@ -39,8 +37,9 @@ npm install @wrksz/themes
 | Generic types                                   | ❌           | ✅ `useTheme<AppTheme>()`  |
 | Typed factory                                   | ❌           | ✅ `createThemes(...)`     |
 | Theme-change effect hook                        | ❌           | ✅ `useThemeEffect(...)`   |
+| Hydration state without mount effects           | ❌           | ✅ `useHydrated()`         |
+| Framework-neutral SSR bootstrap                 | ❌           | ✅ `@wrksz/themes/script`  |
 | Zero runtime dependencies                       | ✅           | ✅                         |
-
 
 ## Table of Contents
 
@@ -157,7 +156,6 @@ with npm provenance from GitHub Actions.
 
 ### `ThemeProvider`
 
-
 | Prop                        | Type                                                               | Default             | Description                                                                                                                                                                                                                        |
 | --------------------------- | ------------------------------------------------------------------ | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `themes`                    | `string[]`                                                         | `["light", "dark"]` | Available themes                                                                                                                                                                                                                   |
@@ -176,7 +174,9 @@ with npm provenance from GitHub Actions.
 | `themeColor`                | `string \| Record<string, string>`                                  | -                   | Update `<meta name="theme-color">` on theme change                                                                                                                                                                                 |
 | `nonce`                     | `string`                                                           | -                   | CSP nonce for the inline script                                                                                                                                                                                                    |
 | `onThemeChange`             | `(theme: string) => void`                                          | -                   | Called when theme changes. Receives the selected value (may be `"system"`). When system preference changes while theme is `"system"`, fires with the resolved value                                                                |
-
+| `onStorageError`            | `(error: unknown) => void`                                         | -                   | Reports storage failures without interrupting in-memory theme updates |
+| `systemThemeMap`            | serializable light/dark mapping                                    | -                   | Resolve system preferences to custom theme variants in both bootstrap and client runtime |
+| `scriptProps`               | `ScriptHTMLAttributes<HTMLScriptElement>`                           | -                   | Extra bootstrap script attributes |
 
 ### `useTheme`
 
@@ -228,13 +228,11 @@ const theme = getTheme(request, {
 // theme: "light" | "dark" | "high-contrast"
 ```
 
-
 | Option         | Type       | Default    | Description                                                              |
 | -------------- | ---------- | ---------- | ------------------------------------------------------------------------ |
 | `storageKey`   | `string`   | `"theme"`  | Cookie name to read from                                                 |
 | `defaultTheme` | `string`   | `"system"` | Returned when no valid theme is found                                    |
 | `themes`       | `readonly string[]` | -          | When provided, stored values not in the list fall back to `defaultTheme`. Use `as const` for return type inference |
-
 
 ### `useThemeValue`
 
@@ -415,6 +413,7 @@ Fine-grained client subpaths are also available for consumers who prefer direct 
 import { useTheme } from "@wrksz/themes/client/use-theme";
 import { useThemeValue } from "@wrksz/themes/client/use-theme-value";
 import { useThemeEffect } from "@wrksz/themes/client/use-theme-effect";
+import { useHydrated } from "@wrksz/themes/client/use-hydrated";
 import { ThemedImage } from "@wrksz/themes/client/themed-image";
 import { ClientThemeProvider } from "@wrksz/themes/client/provider";
 import { createThemes } from "@wrksz/themes/client/create-themes";
@@ -427,11 +426,12 @@ import { createThemes } from "@wrksz/themes/client/create-themes";
 | `@wrksz/themes/client/use-theme` | Direct `useTheme` import |
 | `@wrksz/themes/client/use-theme-value` | Direct `useThemeValue` import |
 | `@wrksz/themes/client/use-theme-effect` | Direct `useThemeEffect` import |
+| `@wrksz/themes/client/use-hydrated` | Direct `useHydrated` import |
 | `@wrksz/themes/client/themed-image` | Direct `ThemedImage` import |
 | `@wrksz/themes/client/provider` | Direct `ClientThemeProvider` import |
 | `@wrksz/themes/client/create-themes` | Direct `createThemes` import |
 | `@wrksz/themes`        | Client-safe `ThemeProvider` alias and `createThemes` for framework-neutral React usage              |
-
+| `@wrksz/themes/script` | Server-safe `ThemeScript` for non-Next SSR frameworks |
 
 ## License
 

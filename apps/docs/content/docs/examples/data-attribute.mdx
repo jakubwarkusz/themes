@@ -56,3 +56,11 @@ Apply multiple attributes at once by passing an array:
 ```
 
 This sets both the `dark` class and `data-theme="dark"` simultaneously, useful when mixing Tailwind with CSS variable styles.
+
+## Class or data attribute?
+
+- Use `class` when your CSS framework already uses class selectors, or when one theme maps to several utility classes.
+- Use a `data-*` attribute when theme state should be explicit, isolated from unrelated classes, or combined with another independent dimension such as `data-palette`.
+- Selector performance is not a meaningful difference for a root-level theme attribute. Specificity and integration with your existing CSS are the practical concerns.
+
+An attribute array mirrors one theme value to several attributes. For independently controlled values, create separate typed factories with distinct contexts and storage keys.

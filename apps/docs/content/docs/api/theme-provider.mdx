@@ -74,6 +74,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `followSystem` | `boolean` | `false` | Always follow system preference, ignores stored value on mount |
 | `themeColor` | `string \| Record<string, string>` | - | Update `<meta name="theme-color">` on theme change |
 | `nonce` | `string` | - | CSP nonce for the inline script |
+| `scriptProps` | `ScriptHTMLAttributes<HTMLScriptElement>` | - | Extra attributes for the bootstrap script, such as `data-cfasync="false"` |
+| `onStorageError` | `(error: unknown) => void` | - | Reports unavailable, blocked, or quota-limited storage without interrupting theme updates |
+| `systemThemeMap` | `{ light: string; dark: string } \| Record<string, { light: string; dark: string }>` | - | Serializable custom resolution for system-aware variants |
+| `themeRoot` | `Element \| ShadowRoot` | - | Client-only Shadow DOM/custom root. Use `target` when the root must be themed before hydration |
 | `onThemeChange` | `(theme: string) => void` | - | Called whenever the theme changes. Receives the selected value (may be `"system"`). When system preference changes while theme is `"system"`, fires with the resolved value (`"light"` or `"dark"`). |
 
 ## Security notes
@@ -291,6 +295,26 @@ Unlike `defaultTheme="system"`, which applies the system preference only on firs
   {children}
 </ThemeProvider>
 ```
+
+Use this with your consent manager rather than giving the theme library control over consent:
+
+```tsx
+<ThemeProvider storage={hasPreferenceConsent ? "localStorage" : "none"}>
+  {children}
+</ThemeProvider>
+```
+
+Remove the previous key when consent is revoked if your policy requires deletion; `storage="none"` guarantees no further reads or writes.
+
+### Observe storage failures
+
+```tsx
+<ThemeProvider onStorageError={(error) => reportError(error)}>
+  {children}
+</ThemeProvider>
+```
+
+The selected theme still updates in memory and on the DOM when persistence is unavailable.
 
 ### Meta theme-color
 
