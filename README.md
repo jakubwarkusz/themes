@@ -6,9 +6,11 @@
 [![docs](https://shieldcn.dev/badge/docs-themes.wrksz.dev-7C3AED.png?logo=readthedocs&variant=secondary&size=sm)](https://themes.wrksz.dev)
 ![Next.js](https://shieldcn.dev/badge/Next.js-16-000000.png?logo=nextdotjs&variant=secondary&size=sm)
 ![React](https://shieldcn.dev/badge/React-19-087EA4.png?logo=react&variant=secondary&size=sm)
-![TypeScript](https://shieldcn.dev/badge/TypeScript-5.9-3178C6.png?logo=typescript&variant=secondary&size=sm)
+![TypeScript](https://shieldcn.dev/badge/TypeScript-5.9%E2%80%937-3178C6.png?logo=typescript&variant=secondary&size=sm)
 
 Modern theme management for Next.js 16+ and React 19+. Near drop-in replacement for `next-themes` - fixes every known bug and adds missing features. Migrating requires changing one import line.
+
+TypeScript 5.9, 6, and 7 are supported and checked against the published package declarations in CI.
 
 ```bash
 bun add @wrksz/themes
