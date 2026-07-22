@@ -1,7 +1,7 @@
-import React from "react";
+import type { ReactElement } from "react";
 import { useThemeValue } from "@wrksz/themes/client/use-theme-value";
 
-export function UseThemeValueSubpathFixture() {
+export function UseThemeValueSubpathFixture(): ReactElement {
 	const label = useThemeValue({
 		light: "Switch to dark",
 		dark: "Switch to light",
