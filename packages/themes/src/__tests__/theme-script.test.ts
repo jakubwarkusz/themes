@@ -41,6 +41,7 @@ const base = {
 	initialTheme: undefined,
 	disableTransitionOnChange: false,
 	followSystem: false,
+	systemThemeMap: undefined,
 };
 
 describe("themeScript - class attribute", () => {
@@ -181,6 +182,19 @@ describe("themeScript - #308 (from next-themes) enableSystem + defaultTheme", ()
 	});
 });
 
+describe("themeScript - custom system resolution", () => {
+	test("maps system preference to custom theme names", () => {
+		window.matchMedia = () => ({ matches: true }) as MediaQueryList;
+		runScript({
+			...base,
+			themes: ["paper", "midnight"],
+			defaultTheme: "system",
+			systemThemeMap: { light: "paper", dark: "midnight" },
+		});
+		expect(document.documentElement.classList.contains("midnight")).toBe(true);
+	});
+});
+
 describe("themeScript - hybrid storage", () => {
 	test("prefers cookie over localStorage", () => {
 		writeCookie("theme", "dark");
@@ -277,6 +291,12 @@ describe("themeScript - initialTheme", () => {
 		runScript({ ...base, forcedTheme: "light", initialTheme: "dark" });
 		expect(document.documentElement.classList.contains("light")).toBe(true);
 		expect(document.documentElement.classList.contains("dark")).toBe(false);
+	});
+
+	test("resolves initialTheme=system before first paint", () => {
+		window.matchMedia = () => ({ matches: true }) as MediaQueryList;
+		runScript({ ...base, initialTheme: "system" });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});
 
 	test("ignores initialTheme not in themes list", () => {

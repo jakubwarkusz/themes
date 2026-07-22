@@ -26,6 +26,10 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>({
 	followSystem = false,
 	initialTheme,
 	cookieOptions,
+	scriptProps,
+	onStorageError,
+	systemThemeMap,
+	themeRoot,
 }: ThemeProviderProps<Themes>): ReactElement {
 	const resolvedDefault = (defaultTheme ?? (enableSystem ? "system" : "light")) as string;
 	const inserted = useRef(false);
@@ -35,6 +39,7 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>({
 		inserted.current = true;
 		return (
 			<script
+				{...scriptProps}
 				suppressHydrationWarning
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: inline script required to prevent flash of unstyled theme
 				dangerouslySetInnerHTML={{
@@ -53,6 +58,7 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>({
 						initialTheme: initialTheme as string | undefined,
 						disableTransitionOnChange,
 						followSystem,
+						systemThemeMap,
 					}),
 				}}
 				nonce={nonce}
@@ -78,6 +84,9 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>({
 			onThemeChange={onThemeChange}
 			initialTheme={initialTheme}
 			cookieOptions={cookieOptions}
+			onStorageError={onStorageError}
+			systemThemeMap={systemThemeMap}
+			themeRoot={themeRoot}
 		>
 			{children}
 		</ClientThemeProvider>
