@@ -12,6 +12,8 @@
 		"lint": "biome check packages apps",
 		"format": "biome format --write packages apps",
 		"verify": "bun run lint && bun run type-check && bun run test && bun run test:docs && bun run --cwd packages/themes size:compare && bun run build:docs",
+		"verify:fixture": "bun run --cwd apps/next-16-3 type-check && bun run --cwd apps/next-16-3 build && bun run --cwd apps/next-16-3 test:e2e",
+		"verify:full": "bun run lint && bun run type-check && bun run test && bun run test:docs && bun run --cwd packages/themes type-check:compat && bun run --cwd packages/themes size:compare && bun run build:docs && bun run verify:fixture && bun audit --audit-level=high",
 		"prepare": "[ \"$CI\" = \"true\" ] || lefthook install"
 	},
 	"devDependencies": {
@@ -21,11 +23,14 @@
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
 		"bunup": "^0.16.31",
-		"happy-dom": "^20.8.4",
+		"happy-dom": "^20.11.1",
 		"lefthook": "^2.1.4",
 		"next": ">=16.0.0",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
 		"typescript": "^5.9.3"
+	},
+	"overrides": {
+		"sharp": "0.35.3"
 	}
 }
