@@ -2,12 +2,18 @@ import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { getTheme } from "../get-theme.js";
 
 let nextCookieValue: string | undefined;
+let nextCookieReads = 0;
 
 mock.module("next/headers", () => ({
-	cookies: async () => ({
-		get: (_key: string) =>
-			nextCookieValue === undefined ? undefined : { name: "theme", value: nextCookieValue },
-	}),
+	cookies: async () => {
+		nextCookieReads += 1;
+		return {
+			get: (_key: string) =>
+				nextCookieValue === undefined
+					? undefined
+					: { name: "theme", value: nextCookieValue },
+		};
+	},
 }));
 
 function makeRequest(cookieHeader: string): Request {
@@ -18,6 +24,7 @@ function makeRequest(cookieHeader: string): Request {
 
 beforeEach(() => {
 	nextCookieValue = undefined;
+	nextCookieReads = 0;
 });
 
 describe("getTheme - sync (Request)", () => {
@@ -107,51 +114,31 @@ describe("getTheme - async (no Request)", () => {
 	});
 });
 
-describe("Next ThemeProvider cookie validation", () => {
-	test("passes a valid stored theme as initialTheme", async () => {
+describe("Next ThemeProvider App Shell behavior", () => {
+	test("leaves cookie reads to the pre-hydration script", async () => {
 		nextCookieValue = "dark";
 		const { ThemeProvider } = await import("../providers/next-provider.js");
-		const element = await ThemeProvider({
+		const element = ThemeProvider({
 			children: null,
 			storage: "cookie",
 			themes: ["light", "dark"],
 		});
 
+		expect(nextCookieReads).toBe(0);
+		expect((element.props as { storage?: string }).storage).toBe("cookie");
+		expect((element.props as { initialTheme?: string }).initialTheme).toBeUndefined();
+	});
+
+	test("preserves an explicit initialTheme without reading request data", async () => {
+		const { ThemeProvider } = await import("../providers/next-provider.js");
+		const element = ThemeProvider({
+			children: null,
+			storage: "cookie",
+			themes: ["light", "dark"],
+			initialTheme: "dark",
+		});
+
+		expect(nextCookieReads).toBe(0);
 		expect((element.props as { initialTheme?: string }).initialTheme).toBe("dark");
-	});
-
-	test("ignores stored values outside the configured themes", async () => {
-		const { ThemeProvider } = await import("../providers/next-provider.js");
-
-		for (const stored of ["unknown", "high%2Dcontrast", "%E0%A4%A"]) {
-			nextCookieValue = stored;
-			const element = await ThemeProvider({
-				children: null,
-				storage: "cookie",
-				themes: ["light", "dark"],
-			});
-
-			expect((element.props as { initialTheme?: string }).initialTheme).toBeUndefined();
-		}
-	});
-
-	test("honors enableSystem when validating the stored theme", async () => {
-		const { ThemeProvider } = await import("../providers/next-provider.js");
-		nextCookieValue = "system";
-
-		const enabled = await ThemeProvider({
-			children: null,
-			storage: "cookie",
-			themes: ["light", "dark"],
-		});
-		const disabled = await ThemeProvider({
-			children: null,
-			storage: "cookie",
-			themes: ["light", "dark"],
-			enableSystem: false,
-		});
-
-		expect((enabled.props as { initialTheme?: string }).initialTheme).toBe("system");
-		expect((disabled.props as { initialTheme?: string }).initialTheme).toBeUndefined();
 	});
 });
