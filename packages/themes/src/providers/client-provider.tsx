@@ -11,6 +11,7 @@ import {
 import { ThemeContext, type ThemeContextInstance } from "../core/context.js";
 import { createThemeStore } from "../core/store.js";
 import { publishThemeChannel, subscribeThemeChannel } from "../core/sync.js";
+import { isThemeSelection } from "../core/theme-validation.js";
 import type {
 	DefaultTheme,
 	SystemThemeMap,
@@ -110,7 +111,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 	const isValidTheme = useCallback(
 		(candidate: string): candidate is Themes | "system" =>
-			themes.includes(candidate as Themes) || (enableSystem && candidate === "system"),
+			isThemeSelection(candidate, themes, enableSystem),
 		[themes, enableSystem],
 	);
 

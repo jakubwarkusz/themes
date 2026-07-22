@@ -1,3 +1,4 @@
+import { isThemeSelection } from "./core/theme-validation.js";
 import type { ThemeName, ThemeSelection } from "./core/types.js";
 
 export type GetThemeOptions<Themes extends readonly string[] = readonly string[]> = {
@@ -38,7 +39,7 @@ function readFromCookieString(
 	const match = cookieString.match(re);
 	const stored = match?.[1] != null ? safeDecodeURIComponent(match[1]) : null;
 	if (!stored) return defaultTheme;
-	if (themes && !themes.includes(stored)) return defaultTheme;
+	if (!isThemeSelection(stored, themes)) return defaultTheme;
 	return stored;
 }
 
@@ -94,7 +95,7 @@ export function getTheme(
 			const cookieStore = await cookies();
 			const stored = cookieStore.get(storageKey)?.value;
 			if (!stored) return defaultTheme;
-			if (themes && !themes.includes(stored)) return defaultTheme;
+			if (!isThemeSelection(stored, themes)) return defaultTheme;
 			return stored;
 		} catch {
 			return defaultTheme;

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useThemeValue as useStandaloneThemeValue } from "../client.js";
 import {
 	type CreateThemesConfig,
 	type CreateThemesResult,
@@ -10,7 +11,7 @@ import {
 } from "../index.js";
 import { getTheme } from "../next.js";
 
-function expectType<T>(_value: T): void {}
+function expectType<T>(_value: T): void { }
 
 const request = new Request("https://example.com", {
 	headers: { cookie: "theme=dark" },
@@ -117,6 +118,13 @@ function TypedUsage(): ReactNode {
 		default: "Fallback",
 	} satisfies ThemeValueMap<AppTheme, string>;
 	expectType<string>(values.default);
+
+	const standaloneValue = useStandaloneThemeValue({
+		light: "Light",
+		"high-contrast": "High contrast",
+		default: "Fallback",
+	});
+	expectType<string | undefined>(standaloneValue);
 
 	return (
 		<typed.ThemedImage

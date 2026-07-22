@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import type { ReactElement } from "react";
+import { isThemeSelection } from "../core/theme-validation.js";
 import type { DefaultTheme, ThemeProviderProps } from "../core/types.js";
 import { ClientNextThemeProvider } from "./client-next-provider.js";
 
@@ -12,7 +13,9 @@ export async function ThemeProvider<Themes extends string = DefaultTheme>(
 		try {
 			const cookieStore = await cookies();
 			const stored = cookieStore.get(props.storageKey ?? "theme")?.value;
-			if (stored) serverTheme = stored;
+			if (stored && isThemeSelection(stored, props.themes, props.enableSystem ?? true)) {
+				serverTheme = stored;
+			}
 		} catch {
 			// Static generation or out-of-request context
 		}
