@@ -7,7 +7,7 @@
 ![React](https://shieldcn.dev/badge/React-19-087EA4.png?logo=react&variant=secondary&size=sm)
 ![TypeScript](https://shieldcn.dev/badge/TypeScript-5.9%E2%80%937-3178C6.png?logo=typescript&variant=secondary&size=sm)
 
-Modern theme management for Next.js 16+ and React 19+. Near drop-in replacement for `next-themes` - fixes every known bug and adds missing features. Migrating requires changing one import line.
+Modern theme management for Next.js 16+ and React 19.2+. Near drop-in replacement for `next-themes` - fixes every known bug and adds missing features. Migrating requires changing one import line.
 
 TypeScript 5.9, 6, and 7 are supported and checked against the published package declarations in CI.
 

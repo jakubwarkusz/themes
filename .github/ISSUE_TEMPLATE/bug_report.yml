@@ -74,7 +74,7 @@ body:
     id: framework_version
     attributes:
       label: Framework version
-      placeholder: "e.g. Next.js 15.1.0, React 19.0.0"
+      placeholder: "e.g. Next.js 16.2.11, React 19.2.4"
     validations:
       required: false
 

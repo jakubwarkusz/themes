@@ -44,6 +44,9 @@ jobs:
       - name: Lint
         run: bun run lint
 
+      - name: Audit high severity dependencies
+        run: bun audit --audit-level=high
+
   library:
     name: Library
     runs-on: ubuntu-latest

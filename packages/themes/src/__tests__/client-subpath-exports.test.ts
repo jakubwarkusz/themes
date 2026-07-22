@@ -49,4 +49,26 @@ describe("client subpath exports", () => {
 			},
 		});
 	});
+
+	test("keeps every public export in build, declaration, and smoke coverage", () => {
+		const packageJson = JSON.parse(readFileSync(resolve(rootDir, "package.json"), "utf-8")) as {
+			exports: Record<string, { import?: { types?: string; default?: string } } | string>;
+		};
+		const config = readFileSync(resolve(rootDir, "bunup.config.ts"), "utf-8");
+		const smoke = readFileSync(resolve(rootDir, "scripts/smoke-exports.ts"), "utf-8");
+
+		for (const [subpath, exported] of Object.entries(packageJson.exports)) {
+			if (subpath === "./package.json" || typeof exported === "string") continue;
+			const runtimePath = exported.import?.default;
+			const declarationPath = exported.import?.types;
+			expect(runtimePath).toBeDefined();
+			expect(declarationPath).toBeDefined();
+
+			const sourceEntry = subpath === "." ? "src/index.ts" : `src/${subpath.slice(2)}.ts`;
+			expect(config).toContain(`"${sourceEntry}"`);
+			const importSpecifier =
+				subpath === "." ? '"@wrksz/themes"' : `"@wrksz/themes/${subpath.slice(2)}"`;
+			expect(smoke).toContain(importSpecifier);
+		}
+	});
 });
