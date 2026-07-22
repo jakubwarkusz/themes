@@ -1,7 +1,7 @@
 "use client";
 
 import type { ImgHTMLAttributes, ReactElement } from "react";
-import { useTheme } from "../core/context.js";
+import { ThemeContext, type ThemeContextInstance, useThemeFromContext } from "../core/context.js";
 
 // Transparent 1x1 GIF - shown before theme resolves to avoid hydration mismatch
 const TRANSPARENT_FALLBACK =
@@ -17,15 +17,18 @@ export type ThemedImageProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" |
 	fallback?: string;
 	/** Alt text (required for accessibility) */
 	alt: string;
+	/** @internal Context used by createThemes factory instances. */
+	themeContext?: ThemeContextInstance;
 };
 
 export function ThemedImage({
 	src,
 	fallback = TRANSPARENT_FALLBACK,
 	alt,
+	themeContext = ThemeContext,
 	...props
 }: ThemedImageProps): ReactElement {
-	const { resolvedTheme } = useTheme();
+	const { resolvedTheme } = useThemeFromContext(themeContext);
 
 	const resolvedSrc = (resolvedTheme && src[resolvedTheme]) || fallback;
 
