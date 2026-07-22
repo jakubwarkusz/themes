@@ -10,24 +10,27 @@
 		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
 		"noEmit": true,
+		"rootDir": ".",
+		"types": ["bun"],
 
 		"strict": true,
 		"skipLibCheck": true,
+		"exactOptionalPropertyTypes": true,
 		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
 		"noUncheckedIndexedAccess": true,
 		"noImplicitOverride": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"noUncheckedSideEffectImports": true,
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+		"isolatedModules": true,
+		"erasableSyntaxOnly": true,
 
 		"declaration": true,
-		"isolatedDeclarations": true,
-
-		"baseUrl": ".",
-		"paths": {
-			"@/*": ["./src/*"]
-		},
-
-		"noUnusedLocals": false,
-		"noUnusedParameters": false,
-		"noPropertyAccessFromIndexSignature": false
+		"isolatedDeclarations": true
 	},
 
 	"include": ["src/**/*"],

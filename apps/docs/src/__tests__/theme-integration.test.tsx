@@ -24,8 +24,8 @@ beforeEach(() => {
 	window.matchMedia = () =>
 		({
 			matches: false,
-			addEventListener: () => { },
-			removeEventListener: () => { },
+			addEventListener: () => {},
+			removeEventListener: () => {},
 		}) as unknown as MediaQueryList;
 });
 

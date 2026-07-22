@@ -6,7 +6,7 @@ import { serializeCookie, writeCookie } from "../core/cookie.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
 import { clearCookies } from "./setup.js";
 
-(globalThis as unknown as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
+Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 
 function ThemeConsumer({ prefix = "" }: { prefix?: string }) {
 	const { theme, resolvedTheme, systemTheme, forcedTheme, setTheme } = useTheme();

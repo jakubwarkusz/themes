@@ -5,6 +5,7 @@ import { ClientThemeProvider as ThemeProviderImplementation } from "./providers/
 
 export type {
 	Attribute,
+	CookieOptions,
 	DefaultTheme,
 	ResolvedTheme,
 	StorageType,

@@ -14,6 +14,7 @@ import { ClientThemeProvider as ClientThemeProviderImplementation } from "./prov
 export type { ThemedImageProps } from "./components/themed-image.js";
 export type {
 	Attribute,
+	CookieOptions,
 	DefaultTheme,
 	ResolvedTheme,
 	StorageType,

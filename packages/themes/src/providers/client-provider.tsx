@@ -14,6 +14,7 @@ import { publishThemeChannel, subscribeThemeChannel } from "../core/sync.js";
 import { isThemeSelection } from "../core/theme-validation.js";
 import type {
 	DefaultTheme,
+	ResolvedTheme,
 	SystemThemeMap,
 	ThemeContextValue,
 	ThemeProviderProps,
@@ -48,7 +49,7 @@ function resolveSelection(
 
 export type ClientThemeProviderProps<Themes extends string = DefaultTheme> =
 	ThemeProviderProps<Themes> & {
-		themeContext?: ThemeContextInstance;
+		themeContext?: ThemeContextInstance<Themes>;
 	};
 
 export function ClientThemeProvider<Themes extends string = DefaultTheme>({
@@ -72,12 +73,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	onStorageError,
 	systemThemeMap,
 	themeRoot,
-	themeContext = ThemeContext,
+	themeContext = ThemeContext as ThemeContextInstance<Themes>,
 }: ClientThemeProviderProps<Themes>): ReactElement {
 	const requestedDefault = defaultTheme ?? (enableSystem ? "system" : themes[0]);
 	const resolvedDefault = (
 		themes.includes(requestedDefault as Themes) ||
-			(enableSystem && requestedDefault === "system")
+		(enableSystem && requestedDefault === "system")
 			? requestedDefault
 			: themes[0]
 	) as Themes | "system";
@@ -100,12 +101,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 	const validForcedTheme = forcedTheme && themes.includes(forcedTheme) ? forcedTheme : undefined;
 	const selectedTheme = validForcedTheme ?? theme;
-	const resolvedTheme = selectedTheme
+	const resolvedTheme: ResolvedTheme<Themes> | undefined = selectedTheme
 		? (resolveSelection(
-			selectedTheme,
-			systemTheme,
-			systemThemeMap as SystemThemeMap<string> | undefined,
-		) as Themes | undefined)
+				selectedTheme,
+				systemTheme,
+				systemThemeMap as SystemThemeMap<string> | undefined,
+			) as ResolvedTheme<Themes> | undefined)
 		: undefined;
 	const channel = `${storage ?? "localStorage"}:${storageKey}:${target}`;
 
@@ -257,10 +258,10 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			const selection = validForcedTheme ?? theme;
 			const resolved = selection
 				? resolveSelection(
-					selection,
-					systemTheme,
-					systemThemeMap as SystemThemeMap<string> | undefined,
-				)
+						selection,
+						systemTheme,
+						systemThemeMap as SystemThemeMap<string> | undefined,
+					)
 				: undefined;
 			if (resolved) applyToDom(resolved);
 		};
@@ -366,13 +367,14 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		],
 	);
 
-	const contextValue: ThemeContextValue<string> = {
-		theme: validForcedTheme ?? theme,
+	const contextTheme = theme !== undefined && isValidTheme(theme) ? theme : undefined;
+	const contextValue: ThemeContextValue<Themes> = {
+		theme: validForcedTheme ?? contextTheme,
 		resolvedTheme,
 		systemTheme,
 		forcedTheme: validForcedTheme,
 		themes,
-		setTheme: setTheme as ThemeContextValue<string>["setTheme"],
+		setTheme,
 	};
 	const ContextProvider = themeContext.Provider;
 

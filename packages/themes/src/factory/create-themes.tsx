@@ -21,9 +21,7 @@ import { ClientThemeProvider } from "../providers/client-provider.js";
 
 export type { ThemeValueMap } from "../core/theme-value.js";
 
-export type TypedThemedImageProps<Themes extends string> = Omit<ThemedImageProps, "src"> & {
-	src: Record<ResolvedTheme<Themes>, string>;
-};
+export type TypedThemedImageProps<Themes extends string> = ThemedImageProps<Themes>;
 
 export type CreateThemesConfig<Themes extends readonly string[]> = Omit<
 	ThemeProviderProps<Themes[number]>,
@@ -50,8 +48,8 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 	config: CreateThemesConfig<Themes>,
 ): CreateThemesResult<Themes> {
 	const defaults = config;
-	const context = createThemeContext();
 	type ThemeName = Themes[number];
+	const context = createThemeContext<ThemeName>();
 
 	function TypedThemeProvider(
 		props: Omit<ThemeProviderProps<ThemeName>, "themes">,
@@ -92,7 +90,7 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 	}
 
 	function TypedThemedImage(props: TypedThemedImageProps<ThemeName>): ReactElement {
-		return <ThemedImage {...(props as ThemedImageProps)} themeContext={context} />;
+		return <ThemedImage {...props} themeContext={context} />;
 	}
 
 	return {

@@ -4,6 +4,7 @@ import { ClientThemeProvider as ClientThemeProviderImplementation } from "../pro
 
 export type {
 	Attribute,
+	CookieOptions,
 	DefaultTheme,
 	StorageType,
 	SystemThemeMap,

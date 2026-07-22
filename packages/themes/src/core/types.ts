@@ -33,7 +33,9 @@ export type CookieOptions = {
 };
 
 /** Per-theme colors for meta theme-color, or a single string for all themes */
-export type ThemeColor = string | Partial<Record<string, string>>;
+export type ThemeColor<Themes extends string = string> =
+	| string
+	| Partial<Record<ResolvedTheme<Themes>, string>>;
 
 export type ThemeScriptAttributes = ScriptHTMLAttributes<HTMLScriptElement> & {
 	[key: `data-${string}`]: string | undefined;
@@ -79,7 +81,7 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	/** Called when theme changes. Receives the selected theme (may be "system"), not the resolved value. When the system preference changes while the theme is set to "system", fires with the resolved value ("light" | "dark"). */
 	onThemeChange?: (theme: ThemeSelection<Themes>) => void;
 	/** Colors for meta theme-color tag, per theme or a single value */
-	themeColor?: ThemeColor;
+	themeColor?: ThemeColor<Themes>;
 	/** Always follow system preference changes, even after setTheme was called */
 	followSystem?: boolean;
 	/** Server-provided theme that overrides storage on mount (e.g. from a database). User can still call setTheme to change it. */

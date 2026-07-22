@@ -19,6 +19,12 @@ type UntypedGetThemeOptions = Omit<GetThemeOptions, "themes"> & {
 	themes?: undefined;
 };
 
+type RuntimeGetThemeOptions = {
+	storageKey?: string | undefined;
+	defaultTheme?: string | undefined;
+	themes?: readonly string[] | undefined;
+};
+
 function safeDecodeURIComponent(value: string): string | null {
 	try {
 		return decodeURIComponent(value);
@@ -77,11 +83,12 @@ export function getTheme<
 ): Promise<GetThemeResult<Themes, DefaultThemeValue>>;
 export function getTheme(options?: UntypedGetThemeOptions): Promise<string>;
 export function getTheme(
-	requestOrOptions?: Request | GetThemeOptions,
-	options?: GetThemeOptions,
+	requestOrOptions?: Request | RuntimeGetThemeOptions,
+	options?: RuntimeGetThemeOptions,
 ): string | Promise<string> {
 	const isRequest = requestOrOptions instanceof Request;
-	const opts = (isRequest ? options : (requestOrOptions as GetThemeOptions | undefined)) ?? {};
+	const opts =
+		(isRequest ? options : (requestOrOptions as RuntimeGetThemeOptions | undefined)) ?? {};
 	const { storageKey = "theme", defaultTheme = "system", themes } = opts;
 
 	if (isRequest) {

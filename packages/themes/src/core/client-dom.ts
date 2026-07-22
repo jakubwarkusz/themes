@@ -10,8 +10,8 @@ type ApplyThemeOptions = {
 	disableTransitionOnChange: boolean | string;
 	enableColorScheme: boolean;
 	themeColor: ThemeColor | undefined;
-	themeRoot?: Element | ShadowRoot;
-	previous?: AppliedThemeState;
+	themeRoot: Element | ShadowRoot | undefined;
+	previous: AppliedThemeState | undefined;
 };
 
 export type AppliedThemeState = {

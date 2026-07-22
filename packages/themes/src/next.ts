@@ -3,6 +3,7 @@ import { ThemeProvider as ThemeProviderImplementation } from "./providers/next-p
 
 export type {
 	Attribute,
+	CookieOptions,
 	DefaultTheme,
 	ResolvedTheme,
 	StorageType,
