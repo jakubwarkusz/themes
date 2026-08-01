@@ -33,10 +33,10 @@ function classAttributeNeedsUpdate(
 	currentValues: string[],
 	nextValues: string[],
 ): boolean {
+	const nextValueSet = new Set(nextValues);
 	return (
-		currentValues.some(
-			(token) => !nextValues.includes(token) && el.classList.contains(token),
-		) || nextValues.some((token) => !el.classList.contains(token))
+		currentValues.some((token) => !nextValueSet.has(token) && el.classList.contains(token)) ||
+		nextValues.some((token) => !el.classList.contains(token))
 	);
 }
 
@@ -44,6 +44,15 @@ function getTargetEl(target: string): Element | null {
 	if (target === "html") return document.documentElement;
 	if (target === "body") return document.body;
 	return document.querySelector(target);
+}
+
+function reportStorageError(
+	onStorageError: ((error: unknown) => void) | undefined,
+	error: unknown,
+): void {
+	try {
+		onStorageError?.(error);
+	} catch {}
 }
 
 function readCookieValue(key: string): string | null {
@@ -64,13 +73,19 @@ export function getDomWindow(): (Window & typeof globalThis) | null {
 export function readStoredTheme(
 	storage: ThemeProviderProps["storage"],
 	storageKey: string,
+	onStorageError?: (error: unknown) => void,
 ): string | null {
-	if (storage === "none") return null;
-	if (storage === "cookie") return readCookieValue(storageKey);
-	if (storage === "hybrid")
-		return readCookieValue(storageKey) ?? localStorage.getItem(storageKey);
-	if (storage === "localStorage") return localStorage.getItem(storageKey);
-	return sessionStorage.getItem(storageKey);
+	try {
+		if (storage === "none") return null;
+		if (storage === "cookie") return readCookieValue(storageKey);
+		if (storage === "hybrid")
+			return readCookieValue(storageKey) ?? localStorage.getItem(storageKey);
+		if (storage === "localStorage") return localStorage.getItem(storageKey);
+		return sessionStorage.getItem(storageKey);
+	} catch (error) {
+		reportStorageError(onStorageError, error);
+		return null;
+	}
 }
 
 export function writeStoredTheme(
@@ -78,22 +93,27 @@ export function writeStoredTheme(
 	storageKey: string,
 	theme: string,
 	cookieOptions: ThemeProviderProps["cookieOptions"],
+	onStorageError?: (error: unknown) => void,
 ): void {
-	if (storage === "none") return;
-	if (storage === "cookie") {
-		writeCookie(storageKey, theme, cookieOptions);
-		return;
+	try {
+		if (storage === "none") return;
+		if (storage === "cookie") {
+			writeCookie(storageKey, theme, cookieOptions);
+			return;
+		}
+		if (storage === "hybrid") {
+			writeCookie(storageKey, theme, cookieOptions);
+			localStorage.setItem(storageKey, theme);
+			return;
+		}
+		if (storage === "localStorage") {
+			localStorage.setItem(storageKey, theme);
+			return;
+		}
+		sessionStorage.setItem(storageKey, theme);
+	} catch (error) {
+		reportStorageError(onStorageError, error);
 	}
-	if (storage === "hybrid") {
-		writeCookie(storageKey, theme, cookieOptions);
-		localStorage.setItem(storageKey, theme);
-		return;
-	}
-	if (storage === "localStorage") {
-		localStorage.setItem(storageKey, theme);
-		return;
-	}
-	sessionStorage.setItem(storageKey, theme);
 }
 
 export function applyThemeToDom({

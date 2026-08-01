@@ -1,6 +1,7 @@
+import type { ReactElement } from "react";
 import { useTheme } from "@wrksz/themes/client";
 
-export function UseThemeFixture() {
+export function UseThemeFixture(): ReactElement {
 	const { resolvedTheme, setTheme } = useTheme();
 
 	return (

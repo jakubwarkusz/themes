@@ -48,6 +48,23 @@ const cases: BundleCase[] = [
 	{ name: "next-provider", entry: "entries/next-provider.tsx" },
 ];
 
+/**
+ * Literal dynamic-import edges so dead-code analysis can see these fixtures as
+ * reachable from this script (Bun.build also uses them as entrypoints).
+ * Never called at runtime — only for static reachability.
+ */
+export function bundleEntryModuleLoaders(): ReadonlyArray<() => Promise<unknown>> {
+	return [
+		() => import("../benchmarks/entries/use-theme.tsx"),
+		() => import("../benchmarks/entries/use-theme-subpath.tsx"),
+		() => import("../benchmarks/entries/use-theme-value.tsx"),
+		() => import("../benchmarks/entries/use-theme-value-subpath.tsx"),
+		() => import("../benchmarks/entries/themed-image.tsx"),
+		() => import("../benchmarks/entries/themed-image-subpath.tsx"),
+		() => import("../benchmarks/entries/next-provider.tsx"),
+	];
+}
+
 const externals = ["react", "react-dom", "react/jsx-runtime", "next/headers", "next/navigation"];
 
 export function formatBytes(bytes: number): string {

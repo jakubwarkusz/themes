@@ -41,6 +41,28 @@ function ThemeConsumer({ prefix = "" }: { prefix?: string }) {
 	);
 }
 
+function InvalidThemeConsumer() {
+	const { setTheme } = useTheme();
+	return (
+		<>
+			<button
+				type="button"
+				data-testid="invalid-literal"
+				onClick={() => setTheme("unknown" as "dark")}
+			>
+				invalid literal
+			</button>
+			<button
+				type="button"
+				data-testid="invalid-functional"
+				onClick={() => setTheme(() => "unknown" as "dark")}
+			>
+				invalid functional
+			</button>
+		</>
+	);
+}
+
 function dispatchStorageEvent(key: string, newValue: string | null) {
 	const StorageEventCtor = (window as Window & { StorageEvent: typeof StorageEvent })
 		.StorageEvent;
@@ -199,6 +221,23 @@ describe("ClientThemeProvider - setTheme", () => {
 			fireEvent.click(screen.getByTestId("btn-dark"));
 		});
 		expect(localStorage.getItem("theme")).toBeNull();
+	});
+
+	test("rejects invalid literal and functional updates", () => {
+		localStorage.setItem("theme", "light");
+		wrap(
+			<>
+				<ThemeConsumer />
+				<InvalidThemeConsumer />
+			</>,
+		);
+
+		act(() => fireEvent.click(screen.getByTestId("invalid-literal")));
+		act(() => fireEvent.click(screen.getByTestId("invalid-functional")));
+
+		expect(screen.getByTestId("theme").textContent).toBe("light");
+		expect(localStorage.getItem("theme")).toBe("light");
+		expect(document.documentElement.classList.contains("unknown")).toBe(false);
 	});
 });
 
@@ -396,6 +435,32 @@ describe("ClientThemeProvider - cross-tab storage sync", () => {
 		});
 
 		expect(screen.getByTestId("theme").textContent).toBe("light");
+	});
+});
+
+describe("ClientThemeProvider - runtime hardening", () => {
+	test("reports storage failures without breaking updates", () => {
+		const errors: unknown[] = [];
+		const originalDescriptor = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+		Object.defineProperty(globalThis, "localStorage", {
+			configurable: true,
+			value: {
+				getItem: () => null,
+				setItem: () => {
+					throw new Error("quota exceeded");
+				},
+			},
+		});
+
+		try {
+			wrap(<ThemeConsumer />, { onStorageError: (error) => errors.push(error) });
+			act(() => fireEvent.click(screen.getByTestId("btn-dark")));
+		} finally {
+			if (originalDescriptor)
+				Object.defineProperty(globalThis, "localStorage", originalDescriptor);
+		}
+		expect(errors).toHaveLength(1);
+		expect(screen.getByTestId("theme").textContent).toBe("dark");
 	});
 });
 

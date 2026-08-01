@@ -1,6 +1,7 @@
+import type { ReactElement } from "react";
 import { ThemedImage } from "@wrksz/themes/client";
 
-export function ThemedImageFixture() {
+export function ThemedImageFixture(): ReactElement {
 	return (
 		<ThemedImage
 			src={{
