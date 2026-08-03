@@ -17,6 +17,7 @@ import type {
 	ThemeProviderProps,
 	ThemeSelection,
 } from "../core/types.js";
+import { useEffectEvent } from "../core/use-effect-event.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
 
 export type { ThemeValueMap } from "../core/theme-value.js";
@@ -80,13 +81,15 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 	): void {
 		const { theme, resolvedTheme } = useTypedTheme();
 		const isFirstRender = useRef(true);
+		const onEffect = useEffectEvent(effect);
+		// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
 		useEffect(() => {
 			if (isFirstRender.current) {
 				isFirstRender.current = false;
 				return;
 			}
-			return effect(theme, resolvedTheme);
-		}, [theme, resolvedTheme, effect, ...deps]);
+			return onEffect(theme, resolvedTheme);
+		}, [theme, resolvedTheme, ...deps]);
 	}
 
 	function TypedThemedImage(props: TypedThemedImageProps<ThemeName>): ReactElement {

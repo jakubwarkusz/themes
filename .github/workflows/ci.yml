@@ -47,3 +47,40 @@ jobs:
 
       - name: Bundle size baseline
         run: bun run size:compare benchmarks/baseline.json
+
+  react-compatibility:
+    name: React ${{ matrix.react }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - react: "18.3.1"
+            react-types: "18.3.23"
+            react-dom-types: "18.3.7"
+          - react: "19.2.4"
+            react-types: "19.2.14"
+            react-dom-types: "19.2.3"
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.9
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Select React version
+        run: >-
+          bun add --no-save --dev
+          react@${{ matrix.react }}
+          react-dom@${{ matrix.react }}
+          @types/react@${{ matrix.react-types }}
+          @types/react-dom@${{ matrix.react-dom-types }}
+
+      - name: Test effect event compatibility
+        run: bun run --cwd packages/themes test src/__tests__/use-effect-event-compat.test.tsx
+
+      - name: Build
+        run: bun run --cwd packages/themes build
