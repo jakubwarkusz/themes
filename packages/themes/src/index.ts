@@ -9,6 +9,7 @@ export type {
 	ThemeContextValue,
 	ThemeName,
 	ThemeProviderProps,
+	ThemeScriptAttributes,
 	ThemeSelection,
 	ThemeValueObject,
 	ValueObject,

@@ -7,7 +7,8 @@
 			"packages/*/scripts/**/*.ts",
 			"packages/*/*.config.ts",
 			"apps/*/src/**/*.ts",
-			"apps/*/src/**/*.tsx"
+			"apps/*/src/**/*.tsx",
+			"!packages/themes/src/core/script-source.ts"
 		]
 	},
 	"vcs": {

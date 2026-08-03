@@ -8,6 +8,7 @@ const clientSubpaths = [
 	"use-theme",
 	"use-theme-value",
 	"use-theme-effect",
+	"use-hydrated",
 	"themed-image",
 	"provider",
 	"create-themes",
@@ -35,5 +36,17 @@ describe("client subpath exports", () => {
 		for (const subpath of clientSubpaths) {
 			expect(config).toContain(`"src/client/${subpath}.ts`);
 		}
+	});
+
+	test("exposes the framework-neutral script entrypoint", () => {
+		const packageJson = JSON.parse(readFileSync(resolve(rootDir, "package.json"), "utf-8")) as {
+			exports: Record<string, { import?: { types?: string; default?: string } }>;
+		};
+		expect(packageJson.exports["./script"]).toEqual({
+			import: {
+				types: "./dist/script.d.ts",
+				default: "./dist/script.js",
+			},
+		});
 	});
 });

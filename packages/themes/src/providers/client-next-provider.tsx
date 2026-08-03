@@ -26,6 +26,7 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>({
 	followSystem = false,
 	initialTheme,
 	cookieOptions,
+	scriptProps,
 	onStorageError,
 }: ThemeProviderProps<Themes>): ReactElement {
 	const resolvedDefault = (defaultTheme ?? (enableSystem ? "system" : "light")) as string;
@@ -36,6 +37,7 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>({
 		inserted.current = true;
 		return (
 			<script
+				{...scriptProps}
 				suppressHydrationWarning
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: inline script required to prevent flash of unstyled theme
 				dangerouslySetInnerHTML={{
@@ -56,7 +58,7 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>({
 						followSystem,
 					}),
 				}}
-				nonce={nonce}
+				{...(nonce !== undefined ? { nonce } : null)}
 			/>
 		);
 	});

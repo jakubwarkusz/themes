@@ -1,0 +1,38 @@
+---
+title: System variants and contrast
+description: Resolve custom variants and model independent accessibility preferences.
+---
+
+## Brand tokens with system preference
+
+Keep `"light"` and `"dark"` as theme selections so `enableSystem` can resolve `"system"`, and map those names to brand attribute tokens with `value`:
+
+```tsx
+<ThemeProvider
+  themes={["light", "dark"]}
+  defaultTheme="system"
+  value={{
+    light: "paper",
+    dark: "midnight",
+  }}
+>
+  {children}
+</ThemeProvider>
+```
+
+The default Next provider stays on this light path on purpose. Custom system maps that rename the selection itself (for example resolving system directly to `"paper"` / `"midnight"`) are heavier and belong behind an opt-in extended API so the core bundle stays small.
+
+## Contrast as an independent axis
+
+Contrast is not a color theme. Model it as a separate `createThemes()` factory using `data-contrast`, or use CSS directly when it only follows the operating system:
+
+```css
+@media (prefers-contrast: more) {
+  :root {
+    --border-strength: 2px;
+    --muted-opacity: 1;
+  }
+}
+```
+
+Keeping contrast separate avoids duplicating every palette as `light-high-contrast`, `dark-high-contrast`, and so on. If users can override contrast, persist that factory under a distinct storage key and expose a separate control.

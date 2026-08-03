@@ -21,8 +21,14 @@ const base = {
 describe("getScript", () => {
 	test("returns a self-invoking function string", () => {
 		const script = getScript(base);
-		expect(script).toMatch(/^\(function/);
+		expect(script).toMatch(/^\(function\(/);
 		expect(script).toMatch(/\)\(.*\)$/);
+	});
+
+	test("uses deterministic source instead of runtime function serialization", () => {
+		const script = getScript(base);
+		expect(script).not.toContain("__name");
+		expect(script).toBe(getScript(base));
 	});
 
 	test("inlines all arguments", () => {
@@ -142,6 +148,6 @@ describe("getScript", () => {
 		const script = getScript(base);
 		expect(script.startsWith("(")).toBe(true);
 		expect(script.endsWith(")")).toBe(true);
-		expect(script).toContain("function");
+		expect(script).toMatch(/^\(function\(/);
 	});
 });

@@ -179,6 +179,13 @@ describe("themeScript - #308 (from next-themes) enableSystem + defaultTheme", ()
 		runScript({ ...base, enableSystem: true, defaultTheme: "light" });
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});
+
+	test("does not resolve system via matchMedia when enableSystem=false", () => {
+		window.matchMedia = () => ({ matches: true }) as MediaQueryList;
+		runScript({ ...base, enableSystem: false, defaultTheme: "system" });
+		expect(document.documentElement.classList.contains("dark")).toBe(false);
+		expect(document.documentElement.classList.contains("system")).toBe(true);
+	});
 });
 
 describe("themeScript - hybrid storage", () => {
@@ -277,6 +284,12 @@ describe("themeScript - initialTheme", () => {
 		runScript({ ...base, forcedTheme: "light", initialTheme: "dark" });
 		expect(document.documentElement.classList.contains("light")).toBe(true);
 		expect(document.documentElement.classList.contains("dark")).toBe(false);
+	});
+
+	test("resolves initialTheme=system before first paint", () => {
+		window.matchMedia = () => ({ matches: true }) as MediaQueryList;
+		runScript({ ...base, initialTheme: "system" });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});
 
 	test("ignores initialTheme not in themes list", () => {
