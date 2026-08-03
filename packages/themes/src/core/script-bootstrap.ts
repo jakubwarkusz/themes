@@ -55,12 +55,13 @@ export function themeBootstrap(
 		theme = stored && isValid(stored) ? stored : defaultTheme;
 	}
 
-	theme =
-		theme === "system"
+	if (theme === "system") {
+		theme = enableSystem
 			? matchMedia("(prefers-color-scheme: dark)").matches
 				? "dark"
 				: "light"
-			: theme;
+			: defaultTheme;
+	}
 
 	const attrValue = value?.[theme] || theme;
 	const el =
