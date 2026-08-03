@@ -41,7 +41,6 @@ const base = {
 	initialTheme: undefined,
 	disableTransitionOnChange: false,
 	followSystem: false,
-	systemThemeMap: undefined,
 };
 
 describe("themeScript - class attribute", () => {
@@ -179,19 +178,6 @@ describe("themeScript - #308 (from next-themes) enableSystem + defaultTheme", ()
 		window.matchMedia = () => ({ matches: false }) as MediaQueryList;
 		runScript({ ...base, enableSystem: true, defaultTheme: "light" });
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
-	});
-});
-
-describe("themeScript - custom system resolution", () => {
-	test("maps system preference to custom theme names", () => {
-		window.matchMedia = () => ({ matches: true }) as MediaQueryList;
-		runScript({
-			...base,
-			themes: ["paper", "midnight"],
-			defaultTheme: "system",
-			systemThemeMap: { light: "paper", dark: "midnight" },
-		});
-		expect(document.documentElement.classList.contains("midnight")).toBe(true);
 	});
 });
 

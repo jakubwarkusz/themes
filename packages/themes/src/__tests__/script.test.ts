@@ -16,7 +16,6 @@ const base = {
 	initialTheme: undefined,
 	disableTransitionOnChange: false,
 	followSystem: false,
-	systemThemeMap: undefined,
 };
 
 describe("getScript", () => {

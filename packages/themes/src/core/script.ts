@@ -1,5 +1,5 @@
 import { THEME_SCRIPT_SOURCE } from "./script-source.js";
-import type { Attribute, StorageType, SystemThemeMap } from "./types.js";
+import type { Attribute, StorageType } from "./types.js";
 
 export type ScriptConfig = {
 	storageKey: string;
@@ -16,11 +16,10 @@ export type ScriptConfig = {
 	initialTheme: string | undefined;
 	disableTransitionOnChange: boolean | string;
 	followSystem: boolean;
-	systemThemeMap: SystemThemeMap<string> | undefined;
 };
 
 /**
- * Serializes themeScript into an IIFE string safe for injection into <script>.
+ * Serializes the deterministic bootstrap into an IIFE string safe for <script>.
  */
 function safeJson(value: unknown): string {
 	return (JSON.stringify(value) as string)
@@ -45,7 +44,6 @@ export function getScript(config: ScriptConfig): string {
 		safeJson(config.initialTheme ?? null),
 		safeJson(config.disableTransitionOnChange),
 		String(config.followSystem),
-		safeJson(config.systemThemeMap ?? null),
 	].join(",");
 
 	return `(${THEME_SCRIPT_SOURCE})(${args})`;

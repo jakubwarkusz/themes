@@ -52,7 +52,7 @@ describe("public hydration and script APIs", () => {
 			systemTheme: undefined,
 			forcedTheme: undefined,
 			themes: ["light", "dark"],
-			setTheme: () => { },
+			setTheme: () => {},
 		};
 		const view = render(
 			<ThemeContext.Provider value={unresolved}>

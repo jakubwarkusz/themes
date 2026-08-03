@@ -3,39 +3,24 @@ title: System variants and contrast
 description: Resolve custom variants and model independent accessibility preferences.
 ---
 
-## Custom system resolution
+## Brand tokens with system preference
 
-Use a serializable `systemThemeMap` when the system preference should resolve to custom names:
+Keep `"light"` and `"dark"` as theme selections so `enableSystem` can resolve `"system"`, and map those names to brand attribute tokens with `value`:
 
 ```tsx
 <ThemeProvider
-  themes={["light-red", "dark-red", "light-blue", "dark-blue"]}
-  defaultTheme="light-red"
-  followSystem
-  systemThemeMap={{
-    "light-red": { light: "light-red", dark: "dark-red" },
-    "dark-red": { light: "light-red", dark: "dark-red" },
-    "light-blue": { light: "light-blue", dark: "dark-blue" },
-    "dark-blue": { light: "light-blue", dark: "dark-blue" },
+  themes={["light", "dark"]}
+  defaultTheme="system"
+  value={{
+    light: "paper",
+    dark: "midnight",
   }}
 >
   {children}
 </ThemeProvider>
 ```
 
-A data map is used instead of a callback because the same resolution must run in the pre-hydration script and in React without serializing executable application code.
-
-For a simple custom system pair:
-
-```tsx
-<ThemeProvider
-  themes={["paper", "midnight"]}
-  defaultTheme="system"
-  systemThemeMap={{ light: "paper", dark: "midnight" }}
->
-  {children}
-</ThemeProvider>
-```
+The default Next provider stays on this light path on purpose. Custom system maps that rename the selection itself (for example resolving system directly to `"paper"` / `"midnight"`) are heavier and belong behind an opt-in extended API so the core bundle stays small.
 
 ## Contrast as an independent axis
 

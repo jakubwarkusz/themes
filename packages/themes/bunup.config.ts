@@ -16,7 +16,6 @@ export default defineConfig({
 		"src/providers/client-next-provider.tsx",
 	],
 	format: ["esm"],
-	splitting: true,
 	target: "browser",
 	sourceBase: "./src",
 	dts: {

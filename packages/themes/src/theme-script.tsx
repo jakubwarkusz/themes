@@ -6,7 +6,7 @@ const DEFAULT_THEMES: string[] = ["light", "dark"];
 
 export type ThemeScriptProps<Themes extends string = DefaultTheme> = Omit<
 	ThemeProviderProps<Themes>,
-	"children" | "onThemeChange" | "onStorageError" | "cookieOptions" | "themeRoot"
+	"children" | "onThemeChange" | "onStorageError" | "cookieOptions"
 >;
 
 export function ThemeScript<Themes extends string = DefaultTheme>({
@@ -26,7 +26,6 @@ export function ThemeScript<Themes extends string = DefaultTheme>({
 	themeColor,
 	followSystem = false,
 	initialTheme,
-	systemThemeMap,
 }: ThemeScriptProps<Themes>): ReactElement {
 	const resolvedDefault = defaultTheme ?? (enableSystem ? "system" : (themes[0] ?? "light"));
 
@@ -51,7 +50,6 @@ export function ThemeScript<Themes extends string = DefaultTheme>({
 					initialTheme,
 					disableTransitionOnChange,
 					followSystem,
-					systemThemeMap,
 				}),
 			}}
 			nonce={nonce}
