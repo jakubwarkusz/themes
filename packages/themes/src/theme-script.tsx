@@ -52,7 +52,7 @@ export function ThemeScript<Themes extends string = DefaultTheme>({
 					followSystem,
 				}),
 			}}
-			nonce={nonce}
+			{...(nonce !== undefined ? { nonce } : null)}
 		/>
 	);
 }

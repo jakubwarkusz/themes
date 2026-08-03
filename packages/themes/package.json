@@ -13,13 +13,14 @@
     "!dist/providers"
   ],
   "scripts": {
-    "build": "bunup",
+    "generate:script-source": "bun scripts/generate-script-source.ts",
+    "build": "bun run generate:script-source && bunup",
     "dev": "bunup --watch",
     "type-check": "tsc --noEmit",
     "lint": "biome check src",
     "lint:fix": "biome check --write src",
     "format": "biome format --write src",
-    "test": "bun test",
+    "test": "bun scripts/generate-script-source.ts --check && bun test",
     "size": "bun run build && bun scripts/bundle-size.ts",
     "size:json": "bun run build >/dev/null && bun scripts/bundle-size.ts --json",
     "size:compare": "bun run build >/dev/null && bun scripts/bundle-size.ts --compare benchmarks/baseline.json",

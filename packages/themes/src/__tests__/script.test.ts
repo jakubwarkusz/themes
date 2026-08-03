@@ -21,7 +21,7 @@ const base = {
 describe("getScript", () => {
 	test("returns a self-invoking function string", () => {
 		const script = getScript(base);
-		expect(script).toMatch(/^\(\(/);
+		expect(script).toMatch(/^\(function\(/);
 		expect(script).toMatch(/\)\(.*\)$/);
 	});
 
@@ -148,6 +148,6 @@ describe("getScript", () => {
 		const script = getScript(base);
 		expect(script.startsWith("(")).toBe(true);
 		expect(script.endsWith(")")).toBe(true);
-		expect(script).toContain("=>");
+		expect(script).toMatch(/^\(function\(/);
 	});
 });

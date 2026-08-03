@@ -26,6 +26,26 @@ describe("public hydration and script APIs", () => {
 		expect(script?.textContent).not.toContain("__name");
 	});
 
+	test("preserves scriptProps.nonce when nonce prop is omitted", () => {
+		const view = render(
+			<ThemeScript defaultTheme="dark" scriptProps={{ nonce: "from-script-props" }} />,
+		);
+		const script = view.container.querySelector("script");
+		expect(script?.getAttribute("nonce")).toBe("from-script-props");
+	});
+
+	test("prefers explicit nonce over scriptProps.nonce", () => {
+		const view = render(
+			<ThemeScript
+				defaultTheme="dark"
+				nonce="from-prop"
+				scriptProps={{ nonce: "from-script-props" }}
+			/>,
+		);
+		const script = view.container.querySelector("script");
+		expect(script?.getAttribute("nonce")).toBe("from-prop");
+	});
+
 	test("keeps the bootstrap in streamed Suspense HTML", async () => {
 		const stream = await renderToReadableStream(
 			<html lang="en">

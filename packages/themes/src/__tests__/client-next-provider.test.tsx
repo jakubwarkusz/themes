@@ -15,6 +15,7 @@ const { ClientNextThemeProvider } = await import("../providers/client-next-provi
 type ScriptElement = ReactElement<{
 	dangerouslySetInnerHTML?: { __html?: string };
 	suppressHydrationWarning?: boolean;
+	nonce?: string;
 }>;
 
 afterEach(() => {
@@ -35,5 +36,16 @@ describe("ClientNextThemeProvider", () => {
 		expect((script as ScriptElement).type).toBe("script");
 		expect((script as ScriptElement).props.suppressHydrationWarning).toBe(true);
 		expect((script as ScriptElement).props.dangerouslySetInnerHTML?.__html).toContain('"dark"');
+	});
+
+	test("preserves scriptProps.nonce when nonce prop is omitted", () => {
+		render(
+			<ClientNextThemeProvider scriptProps={{ nonce: "from-script-props" }}>
+				<span>content</span>
+			</ClientNextThemeProvider>,
+		);
+
+		const script = insertedHtml[0] as ScriptElement;
+		expect(script.props.nonce).toBe("from-script-props");
 	});
 });

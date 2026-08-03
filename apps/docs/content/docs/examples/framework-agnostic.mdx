@@ -23,7 +23,11 @@ export function Document({ children }: { children: React.ReactNode }) {
 }
 ```
 
-`ThemeScript` uses deterministic source that bundlers cannot rewrite through `Function#toString()`. Keep its configuration equal to the provider configuration.
+`ThemeScript` and `getScript` use a build-generated deterministic bootstrap so bundlers cannot rewrite behavior through `Function#toString()`. Keep script configuration equal to the provider configuration.
+
+```tsx
+import { getScript, ThemeScript } from "@wrksz/themes/script";
+```
 
 ## Cloudflare
 
