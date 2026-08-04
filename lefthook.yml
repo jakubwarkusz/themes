@@ -3,6 +3,8 @@ pre-commit:
     - name: format-and-lint
       run: bun biome check --write {staged_files}
       glob: "*.{ts,tsx}"
+      exclude:
+        - ".agents/**"
       stage_fixed: true
 
     - name: type-check-themes
