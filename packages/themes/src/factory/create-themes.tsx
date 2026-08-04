@@ -1,9 +1,15 @@
 "use client";
 
-import type { DependencyList, EffectCallback, ReactElement } from "react";
+import {
+	type DependencyList,
+	type EffectCallback,
+	type ReactElement,
+	useEffect,
+	useRef,
+} from "react";
 import type { ThemedImageProps } from "../components/themed-image.js";
 import { ThemedImage } from "../components/themed-image.js";
-import { useTheme } from "../core/context.js";
+import { createThemeContext, useThemeFromContext } from "../core/context.js";
 import { resolveThemeValue, type ThemeValueMap } from "../core/theme-value.js";
 import type {
 	ResolvedTheme,
@@ -11,14 +17,11 @@ import type {
 	ThemeProviderProps,
 	ThemeSelection,
 } from "../core/types.js";
-import { useThemeEffect } from "../hooks/use-theme-effect.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
 
 export type { ThemeValueMap } from "../core/theme-value.js";
 
-export type TypedThemedImageProps<Themes extends string> = Omit<ThemedImageProps, "src"> & {
-	src: Record<ResolvedTheme<Themes>, string>;
-};
+export type TypedThemedImageProps<Themes extends string> = ThemedImageProps<Themes>;
 
 export type CreateThemesConfig<Themes extends readonly string[]> = Omit<
 	ThemeProviderProps<Themes[number]>,
@@ -46,6 +49,7 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 ): CreateThemesResult<Themes> {
 	const defaults = config;
 	type ThemeName = Themes[number];
+	const context = createThemeContext<ThemeName>();
 
 	function TypedThemeProvider(
 		props: Omit<ThemeProviderProps<ThemeName>, "themes">,
@@ -55,11 +59,11 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 			...props,
 			themes: defaults.themes,
 		} satisfies ThemeProviderProps<ThemeName>;
-		return <ClientThemeProvider {...merged} />;
+		return <ClientThemeProvider {...merged} themeContext={context} />;
 	}
 
 	function useTypedTheme(): ThemeContextValue<ThemeName> {
-		return useTheme<ThemeName>();
+		return useThemeFromContext<ThemeName>(context);
 	}
 
 	function useTypedThemeValue<Value>(map: ThemeValueMap<ThemeName, Value>): Value | undefined {
@@ -74,16 +78,19 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 		) => ReturnType<EffectCallback>,
 		deps: DependencyList = [],
 	): void {
-		useThemeEffect((theme, resolvedTheme) => {
-			return effect(
-				theme as ThemeSelection<ThemeName> | undefined,
-				resolvedTheme as ResolvedTheme<ThemeName> | undefined,
-			);
-		}, deps);
+		const { theme, resolvedTheme } = useTypedTheme();
+		const isFirstRender = useRef(true);
+		useEffect(() => {
+			if (isFirstRender.current) {
+				isFirstRender.current = false;
+				return;
+			}
+			return effect(theme, resolvedTheme);
+		}, [theme, resolvedTheme, effect, ...deps]);
 	}
 
 	function TypedThemedImage(props: TypedThemedImageProps<ThemeName>): ReactElement {
-		return <ThemedImage {...(props as ThemedImageProps)} />;
+		return <ThemedImage {...props} themeContext={context} />;
 	}
 
 	return {

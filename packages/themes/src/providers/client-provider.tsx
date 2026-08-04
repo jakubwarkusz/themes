@@ -7,15 +7,22 @@ import {
 	readStoredTheme,
 	writeStoredTheme,
 } from "../core/client-dom.js";
-import { ThemeContext } from "../core/context.js";
+import { ThemeContext, type ThemeContextInstance } from "../core/context.js";
 import { createThemeStore } from "../core/store.js";
 import { isThemeSelection } from "../core/theme-validation.js";
-import type { DefaultTheme, ThemeContextValue, ThemeProviderProps } from "../core/types.js";
+import type {
+	DefaultTheme,
+	ResolvedTheme,
+	ThemeContextValue,
+	ThemeProviderProps,
+} from "../core/types.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
 
 export type ClientThemeProviderProps<Themes extends string = DefaultTheme> =
-	ThemeProviderProps<Themes>;
+	ThemeProviderProps<Themes> & {
+		themeContext?: ThemeContextInstance<Themes>;
+	};
 
 export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	children,
@@ -36,6 +43,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	initialTheme,
 	cookieOptions,
 	onStorageError,
+	themeContext = ThemeContext as ThemeContextInstance<Themes>,
 }: ClientThemeProviderProps<Themes>): ReactElement {
 	const requestedDefault = defaultTheme ?? (enableSystem ? "system" : themes[0]);
 	const resolvedDefault = (
@@ -62,10 +70,10 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 	const validForcedTheme = forcedTheme && themes.includes(forcedTheme) ? forcedTheme : undefined;
 	const selectedTheme = validForcedTheme ?? theme;
-	const resolvedTheme =
+	const resolvedTheme: ResolvedTheme<Themes> | undefined =
 		selectedTheme === "system" || selectedTheme === undefined
-			? (systemTheme as Themes | undefined)
-			: (selectedTheme as Themes);
+			? (systemTheme as ResolvedTheme<Themes> | undefined)
+			: (selectedTheme as ResolvedTheme<Themes>);
 
 	const isValidTheme = useCallback(
 		(candidate: string): candidate is Themes | "system" =>
@@ -252,13 +260,16 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		],
 	);
 
-	const contextValue: ThemeContextValue<string> = {
-		theme: validForcedTheme ?? theme,
+	const contextTheme = theme !== undefined && isValidTheme(theme) ? theme : undefined;
+	const contextValue: ThemeContextValue<Themes> = {
+		theme: validForcedTheme ?? contextTheme,
 		resolvedTheme,
 		systemTheme,
 		forcedTheme: validForcedTheme,
 		themes,
-		setTheme: setTheme as ThemeContextValue<string>["setTheme"],
+		setTheme,
 	};
-	return <ThemeContext.Provider value={contextValue}>{children}</ThemeContext.Provider>;
+	const ContextProvider = themeContext.Provider;
+
+	return <ContextProvider value={contextValue}>{children}</ContextProvider>;
 }

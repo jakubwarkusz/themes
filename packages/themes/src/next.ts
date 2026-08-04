@@ -1,5 +1,6 @@
 export type {
 	Attribute,
+	CookieOptions,
 	DefaultTheme,
 	ResolvedTheme,
 	StorageType,

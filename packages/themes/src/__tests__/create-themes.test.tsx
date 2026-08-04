@@ -12,6 +12,13 @@ const { ThemeProvider, useTheme, useThemeValue, useThemeEffect } = createThemes(
 	storage: "none",
 });
 
+const paletteThemes = createThemes({
+	themes: ["ocean", "forest"] as const,
+	defaultTheme: "ocean",
+	attribute: "data-palette",
+	storage: "none",
+});
+
 function ThemeReader({ children }: { children?: ReactNode }) {
 	const { theme, setTheme } = useTheme();
 	const label = useThemeValue({
@@ -40,6 +47,18 @@ function EffectProbe({ onChange }: { onChange: (value: string) => void }) {
 		onChange(`${theme ?? "none"}:${resolvedTheme ?? "none"}`);
 	});
 	return null;
+}
+
+function PaletteReader() {
+	const { theme, setTheme } = paletteThemes.useTheme();
+	return (
+		<div>
+			<span data-testid="palette">{theme}</span>
+			<button type="button" data-testid="set-forest" onClick={() => setTheme("forest")}>
+				set forest
+			</button>
+		</div>
+	);
 }
 
 beforeEach(() => {
@@ -110,5 +129,25 @@ describe("createThemes", () => {
 		});
 
 		expect(calls).toEqual(["light:light", "dark:dark"]);
+	});
+
+	test("keeps multiple factory contexts independent when nested", () => {
+		const view = render(
+			<ThemeProvider>
+				<paletteThemes.ThemeProvider>
+					<ThemeReader />
+					<PaletteReader />
+				</paletteThemes.ThemeProvider>
+			</ThemeProvider>,
+		);
+
+		act(() => fireEvent.click(view.getByTestId("set-dark")));
+		expect(view.getByTestId("theme").textContent).toBe("dark");
+		expect(view.getByTestId("palette").textContent).toBe("ocean");
+
+		act(() => fireEvent.click(view.getByTestId("set-forest")));
+		expect(view.getByTestId("theme").textContent).toBe("dark");
+		expect(view.getByTestId("palette").textContent).toBe("forest");
+		expect(document.documentElement.getAttribute("data-palette")).toBe("forest");
 	});
 });

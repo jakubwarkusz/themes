@@ -5,6 +5,7 @@ export { ThemedImage } from "./components/themed-image.js";
 export { ThemeContext, useTheme } from "./core/context.js";
 export type {
 	Attribute,
+	CookieOptions,
 	DefaultTheme,
 	ResolvedTheme,
 	StorageType,

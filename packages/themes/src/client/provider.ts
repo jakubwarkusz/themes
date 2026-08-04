@@ -2,6 +2,7 @@
 
 export type {
 	Attribute,
+	CookieOptions,
 	DefaultTheme,
 	StorageType,
 	ThemeColor,
