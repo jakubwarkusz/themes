@@ -19,7 +19,7 @@ export const docs = defineDocs({
 
 export default defineConfig({
 	mdxOptions: {
-		// MDX options
+		providerImportSource: "@/components/mdx",
 	},
 	plugins: [lastModified()],
 });

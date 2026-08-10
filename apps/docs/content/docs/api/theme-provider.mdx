@@ -163,10 +163,10 @@ export default async function RootLayout({ children }) {
 }
 ```
 
-### Cookie storage (zero-flash SSR) <Breaking />
+### Cookie storage (zero-flash SSR)
 
 <Callout type="warn">
-  **1.x:** `@wrksz/themes/next` called `cookies()` and could set `initialTheme` for you. **`2.0.0-beta.1`:** zero-flash comes from the pre-paint bootstrap only; the provider stays static. Explicit SSR markup still needs [`getTheme`](/docs/api/get-theme).
+  <Breaking /> **1.x:** `@wrksz/themes/next` called `cookies()` and could set `initialTheme` for you. **`2.0.0-beta.1`:** zero-flash comes from the pre-paint bootstrap only; the provider stays static. Explicit SSR markup still needs [`getTheme`](/docs/api/get-theme).
 </Callout>
 
 When using `@wrksz/themes/next`, `storage="cookie"` keeps the provider in the static App Shell. Its bootstrap reads `document.cookie` synchronously and applies the class before the first paint:
@@ -198,7 +198,11 @@ Theme changes are written to the cookie automatically. If server-rendered markup
   Cookie storage does not support cross-tab theme sync. If you need cross-tab sync, use `localStorage` with [`initialTheme`](/docs/examples/server-theme).
 </Callout>
 
-### Hybrid storage (SSR + cross-tab sync) <Breaking />
+### Hybrid storage (SSR + cross-tab sync)
+
+<Callout type="warn">
+  <Breaking /> In 1.x, hybrid storage also triggered a server `cookies()` read on the Next provider.
+</Callout>
 
 `storage="hybrid"` combines the best parts of cookie and local storage:
 
@@ -223,10 +227,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-### Next.js 16.3 Instant Navigations <Breaking />
+### Next.js 16.3 Instant Navigations
 
 <Callout type="info">
-  New in **`2.0.0-beta.1`** as a consequence of removing implicit `cookies()`. In 1.x the Next provider was request-time for cookie/hybrid storage. See [Upgrading from 1.x](/docs/migration#upgrading-from-1x).
+  <Breaking /> New in **`2.0.0-beta.1`** as a consequence of removing implicit `cookies()`. In 1.x the Next provider was request-time for cookie/hybrid storage. See [Upgrading from 1.x](/docs/migration#upgrading-from-1x).
 </Callout>
 
 `ThemeProvider` does not call request-time APIs, so it can stay in a reusable App Shell when

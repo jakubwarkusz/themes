@@ -19,6 +19,9 @@ export function getMDXComponents(components?: MDXComponents) {
 	} satisfies MDXComponents;
 }
 
+/** Required by fumadocs-mdx when evaluating MDX outside page renders (search, processed markdown). */
+export const useMDXComponents = getMDXComponents;
+
 declare global {
 	type MDXProvidedComponents = ReturnType<typeof getMDXComponents>;
 }

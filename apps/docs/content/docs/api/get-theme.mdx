@@ -60,9 +60,13 @@ const theme = await getTheme({
 
 When `themes` is omitted, `getTheme` returns `string` because an existing cookie can contain any stored value.
 
-## Layout - apply class directly on `<html>` <Breaking />
+## Layout - apply class directly on `<html>`
 
-Use this pattern when server-rendered markup itself must depend on the theme. Required more often in **`2.0.0-beta.1`** because the provider no longer injects the cookie class for you:
+<Callout type="warn">
+  <Breaking /> Required more often in **`2.0.0-beta.1`** because the provider no longer injects the cookie class for you.
+</Callout>
+
+Use this pattern when server-rendered markup itself must depend on the theme:
 
 ```tsx title="app/layout.tsx"
 import { ThemeProvider, getTheme } from "@wrksz/themes/next";
