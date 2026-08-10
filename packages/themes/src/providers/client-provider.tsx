@@ -16,6 +16,7 @@ import type {
 	ThemeContextValue,
 	ThemeProviderProps,
 } from "../core/types.js";
+import { useEffectEvent } from "../core/use-effect-event.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
 
@@ -81,9 +82,8 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		[themes, enableSystem],
 	);
 
-	const onThemeChangeRef = useRef(onThemeChange);
-	useEffect(() => {
-		onThemeChangeRef.current = onThemeChange;
+	const onThemeChangeEvent = useEffectEvent((next: Themes) => {
+		onThemeChange?.(next);
 	});
 
 	const applyToDom = useCallback(
@@ -109,7 +109,9 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			themeColor,
 		],
 	);
+	const applyToDomEvent = useEffectEvent(applyToDom);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
 	useEffect(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
@@ -156,8 +158,8 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				if (followSystem) {
 					setStoreTheme("system");
 				}
-				applyToDom(next);
-				onThemeChangeRef.current?.(next as Themes);
+				applyToDomEvent(next);
+				onThemeChangeEvent(next as Themes);
 			}
 		};
 		mq.addEventListener?.("change", handler);
@@ -181,6 +183,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	]);
 
 	// Re-apply theme on bfcache restore (pageshow) and history navigation (popstate)
+	// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
 	useEffect(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
@@ -189,7 +192,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			const resolved =
 				validForcedTheme ??
 				(theme === "system" || theme === undefined ? systemTheme : theme);
-			if (resolved) applyToDom(resolved);
+			if (resolved) applyToDomEvent(resolved);
 		};
 		domWindow.addEventListener("pageshow", handler);
 		domWindow.addEventListener("popstate", handler);
@@ -197,8 +200,9 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			domWindow.removeEventListener("pageshow", handler);
 			domWindow.removeEventListener("popstate", handler);
 		};
-	}, [applyToDom, validForcedTheme, getSnapshot]);
+	}, [validForcedTheme, getSnapshot]);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
 	useEffect(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
@@ -211,7 +215,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			const resolved =
 				newTheme === "system" ? (getSnapshot().systemTheme ?? "light") : newTheme;
 			setStoreTheme(newTheme);
-			if (!validForcedTheme) applyToDom(resolved);
+			if (!validForcedTheme) applyToDomEvent(resolved);
 		};
 		domWindow.addEventListener("storage", handler);
 		return () => domWindow.removeEventListener("storage", handler);
@@ -221,7 +225,6 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		resolvedDefault,
 		isValidTheme,
 		validForcedTheme,
-		applyToDom,
 		getSnapshot,
 		setStoreTheme,
 	]);
@@ -243,7 +246,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 			setStoreTheme(newTheme);
 			applyToDom(resolved);
-			onThemeChangeRef.current?.(newTheme as Themes);
+			onThemeChangeEvent(newTheme as Themes);
 
 			writeStoredTheme(storage, storageKey, newTheme, cookieOptions, onStorageError);
 		},
@@ -257,6 +260,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			isValidTheme,
 			getSnapshot,
 			setStoreTheme,
+			onThemeChangeEvent,
 		],
 	);
 
