@@ -42,4 +42,18 @@ describe("ClientNextThemeProvider", () => {
 		expect((script as ScriptElement).props.dangerouslySetInnerHTML?.__html).toContain('"dark"');
 		expect(callback?.()).toBeNull();
 	});
+
+	test("preserves scriptProps.nonce when nonce prop is omitted", () => {
+		render(
+			<ClientNextThemeProvider scriptProps={{ nonce: "from-script-props" }}>
+				<span>content</span>
+			</ClientNextThemeProvider>,
+		);
+
+		const callback = insertedHtmlCallbacks[0];
+		expect(callback).toBeDefined();
+		const script = callback?.();
+		expect(isValidElement(script)).toBe(true);
+		expect((script as ScriptElement).props.nonce).toBe("from-script-props");
+	});
 });

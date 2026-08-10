@@ -119,6 +119,7 @@ jobs:
         run: bun run --cwd apps/next-16-3 build
 
       - name: Install Chromium
+        working-directory: apps/next-16-3
         run: bunx playwright install --with-deps chromium
 
       - name: Test Instant Navigations
