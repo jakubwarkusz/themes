@@ -211,6 +211,10 @@ async function bundleCase(bundleCase: BundleCase): Promise<BundleReport> {
 		splitting: false,
 		sourcemap: "none",
 		external: externals,
+		// Measure production JSX/runtime paths — app bundlers set this for real builds.
+		define: {
+			"process.env.NODE_ENV": JSON.stringify("production"),
+		},
 	});
 
 	if (!result.success) {

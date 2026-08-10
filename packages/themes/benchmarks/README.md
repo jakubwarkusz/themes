@@ -17,7 +17,8 @@ bun run --cwd packages/themes size
 ```
 
 The script builds the package, bundles each fixture with React and Next peer dependencies
-externalized, prints raw and gzip sizes, and fails when a fixture exceeds
+externalized, `process.env.NODE_ENV` set to `"production"` (so JSX uses the production
+runtime), prints raw and gzip sizes, and fails when a fixture exceeds
 `bundle-size-thresholds.json`.
 
 When an intentional change increases size, update only the affected threshold and mention the

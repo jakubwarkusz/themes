@@ -33,10 +33,11 @@ function classAttributeNeedsUpdate(
 	currentValues: string[],
 	nextValues: string[],
 ): boolean {
-	const nextValueSet = new Set(nextValues);
+	// Match bootstrap: theme class lists are tiny, so includes() beats Set alloc.
 	return (
-		currentValues.some((token) => !nextValueSet.has(token) && el.classList.contains(token)) ||
-		nextValues.some((token) => !el.classList.contains(token))
+		currentValues.some(
+			(token) => !nextValues.includes(token) && el.classList.contains(token),
+		) || nextValues.some((token) => !el.classList.contains(token))
 	);
 }
 
