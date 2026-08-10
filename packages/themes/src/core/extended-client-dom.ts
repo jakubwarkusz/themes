@@ -12,7 +12,7 @@ type ApplyExtendedThemeOptions = {
 	enableColorScheme: boolean;
 	themeColor: ThemeColor | undefined;
 	themeRoot?: Element | ShadowRoot;
-	previous?: AppliedThemeState;
+	previous: AppliedThemeState | undefined;
 };
 
 export type AppliedThemeState = {

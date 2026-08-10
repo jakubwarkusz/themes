@@ -11,27 +11,26 @@ const DEFAULT_THEMES: string[] = ["light", "dark"];
 
 export function ExtendedClientNextThemeProvider<Themes extends string = DefaultTheme>({
 	children,
-	themes = DEFAULT_THEMES as Themes[],
-	forcedTheme,
-	enableSystem = true,
-	defaultTheme,
-	attribute = "class",
-	value: valueMap,
-	target = "html",
-	disableTransitionOnChange = false,
-	storage = "localStorage",
-	storageKey = "theme",
-	enableColorScheme = true,
 	nonce,
-	onThemeChange,
-	themeColor,
-	followSystem = false,
-	initialTheme,
-	cookieOptions,
-	onStorageError,
-	enableSameDocumentSync = false,
-	systemThemeMap,
+	...providerProps
 }: ExtendedNextThemeProviderProps<Themes>): ReactElement {
+	const {
+		themes = DEFAULT_THEMES as Themes[],
+		forcedTheme,
+		enableSystem = true,
+		defaultTheme,
+		attribute = "class",
+		value: valueMap,
+		target = "html",
+		disableTransitionOnChange = false,
+		storage = "localStorage",
+		storageKey = "theme",
+		enableColorScheme = true,
+		themeColor,
+		followSystem = false,
+		initialTheme,
+		systemThemeMap,
+	} = providerProps;
 	const resolvedDefault = (defaultTheme ?? (enableSystem ? "system" : "light")) as string;
 	const inserted = useRef(false);
 
@@ -66,29 +65,5 @@ export function ExtendedClientNextThemeProvider<Themes extends string = DefaultT
 		);
 	});
 
-	return (
-		<ExtendedClientThemeProvider
-			themes={themes}
-			forcedTheme={forcedTheme}
-			enableSystem={enableSystem}
-			defaultTheme={defaultTheme}
-			attribute={attribute}
-			value={valueMap}
-			target={target}
-			disableTransitionOnChange={disableTransitionOnChange}
-			storage={storage}
-			storageKey={storageKey}
-			enableColorScheme={enableColorScheme}
-			themeColor={themeColor}
-			followSystem={followSystem}
-			onThemeChange={onThemeChange}
-			initialTheme={initialTheme}
-			cookieOptions={cookieOptions}
-			onStorageError={onStorageError}
-			enableSameDocumentSync={enableSameDocumentSync}
-			systemThemeMap={systemThemeMap}
-		>
-			{children}
-		</ExtendedClientThemeProvider>
-	);
+	return <ExtendedClientThemeProvider {...providerProps}>{children}</ExtendedClientThemeProvider>;
 }

@@ -122,8 +122,8 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 				disableTransitionOnChange,
 				enableColorScheme,
 				themeColor,
-				themeRoot,
 				previous: appliedThemeRef.current,
+				...(themeRoot !== undefined ? { themeRoot } : {}),
 			});
 		},
 		[

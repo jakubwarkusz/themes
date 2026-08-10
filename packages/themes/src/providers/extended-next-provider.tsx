@@ -21,10 +21,13 @@ export async function ExtendedThemeProvider<Themes extends string = DefaultTheme
 		}
 	}
 
+	const { initialTheme: initialThemeProp, ...rest } = props;
+	const initialTheme = initialThemeProp ?? (serverTheme as Themes | undefined);
+
 	return (
 		<ExtendedClientNextThemeProvider
-			{...props}
-			initialTheme={(props.initialTheme ?? serverTheme) as Themes | undefined}
+			{...rest}
+			{...(initialTheme !== undefined ? { initialTheme } : {})}
 		/>
 	);
 }
