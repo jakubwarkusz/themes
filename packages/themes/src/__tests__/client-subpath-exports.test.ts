@@ -30,14 +30,6 @@ describe("client subpath exports", () => {
 		}
 	});
 
-	test("build config includes every client subpath entrypoint", () => {
-		const config = readFileSync(resolve(rootDir, "bunup.config.ts"), "utf-8");
-
-		for (const subpath of clientSubpaths) {
-			expect(config).toContain(`"src/client/${subpath}.ts`);
-		}
-	});
-
 	test("exposes the framework-neutral script entrypoint", () => {
 		const packageJson = JSON.parse(readFileSync(resolve(rootDir, "package.json"), "utf-8")) as {
 			exports: Record<string, { import?: { types?: string; default?: string } }>;

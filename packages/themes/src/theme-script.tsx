@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { getScript } from "./core/script.js";
+import { resolveDefaultTheme } from "./core/theme-validation.js";
 import type { DefaultTheme, ThemeProviderProps } from "./core/types.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
@@ -27,7 +28,7 @@ export function ThemeScript<Themes extends string = DefaultTheme>({
 	followSystem = false,
 	initialTheme,
 }: ThemeScriptProps<Themes>): ReactElement {
-	const resolvedDefault = defaultTheme ?? (enableSystem ? "system" : (themes[0] ?? "light"));
+	const resolvedDefault = resolveDefaultTheme(themes, enableSystem, defaultTheme);
 
 	return (
 		<script

@@ -261,6 +261,12 @@ describe("ClientThemeProvider - forcedTheme", () => {
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 		expect(document.documentElement.classList.contains("light")).toBe(false);
 	});
+
+	test("does not write storage when forcedTheme is set with initialTheme", () => {
+		wrap(<ThemeConsumer />, { forcedTheme: "dark", initialTheme: "light" });
+		expect(localStorage.getItem("theme")).toBeNull();
+		expect(screen.getByTestId("resolved").textContent).toBe("dark");
+	});
 });
 
 describe("ClientThemeProvider - initialTheme", () => {
@@ -439,6 +445,83 @@ describe("ClientThemeProvider - cross-tab storage sync", () => {
 });
 
 describe("ClientThemeProvider - runtime hardening", () => {
+	test("preserves manual selection across configuration object rerenders", () => {
+		const view = render(
+			<ClientThemeProvider
+				cookieOptions={{ maxAge: 60 }}
+				value={{ dark: "dark-one" }}
+				themeColor={{ dark: "#000" }}
+			>
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		act(() => fireEvent.click(screen.getByTestId("btn-dark")));
+
+		view.rerender(
+			<ClientThemeProvider
+				cookieOptions={{ maxAge: 120 }}
+				value={{ dark: "dark-two" }}
+				themeColor={{ dark: "#111" }}
+			>
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+
+		expect(screen.getByTestId("theme").textContent).toBe("dark");
+		expect(document.documentElement.classList.contains("dark-two")).toBe(true);
+		expect(document.querySelector('meta[name="theme-color"]')?.getAttribute("content")).toBe(
+			"#111",
+		);
+	});
+
+	test("keeps storage=none selections in memory across rerenders", () => {
+		const view = render(
+			<ClientThemeProvider storage="none">
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		act(() => fireEvent.click(screen.getByTestId("btn-dark")));
+		view.rerender(
+			<ClientThemeProvider storage="none" cookieOptions={{ maxAge: 120 }}>
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		expect(screen.getByTestId("theme").textContent).toBe("dark");
+	});
+
+	test("writes initialTheme only during initialization", () => {
+		const view = render(
+			<ClientThemeProvider initialTheme="dark">
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		act(() => fireEvent.click(screen.getByTestId("btn-light")));
+		view.rerender(
+			<ClientThemeProvider initialTheme="dark" cookieOptions={{ maxAge: 120 }}>
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		expect(screen.getByTestId("theme").textContent).toBe("light");
+		expect(localStorage.getItem("theme")).toBe("light");
+	});
+
+	test("updates forced theme and DOM configuration dynamically", () => {
+		const view = render(
+			<ClientThemeProvider forcedTheme="dark" attribute="class">
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+
+		view.rerender(
+			<ClientThemeProvider forcedTheme="light" attribute="data-theme">
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		expect(screen.getByTestId("forced").textContent).toBe("light");
+		expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+	});
+
 	test("reports storage failures without breaking updates", () => {
 		const errors: unknown[] = [];
 		const originalDescriptor = Object.getOwnPropertyDescriptor(globalThis, "localStorage");

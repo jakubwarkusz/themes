@@ -34,6 +34,22 @@ export default function TenantLayout({ children }: { children: ReactNode }) {
 					</header>
 					{children}
 				</ThemeProvider>
+				<ThemeProvider
+					target="body"
+					forcedTheme="dark"
+					storage="none"
+					scriptProps={{ "data-body-theme-bootstrap": "true" }}
+				>
+					<span hidden data-testid="body-theme-target" />
+				</ThemeProvider>
+				<ThemeProvider
+					target="#scoped-theme-target"
+					forcedTheme="dark"
+					storage="none"
+					scriptProps={{ "data-scoped-theme-bootstrap": "true" }}
+				>
+					<div id="scoped-theme-target" data-testid="scoped-theme-target" />
+				</ThemeProvider>
 			</body>
 		</html>
 	);

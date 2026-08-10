@@ -9,7 +9,7 @@ import {
 } from "../core/client-dom.js";
 import { ThemeContext, type ThemeContextInstance } from "../core/context.js";
 import { createThemeStore } from "../core/store.js";
-import { isThemeSelection } from "../core/theme-validation.js";
+import { isThemeSelection, resolveDefaultTheme } from "../core/theme-validation.js";
 import type {
 	DefaultTheme,
 	ResolvedTheme,
@@ -46,15 +46,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	onStorageError,
 	themeContext = ThemeContext as ThemeContextInstance<Themes>,
 }: ClientThemeProviderProps<Themes>): ReactElement {
-	const requestedDefault = defaultTheme ?? (enableSystem ? "system" : themes[0]);
-	const resolvedDefault = (
-		themes.includes(requestedDefault as Themes) ||
-		(enableSystem && requestedDefault === "system")
-			? requestedDefault
-			: themes[0]
-	) as Themes | "system";
+	const resolvedDefault = resolveDefaultTheme(themes, enableSystem, defaultTheme);
 
-	const storeRef = useRef(createThemeStore());
+	const storeRef = useRef<ReturnType<typeof createThemeStore> | null>(null);
+	if (storeRef.current === null) {
+		storeRef.current = createThemeStore();
+	}
 	const store = storeRef.current;
 	const {
 		getSnapshot,
@@ -110,26 +107,21 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		],
 	);
 	const applyToDomEvent = useEffectEvent(applyToDom);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
-	useEffect(() => {
+	const initializeEvent = useEffectEvent(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
 		const mq =
 			enableSystem && typeof domWindow.matchMedia === "function"
 				? domWindow.matchMedia("(prefers-color-scheme: dark)")
 				: null;
-		const sys: "light" | "dark" | undefined = mq ? (mq.matches ? "dark" : "light") : undefined;
-		if (sys) {
-			setStoreSystemTheme(sys);
-		}
+		const system = mq ? (mq.matches ? "dark" : "light") : undefined;
+		let initial: Themes | "system";
 
+		// Forced theme short-circuits init and must not persist to storage.
 		if (validForcedTheme) {
-			setStoreTheme(validForcedTheme);
-			applyToDom(validForcedTheme);
+			initial = validForcedTheme;
 		} else if (initialTheme && isValidTheme(initialTheme)) {
-			setStoreTheme(initialTheme);
-			applyToDom(initialTheme === "system" ? (sys ?? "light") : initialTheme);
+			initial = initialTheme;
 			writeStoredTheme(
 				storage,
 				storageKey,
@@ -139,48 +131,47 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			);
 		} else {
 			const stored = readStoredTheme(storage, storageKey, onStorageError);
-
-			const initial =
+			initial =
 				!followSystem && stored && isValidTheme(stored)
 					? (stored as Themes | "system")
 					: resolvedDefault;
-
-			setStoreState({ theme: initial, systemTheme: sys });
-			applyToDom(initial === "system" ? (sys ?? "light") : initial);
 		}
 
-		if (!mq) return;
-		const handler = (e: MediaQueryListEvent) => {
-			const next = e.matches ? "dark" : "light";
-			setStoreSystemTheme(next);
-			const current = getSnapshot().theme;
-			if (current === "system" || current === undefined || followSystem) {
-				if (followSystem) {
-					setStoreTheme("system");
-				}
-				applyToDomEvent(next);
-				onThemeChangeEvent(next as Themes);
+		setStoreState({ theme: initial, systemTheme: system });
+	});
+	const handleSystemChangeEvent = useEffectEvent((next: "light" | "dark") => {
+		setStoreSystemTheme(next);
+		const current = getSnapshot().theme;
+		if (current === "system" || current === undefined || followSystem) {
+			if (followSystem) {
+				setStoreTheme("system");
 			}
+			applyToDomEvent(next);
+			onThemeChangeEvent(next as Themes);
+		}
+	});
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
+	useEffect(() => {
+		initializeEvent();
+	}, []);
+
+	useEffect(() => {
+		if (resolvedTheme) applyToDom(resolvedTheme);
+	}, [resolvedTheme, applyToDom]);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
+	useEffect(() => {
+		const domWindow = getDomWindow();
+		if (!enableSystem || !domWindow || typeof domWindow.matchMedia !== "function") return;
+		const mq = domWindow.matchMedia("(prefers-color-scheme: dark)");
+		setStoreSystemTheme(mq.matches ? "dark" : "light");
+		const handler = (event: MediaQueryListEvent) => {
+			handleSystemChangeEvent(event.matches ? "dark" : "light");
 		};
 		mq.addEventListener?.("change", handler);
 		return () => mq.removeEventListener?.("change", handler);
-	}, [
-		cookieOptions,
-		validForcedTheme,
-		initialTheme,
-		resolvedDefault,
-		storage,
-		storageKey,
-		enableSystem,
-		followSystem,
-		isValidTheme,
-		onStorageError,
-		applyToDom,
-		getSnapshot,
-		setStoreState,
-		setStoreTheme,
-		setStoreSystemTheme,
-	]);
+	}, [enableSystem, setStoreSystemTheme]);
 
 	// Re-apply theme on bfcache restore (pageshow) and history navigation (popstate)
 	// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
