@@ -24,6 +24,9 @@ test("keeps the current theme across prefetched shells and root params", async (
 	expect(documentHtml.indexOf("data-theme-bootstrap")).toBeLessThan(
 		documentHtml.indexOf("<body"),
 	);
+	expect(documentHtml.indexOf("scoped-theme-target")).toBeLessThan(
+		documentHtml.indexOf("data-scoped-theme-bootstrap"),
+	);
 	expect(documentHtml).toContain("document.cookie");
 
 	await page.goto("/alpha");
@@ -35,6 +38,12 @@ test("keeps the current theme across prefetched shells and root params", async (
 	expect(initialScriptCount).toBeGreaterThan(0);
 	const bootstrapSources = await bootstrapScripts.allTextContents();
 	expect(new Set(bootstrapSources).size).toBe(1);
+	await expect(page.locator("body")).toHaveClass(/dark/);
+	await expect(page.getByTestId("scoped-theme-target")).toHaveClass(/dark/);
+	const bodyBootstrapScripts = page.locator("script[data-body-theme-bootstrap]");
+	const scopedBootstrapScripts = page.locator("script[data-scoped-theme-bootstrap]");
+	await expect(bodyBootstrapScripts).toHaveCount(1);
+	await expect(scopedBootstrapScripts).toHaveCount(1);
 
 	await page.evaluate(() => {
 		Object.defineProperty(window, "__spaMarker", { value: true, writable: true });
@@ -51,12 +60,16 @@ test("keeps the current theme across prefetched shells and root params", async (
 	await expect(page.getByRole("heading", { name: "alpha about" })).toBeVisible();
 	await expect(page.locator("html")).toHaveClass(/light/);
 	await expect(bootstrapScripts).toHaveCount(initialScriptCount);
+	await expect(bodyBootstrapScripts).toHaveCount(1);
+	await expect(scopedBootstrapScripts).toHaveCount(1);
 
 	await page.getByRole("link", { name: "Switch tenant" }).click();
 	await expect(page).toHaveURL("/beta/about");
 	await expect(page.getByRole("heading", { name: "beta about" })).toBeVisible();
 	await expect(page.getByTestId("root-param").filter({ visible: true })).toHaveText("beta");
 	await expect(page.locator("html")).toHaveClass(/light/);
+	await expect(bodyBootstrapScripts).toHaveCount(1);
+	await expect(scopedBootstrapScripts).toHaveCount(1);
 
 	await page.goBack();
 	await expect(page).toHaveURL("/alpha/about");

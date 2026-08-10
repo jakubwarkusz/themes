@@ -2,14 +2,31 @@ import { describe, expect, test } from "bun:test";
 import {
 	type BundleReport,
 	type BundleThresholds,
+	bundleEntryModuleLoaders,
+	bundleReportNames,
 	compareReports,
 	compareWithBaseline,
 	formatBytes,
 	formatDeltaBytes,
 	formatPercent,
+	GENERATED_SCRIPT_REPORT_NAME,
+	measureText,
 } from "../../scripts/bundle-size.ts";
 
 describe("bundle-size script helpers", () => {
+	test("keeps every benchmark fixture statically reachable", () => {
+		expect(bundleEntryModuleLoaders()).toHaveLength(9);
+		expect(bundleReportNames()).toContain(GENERATED_SCRIPT_REPORT_NAME);
+		expect(bundleReportNames()).not.toContain("get-script");
+	});
+
+	test("measures generated text rather than generator bundle code", () => {
+		const report = measureText(GENERATED_SCRIPT_REPORT_NAME, "abc");
+		expect(report.name).toBe("generated-script");
+		expect(report.bytes).toBe(3);
+		expect(report.gzipBytes).toBeGreaterThan(0);
+	});
+
 	test("formatBytes formats bytes and kibibytes", () => {
 		expect(formatBytes(512)).toBe("512 B");
 		expect(formatBytes(1536)).toBe("1.50 KiB");

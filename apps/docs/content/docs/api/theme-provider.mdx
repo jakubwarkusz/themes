@@ -9,8 +9,9 @@ Two variants are available depending on your framework:
 
 | Import | Mechanism | Use when |
 |--------|-----------|----------|
-| `@wrksz/themes/next` | `useServerInsertedHTML` | Next.js 16+ (no React 19 warning) |
-| `@wrksz/themes` | inline `<script>` in RSC | Other frameworks |
+| `@wrksz/themes/next` | `useServerInsertedHTML` for `<html>`; synchronous adjacent script for later targets | Next.js 16+ (no React 19 warning) |
+| `@wrksz/themes` | Client-only provider | Nested scopes and client-rendered React |
+| `@wrksz/themes/script` | Server-rendered bootstrap script | Other SSR frameworks |
 
 ```tsx title="app/layout.tsx (Next.js)"
 import { ThemeProvider } from "@wrksz/themes/next";
