@@ -154,6 +154,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Build library
+        run: bun run --cwd packages/themes build
+
       - name: Test
         run: bun run --cwd apps/docs test
 
