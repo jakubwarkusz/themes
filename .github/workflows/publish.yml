@@ -24,7 +24,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: latest
+          node-version: 24
           registry-url: https://registry.npmjs.org
 
       - name: Setup Bun
@@ -47,6 +47,12 @@ jobs:
 
       - name: Build
         run: bun run build
+
+      - name: Declaration compatibility
+        run: bun run type-check:compat
+
+      - name: Bundle size baseline
+        run: bun run size:compare
 
       - name: Publish to NPM registry
         run: |

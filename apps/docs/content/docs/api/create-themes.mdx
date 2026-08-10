@@ -111,6 +111,37 @@ export function AuthSection({ children }: { children: React.ReactNode }) {
 
 The configured `themes` tuple remains the source of truth, so the typed provider does not accept a per-use `themes` override. Create another factory if a subtree genuinely needs a different theme union.
 
+## Independent theme dimensions
+
+Every factory owns its own context. You can combine independent mode, palette, typography, or contrast axes without one nested provider hiding another factory's hook:
+
+```tsx title="app/preferences.ts"
+import { createThemes } from "@wrksz/themes/client";
+
+export const mode = createThemes({
+  themes: ["light", "dark"] as const,
+  attribute: "data-mode",
+  storageKey: "mode",
+});
+
+export const palette = createThemes({
+  themes: ["ocean", "forest"] as const,
+  attribute: "data-palette",
+  storageKey: "palette",
+  enableSystem: false,
+});
+```
+
+```tsx
+<mode.ThemeProvider>
+  <palette.ThemeProvider>
+    {children}
+  </palette.ThemeProvider>
+</mode.ThemeProvider>
+```
+
+The resulting attributes are independent, for example `data-mode="dark"` and `data-palette="forest"`. This avoids defining every mode/palette combination as a separate theme.
+
 ## Generic `useTheme<T>()` vs `createThemes`
 
 - Use `createThemes` for shipped app code with one canonical theme configuration.

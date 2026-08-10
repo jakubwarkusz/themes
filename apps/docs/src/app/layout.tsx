@@ -1,8 +1,10 @@
+import { ThemeProvider } from "@wrksz/themes/next";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
 import "./global.css";
 import { Analytics } from "@vercel/analytics/next";
 import { Inter } from "next/font/google";
+import { appThemes, themeProviderDefaults } from "@/lib/theme-config";
 
 const inter = Inter({
 	subsets: ["latin"],
@@ -33,8 +35,10 @@ export const metadata: Metadata = {
 export default function Layout({ children }: LayoutProps<"/">) {
 	return (
 		<html lang="en" className={inter.className} suppressHydrationWarning>
-			<body className="flex flex-col min-h-screen antialiased">
-				<RootProvider>{children}</RootProvider>
+			<body className="flex flex-col min-h-dvh antialiased">
+				<ThemeProvider {...themeProviderDefaults} themes={appThemes}>
+					<RootProvider>{children}</RootProvider>
+				</ThemeProvider>
 				<Analytics />
 			</body>
 		</html>
