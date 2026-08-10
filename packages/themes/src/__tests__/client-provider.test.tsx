@@ -261,6 +261,12 @@ describe("ClientThemeProvider - forcedTheme", () => {
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 		expect(document.documentElement.classList.contains("light")).toBe(false);
 	});
+
+	test("does not write storage when forcedTheme is set with initialTheme", () => {
+		wrap(<ThemeConsumer />, { forcedTheme: "dark", initialTheme: "light" });
+		expect(localStorage.getItem("theme")).toBeNull();
+		expect(screen.getByTestId("resolved").textContent).toBe("dark");
+	});
 });
 
 describe("ClientThemeProvider - initialTheme", () => {

@@ -61,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `themes` | `readonly string[]` | `["light", "dark"]` | Available themes. Use `as const` to preserve custom theme unions in TypeScript |
 | `defaultTheme` | `string` | `"system"` | Theme used when no preference is stored |
 | `forcedTheme` | `string` | - | Force a specific theme, ignoring user preference |
-| `initialTheme` | `string` | - | Server-provided theme that overrides storage on mount. User can still call `setTheme` to change it |
+| `initialTheme` | `string` | - | Server-provided theme that overrides storage on mount. User can still call `setTheme` to change it. Mount init is sticky: later prop changes to `storageKey` / `initialTheme` do not re-run initialization (`forcedTheme` still updates via overlay). |
 | `enableSystem` | `boolean` | `true` | Detect system preference via `prefers-color-scheme` |
 | `enableColorScheme` | `boolean` | `true` | Set native `color-scheme` CSS property |
 | `attribute` | `"class" \| "data-*" \| ("class" \| "data-*")[]` | `"class"` | HTML attribute(s) to set on the target element |

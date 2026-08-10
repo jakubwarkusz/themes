@@ -117,7 +117,10 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		const system = mq ? (mq.matches ? "dark" : "light") : undefined;
 		let initial: Themes | "system";
 
-		if (initialTheme && isValidTheme(initialTheme)) {
+		// Forced theme short-circuits init and must not persist to storage.
+		if (validForcedTheme) {
+			initial = validForcedTheme;
+		} else if (initialTheme && isValidTheme(initialTheme)) {
 			initial = initialTheme;
 			writeStoredTheme(
 				storage,

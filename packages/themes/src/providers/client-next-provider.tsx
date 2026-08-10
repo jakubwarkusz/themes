@@ -75,11 +75,9 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>(
 		const scripts = document.querySelectorAll<HTMLScriptElement>(
 			"script[data-wrksz-theme-target]",
 		);
-		for (const candidate of Array.from(scripts)) {
-			if (
-				candidate !== current &&
-				candidate.getAttribute("data-wrksz-theme-target") === target
-			) {
+		for (let i = 0; i < scripts.length; i++) {
+			const el = scripts[i];
+			if (el && el !== current && el.dataset.wrkszThemeTarget === target) {
 				current.remove();
 				return;
 			}
