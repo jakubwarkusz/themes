@@ -3,27 +3,31 @@ title: Getting Started
 description: Install and configure @wrksz/themes in your Next.js app.
 ---
 
+<Callout type="warn">
+  These docs describe **`2.0.0-beta.1`**. Install with the `beta` tag. Stable `latest` is still **1.2.0**. See [Upgrading from 1.x](/docs/migration#upgrading-from-1x).
+</Callout>
+
 ## Installation
 
 <Tabs items={["bun", "npm", "pnpm", "yarn"]}>
   <Tab value="bun">
     ```bash
-    bun add @wrksz/themes
+    bun add @wrksz/themes@beta
     ```
   </Tab>
   <Tab value="npm">
     ```bash
-    npm install @wrksz/themes
+    npm install @wrksz/themes@beta
     ```
   </Tab>
   <Tab value="pnpm">
     ```bash
-    pnpm add @wrksz/themes
+    pnpm add @wrksz/themes@beta
     ```
   </Tab>
   <Tab value="yarn">
     ```bash
-    yarn add @wrksz/themes
+    yarn add @wrksz/themes@beta
     ```
   </Tab>
 </Tabs>
@@ -92,6 +96,7 @@ export function ThemeToggle() {
 
 - Next.js 16+
 - React 18+ (uses native `useEffectEvent` on React 19.2+)
+- TypeScript 5.9+ <Breaking /> (`typescript` peer is `>=5.9` from `2.0.0-beta.1`; 4.x and 5.0–5.8 are unsupported on this line)
 
 ## Next steps
 

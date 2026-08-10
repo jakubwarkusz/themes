@@ -2,14 +2,18 @@
 
 Modern theme management for Next.js and React. It keeps the `next-themes` style API, adds typed helpers, and fixes React 19 / Next.js App Router edge cases around inline scripts, server themes, cookies, and hydration.
 
+> **Pre-release:** current `main` / docs track **`2.0.0-beta.1`** (`npm install @wrksz/themes@beta`). npm `latest` is still **1.2.0**.
+>
+> **Breaking vs 1.2.0:** Next `ThemeProvider` is sync and no longer calls `cookies()`; explicit `getTheme` + `initialTheme` when SSR markup needs the theme; TypeScript peer `>=5.9`; `forcedTheme` does not write storage; mount init for `initialTheme`/`storageKey` is sticky. Guide: [Upgrading from 1.x](https://themes.wrksz.dev/docs/migration#upgrading-from-1x).
+
 Requires TypeScript 5.9 or newer. TypeScript 5.9, 6, and 7 are supported.
 
 [Docs](https://themes.wrksz.dev) · [GitHub](https://github.com/jakubwarkusz/themes)
 
 ```bash
-bun add @wrksz/themes
+bun add @wrksz/themes@beta
 # or
-npm install @wrksz/themes
+npm install @wrksz/themes@beta
 ```
 
 ## Setup

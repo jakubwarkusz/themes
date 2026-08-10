@@ -11,10 +11,15 @@ export const gitConfig = {
 export const getLibraryVersion = unstable_cache(
 	async (): Promise<string> => {
 		try {
-			const res = await fetch("https://registry.npmjs.org/@wrksz/themes/latest");
+			const res = await fetch("https://registry.npmjs.org/@wrksz/themes");
 			if (!res.ok) return "";
-			const data = (await res.json()) as { version: string };
-			return data.version;
+			const data = (await res.json()) as {
+				"dist-tags"?: { latest?: string; beta?: string };
+			};
+			const beta = data["dist-tags"]?.beta;
+			const latest = data["dist-tags"]?.latest;
+			if (beta && beta.includes("-")) return beta;
+			return latest ?? beta ?? "";
 		} catch {
 			return "";
 		}
@@ -63,6 +68,7 @@ export function baseOptions(version?: string): BaseLayoutProps {
 					{version && (
 						<span className="rounded-md border border-fd-border bg-fd-muted px-1.5 py-0.5 text-xs font-medium text-fd-muted-foreground">
 							v{version}
+							{version.includes("beta") ? " · beta" : null}
 						</span>
 					)}
 				</span>

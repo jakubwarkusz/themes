@@ -7,25 +7,29 @@ description: Step-by-step guide for migrating from next-themes to @wrksz/themes.
 
 ## Step 1: Install
 
+<Callout type="info">
+  Current docs target **`2.0.0-beta.1`**. Use `@wrksz/themes@beta`. For stable 1.x, install `@wrksz/themes@1.2.0` and skip [Upgrading from 1.x](#upgrading-from-1x).
+</Callout>
+
 <Tabs items={["bun", "npm", "pnpm", "yarn"]}>
   <Tab value="bun">
     ```bash
-    bun add @wrksz/themes
+    bun add @wrksz/themes@beta
     ```
   </Tab>
   <Tab value="npm">
     ```bash
-    npm install @wrksz/themes
+    npm install @wrksz/themes@beta
     ```
   </Tab>
   <Tab value="pnpm">
     ```bash
-    pnpm add @wrksz/themes
+    pnpm add @wrksz/themes@beta
     ```
   </Tab>
   <Tab value="yarn">
     ```bash
-    yarn add @wrksz/themes
+    yarn add @wrksz/themes@beta
     ```
   </Tab>
 </Tabs>
@@ -39,13 +43,26 @@ description: Step-by-step guide for migrating from next-themes to @wrksz/themes.
 
 That's it for most apps.
 
-## Upgrading from 1.x
+## Upgrading from 1.x <Breaking />
 
-`ThemeProvider` from `@wrksz/themes/next` no longer reads the request cookie implicitly and no longer sets `initialTheme` for you.
+<Callout type="warn">
+  Breaking changes below ship in **`2.0.0-beta.1`** (`npm install @wrksz/themes@beta`). npm `latest` is still **1.2.0**. Skip this section if you stay on 1.x.
+</Callout>
 
-- TypeScript 5.9 or newer is required (`typescript` peer dependency is now `>=5.9`; 4.x and 5.0–5.8 are no longer supported).
-- For zero-flash theme application, keep using cookie or hybrid storage. The pre-hydration bootstrap still reads the stored theme before paint.
-- If server-rendered markup must depend on the cookie (for example setting `<html className={theme}>`), call [`getTheme`](/docs/api/get-theme) explicitly and pass `initialTheme`, and opt the layout out of Instant Navigations with `export const instant = false` when that request-time read would block the static App Shell.
+### What broke vs 1.2.0
+
+| Change | 1.x | 2.0.0-beta.1 |
+|--------|-----|--------------|
+| Next `ThemeProvider` | `async`, called `cookies()` for `storage="cookie"\|"hybrid"` and set `initialTheme` for you | Sync passthrough. No request-time cookie read. |
+| SSR `<html className={theme}>` | Often came "for free" from the provider | You must call [`getTheme`](/docs/api/get-theme) and pass `initialTheme` (and usually `export const instant = false`) |
+| TypeScript peer | `>=4.5.0` | `>=5.9` (5.0–5.8 unsupported) |
+| `forcedTheme` | Could write the forced value into storage on init | Does **not** persist to storage |
+| `initialTheme` / `storageKey` | Prop changes could re-run mount init | Mount init is sticky; later prop changes do not re-initialize |
+
+### Migration path
+
+- For zero-flash without request-time APIs, keep `storage="cookie"` or `"hybrid"`. The pre-paint bootstrap still reads the cookie before hydration.
+- If server-rendered markup must know the theme, do this explicitly:
 
 ```tsx title="app/layout.tsx"
 import { ThemeProvider, getTheme } from "@wrksz/themes/next";
@@ -69,7 +86,11 @@ export default async function RootLayout({ children }) {
 
 ## Step 3: Remove the "use client" wrapper
 
-`@wrksz/themes/next` is the server-layout entry and also exports the server-only `getTheme` helper. If you have a client wrapper (common in Next.js `next-themes` setups), remove it:
+`@wrksz/themes/next` is the server-layout entry and also exports the server-only `getTheme` helper. If you have a client wrapper (common in Next.js `next-themes` setups), remove it.
+
+<Callout type="info">
+  <Breaking /> In 1.x this entry was an **async** Server Component. From `2.0.0-beta.1` it is synchronous, but it still must not be imported from a `"use client"` module because it re-exports `getTheme`.
+</Callout>
 
 ```diff
 - "use client";

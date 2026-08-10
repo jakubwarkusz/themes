@@ -11,10 +11,16 @@ Modern theme management for Next.js 16+ and React 18+. Near drop-in replacement 
 
 TypeScript 5.9 or newer is required. TypeScript 5.9, 6, and 7 are supported and checked against the published package declarations in CI.
 
+> **`2.0.0-beta.1`:** install with `@wrksz/themes@beta`. npm `latest` remains **1.2.0** until 2.0 is stable.
+>
+> **Breaking vs 1.2.0:** Next `ThemeProvider` no longer calls `cookies()` (sync App Shell provider); pass `initialTheme` via `getTheme()` when SSR markup needs the cookie; TypeScript peer `>=5.9`; `forcedTheme` does not persist; sticky mount init for `initialTheme`/`storageKey`. Full guide: [Upgrading from 1.x](https://themes.wrksz.dev/docs/migration#upgrading-from-1x).
+
 ```bash
-bun add @wrksz/themes
+bun add @wrksz/themes@beta
 # or
-npm install @wrksz/themes
+npm install @wrksz/themes@beta
+# stable 1.x:
+# npm install @wrksz/themes@1.2.0
 ```
 
 ## Why not `next-themes`?

@@ -5,6 +5,10 @@ description: Read the current theme from a cookie outside React - in proxy, layo
 
 `getTheme` reads the current theme from a cookie. Available in `@wrksz/themes/next`.
 
+<Callout type="warn">
+  <Breaking /> In **`2.0.0-beta.1`**, `ThemeProvider` no longer calls `getTheme` / `cookies()` for you. Use this helper only when server markup must know the theme. See [Upgrading from 1.x](/docs/migration#upgrading-from-1x).
+</Callout>
+
 Two variants depending on context:
 
 | Call | Returns | Use when |
@@ -56,9 +60,9 @@ const theme = await getTheme({
 
 When `themes` is omitted, `getTheme` returns `string` because an existing cookie can contain any stored value.
 
-## Layout - apply class directly on `<html>`
+## Layout - apply class directly on `<html>` <Breaking />
 
-Use this pattern when server-rendered markup itself must depend on the theme:
+Use this pattern when server-rendered markup itself must depend on the theme. Required more often in **`2.0.0-beta.1`** because the provider no longer injects the cookie class for you:
 
 ```tsx title="app/layout.tsx"
 import { ThemeProvider, getTheme } from "@wrksz/themes/next";

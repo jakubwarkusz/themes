@@ -27,10 +27,10 @@ const trustItems: { icon: IconSvgElement; label: string }[] = [
 ];
 
 const PKG_MANAGERS = [
-	{ label: "bun", command: "bun add @wrksz/themes" },
-	{ label: "npm", command: "npm install @wrksz/themes" },
-	{ label: "pnpm", command: "pnpm add @wrksz/themes" },
-	{ label: "yarn", command: "yarn add @wrksz/themes" },
+	{ label: "bun", command: "bun add @wrksz/themes@beta" },
+	{ label: "npm", command: "npm install @wrksz/themes@beta" },
+	{ label: "pnpm", command: "pnpm add @wrksz/themes@beta" },
+	{ label: "yarn", command: "yarn add @wrksz/themes@beta" },
 ] as const;
 
 type PkgManager = (typeof PKG_MANAGERS)[number]["label"];
@@ -49,7 +49,7 @@ function InstallSnippet() {
 	}
 
 	return (
-		<div className="w-[296px] max-w-full overflow-hidden rounded-lg border border-fd-border bg-fd-card">
+		<div className="w-74 max-w-full overflow-hidden rounded-lg border border-fd-border bg-fd-card">
 			<div className="flex border-b border-fd-border">
 				{PKG_MANAGERS.map((mgr) => (
 					<button
@@ -83,7 +83,7 @@ function InstallSnippet() {
 				<span className="flex-1 truncate text-left font-mono text-xs text-fd-foreground">
 					{command}
 				</span>
-				<span className="relative size-[13px] shrink-0">
+				<span className="relative size-3.25 shrink-0">
 					<span
 						className="absolute inset-0 flex items-center justify-center text-fd-muted-foreground/30 transition-[opacity,transform,filter] duration-150 group-hover:text-fd-muted-foreground/70"
 						style={{
