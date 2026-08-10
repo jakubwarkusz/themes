@@ -24,13 +24,13 @@ Use the Next.js entry in `app/layout.tsx`:
 import { ThemeProvider } from "@wrksz/themes/next";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
- return (
-  <html lang="en" suppressHydrationWarning>
-   <body>
-    <ThemeProvider>{children}</ThemeProvider>
-   </body>
-  </html>
- );
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<body>
+				<ThemeProvider>{children}</ThemeProvider>
+			</body>
+		</html>
+	);
 }
 ```
 
@@ -42,13 +42,13 @@ Use client hooks from the client entry:
 import { useTheme } from "@wrksz/themes/client";
 
 export function ThemeToggle() {
- const { resolvedTheme, setTheme } = useTheme();
+	const { resolvedTheme, setTheme } = useTheme();
 
- return (
-  <button onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
-   Toggle theme
-  </button>
- );
+	return (
+		<button onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
+			Toggle theme
+		</button>
+	);
 }
 ```
 
@@ -70,15 +70,15 @@ export function ThemeToggle() {
 import { ThemeProvider } from "@wrksz/themes/next";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
- return (
-  <html lang="en" suppressHydrationWarning>
-   <body>
-    <ThemeProvider storage="cookie" defaultTheme="dark" disableTransitionOnChange>
-     {children}
-    </ThemeProvider>
-   </body>
-  </html>
- );
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<body>
+				<ThemeProvider storage="cookie" defaultTheme="dark" disableTransitionOnChange>
+					{children}
+				</ThemeProvider>
+			</body>
+		</html>
+	);
 }
 ```
 
@@ -91,13 +91,13 @@ wrap request-time themed subtrees in `Suspense` or set `export const instant = f
 ```tsx
 import { ThemeProvider, getTheme } from "@wrksz/themes/next";
 import {
- ClientThemeProvider,
- ThemedImage,
- createThemes,
- useTheme,
- useThemeEffect,
- useHydrated,
- useThemeValue,
+	ClientThemeProvider,
+	ThemedImage,
+	createThemes,
+	useTheme,
+	useThemeEffect,
+	useHydrated,
+	useThemeValue,
 } from "@wrksz/themes/client";
 import { ThemeScript } from "@wrksz/themes/script";
 ```

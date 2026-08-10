@@ -9,8 +9,8 @@
 		"test": "bun test src/__tests__",
 		"types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
 		"postinstall": "fumadocs-mdx",
-		"lint": "biome check",
-		"format": "biome format --write"
+		"lint": "oxlint --config ../../oxlint.config.ts --deny-warnings src",
+		"format": "oxfmt --config ../../oxfmt.config.ts src"
 	},
 	"dependencies": {
 		"@hugeicons/core-free-icons": "^4.0.0",

@@ -38,7 +38,7 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>(
 			data-wrksz-theme-target={target}
 			ref={scriptRef}
 			suppressHydrationWarning
-			// biome-ignore lint/security/noDangerouslySetInnerHtml: inline script required to prevent flash of unstyled theme
+			// inline script required to prevent flash of unstyled theme
 			dangerouslySetInnerHTML={{
 				__html: getScript({
 					storageKey,

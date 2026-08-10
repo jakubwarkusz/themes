@@ -34,7 +34,7 @@ export function ThemeScript<Themes extends string = DefaultTheme>({
 		<script
 			{...scriptProps}
 			suppressHydrationWarning
-			// biome-ignore lint/security/noDangerouslySetInnerHtml: escaped inline bootstrap prevents a flash before hydration
+			// escaped inline bootstrap prevents a flash before hydration
 			dangerouslySetInnerHTML={{
 				__html: getScript({
 					storageKey,

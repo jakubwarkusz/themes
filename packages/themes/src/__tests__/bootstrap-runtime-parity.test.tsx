@@ -158,7 +158,7 @@ function captureDom(run: () => void): DomSnapshot {
 	}
 
 	return {
-		classes: Array.from(document.documentElement.classList).sort(),
+		classes: Array.from(document.documentElement.classList).toSorted(),
 		dataTheme: document.documentElement.getAttribute("data-theme"),
 		colorScheme: document.documentElement.style.colorScheme,
 		themeColor:
@@ -237,7 +237,7 @@ describe("bootstrap/runtime/provider parity", () => {
 
 			resetDom(parityCase);
 			const scriptSnapshot = captureDom(() => {
-				// biome-ignore lint/security/noGlobalEval: executes the generated bootstrap in the test DOM
+				// oxlint-disable-next-line no-eval -- executes the generated bootstrap in the test DOM
 				eval(
 					getScript({
 						storageKey: "theme",

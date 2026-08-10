@@ -24,7 +24,7 @@ afterEach(() => {
 });
 
 function runScript(config: Parameters<typeof getScript>[0]): void {
-	// biome-ignore lint/security/noGlobalEval: intentional in test - runs inline theme script in happy-dom context
+	// oxlint-disable-next-line no-eval -- intentional in test - runs inline theme script in happy-dom context
 	eval(getScript(config));
 }
 
