@@ -20,7 +20,7 @@
 		"@wrksz/themes": "workspace:*",
 		"fumadocs-core": "16.11.5",
 		"fumadocs-mdx": "15.2.0",
-		"fumadocs-ui": "16.11.5",
+		"fumadocs-ui": "16.14.2",
 		"motion": "^12.38.0",
 		"next": "16.2.11",
 		"react": "^19.2.4",
