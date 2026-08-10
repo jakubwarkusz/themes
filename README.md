@@ -10,7 +10,7 @@
 
 Modern theme management for Next.js 16+ and React 19+. Near drop-in replacement for `next-themes` - fixes every known bug and adds missing features. Migrating requires changing one import line.
 
-TypeScript 5.9, 6, and 7 are supported and checked against the published package declarations in CI.
+TypeScript 5.9 or newer is required. TypeScript 5.9, 6, and 7 are supported and checked against the published package declarations in CI.
 
 ```bash
 bun add @wrksz/themes
