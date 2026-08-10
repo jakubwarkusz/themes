@@ -2,6 +2,8 @@
 
 Modern theme management for Next.js and React. It keeps the `next-themes` style API, adds typed helpers, and fixes React 19 / Next.js App Router edge cases around inline scripts, server themes, cookies, and hydration.
 
+Requires TypeScript 5.9 or newer. TypeScript 5.9, 6, and 7 are supported.
+
 [Docs](https://themes.wrksz.dev) · [GitHub](https://github.com/jakubwarkusz/themes)
 
 ```bash

@@ -43,6 +43,7 @@ That's it for most apps.
 
 `ThemeProvider` from `@wrksz/themes/next` no longer reads the request cookie implicitly and no longer sets `initialTheme` for you.
 
+- TypeScript 5.9 or newer is required (`typescript` peer dependency is now `>=5.9`; 4.x and 5.0–5.8 are no longer supported).
 - For zero-flash theme application, keep using cookie or hybrid storage. The pre-hydration bootstrap still reads the stored theme before paint.
 - If server-rendered markup must depend on the cookie (for example setting `<html className={theme}>`), call [`getTheme`](/docs/api/get-theme) explicitly and pass `initialTheme`, and opt the layout out of Instant Navigations with `export const instant = false` when that request-time read would block the static App Shell.
 
