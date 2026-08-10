@@ -39,9 +39,36 @@ description: Step-by-step guide for migrating from next-themes to @wrksz/themes.
 
 That's it for most apps.
 
+## Upgrading from 1.x
+
+`ThemeProvider` from `@wrksz/themes/next` no longer reads the request cookie implicitly and no longer sets `initialTheme` for you.
+
+- For zero-flash theme application, keep using cookie or hybrid storage. The pre-hydration bootstrap still reads the stored theme before paint.
+- If server-rendered markup must depend on the cookie (for example setting `<html className={theme}>`), call [`getTheme`](/docs/api/get-theme) explicitly and pass `initialTheme`, and opt the layout out of Instant Navigations with `export const instant = false` when that request-time read would block the static App Shell.
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider, getTheme } from "@wrksz/themes/next";
+
+export const instant = false;
+
+export default async function RootLayout({ children }) {
+  const theme = await getTheme();
+
+  return (
+    <html className={theme} suppressHydrationWarning>
+      <body>
+        <ThemeProvider storage="cookie" initialTheme={theme}>
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
 ## Step 3: Remove the "use client" wrapper
 
-`ThemeProvider` from `@wrksz/themes/next` is an async Server Component. If you have a client wrapper (common in Next.js `next-themes` setups), remove it:
+`@wrksz/themes/next` is the server-layout entry and also exports the server-only `getTheme` helper. If you have a client wrapper (common in Next.js `next-themes` setups), remove it:
 
 ```diff
 - "use client";

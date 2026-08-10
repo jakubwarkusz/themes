@@ -49,8 +49,9 @@ export function ThemeToggle() {
 ## Highlights
 
 - React 19 friendly Next.js provider using `useServerInsertedHTML`.
+- Static provider compatible with Next.js 16.3 App Shells and Partial Prefetching.
 - `localStorage`, `sessionStorage`, `cookie`, `hybrid`, and disabled storage modes.
-- Zero-flash SSR when using cookie storage with `@wrksz/themes/next`.
+- Zero-flash cookie theming via a synchronous pre-paint bootstrap.
 - `initialTheme`, `themeColor`, nested providers, scoped targets, and multi-class theme values.
 - Typed `useTheme`, `useThemeValue`, `useThemeEffect`, `ThemedImage`, and `createThemes`.
 - Fine-grained client subpath exports for smaller app bundles.
@@ -73,6 +74,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 	);
 }
 ```
+
+The provider itself does not call `cookies()`, so it remains part of a reusable App Shell.
+Use `getTheme()` explicitly when server-rendered markup needs the cookie; with Cache Components,
+wrap request-time themed subtrees in `Suspense` or set `export const instant = false`.
 
 ## Import Paths
 

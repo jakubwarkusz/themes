@@ -1,12 +1,13 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
+import "./setup.js";
 import { cleanup, render } from "@testing-library/react";
 import { isValidElement, type ReactElement, type ReactNode } from "react";
 
-const insertedHtml: ReactNode[] = [];
+const insertedHtmlCallbacks: Array<() => ReactNode> = [];
 
 mock.module("next/navigation", () => ({
 	useServerInsertedHTML: (callback: () => ReactNode) => {
-		insertedHtml.push(callback());
+		insertedHtmlCallbacks.push(callback);
 	},
 }));
 
@@ -14,28 +15,32 @@ const { ClientNextThemeProvider } = await import("../providers/client-next-provi
 
 type ScriptElement = ReactElement<{
 	dangerouslySetInnerHTML?: { __html?: string };
-	suppressHydrationWarning?: boolean;
 	nonce?: string;
+	suppressHydrationWarning?: boolean;
 }>;
 
 afterEach(() => {
 	cleanup();
-	insertedHtml.length = 0;
+	insertedHtmlCallbacks.length = 0;
 });
 
 describe("ClientNextThemeProvider", () => {
-	test("suppresses hydration warnings on the injected theme script", () => {
+	test("injects a nonce-bearing theme script once", () => {
 		render(
-			<ClientNextThemeProvider storage="hybrid" initialTheme="dark">
+			<ClientNextThemeProvider storage="hybrid" initialTheme="dark" nonce="test-nonce">
 				<span>content</span>
 			</ClientNextThemeProvider>,
 		);
 
-		const script = insertedHtml[0];
+		const callback = insertedHtmlCallbacks[0];
+		expect(callback).toBeDefined();
+		const script = callback?.();
 		expect(isValidElement(script)).toBe(true);
 		expect((script as ScriptElement).type).toBe("script");
 		expect((script as ScriptElement).props.suppressHydrationWarning).toBe(true);
+		expect((script as ScriptElement).props.nonce).toBe("test-nonce");
 		expect((script as ScriptElement).props.dangerouslySetInnerHTML?.__html).toContain('"dark"');
+		expect(callback?.()).toBeNull();
 	});
 
 	test("preserves scriptProps.nonce when nonce prop is omitted", () => {
@@ -45,7 +50,10 @@ describe("ClientNextThemeProvider", () => {
 			</ClientNextThemeProvider>,
 		);
 
-		const script = insertedHtml[0] as ScriptElement;
-		expect(script.props.nonce).toBe("from-script-props");
+		const callback = insertedHtmlCallbacks[0];
+		expect(callback).toBeDefined();
+		const script = callback?.();
+		expect(isValidElement(script)).toBe(true);
+		expect((script as ScriptElement).props.nonce).toBe("from-script-props");
 	});
 });
