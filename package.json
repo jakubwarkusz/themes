@@ -1,7 +1,11 @@
 {
 	"name": "@wrksz/themes-monorepo",
 	"private": true,
-	"workspaces": ["packages/*", "apps/*"],
+	"packageManager": "bun@1.3.9",
+	"workspaces": [
+		"packages/*",
+		"apps/*"
+	],
 	"scripts": {
 		"build": "bun run --cwd packages/themes build",
 		"test": "bun run --cwd packages/themes test",
