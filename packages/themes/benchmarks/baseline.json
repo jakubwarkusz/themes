@@ -2,7 +2,7 @@
 	{
 		"name": "use-theme",
 		"bytes": 427,
-		"gzipBytes": 283
+		"gzipBytes": 284
 	},
 	{
 		"name": "use-theme-subpath",
@@ -12,7 +12,7 @@
 	{
 		"name": "use-theme-value",
 		"bytes": 558,
-		"gzipBytes": 335
+		"gzipBytes": 334
 	},
 	{
 		"name": "use-theme-value-subpath",
@@ -22,7 +22,7 @@
 	{
 		"name": "themed-image",
 		"bytes": 641,
-		"gzipBytes": 418
+		"gzipBytes": 416
 	},
 	{
 		"name": "themed-image-subpath",
@@ -31,18 +31,18 @@
 	},
 	{
 		"name": "next-provider",
-		"bytes": 9777,
-		"gzipBytes": 3776
+		"bytes": 9945,
+		"gzipBytes": 3799
 	},
 	{
 		"name": "script",
 		"bytes": 3007,
-		"gzipBytes": 1416
+		"gzipBytes": 1415
 	},
 	{
 		"name": "client-provider",
-		"bytes": 6340,
-		"gzipBytes": 2701
+		"bytes": 6508,
+		"gzipBytes": 2731
 	},
 	{
 		"name": "generated-script",

@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactElement, useEffect, useRef, useSyncExternalStore } from "react";
+import { type ReactElement, useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import {
 	applyThemeToDom,
 	getDomWindow,
@@ -132,7 +132,9 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			onThemeChangeEvent(next as Themes);
 		}
 	});
-	const setTheme = useEffectEvent(
+	// Public API: must be a regular callback (not an Effect Event) so consumers can
+	// call it from event handlers and receive it via context under oxlint rules.
+	const setTheme = useCallback(
 		(
 			next:
 				| Themes
@@ -148,11 +150,38 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				newTheme === "system" ? (getSnapshot().systemTheme ?? "light") : newTheme;
 
 			setStoreTheme(newTheme);
-			applyToDomEvent(resolved);
-			onThemeChangeEvent(newTheme as Themes);
+			applyThemeToDom({
+				resolved,
+				attribute,
+				themes,
+				valueMap,
+				target,
+				disableTransitionOnChange,
+				enableColorScheme,
+				themeColor,
+			});
+			onThemeChange?.(newTheme as Themes);
 
 			writeStoredTheme(storage, storageKey, newTheme, cookieOptions, onStorageError);
 		},
+		[
+			validForcedTheme,
+			themes,
+			enableSystem,
+			attribute,
+			valueMap,
+			target,
+			disableTransitionOnChange,
+			enableColorScheme,
+			themeColor,
+			storage,
+			storageKey,
+			cookieOptions,
+			onStorageError,
+			getSnapshot,
+			setStoreTheme,
+			onThemeChange,
+		],
 	);
 
 	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
