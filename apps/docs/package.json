@@ -13,7 +13,7 @@
 		"format": "oxfmt --config ../../oxfmt.config.ts src"
 	},
 	"dependencies": {
-		"@hugeicons/core-free-icons": "^4.0.0",
+		"@hugeicons/core-free-icons": "^4.2.3",
 		"@hugeicons/react": "^1.1.6",
 		"@takumi-rs/image-response": "^0.73.1",
 		"@vercel/analytics": "^2.0.1",
