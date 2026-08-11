@@ -8,9 +8,9 @@ allowBuilds:
 # These pinned releases were published within pnpm's default 24h
 # minimumReleaseAge window; drop each exclusion on its next version bump.
 minimumReleaseAgeExclude:
-  - oxfmt@0.60.0
+  - oxfmt@0.62.0
   - "@oxfmt/*"
-  - oxlint@1.75.0
+  - oxlint@1.78.0
   - "@oxlint/*"
   - happy-dom@20.11.1
 overrides:
