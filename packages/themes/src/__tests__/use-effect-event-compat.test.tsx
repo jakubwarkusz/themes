@@ -13,7 +13,7 @@ test("effect events keep a stable identity while reading the latest callback", (
 				calls.push(`${prefix}:${next}`);
 			});
 
-			// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
+			// effect events are intentionally non-reactive.
 			useEffect(() => {
 				onValue(value);
 			}, [value]);

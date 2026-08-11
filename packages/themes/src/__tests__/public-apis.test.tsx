@@ -49,7 +49,7 @@ describe("public hydration and script APIs", () => {
 	test("keeps the bootstrap in streamed Suspense HTML", async () => {
 		const stream = await renderToReadableStream(
 			<html lang="en">
-				{/* biome-ignore lint/style/noHeadElement: this verifies a framework-neutral streamed HTML document */}
+				{/* this verifies a framework-neutral streamed HTML document */}
 				<head>
 					<Suspense fallback={null}>
 						<ThemeScript defaultTheme="dark" />

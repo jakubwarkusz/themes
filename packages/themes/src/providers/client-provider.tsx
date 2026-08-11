@@ -151,7 +151,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		}
 	});
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
+	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		initializeEvent();
 	}, []);
@@ -160,7 +160,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		if (resolvedTheme) applyToDom(resolvedTheme);
 	}, [resolvedTheme, applyToDom]);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
+	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		const domWindow = getDomWindow();
 		if (!enableSystem || !domWindow || typeof domWindow.matchMedia !== "function") return;
@@ -174,7 +174,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	}, [enableSystem, setStoreSystemTheme]);
 
 	// Re-apply theme on bfcache restore (pageshow) and history navigation (popstate)
-	// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
+	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
@@ -193,7 +193,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		};
 	}, [validForcedTheme, getSnapshot]);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
+	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
@@ -237,7 +237,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 			setStoreTheme(newTheme);
 			applyToDom(resolved);
-			onThemeChangeEvent(newTheme as Themes);
+			onThemeChange?.(newTheme as Themes);
 
 			writeStoredTheme(storage, storageKey, newTheme, cookieOptions, onStorageError);
 		},
@@ -251,7 +251,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			isValidTheme,
 			getSnapshot,
 			setStoreTheme,
-			onThemeChangeEvent,
+			onThemeChange,
 		],
 	);
 

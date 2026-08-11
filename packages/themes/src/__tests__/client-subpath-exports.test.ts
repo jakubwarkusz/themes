@@ -72,13 +72,13 @@ describe("client subpath exports", () => {
 		const publicEntries: string[] = [...PUBLIC_BUILD_ENTRIES];
 		const declarationEntries: string[] = [...DECLARATION_BUILD_ENTRIES];
 		const runtimeEntries: string[] = [...RUNTIME_BUILD_ENTRIES];
-		expect(publicEntries.sort()).toEqual(publicSourceEntries.sort());
-		expect(declarationEntries.sort()).toEqual(publicSourceEntries.sort());
+		expect(publicEntries.toSorted()).toEqual(publicSourceEntries.toSorted());
+		expect(declarationEntries.toSorted()).toEqual(publicSourceEntries.toSorted());
 		expect([...INTERNAL_RUNTIME_BUILD_ENTRIES]).toEqual([
 			"src/providers/client-next-provider.tsx",
 		]);
-		expect(runtimeEntries.sort()).toEqual(
-			[...publicSourceEntries, ...INTERNAL_RUNTIME_BUILD_ENTRIES].sort(),
+		expect(runtimeEntries.toSorted()).toEqual(
+			[...publicSourceEntries, ...INTERNAL_RUNTIME_BUILD_ENTRIES].toSorted(),
 		);
 	});
 });

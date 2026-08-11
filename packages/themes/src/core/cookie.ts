@@ -51,6 +51,6 @@ export function serializeCookie(key: string, value: string, options: CookieOptio
 }
 
 export function writeCookie(key: string, value: string, options: CookieOptions = {}): void {
-	// biome-ignore lint/suspicious/noDocumentCookie: cookie storage requires direct document.cookie assignment
+	// cookie storage requires direct document.cookie assignment
 	document.cookie = serializeCookie(key, value, options);
 }

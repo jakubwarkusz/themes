@@ -9,7 +9,8 @@ on:
       - "apps/next-16-3/**"
       - "package.json"
       - "bun.lock"
-      - "biome.json"
+      - "oxlint.config.ts"
+      - "oxfmt.config.ts"
       - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
@@ -19,7 +20,8 @@ on:
       - "apps/next-16-3/**"
       - "package.json"
       - "bun.lock"
-      - "biome.json"
+      - "oxlint.config.ts"
+      - "oxfmt.config.ts"
       - ".github/workflows/ci.yml"
 
 concurrency:
@@ -40,6 +42,9 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      - name: Format check
+        run: bun run format:check
 
       - name: Lint
         run: bun run lint

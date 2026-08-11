@@ -1,7 +1,12 @@
 pre-commit:
   jobs:
-    - name: format-and-lint
-      run: bun biome check --write {staged_files}
+    - name: format
+      run: bunx oxfmt --config ./oxfmt.config.ts --no-error-on-unmatched-pattern {staged_files}
+      glob: "*.{ts,tsx,json,md,css}"
+      stage_fixed: true
+
+    - name: lint
+      run: bunx oxlint --config ./oxlint.config.ts --deny-warnings --fix --no-error-on-unmatched-pattern {staged_files}
       glob: "*.{ts,tsx}"
       exclude:
         - ".agents/**"

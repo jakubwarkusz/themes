@@ -82,13 +82,13 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 		const { theme, resolvedTheme } = useTypedTheme();
 		const isFirstRender = useRef(true);
 		const onEffect = useEffectEvent(effect);
-		// biome-ignore lint/correctness/useExhaustiveDependencies: effect events are intentionally non-reactive.
 		useEffect(() => {
 			if (isFirstRender.current) {
 				isFirstRender.current = false;
 				return;
 			}
 			return onEffect(theme, resolvedTheme);
+			// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive; caller deps are spread in.
 		}, [theme, resolvedTheme, ...deps]);
 	}
 

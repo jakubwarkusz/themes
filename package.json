@@ -1,11 +1,11 @@
 {
 	"name": "@wrksz/themes-monorepo",
 	"private": true,
-	"packageManager": "bun@1.3.9",
 	"workspaces": [
 		"packages/*",
 		"apps/*"
 	],
+	"type": "module",
 	"scripts": {
 		"build": "bun run --cwd packages/themes build",
 		"test": "bun run --cwd packages/themes test",
@@ -13,15 +13,16 @@
 		"type-check": "bun run --cwd packages/themes type-check && bun run --cwd apps/docs types:check",
 		"dev:docs": "bun run --cwd apps/docs dev",
 		"build:docs": "bun run --cwd apps/docs build",
-		"lint": "biome check packages apps",
-		"format": "biome format --write packages apps",
-		"verify": "bun run lint && bun run type-check && bun run test && bun run build && bun run test:docs && bun run --cwd packages/themes size:compare && bun run build:docs",
+		"lint": "oxlint --config ./oxlint.config.ts --deny-warnings packages apps",
+		"lint:fix": "oxlint --config ./oxlint.config.ts --deny-warnings --fix packages apps",
+		"format": "oxfmt --config ./oxfmt.config.ts packages apps oxlint.config.ts oxfmt.config.ts",
+		"format:check": "oxfmt --config ./oxfmt.config.ts --check packages apps oxlint.config.ts oxfmt.config.ts",
+		"verify": "bun run format:check && bun run lint && bun run type-check && bun run test && bun run build && bun run test:docs && bun run --cwd packages/themes size:compare && bun run build:docs",
 		"verify:fixture": "bun run --cwd apps/next-16-3 type-check && bun run --cwd apps/next-16-3 build && bun run --cwd apps/next-16-3 test:e2e",
-		"verify:full": "bun run lint && bun run type-check && bun run test && bun run build && bun run test:docs && bun run --cwd packages/themes type-check:compat && bun run --cwd packages/themes size:compare && bun run build:docs && bun run verify:fixture && bun audit --audit-level=high",
+		"verify:full": "bun run format:check && bun run lint && bun run type-check && bun run test && bun run build && bun run test:docs && bun run --cwd packages/themes type-check:compat && bun run --cwd packages/themes size:compare && bun run build:docs && bun run verify:fixture && bun audit --audit-level=high",
 		"prepare": "[ \"$CI\" = \"true\" ] || lefthook install"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.13",
 		"@testing-library/react": "^16.3.2",
 		"@types/bun": "^1.3.11",
 		"@types/react": "^19.2.14",
@@ -30,6 +31,8 @@
 		"happy-dom": "^20.11.1",
 		"lefthook": "^2.1.4",
 		"next": ">=16.2.11",
+		"oxfmt": "^0.62.0",
+		"oxlint": "^1.78.0",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
 		"typescript": "^5.9.3"
@@ -38,5 +41,6 @@
 		"nanoid": "3.3.18",
 		"postcss": "8.5.26",
 		"sharp": "0.35.3"
-	}
+	},
+	"packageManager": "bun@1.3.9"
 }
