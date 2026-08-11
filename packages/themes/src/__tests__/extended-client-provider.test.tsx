@@ -209,6 +209,14 @@ describe("ExtendedClientThemeProvider", () => {
 		const host = document.createElement("div");
 		document.body.appendChild(host);
 		const shadowRoot = host.attachShadow({ mode: "open" });
+		const appendedStyles: string[] = [];
+		const origAppend = shadowRoot.appendChild.bind(shadowRoot);
+		shadowRoot.appendChild = <T extends Node>(node: T): T => {
+			if ((node as unknown as Element).tagName === "STYLE") {
+				appendedStyles.push((node as unknown as Element).textContent ?? "");
+			}
+			return origAppend(node);
+		};
 
 		wrap(<ThemeConsumer />, {
 			defaultTheme: "dark",
@@ -216,8 +224,9 @@ describe("ExtendedClientThemeProvider", () => {
 			disableTransitionOnChange: true,
 		});
 
+		shadowRoot.appendChild = origAppend;
 		expect(host.classList.contains("dark")).toBe(true);
-		expect(shadowRoot.querySelector("style")).not.toBeNull();
+		expect(appendedStyles.some((content) => content.includes("transition:none"))).toBe(true);
 		host.remove();
 	});
 });

@@ -15,7 +15,7 @@ import {
 
 describe("bundle-size script helpers", () => {
 	test("keeps every benchmark fixture statically reachable", () => {
-		expect(bundleEntryModuleLoaders()).toHaveLength(9);
+		expect(bundleEntryModuleLoaders()).toHaveLength(10);
 		expect(bundleReportNames()).toContain(GENERATED_SCRIPT_REPORT_NAME);
 		expect(bundleReportNames()).not.toContain("get-script");
 	});

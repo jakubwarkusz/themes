@@ -100,6 +100,7 @@ describe("client subpath exports", () => {
 		expect(declarationEntries.toSorted()).toEqual(publicSourceEntries.toSorted());
 		expect([...INTERNAL_RUNTIME_BUILD_ENTRIES]).toEqual([
 			"src/providers/client-next-provider.tsx",
+			"src/providers/extended-client-next-provider.tsx",
 		]);
 		expect(runtimeEntries.toSorted()).toEqual(
 			[...publicSourceEntries, ...INTERNAL_RUNTIME_BUILD_ENTRIES].toSorted(),

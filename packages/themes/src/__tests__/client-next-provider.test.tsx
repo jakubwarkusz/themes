@@ -12,9 +12,8 @@ mock.module("next/navigation", () => ({
 }));
 
 const { ClientNextThemeProvider } = await import("../providers/client-next-provider.js");
-const { ExtendedClientNextThemeProvider } = await import(
-	"../providers/extended-client-next-provider.js"
-);
+const { ExtendedClientNextThemeProvider } =
+	await import("../providers/extended-client-next-provider.js");
 
 type ScriptElement = ReactElement<{
 	dangerouslySetInnerHTML?: { __html?: string };
@@ -123,11 +122,9 @@ describe("ExtendedClientNextThemeProvider", () => {
 			</ExtendedClientNextThemeProvider>,
 		);
 
-		const script = insertedHtml[0];
+		const script = insertedHtmlCallbacks[0]?.() as ScriptElement;
 		expect(isValidElement(script)).toBe(true);
-		expect((script as ScriptElement).props.suppressHydrationWarning).toBe(true);
-		expect((script as ScriptElement).props.dangerouslySetInnerHTML?.__html).toContain(
-			'"midnight"',
-		);
+		expect(script.props.suppressHydrationWarning).toBe(true);
+		expect(script.props.dangerouslySetInnerHTML?.__html).toContain('"midnight"');
 	});
 });

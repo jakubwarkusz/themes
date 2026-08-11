@@ -1,6 +1,7 @@
 import * as root from "@wrksz/themes";
 import * as client from "@wrksz/themes/client";
 import * as createThemes from "@wrksz/themes/client/create-themes";
+import * as extendedProvider from "@wrksz/themes/client/extended-provider";
 import * as provider from "@wrksz/themes/client/provider";
 import * as themedImage from "@wrksz/themes/client/themed-image";
 import * as useHydrated from "@wrksz/themes/client/use-hydrated";
@@ -8,12 +9,14 @@ import * as useTheme from "@wrksz/themes/client/use-theme";
 import * as useThemeEffect from "@wrksz/themes/client/use-theme-effect";
 import * as useThemeValue from "@wrksz/themes/client/use-theme-value";
 import * as next from "@wrksz/themes/next";
+import * as nextExtended from "@wrksz/themes/next/extended";
 import * as script from "@wrksz/themes/script";
 
 const entrypoints = [
 	[".", root, ["ThemeProvider", "createThemes"]],
 	["./client", client, ["ClientThemeProvider", "useTheme"]],
 	["./client/create-themes", createThemes, ["createThemes"]],
+	["./client/extended-provider", extendedProvider, ["ClientThemeProvider"]],
 	["./client/provider", provider, ["ClientThemeProvider"]],
 	["./client/themed-image", themedImage, ["ThemedImage"]],
 	["./client/use-hydrated", useHydrated, ["useHydrated"]],
@@ -21,6 +24,7 @@ const entrypoints = [
 	["./client/use-theme-effect", useThemeEffect, ["useThemeEffect"]],
 	["./client/use-theme-value", useThemeValue, ["useThemeValue"]],
 	["./next", next, ["ThemeProvider", "getTheme"]],
+	["./next/extended", nextExtended, ["ThemeProvider"]],
 	["./script", script, ["ThemeScript"]],
 ] as const;
 
