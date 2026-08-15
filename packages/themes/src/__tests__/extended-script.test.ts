@@ -20,7 +20,7 @@ const base = {
 };
 
 function runScript(config: Parameters<typeof getExtendedScript>[0]): void {
-	// biome-ignore lint/security/noGlobalEval: intentional inline-script execution in happy-dom
+	// oxlint-disable-next-line no-eval -- intentional in test - runs inline theme script in happy-dom context
 	eval(getExtendedScript(config));
 }
 
