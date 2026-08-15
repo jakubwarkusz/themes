@@ -143,27 +143,32 @@ describe("Next ThemeProvider App Shell behavior", () => {
 	});
 });
 
-describe("Extended Next ThemeProvider cookie validation", () => {
-	test("passes valid stored themes and rejects unknown values", async () => {
-		const { ExtendedThemeProvider } = await import("../providers/extended-next-provider.js");
-
+describe("Extended Next ThemeProvider App Shell behavior", () => {
+	test("leaves cookie reads to the pre-hydration script", async () => {
 		nextCookieValue = "midnight";
-		const valid = await ExtendedThemeProvider({
+		const { ExtendedThemeProvider } = await import("../providers/extended-next-provider.js");
+		const element = ExtendedThemeProvider({
 			children: null,
 			storage: "cookie",
 			themes: ["paper", "midnight"],
 			systemThemeMap: { light: "paper", dark: "midnight" },
 		});
 
-		nextCookieValue = "unknown";
-		const invalid = await ExtendedThemeProvider({
+		expect(nextCookieReads).toBe(0);
+		expect((element.props as { initialTheme?: string }).initialTheme).toBeUndefined();
+	});
+
+	test("preserves an explicit initialTheme without reading request data", async () => {
+		const { ExtendedThemeProvider } = await import("../providers/extended-next-provider.js");
+		const element = ExtendedThemeProvider({
 			children: null,
 			storage: "cookie",
 			themes: ["paper", "midnight"],
+			initialTheme: "midnight",
 			systemThemeMap: { light: "paper", dark: "midnight" },
 		});
 
-		expect((valid.props as { initialTheme?: string }).initialTheme).toBe("midnight");
-		expect((invalid.props as { initialTheme?: string }).initialTheme).toBeUndefined();
+		expect(nextCookieReads).toBe(0);
+		expect((element.props as { initialTheme?: string }).initialTheme).toBe("midnight");
 	});
 });

@@ -63,4 +63,27 @@ describe("extended theme script", () => {
 			}),
 		).not.toContain("</script>");
 	});
+
+	test("does not query matchMedia when system resolution is unnecessary", () => {
+		let queried = false;
+		window.matchMedia = () => {
+			queried = true;
+			return { matches: true } as MediaQueryList;
+		};
+		runScript({ ...base, enableSystem: false, defaultTheme: "paper" });
+
+		expect(queried).toBe(false);
+		expect(document.documentElement.classList.contains("paper")).toBe(true);
+	});
+
+	test("falls back to defaultTheme when system is selected but disabled", () => {
+		localStorage.setItem("theme", "system");
+		runScript({ ...base, enableSystem: false, defaultTheme: "paper" });
+
+		expect(document.documentElement.classList.contains("paper")).toBe(true);
+	});
+
+	test("snapshot of extended bootstrap output stays reviewable", () => {
+		expect(getExtendedScript(base)).toMatchSnapshot();
+	});
 });

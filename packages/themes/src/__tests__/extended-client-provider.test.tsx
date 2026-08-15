@@ -205,6 +205,13 @@ describe("ExtendedClientThemeProvider", () => {
 		expect(document.querySelector('meta[name="theme-color"]')).toBeNull();
 	});
 
+	test("does not write storage when forcedTheme is set with initialTheme", () => {
+		wrap(<ThemeConsumer />, { forcedTheme: "dark", initialTheme: "light" });
+
+		expect(localStorage.getItem("theme")).toBeNull();
+		expect(screen.getByTestId("theme").textContent).toBe("dark");
+	});
+
 	test("applies a client theme to a ShadowRoot host", () => {
 		const host = document.createElement("div");
 		document.body.appendChild(host);

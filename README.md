@@ -1,4 +1,3 @@
-
 # @wrksz/themes
 
 [![npm](https://shieldcn.dev/badge/npm-%40wrksz%2Fthemes-CB3837.png?logo=npm&variant=secondary&size=sm)](https://www.npmjs.com/package/@wrksz/themes)
@@ -25,27 +24,27 @@ npm install @wrksz/themes@beta
 
 ## Why not `next-themes`?
 
-|                                                 | next-themes | @wrksz/themes             |
-| ----------------------------------------------- | ----------- | ------------------------- |
-| React 19 script warning                         | ❌           | ✅ `useServerInsertedHTML` |
-| `__name` minification bug                       | ❌           | ✅                         |
-| Stale theme with React 19 `cacheComponents`     | ❌           | ✅ `useSyncExternalStore`  |
-| Multi-class theme removal leaving stale classes | ❌           | ✅                         |
-| Nested providers                                | ❌           | ✅ per-instance store      |
-| `sessionStorage` support                        | ❌           | ✅                         |
-| `cookie` storage (zero-flash SSR)               | ❌           | ✅                         |
-| `hybrid` storage (SSR + cross-tab sync)         | ❌           | ✅                         |
-| Disable storage                                 | ❌           | ✅ `storage="none"`        |
-| `meta theme-color` support                      | ❌           | ✅ `themeColor` prop       |
-| Server-provided theme                           | ❌           | ✅ `initialTheme` prop     |
-| `disableTransitionOnChange` per property        | ❌           | ✅ pass a CSS string       |
-| Read theme outside React                        | ❌           | ✅ `getTheme()` helper     |
-| Generic types                                   | ❌           | ✅ `useTheme<AppTheme>()`  |
-| Typed factory                                   | ❌           | ✅ `createThemes(...)`     |
-| Theme-change effect hook                        | ❌           | ✅ `useThemeEffect(...)`   |
-| Hydration state without mount effects           | ❌           | ✅ `useHydrated()`         |
-| Framework-neutral SSR bootstrap                 | ❌           | ✅ `@wrksz/themes/script`  |
-| Zero runtime dependencies                       | ✅           | ✅                         |
+|                                                 | next-themes | @wrksz/themes              |
+| ----------------------------------------------- | ----------- | -------------------------- |
+| React 19 script warning                         | ❌          | ✅ `useServerInsertedHTML` |
+| `__name` minification bug                       | ❌          | ✅                         |
+| Stale theme with React 19 `cacheComponents`     | ❌          | ✅ `useSyncExternalStore`  |
+| Multi-class theme removal leaving stale classes | ❌          | ✅                         |
+| Nested providers                                | ❌          | ✅ per-instance store      |
+| `sessionStorage` support                        | ❌          | ✅                         |
+| `cookie` storage (zero-flash SSR)               | ❌          | ✅                         |
+| `hybrid` storage (SSR + cross-tab sync)         | ❌          | ✅                         |
+| Disable storage                                 | ❌          | ✅ `storage="none"`        |
+| `meta theme-color` support                      | ❌          | ✅ `themeColor` prop       |
+| Server-provided theme                           | ❌          | ✅ `initialTheme` prop     |
+| `disableTransitionOnChange` per property        | ❌          | ✅ pass a CSS string       |
+| Read theme outside React                        | ❌          | ✅ `getTheme()` helper     |
+| Generic types                                   | ❌          | ✅ `useTheme<AppTheme>()`  |
+| Typed factory                                   | ❌          | ✅ `createThemes(...)`     |
+| Theme-change effect hook                        | ❌          | ✅ `useThemeEffect(...)`   |
+| Hydration state without mount effects           | ❌          | ✅ `useHydrated()`         |
+| Framework-neutral SSR bootstrap                 | ❌          | ✅ `@wrksz/themes/script`  |
+| Zero runtime dependencies                       | ✅          | ✅                         |
 
 ## Table of Contents
 
@@ -54,11 +53,11 @@ npm install @wrksz/themes@beta
 - [Zero-flash SSR with cookie storage](#zero-flash-ssr-with-cookie-storage)
 - [Security model](#security-model)
 - [API](#api)
-  - [ThemeProvider](#themeprovider)
-  - [useTheme](#usetheme)
-  - [getTheme](#gettheme)
-  - [useThemeValue](#usethemevalue)
-  - [ThemedImage](#themedimage)
+    - [ThemeProvider](#themeprovider)
+    - [useTheme](#usetheme)
+    - [getTheme](#gettheme)
+    - [useThemeValue](#usethemevalue)
+    - [ThemedImage](#themedimage)
 - [Examples](#examples)
 - [Import paths](#import-paths)
 
@@ -71,13 +70,13 @@ Add the provider to your root layout. Import from `@wrksz/themes/next` for Next.
 import { ThemeProvider } from "@wrksz/themes/next";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<body>
+				<ThemeProvider>{children}</ThemeProvider>
+			</body>
+		</html>
+	);
 }
 ```
 
@@ -97,13 +96,13 @@ Components, isolate that request-time read with `Suspense` or opt the route out 
 import { useTheme } from "@wrksz/themes/client";
 
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
+	const { resolvedTheme, setTheme } = useTheme();
 
-  return (
-    <button onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
-      Toggle theme
-    </button>
-  );
+	return (
+		<button onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
+			Toggle theme
+		</button>
+	);
 }
 ```
 
@@ -116,15 +115,15 @@ Use `storage="cookie"` with `@wrksz/themes/next` to eliminate theme flash. The s
 import { ThemeProvider } from "@wrksz/themes/next";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider storage="cookie" defaultTheme="dark" disableTransitionOnChange>
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<body>
+				<ThemeProvider storage="cookie" defaultTheme="dark" disableTransitionOnChange>
+					{children}
+				</ThemeProvider>
+			</body>
+		</html>
+	);
 }
 ```
 
@@ -133,12 +132,18 @@ For apps using CSS media queries (`@media (prefers-color-scheme: dark)`) alongsi
 ```css
 /* ❌ causes flash when system pref differs from stored theme */
 @media (prefers-color-scheme: dark) {
-  :root:not(.light) { --bg: #09090b; }
+	:root:not(.light) {
+		--bg: #09090b;
+	}
 }
 
 /* ✅ */
-:root      { --bg: #ffffff; }
-:root.dark { --bg: #09090b; }
+:root {
+	--bg: #ffffff;
+}
+:root.dark {
+	--bg: #09090b;
+}
 ```
 
 > Cookie storage does not support cross-tab theme sync. Use `localStorage` with `initialTheme` if you need it.
@@ -162,26 +167,26 @@ with npm provenance from GitHub Actions.
 
 ### `ThemeProvider`
 
-| Prop                        | Type                                                               | Default             | Description                                                                                                                                                                                                                        |
-| --------------------------- | ------------------------------------------------------------------ | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `themes`                    | `string[]`                                                         | `["light", "dark"]` | Available themes                                                                                                                                                                                                                   |
-| `defaultTheme`              | `string`                                                           | `"system"`          | Theme used when no preference is stored                                                                                                                                                                                            |
-| `forcedTheme`               | `string`                                                           | -                   | Force a specific theme, ignoring user preference                                                                                                                                                                                   |
-| `initialTheme`              | `string`                                                           | -                   | Server-provided theme that overrides storage on mount. User can still call `setTheme` to change it                                                                                                                                 |
-| `enableSystem`              | `boolean`                                                          | `true`              | Detect system preference via `prefers-color-scheme`                                                                                                                                                                                |
-| `enableColorScheme`         | `boolean`                                                          | `true`              | Set native `color-scheme` CSS property                                                                                                                                                                                             |
-| `attribute`                 | `string \| string[]`                                                | `"class"`           | HTML attribute(s) to set on target element (`"class"`, `"data-theme"`, etc.)                                                                                                                                                       |
-| `value`                     | `Record<string, string>`                                           | -                   | Map theme names to attribute values                                                                                                                                                                                                |
-| `target`                    | `string`                                                           | `"html"`            | Element to apply theme to (`"html"`, `"body"`, or a CSS selector)                                                                                                                                                                  |
-| `storageKey`                | `string`                                                           | `"theme"`           | Key used for storage                                                                                                                                                                                                               |
-| `storage`                   | `"localStorage" \| "sessionStorage" \| "cookie" \| "hybrid" \| "none"` | `"localStorage"`    | Where to persist the theme. The bootstrap reads cookies before paint; `"hybrid"` prefers the cookie and mirrors writes to `localStorage` for cross-tab sync |
-| `disableTransitionOnChange` | `boolean \| string`                                                 | `false`             | Suppress CSS transitions when switching themes. `true` disables all. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties                                                   |
-| `followSystem`              | `boolean`                                                          | `false`             | Always follow system preference, ignores stored value on mount                                                                                                                                                                     |
-| `themeColor`                | `string \| Record<string, string>`                                  | -                   | Update `<meta name="theme-color">` on theme change                                                                                                                                                                                 |
-| `nonce`                     | `string`                                                           | -                   | CSP nonce for the inline script                                                                                                                                                                                                    |
-| `onThemeChange`             | `(theme: string) => void`                                          | -                   | Called when theme changes. Receives the selected value (may be `"system"`). When system preference changes while theme is `"system"`, fires with the resolved value                                                                |
-| `onStorageError`            | `(error: unknown) => void`                                         | -                   | Reports storage failures without interrupting in-memory theme updates |
-| `scriptProps`               | `ScriptHTMLAttributes<HTMLScriptElement>`                           | -                   | Extra bootstrap script attributes |
+| Prop                        | Type                                                                   | Default             | Description                                                                                                                                                                      |
+| --------------------------- | ---------------------------------------------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `themes`                    | `string[]`                                                             | `["light", "dark"]` | Available themes                                                                                                                                                                 |
+| `defaultTheme`              | `string`                                                               | `"system"`          | Theme used when no preference is stored                                                                                                                                          |
+| `forcedTheme`               | `string`                                                               | -                   | Force a specific theme, ignoring user preference                                                                                                                                 |
+| `initialTheme`              | `string`                                                               | -                   | Server-provided theme that overrides storage on mount. User can still call `setTheme` to change it                                                                               |
+| `enableSystem`              | `boolean`                                                              | `true`              | Detect system preference via `prefers-color-scheme`                                                                                                                              |
+| `enableColorScheme`         | `boolean`                                                              | `true`              | Set native `color-scheme` CSS property                                                                                                                                           |
+| `attribute`                 | `string \| string[]`                                                   | `"class"`           | HTML attribute(s) to set on target element (`"class"`, `"data-theme"`, etc.)                                                                                                     |
+| `value`                     | `Record<string, string>`                                               | -                   | Map theme names to attribute values                                                                                                                                              |
+| `target`                    | `string`                                                               | `"html"`            | Element to apply theme to (`"html"`, `"body"`, or a CSS selector)                                                                                                                |
+| `storageKey`                | `string`                                                               | `"theme"`           | Key used for storage                                                                                                                                                             |
+| `storage`                   | `"localStorage" \| "sessionStorage" \| "cookie" \| "hybrid" \| "none"` | `"localStorage"`    | Where to persist the theme. The bootstrap reads cookies before paint; `"hybrid"` prefers the cookie and mirrors writes to `localStorage` for cross-tab sync                      |
+| `disableTransitionOnChange` | `boolean \| string`                                                    | `false`             | Suppress CSS transitions when switching themes. `true` disables all. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties |
+| `followSystem`              | `boolean`                                                              | `false`             | Always follow system preference, ignores stored value on mount                                                                                                                   |
+| `themeColor`                | `string \| Record<string, string>`                                     | -                   | Update `<meta name="theme-color">` on theme change                                                                                                                               |
+| `nonce`                     | `string`                                                               | -                   | CSP nonce for the inline script                                                                                                                                                  |
+| `onThemeChange`             | `(theme: string) => void`                                              | -                   | Called when theme changes. Receives the selected value (may be `"system"`). When system preference changes while theme is `"system"`, fires with the resolved value              |
+| `onStorageError`            | `(error: unknown) => void`                                             | -                   | Reports storage failures without interrupting in-memory theme updates                                                                                                            |
+| `scriptProps`               | `ScriptHTMLAttributes<HTMLScriptElement>`                              | -                   | Extra bootstrap script attributes                                                                                                                                                |
 
 ### Opt-in extended provider
 
@@ -192,15 +197,16 @@ same-document synchronization, custom system mappings, or a client-owned `Elemen
 import { ThemeProvider } from "@wrksz/themes/next/extended";
 
 <ThemeProvider
-  themes={["paper", "midnight"]}
-  systemThemeMap={{ light: "paper", dark: "midnight" }}
-  enableSameDocumentSync
+	themes={["paper", "midnight"]}
+	systemThemeMap={{ light: "paper", dark: "midnight" }}
+	enableSameDocumentSync
 >
-  {children}
+	{children}
 </ThemeProvider>;
 ```
 
-The Next.js extended provider supports the serializable `systemThemeMap` and
+The Next.js extended provider is synchronous and does not read cookies on the
+server. It supports the serializable `systemThemeMap` and
 `enableSameDocumentSync` props. For a DOM object, use the client-only entry:
 
 ```tsx
@@ -209,7 +215,7 @@ The Next.js extended provider supports the serializable `systemThemeMap` and
 import { ClientThemeProvider } from "@wrksz/themes/client/extended-provider";
 
 <ClientThemeProvider themeRoot={shadowRoot} storage="none" defaultTheme="dark">
-  {children}
+	{children}
 </ClientThemeProvider>;
 ```
 
@@ -222,12 +228,12 @@ import { ClientThemeProvider } from "@wrksz/themes/client/extended-provider";
 
 ```tsx
 const {
-  theme,         // Current theme - may be "system"
-  resolvedTheme, // Actual theme - never "system"
-  systemTheme,   // System preference: "light" | "dark" | undefined
-  forcedTheme,   // Forced theme if set
-  themes,        // Available themes
-  setTheme,      // Set theme
+	theme, // Current theme - may be "system"
+	resolvedTheme, // Actual theme - never "system"
+	systemTheme, // System preference: "light" | "dark" | undefined
+	forcedTheme, // Forced theme if set
+	themes, // Available themes
+	setTheme, // Set theme
 } = useTheme();
 ```
 
@@ -262,16 +268,16 @@ Pass `themes` as a readonly tuple to infer the return type:
 
 ```ts
 const theme = getTheme(request, {
-  themes: ["light", "dark", "high-contrast"] as const,
-  defaultTheme: "light",
+	themes: ["light", "dark", "high-contrast"] as const,
+	defaultTheme: "light",
 });
 // theme: "light" | "dark" | "high-contrast"
 ```
 
-| Option         | Type       | Default    | Description                                                              |
-| -------------- | ---------- | ---------- | ------------------------------------------------------------------------ |
-| `storageKey`   | `string`   | `"theme"`  | Cookie name to read from                                                 |
-| `defaultTheme` | `string`   | `"system"` | Returned when no valid theme is found                                    |
+| Option         | Type                | Default    | Description                                                                                                        |
+| -------------- | ------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------ |
+| `storageKey`   | `string`            | `"theme"`  | Cookie name to read from                                                                                           |
+| `defaultTheme` | `string`            | `"system"` | Returned when no valid theme is found                                                                              |
 | `themes`       | `readonly string[]` | -          | When provided, stored values not in the list fall back to `defaultTheme`. Use `as const` for return type inference |
 
 ### `useThemeValue`
@@ -296,7 +302,7 @@ Runs an effect after mount whenever the theme changes:
 import { useThemeEffect } from "@wrksz/themes/client";
 
 useThemeEffect((theme, resolvedTheme) => {
-  trackThemeChange(theme, resolvedTheme);
+	trackThemeChange(theme, resolvedTheme);
 });
 ```
 
@@ -309,10 +315,10 @@ Create a typed theme module once and reuse it everywhere:
 import { createThemes } from "@wrksz/themes/client";
 
 export const { ThemeProvider, useTheme, useThemeValue, useThemeEffect } = createThemes({
-  themes: ["light", "dark", "high-contrast"] as const,
-  storage: "hybrid",
-  defaultTheme: "system",
-  attribute: "class",
+	themes: ["light", "dark", "high-contrast"] as const,
+	storage: "hybrid",
+	defaultTheme: "system",
+	attribute: "class",
 });
 ```
 
@@ -324,11 +330,11 @@ Shows different images per theme. Renders a transparent placeholder on the serve
 import { ThemedImage } from "@wrksz/themes/client";
 
 <ThemedImage
-  src={{ light: "/logo-light.png", dark: "/logo-dark.png" }}
-  alt="Logo"
-  width={200}
-  height={50}
-/>
+	src={{ light: "/logo-light.png", dark: "/logo-dark.png" }}
+	alt="Logo"
+	width={200}
+	height={50}
+/>;
 ```
 
 ## Examples
@@ -336,32 +342,32 @@ import { ThemedImage } from "@wrksz/themes/client";
 ### Custom themes
 
 ```tsx
-<ThemeProvider themes={["light", "dark", "high-contrast"]}>
-  {children}
-</ThemeProvider>
+<ThemeProvider themes={["light", "dark", "high-contrast"]}>{children}</ThemeProvider>
 ```
 
 ### Data attribute instead of class
 
 ```tsx
-<ThemeProvider attribute="data-theme">
-  {children}
-</ThemeProvider>
+<ThemeProvider attribute="data-theme">{children}</ThemeProvider>
 ```
 
 ```css
-[data-theme="dark"] { --bg: #000; }
-[data-theme="light"] { --bg: #fff; }
+[data-theme="dark"] {
+	--bg: #000;
+}
+[data-theme="light"] {
+	--bg: #fff;
+}
 ```
 
 ### Multiple classes per theme
 
 ```tsx
 <ThemeProvider
-  themes={["light", "dark", "dim"]}
-  value={{ light: "light", dark: "dark high-contrast", dim: "dark dim" }}
+	themes={["light", "dark", "dim"]}
+	value={{ light: "light", dark: "dark high-contrast", dim: "dark dim" }}
 >
-  {children}
+	{children}
 </ThemeProvider>
 ```
 
@@ -371,9 +377,7 @@ Switching away from `"dark"` correctly removes both `dark` and `high-contrast`.
 
 ```tsx
 // app/dashboard/layout.tsx
-<ThemeProvider forcedTheme="dark">
-  {children}
-</ThemeProvider>
+<ThemeProvider forcedTheme="dark">{children}</ThemeProvider>
 ```
 
 ### Scoped theming
@@ -382,12 +386,15 @@ Apply the theme to a specific element instead of `<html>`, so different sections
 
 ```tsx
 <ThemeProvider forcedTheme="dark" target="#landing-root" storage="none">
-  <div id="landing-root">{children}</div>
+	<div id="landing-root">{children}</div>
 </ThemeProvider>
 ```
 
 ```css
-#landing-root { --bg: #0a0a0a; --fg: #fafafa; }
+#landing-root {
+	--bg: #0a0a0a;
+	--fg: #fafafa;
+}
 ```
 
 ### Server-provided theme
@@ -396,17 +403,17 @@ Initialize from a server-side source (database, session) - overrides stored valu
 
 ```tsx
 export default async function RootLayout({ children }) {
-  const userTheme = await getUserTheme();
+	const userTheme = await getUserTheme();
 
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider initialTheme={userTheme ?? undefined} onThemeChange={saveUserTheme}>
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<body>
+				<ThemeProvider initialTheme={userTheme ?? undefined} onThemeChange={saveUserTheme}>
+					{children}
+				</ThemeProvider>
+			</body>
+		</html>
+	);
 }
 ```
 
@@ -417,11 +424,7 @@ export default async function RootLayout({ children }) {
 import { ClientThemeProvider } from "@wrksz/themes/client";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
-  return (
-    <ClientThemeProvider forcedTheme="dark">
-      {children}
-    </ClientThemeProvider>
-  );
+	return <ClientThemeProvider forcedTheme="dark">{children}</ClientThemeProvider>;
 }
 ```
 
@@ -460,21 +463,21 @@ import { ClientThemeProvider as ExtendedClientThemeProvider } from "@wrksz/theme
 import { createThemes } from "@wrksz/themes/client/create-themes";
 ```
 
-| Import                 | Use for                                                                                             |
-| ---------------------- | --------------------------------------------------------------------------------------------------- |
-| `@wrksz/themes/next`   | `ThemeProvider`, `getTheme` in Next.js (recommended)                                                |
-| `@wrksz/themes/client` | `useTheme`, `useThemeValue`, `useThemeEffect`, `createThemes`, `ThemedImage`, `ClientThemeProvider` |
-| `@wrksz/themes/client/use-theme` | Direct `useTheme` import |
-| `@wrksz/themes/client/use-theme-value` | Direct `useThemeValue` import |
-| `@wrksz/themes/client/use-theme-effect` | Direct `useThemeEffect` import |
-| `@wrksz/themes/client/use-hydrated` | Direct `useHydrated` import |
-| `@wrksz/themes/client/themed-image` | Direct `ThemedImage` import |
-| `@wrksz/themes/client/provider` | Direct `ClientThemeProvider` import |
-| `@wrksz/themes/client/extended-provider` | Opt-in `ClientThemeProvider` with synchronization, mapping, and ShadowRoot support |
-| `@wrksz/themes/client/create-themes` | Direct `createThemes` import |
-| `@wrksz/themes/next/extended` | Opt-in Next.js `ThemeProvider` with synchronization and system mapping |
-| `@wrksz/themes`        | Client-safe `ThemeProvider` alias and `createThemes` for framework-neutral React usage              |
-| `@wrksz/themes/script` | Server-safe `ThemeScript` for non-Next SSR frameworks |
+| Import                                   | Use for                                                                                             |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `@wrksz/themes/next`                     | `ThemeProvider`, `getTheme` in Next.js (recommended)                                                |
+| `@wrksz/themes/client`                   | `useTheme`, `useThemeValue`, `useThemeEffect`, `createThemes`, `ThemedImage`, `ClientThemeProvider` |
+| `@wrksz/themes/client/use-theme`         | Direct `useTheme` import                                                                            |
+| `@wrksz/themes/client/use-theme-value`   | Direct `useThemeValue` import                                                                       |
+| `@wrksz/themes/client/use-theme-effect`  | Direct `useThemeEffect` import                                                                      |
+| `@wrksz/themes/client/use-hydrated`      | Direct `useHydrated` import                                                                         |
+| `@wrksz/themes/client/themed-image`      | Direct `ThemedImage` import                                                                         |
+| `@wrksz/themes/client/provider`          | Direct `ClientThemeProvider` import                                                                 |
+| `@wrksz/themes/client/extended-provider` | Opt-in `ClientThemeProvider` with synchronization, mapping, and ShadowRoot support                  |
+| `@wrksz/themes/client/create-themes`     | Direct `createThemes` import                                                                        |
+| `@wrksz/themes/next/extended`            | Opt-in Next.js `ThemeProvider` with synchronization and system mapping                              |
+| `@wrksz/themes`                          | Client-safe `ThemeProvider` alias and `createThemes` for framework-neutral React usage              |
+| `@wrksz/themes/script`                   | Server-safe `ThemeScript` for non-Next SSR frameworks                                               |
 
 ## License
 

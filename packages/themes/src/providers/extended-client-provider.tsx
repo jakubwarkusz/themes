@@ -12,8 +12,9 @@ import {
 import type { ExtendedThemeProviderProps, SystemThemeMap } from "../core/extended-types.js";
 import { createThemeStore } from "../core/store.js";
 import { publishThemeChannel, subscribeThemeChannel } from "../core/sync.js";
-import { isThemeSelection } from "../core/theme-validation.js";
+import { isThemeSelection, resolveDefaultTheme } from "../core/theme-validation.js";
 import type { DefaultTheme, ThemeContextValue } from "../core/types.js";
+import { useEffectEvent } from "../core/use-effect-event.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
 
@@ -65,15 +66,12 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	systemThemeMap,
 	themeRoot,
 }: ExtendedThemeProviderProps<Themes>): ReactElement {
-	const requestedDefault = defaultTheme ?? (enableSystem ? "system" : themes[0]);
-	const resolvedDefault = (
-		themes.includes(requestedDefault as Themes) ||
-		(enableSystem && requestedDefault === "system")
-			? requestedDefault
-			: themes[0]
-	) as Themes | "system";
+	const resolvedDefault = resolveDefaultTheme(themes, enableSystem, defaultTheme);
 
-	const storeRef = useRef(createThemeStore());
+	const storeRef = useRef<ReturnType<typeof createThemeStore> | null>(null);
+	if (storeRef.current === null) {
+		storeRef.current = createThemeStore();
+	}
 	const store = storeRef.current;
 	const appliedThemeRef = useRef<AppliedThemeState | undefined>(undefined);
 	const {
@@ -100,76 +98,40 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		: undefined;
 	const channel = `${storage ?? "localStorage"}:${storageKey}:${target}`;
 
-	const isValidTheme = useCallback(
-		(candidate: string): candidate is Themes | "system" =>
-			isThemeSelection(candidate, themes, enableSystem),
-		[themes, enableSystem],
-	);
-
-	const onThemeChangeRef = useRef(onThemeChange);
-	useEffect(() => {
-		onThemeChangeRef.current = onThemeChange;
+	const onThemeChangeEvent = useEffectEvent((next: Themes) => {
+		onThemeChange?.(next);
 	});
 
-	const applyToDom = useCallback(
-		(resolved: string) => {
-			appliedThemeRef.current = applyExtendedThemeToDom({
-				resolved,
-				attribute,
-				themes,
-				valueMap,
-				target,
-				disableTransitionOnChange,
-				enableColorScheme,
-				themeColor,
-				previous: appliedThemeRef.current,
-				...(themeRoot !== undefined ? { themeRoot } : {}),
-			});
-		},
-		[
+	const applyToDomEvent = useEffectEvent((resolved: string) => {
+		appliedThemeRef.current = applyExtendedThemeToDom({
+			resolved,
 			attribute,
-			disableTransitionOnChange,
-			enableColorScheme,
-			target,
 			themes,
 			valueMap,
+			target,
+			disableTransitionOnChange,
+			enableColorScheme,
 			themeColor,
-			themeRoot,
-		],
-	);
+			previous: appliedThemeRef.current,
+			...(themeRoot !== undefined ? { themeRoot } : {}),
+		});
+	});
 
-	useEffect(() => {
+	const initializeEvent = useEffectEvent(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
-		const mediaQuery =
+		const mq =
 			enableSystem && typeof domWindow.matchMedia === "function"
 				? domWindow.matchMedia("(prefers-color-scheme: dark)")
 				: null;
-		const nextSystemTheme: "light" | "dark" | undefined = mediaQuery
-			? mediaQuery.matches
-				? "dark"
-				: "light"
-			: undefined;
-		if (nextSystemTheme) setStoreSystemTheme(nextSystemTheme);
+		const system = mq ? (mq.matches ? "dark" : "light") : undefined;
+		let initial: Themes | "system";
 
+		// Forced theme short-circuits init and must not persist to storage.
 		if (validForcedTheme) {
-			setStoreTheme(validForcedTheme);
-			applyToDom(
-				resolveSelection(
-					validForcedTheme,
-					nextSystemTheme,
-					systemThemeMap as SystemThemeMap<string> | undefined,
-				) ?? validForcedTheme,
-			);
-		} else if (initialTheme && isValidTheme(initialTheme)) {
-			setStoreTheme(initialTheme);
-			applyToDom(
-				resolveSelection(
-					initialTheme,
-					nextSystemTheme,
-					systemThemeMap as SystemThemeMap<string> | undefined,
-				) ?? "light",
-			);
+			initial = validForcedTheme;
+		} else if (initialTheme && isThemeSelection(initialTheme, themes, enableSystem)) {
+			initial = initialTheme;
 			writeStoredTheme(
 				storage,
 				storageKey,
@@ -179,142 +141,36 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			);
 		} else {
 			const stored = readStoredTheme(storage, storageKey, onStorageError);
-			const initial =
-				!followSystem && stored && isValidTheme(stored)
+			initial =
+				!followSystem && stored && isThemeSelection(stored, themes, enableSystem)
 					? (stored as Themes | "system")
 					: resolvedDefault;
-
-			setStoreState({ theme: initial, systemTheme: nextSystemTheme });
-			applyToDom(
-				resolveSelection(
-					initial,
-					nextSystemTheme,
-					systemThemeMap as SystemThemeMap<string> | undefined,
-				) ?? "light",
-			);
 		}
 
-		if (!mediaQuery) return;
-		const handleSystemChange = (event: MediaQueryListEvent) => {
-			const next = event.matches ? "dark" : "light";
-			setStoreSystemTheme(next);
-			const current = getSnapshot().theme;
-			if (current === "system" || current === undefined || followSystem) {
-				const followsVariant =
-					followSystem && Boolean(systemThemeMap) && !isDirectSystemMap(systemThemeMap);
-				if (followSystem && !followsVariant) setStoreTheme("system");
-				applyToDom(
-					resolveSelection(
-						followsVariant
-							? (current ?? resolvedDefault)
-							: followSystem
-								? "system"
-								: (current ?? "system"),
-						next,
-						systemThemeMap as SystemThemeMap<string> | undefined,
-					) ?? next,
-				);
-				onThemeChangeRef.current?.(next as Themes);
-			}
-		};
-		mediaQuery.addEventListener?.("change", handleSystemChange);
-		return () => mediaQuery.removeEventListener?.("change", handleSystemChange);
-	}, [
-		cookieOptions,
-		validForcedTheme,
-		initialTheme,
-		resolvedDefault,
-		storage,
-		storageKey,
-		enableSystem,
-		followSystem,
-		isValidTheme,
-		onStorageError,
-		systemThemeMap,
-		applyToDom,
-		getSnapshot,
-		setStoreState,
-		setStoreTheme,
-		setStoreSystemTheme,
-	]);
+		setStoreState({ theme: initial, systemTheme: system });
+	});
 
-	useEffect(() => {
-		const domWindow = getDomWindow();
-		if (!domWindow) return;
-		const handleNavigation = () => {
-			const { theme: currentTheme, systemTheme: currentSystemTheme } = getSnapshot();
-			const selection = validForcedTheme ?? currentTheme;
-			const resolved = selection
-				? resolveSelection(
-						selection,
-						currentSystemTheme,
-						systemThemeMap as SystemThemeMap<string> | undefined,
-					)
-				: undefined;
-			if (resolved) applyToDom(resolved);
-		};
-		domWindow.addEventListener("pageshow", handleNavigation);
-		domWindow.addEventListener("popstate", handleNavigation);
-		return () => {
-			domWindow.removeEventListener("pageshow", handleNavigation);
-			domWindow.removeEventListener("popstate", handleNavigation);
-		};
-	}, [applyToDom, validForcedTheme, getSnapshot, systemThemeMap]);
-
-	useEffect(() => {
-		const domWindow = getDomWindow();
-		if (!domWindow) return;
-		if (storage === "none" || storage === "sessionStorage" || storage === "cookie") return;
-
-		const handleStorage = (event: StorageEvent) => {
-			if (event.storageArea !== localStorage || event.key !== storageKey) return;
-			const newTheme = event.newValue ?? resolvedDefault;
-			if (!isValidTheme(newTheme)) return;
-			const resolved = resolveSelection(
-				newTheme,
-				getSnapshot().systemTheme,
-				systemThemeMap as SystemThemeMap<string> | undefined,
-			);
-			setStoreTheme(newTheme);
-			if (!validForcedTheme && resolved) applyToDom(resolved);
-		};
-		domWindow.addEventListener("storage", handleStorage);
-		return () => domWindow.removeEventListener("storage", handleStorage);
-	}, [
-		storage,
-		storageKey,
-		resolvedDefault,
-		isValidTheme,
-		systemThemeMap,
-		validForcedTheme,
-		applyToDom,
-		getSnapshot,
-		setStoreTheme,
-	]);
-
-	useEffect(() => {
-		if (!enableSameDocumentSync || storage === "none") return;
-		return subscribeThemeChannel(channel, (newTheme) => {
-			if (!isValidTheme(newTheme)) return;
-			setStoreTheme(newTheme);
-			const resolved = resolveSelection(
-				newTheme,
-				getSnapshot().systemTheme,
-				systemThemeMap as SystemThemeMap<string> | undefined,
-			);
-			if (!validForcedTheme && resolved) applyToDom(resolved);
-		});
-	}, [
-		enableSameDocumentSync,
-		storage,
-		channel,
-		isValidTheme,
-		systemThemeMap,
-		validForcedTheme,
-		applyToDom,
-		getSnapshot,
-		setStoreTheme,
-	]);
+	const handleSystemChangeEvent = useEffectEvent((next: "light" | "dark") => {
+		setStoreSystemTheme(next);
+		const current = getSnapshot().theme;
+		if (current === "system" || current === undefined || followSystem) {
+			const followsVariant =
+				followSystem && Boolean(systemThemeMap) && !isDirectSystemMap(systemThemeMap);
+			if (followSystem && !followsVariant) setStoreTheme("system");
+			const resolved =
+				resolveSelection(
+					followsVariant
+						? (current ?? resolvedDefault)
+						: followSystem
+							? "system"
+							: (current ?? "system"),
+					next,
+					systemThemeMap as SystemThemeMap<string> | undefined,
+				) ?? next;
+			applyToDomEvent(resolved);
+			onThemeChangeEvent(next as Themes);
+		}
+	});
 
 	const setTheme = useCallback(
 		(
@@ -327,7 +183,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 
 			const current = getSnapshot().theme as Themes | "system" | undefined;
 			const newTheme = typeof next === "function" ? next(current) : next;
-			if (!isValidTheme(newTheme)) return;
+			if (!isThemeSelection(newTheme, themes, enableSystem)) return;
 			const resolved = resolveSelection(
 				newTheme,
 				getSnapshot().systemTheme,
@@ -335,27 +191,162 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			);
 
 			setStoreTheme(newTheme);
-			if (resolved) applyToDom(resolved);
-			onThemeChangeRef.current?.(newTheme as Themes);
+			if (resolved) {
+				appliedThemeRef.current = applyExtendedThemeToDom({
+					resolved,
+					attribute,
+					themes,
+					valueMap,
+					target,
+					disableTransitionOnChange,
+					enableColorScheme,
+					themeColor,
+					previous: appliedThemeRef.current,
+					...(themeRoot !== undefined ? { themeRoot } : {}),
+				});
+			}
+			onThemeChange?.(newTheme as Themes);
 			writeStoredTheme(storage, storageKey, newTheme, cookieOptions, onStorageError);
 			if (enableSameDocumentSync && storage !== "none")
 				publishThemeChannel(channel, newTheme);
 		},
 		[
-			applyToDom,
-			cookieOptions,
 			validForcedTheme,
+			themes,
+			enableSystem,
+			systemThemeMap,
+			attribute,
+			valueMap,
+			target,
+			disableTransitionOnChange,
+			enableColorScheme,
+			themeColor,
+			themeRoot,
 			storage,
 			storageKey,
+			cookieOptions,
 			onStorageError,
 			channel,
 			enableSameDocumentSync,
-			isValidTheme,
-			systemThemeMap,
 			getSnapshot,
 			setStoreTheme,
+			onThemeChange,
 		],
 	);
+
+	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
+	useEffect(() => {
+		initializeEvent();
+	}, []);
+
+	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
+	useEffect(() => {
+		if (resolvedTheme) applyToDomEvent(resolvedTheme);
+	}, [
+		resolvedTheme,
+		attribute,
+		themes,
+		valueMap,
+		target,
+		disableTransitionOnChange,
+		enableColorScheme,
+		themeColor,
+		themeRoot,
+	]);
+
+	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
+	useEffect(() => {
+		const domWindow = getDomWindow();
+		if (!enableSystem || !domWindow || typeof domWindow.matchMedia !== "function") return;
+		const mq = domWindow.matchMedia("(prefers-color-scheme: dark)");
+		setStoreSystemTheme(mq.matches ? "dark" : "light");
+		const handler = (event: MediaQueryListEvent) => {
+			handleSystemChangeEvent(event.matches ? "dark" : "light");
+		};
+		mq.addEventListener?.("change", handler);
+		return () => mq.removeEventListener?.("change", handler);
+	}, [enableSystem, setStoreSystemTheme]);
+
+	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
+	useEffect(() => {
+		const domWindow = getDomWindow();
+		if (!domWindow) return;
+		const handler = () => {
+			const { theme: currentTheme, systemTheme: currentSystemTheme } = getSnapshot();
+			const selection = validForcedTheme ?? currentTheme;
+			const resolved = selection
+				? resolveSelection(
+						selection,
+						currentSystemTheme,
+						systemThemeMap as SystemThemeMap<string> | undefined,
+					)
+				: undefined;
+			if (resolved) applyToDomEvent(resolved);
+		};
+		domWindow.addEventListener("pageshow", handler);
+		domWindow.addEventListener("popstate", handler);
+		return () => {
+			domWindow.removeEventListener("pageshow", handler);
+			domWindow.removeEventListener("popstate", handler);
+		};
+	}, [validForcedTheme, getSnapshot, systemThemeMap]);
+
+	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
+	useEffect(() => {
+		const domWindow = getDomWindow();
+		if (!domWindow) return;
+		if (storage === "none" || storage === "sessionStorage" || storage === "cookie") return;
+
+		const handler = (event: StorageEvent) => {
+			if (event.storageArea !== localStorage || event.key !== storageKey) return;
+			const newTheme = event.newValue ?? resolvedDefault;
+			if (!isThemeSelection(newTheme, themes, enableSystem)) return;
+			const resolved = resolveSelection(
+				newTheme,
+				getSnapshot().systemTheme,
+				systemThemeMap as SystemThemeMap<string> | undefined,
+			);
+			setStoreTheme(newTheme);
+			if (!validForcedTheme && resolved) applyToDomEvent(resolved);
+		};
+		domWindow.addEventListener("storage", handler);
+		return () => domWindow.removeEventListener("storage", handler);
+	}, [
+		storage,
+		storageKey,
+		resolvedDefault,
+		themes,
+		enableSystem,
+		systemThemeMap,
+		validForcedTheme,
+		getSnapshot,
+		setStoreTheme,
+	]);
+
+	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
+	useEffect(() => {
+		if (!enableSameDocumentSync || storage === "none") return;
+		return subscribeThemeChannel(channel, (newTheme) => {
+			if (!isThemeSelection(newTheme, themes, enableSystem)) return;
+			setStoreTheme(newTheme);
+			const resolved = resolveSelection(
+				newTheme,
+				getSnapshot().systemTheme,
+				systemThemeMap as SystemThemeMap<string> | undefined,
+			);
+			if (!validForcedTheme && resolved) applyToDomEvent(resolved);
+		});
+	}, [
+		enableSameDocumentSync,
+		storage,
+		channel,
+		themes,
+		enableSystem,
+		systemThemeMap,
+		validForcedTheme,
+		getSnapshot,
+		setStoreTheme,
+	]);
 
 	const contextValue: ThemeContextValue<string> = {
 		theme: validForcedTheme ?? theme,
