@@ -2,30 +2,16 @@ import type { CookieOptions } from "./types.js";
 
 const COOKIE_NAME_RE = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/;
 
-function assertCookieName(key: string): void {
-	if (!COOKIE_NAME_RE.test(key)) {
-		throw new TypeError("Invalid cookie name");
-	}
+function invalidCookie(label: string): never {
+	throw new TypeError(`Invalid cookie ${label}`);
 }
 
 function assertCookieAttributeValue(value: string, label: string): void {
 	for (let index = 0; index < value.length; index += 1) {
 		const charCode = value.charCodeAt(index);
 		if (value[index] === ";" || charCode <= 0x1f || charCode === 0x7f) {
-			throw new TypeError(`Invalid cookie ${label}`);
+			invalidCookie(label);
 		}
-	}
-}
-
-function assertCookieMaxAge(value: number): void {
-	if (!Number.isFinite(value) || !Number.isInteger(value)) {
-		throw new TypeError("Invalid cookie maxAge");
-	}
-}
-
-function assertCookieSameSite(value: string): void {
-	if (value !== "Strict" && value !== "Lax" && value !== "None") {
-		throw new TypeError("Invalid cookie sameSite");
 	}
 }
 
@@ -38,10 +24,12 @@ export function serializeCookie(key: string, value: string, options: CookieOptio
 		path = "/",
 	} = options;
 
-	assertCookieName(key);
+	if (!COOKIE_NAME_RE.test(key)) invalidCookie("name");
 	assertCookieAttributeValue(path, "path");
-	assertCookieMaxAge(maxAge);
-	assertCookieSameSite(sameSite);
+	if (!Number.isFinite(maxAge) || !Number.isInteger(maxAge)) invalidCookie("maxAge");
+	if (sameSite !== "Strict" && sameSite !== "Lax" && sameSite !== "None") {
+		invalidCookie("sameSite");
+	}
 	if (domain) assertCookieAttributeValue(domain, "domain");
 
 	let cookie = `${key}=${encodeURIComponent(value)}; path=${path}; max-age=${maxAge}; SameSite=${sameSite}`;
