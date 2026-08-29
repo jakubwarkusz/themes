@@ -1,19 +1,19 @@
 pre-commit:
   jobs:
     - name: format
-      run: bunx oxfmt --config ./oxfmt.config.ts --no-error-on-unmatched-pattern {staged_files}
+      run: pnpm exec oxfmt --config ./oxfmt.config.ts --no-error-on-unmatched-pattern {staged_files}
       glob: "*.{ts,tsx,json,md,css}"
       stage_fixed: true
 
     - name: lint
-      run: bunx oxlint --config ./oxlint.config.ts --deny-warnings --fix --no-error-on-unmatched-pattern {staged_files}
+      run: pnpm exec oxlint --config ./oxlint.config.ts --deny-warnings --fix --no-error-on-unmatched-pattern {staged_files}
       glob: "*.{ts,tsx}"
       exclude:
         - ".agents/**"
       stage_fixed: true
 
     - name: type-check-themes
-      run: bun run --cwd packages/themes type-check
+      run: pnpm --filter @wrksz/themes type-check
 
     - name: type-check-docs
-      run: bun run --cwd apps/docs types:check
+      run: pnpm --filter theme-docs types:check

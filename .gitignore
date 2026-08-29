@@ -20,3 +20,5 @@ yarn-error.log*
 .turbo
 .next
 packages/themes/benchmarks/.bundle-size/
+
+.pnpm-store/
