@@ -18,7 +18,7 @@
 		"@takumi-rs/image-response": "^0.73.1",
 		"@vercel/analytics": "^2.0.1",
 		"@wrksz/themes": "workspace:*",
-		"fumadocs-core": "16.11.5",
+		"fumadocs-core": "16.15.1",
 		"fumadocs-mdx": "15.2.0",
 		"fumadocs-ui": "16.11.5",
 		"motion": "^13.0.0",
