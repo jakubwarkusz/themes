@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import { applyExtendedThemeToDom } from "../core/extended-client-dom.js";
 import { getExtendedScript } from "../core/extended-script.js";
+import { EXTENDED_THEME_SCRIPT_SOURCE } from "../core/extended-script-source.js";
 
 const base = {
 	storageKey: "theme",
@@ -26,11 +28,24 @@ function runScript(config: Parameters<typeof getExtendedScript>[0]): void {
 
 beforeEach(() => {
 	document.documentElement.className = "";
+	document.documentElement.removeAttribute("data-theme");
+	document.documentElement.style.colorScheme = "";
+	document.querySelector('meta[name="theme-color"]')?.remove();
 	localStorage.clear();
 	window.matchMedia = () => ({ matches: false }) as MediaQueryList;
 });
 
 describe("extended theme script", () => {
+	test("uses deterministic generated source instead of runtime function serialization", () => {
+		const script = getExtendedScript(base);
+
+		expect(EXTENDED_THEME_SCRIPT_SOURCE.startsWith("function(")).toBe(true);
+		expect(script).toMatch(/^\(function\(/);
+		expect(script).not.toContain("extendedThemeScript");
+		expect(script).not.toContain("__name");
+		expect(script).toBe(getExtendedScript(base));
+	});
+
 	test("maps a system preference before hydration", () => {
 		window.matchMedia = () => ({ matches: true }) as MediaQueryList;
 		runScript(base);
@@ -81,6 +96,46 @@ describe("extended theme script", () => {
 		runScript({ ...base, enableSystem: false, defaultTheme: "paper" });
 
 		expect(document.documentElement.classList.contains("paper")).toBe(true);
+	});
+
+	test("matches direct DOM application for a mapped system theme", () => {
+		window.matchMedia = () => ({ matches: true }) as MediaQueryList;
+		const config = {
+			...base,
+			attribute: ["class", "data-theme"] as const,
+			value: { paper: "paper surface", midnight: "midnight surface" },
+			themeColors: { midnight: "#001" },
+		};
+		const snapshot = () => ({
+			classes: Array.from(document.documentElement.classList).toSorted(),
+			dataTheme: document.documentElement.getAttribute("data-theme"),
+			colorScheme: document.documentElement.style.colorScheme,
+			themeColor:
+				document
+					.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+					?.getAttribute("content") ?? null,
+		});
+
+		runScript(config);
+		const bootstrapSnapshot = snapshot();
+
+		document.documentElement.className = "";
+		document.documentElement.removeAttribute("data-theme");
+		document.documentElement.style.colorScheme = "";
+		document.querySelector('meta[name="theme-color"]')?.remove();
+		applyExtendedThemeToDom({
+			resolved: "midnight",
+			attribute: config.attribute,
+			themes: config.themes,
+			valueMap: config.value,
+			target: config.target,
+			disableTransitionOnChange: config.disableTransitionOnChange,
+			enableColorScheme: config.enableColorScheme,
+			themeColor: config.themeColors,
+			previous: undefined,
+		});
+
+		expect(snapshot()).toEqual(bootstrapSnapshot);
 	});
 
 	test("snapshot of extended bootstrap output stays reviewable", () => {

@@ -34,7 +34,7 @@ describe("script-source generation", () => {
 		expect(getScript(base)).toMatchSnapshot();
 	});
 
-	test("generated script-source stays in sync with script-bootstrap", async () => {
+	test("generated script sources stay in sync with readable bootstraps", async () => {
 		const result = Bun.spawnSync({
 			cmd: ["bun", "scripts/generate-script-source.ts", "--check"],
 			cwd: rootDir,
