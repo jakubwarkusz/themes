@@ -1,4 +1,4 @@
 {
-	"buildCommand": "bunx bun@1.3.9 run build",
-	"installCommand": "bunx bun@1.3.9 install --frozen-lockfile"
+	"installCommand": "pnpm install --frozen-lockfile",
+	"buildCommand": "bunx bun@1.3.9 run build"
 }

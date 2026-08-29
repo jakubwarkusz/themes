@@ -8,7 +8,8 @@
 
 ## Working rules
 
-- Use Bun 1.3.x and run `CI=true bun install --frozen-lockfile`.
+- Use pnpm 11.x for dependency management: `CI=true pnpm install --frozen-lockfile`.
+- Use Bun 1.3.x as the runtime for tests (`bun test`) and builds (Bunup).
 - Keep runtime dependencies at zero and imports at module scope.
 - Preserve bootstrap/runtime parity: changes to the inline script, DOM applier, or providers need equivalent tests.
 - Keep package exports, Bunup runtime/declaration entries, and smoke imports in lockstep.
@@ -18,8 +19,8 @@
 
 ## Verification
 
-- Fast: `bun run verify`
-- Full release/CI parity: `bun run verify:full`
-- Library only: `bun run --cwd packages/themes test`
+- Fast: `pnpm verify`
+- Full release/CI parity: `pnpm verify:full`
+- Library only: `pnpm --filter @wrksz/themes test`
 
 The docs site is the canonical API reference. Link to it instead of duplicating prop tables.
