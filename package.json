@@ -30,7 +30,7 @@
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
 		"bunup": "^0.16.31",
-		"happy-dom": "^20.11.1",
+		"happy-dom": "^20.11.6",
 		"lefthook": "^2.1.4",
 		"next": ">=16.2.11",
 		"oxfmt": "^0.62.0",
