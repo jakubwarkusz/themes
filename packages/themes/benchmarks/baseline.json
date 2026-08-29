@@ -48,5 +48,10 @@
 		"name": "generated-script",
 		"bytes": 1772,
 		"gzipBytes": 927
+	},
+	{
+		"name": "extended-next-provider",
+		"bytes": 12253,
+		"gzipBytes": 4506
 	}
 ]

@@ -142,3 +142,33 @@ describe("Next ThemeProvider App Shell behavior", () => {
 		expect((element.props as { initialTheme?: string }).initialTheme).toBe("dark");
 	});
 });
+
+describe("Extended Next ThemeProvider App Shell behavior", () => {
+	test("leaves cookie reads to the pre-hydration script", async () => {
+		nextCookieValue = "midnight";
+		const { ExtendedThemeProvider } = await import("../providers/extended-next-provider.js");
+		const element = ExtendedThemeProvider({
+			children: null,
+			storage: "cookie",
+			themes: ["paper", "midnight"],
+			systemThemeMap: { light: "paper", dark: "midnight" },
+		});
+
+		expect(nextCookieReads).toBe(0);
+		expect((element.props as { initialTheme?: string }).initialTheme).toBeUndefined();
+	});
+
+	test("preserves an explicit initialTheme without reading request data", async () => {
+		const { ExtendedThemeProvider } = await import("../providers/extended-next-provider.js");
+		const element = ExtendedThemeProvider({
+			children: null,
+			storage: "cookie",
+			themes: ["paper", "midnight"],
+			initialTheme: "midnight",
+			systemThemeMap: { light: "paper", dark: "midnight" },
+		});
+
+		expect(nextCookieReads).toBe(0);
+		expect((element.props as { initialTheme?: string }).initialTheme).toBe("midnight");
+	});
+});

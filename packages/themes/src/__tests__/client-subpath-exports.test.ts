@@ -17,6 +17,7 @@ const clientSubpaths = [
 	"use-hydrated",
 	"themed-image",
 	"provider",
+	"extended-provider",
 	"create-themes",
 ] as const;
 
@@ -34,6 +35,29 @@ describe("client subpath exports", () => {
 				},
 			});
 		}
+	});
+
+	test("build entries include every client subpath entrypoint", () => {
+		const buildEntries = readFileSync(resolve(rootDir, "build-entries.ts"), "utf-8");
+
+		for (const subpath of clientSubpaths) {
+			expect(buildEntries).toContain(`"src/client/${subpath}.ts"`);
+		}
+		expect(buildEntries).toContain('"src/next/extended.ts"');
+		expect(buildEntries).toContain('"src/providers/extended-client-next-provider.tsx"');
+	});
+
+	test("package.json exposes the extended Next provider", () => {
+		const packageJson = JSON.parse(readFileSync(resolve(rootDir, "package.json"), "utf-8")) as {
+			exports: Record<string, { import?: { types?: string; default?: string } }>;
+		};
+
+		expect(packageJson.exports["./next/extended"]).toEqual({
+			import: {
+				types: "./dist/next/extended.d.ts",
+				default: "./dist/next/extended.js",
+			},
+		});
 	});
 
 	test("exposes the framework-neutral script entrypoint", () => {
@@ -76,6 +100,7 @@ describe("client subpath exports", () => {
 		expect(declarationEntries.toSorted()).toEqual(publicSourceEntries.toSorted());
 		expect([...INTERNAL_RUNTIME_BUILD_ENTRIES]).toEqual([
 			"src/providers/client-next-provider.tsx",
+			"src/providers/extended-client-next-provider.tsx",
 		]);
 		expect(runtimeEntries.toSorted()).toEqual(
 			[...publicSourceEntries, ...INTERNAL_RUNTIME_BUILD_ENTRIES].toSorted(),

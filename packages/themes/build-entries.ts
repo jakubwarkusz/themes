@@ -7,13 +7,16 @@ export const PUBLIC_BUILD_ENTRIES: readonly string[] = [
 	"src/client/use-hydrated.ts",
 	"src/client/themed-image.ts",
 	"src/client/provider.ts",
+	"src/client/extended-provider.ts",
 	"src/client/create-themes.ts",
 	"src/next.ts",
+	"src/next/extended.ts",
 	"src/script.ts",
 ];
 
 export const INTERNAL_RUNTIME_BUILD_ENTRIES: readonly string[] = [
 	"src/providers/client-next-provider.tsx",
+	"src/providers/extended-client-next-provider.tsx",
 ];
 
 export const RUNTIME_BUILD_ENTRIES: readonly string[] = [

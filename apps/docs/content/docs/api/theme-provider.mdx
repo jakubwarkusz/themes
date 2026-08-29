@@ -14,7 +14,9 @@ Two variants are available depending on your framework:
 | Import | Mechanism | Use when |
 |--------|-----------|----------|
 | `@wrksz/themes/next` | `useServerInsertedHTML` for `<html>`; synchronous adjacent script for later targets | Next.js 16+ (no React 19 warning) |
+| `@wrksz/themes/next/extended` | Same Next bootstrap path, plus opt-in sync and system mapping | Same-document sync or custom system theme names |
 | `@wrksz/themes` | Client-only provider | Nested scopes and client-rendered React |
+| `@wrksz/themes/client/extended-provider` | Client-only extended provider | ShadowRoot / client-owned `themeRoot` |
 | `@wrksz/themes/script` | Server-rendered bootstrap script | Other SSR frameworks |
 
 ```tsx title="app/layout.tsx (Next.js)"
@@ -80,9 +82,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `nonce` | `string` | - | CSP nonce for the inline script |
 | `scriptProps` | `ScriptHTMLAttributes<HTMLScriptElement>` | - | Extra attributes for the bootstrap script, such as `data-cfasync="false"` |
 | `onStorageError` | `(error: unknown) => void` | - | Reports unavailable, blocked, or quota-limited storage without interrupting theme updates |
-| `systemThemeMap` | `{ light: string; dark: string } \| Record<string, { light: string; dark: string }>` | - | Serializable custom resolution for system-aware variants |
-| `themeRoot` | `Element \| ShadowRoot` | - | Client-only Shadow DOM/custom root. Use `target` when the root must be themed before hydration |
 | `onThemeChange` | `(theme: string) => void` | - | Called whenever the theme changes. Receives the selected value (may be `"system"`). When system preference changes while theme is `"system"`, fires with the resolved value (`"light"` or `"dark"`). |
+
+## Extended provider
+
+Heavier capabilities stay behind opt-in imports so the default provider bundle does not grow. `@wrksz/themes/next/extended` is synchronous and does not call `cookies()`, matching the default Next provider.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `enableSameDocumentSync` | `boolean` | `false` | Synchronize providers that share a storage key in the same document |
+| `systemThemeMap` | `{ light: string; dark: string } \| Record<string, { light: string; dark: string }>` | - | Serializable custom resolution for system-aware variants |
+| `themeRoot` | `Element \| ShadowRoot` | - | Client-only Shadow DOM/custom root. Use `@wrksz/themes/client/extended-provider`. Use `target` when the root must be themed before hydration |
 
 ## Security notes
 

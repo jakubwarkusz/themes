@@ -1,0 +1,78 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`extended theme script snapshot of extended bootstrap output stays reviewable 1`] = `
+"(function extendedThemeScript(storageKey, attribute, defaultTheme, enableSystem, enableColorScheme, forcedTheme, themes, value, target, storage, themeColors, initialTheme, disableTransitionOnChange, followSystem, systemThemeMap) {
+  let selection;
+  if (forcedTheme)
+    selection = forcedTheme;
+  else if (initialTheme && (themes.includes(initialTheme) || enableSystem && initialTheme === "system"))
+    selection = initialTheme;
+  else {
+    let stored = null;
+    if (!followSystem)
+      try {
+        if (storage === "cookie" || storage === "hybrid") {
+          const parts = \`; \${document.cookie}\`.split(\`; \${storageKey}=\`), encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null, fromCookie = encoded ? decodeURIComponent(encoded) : null;
+          stored = storage === "hybrid" ? fromCookie ?? localStorage.getItem(storageKey) : fromCookie;
+        } else if (storage !== "none")
+          stored = (storage === "localStorage" ? localStorage : sessionStorage).getItem(storageKey);
+      } catch {}
+    selection = stored && (themes.includes(stored) || enableSystem && stored === "system") ? stored : defaultTheme;
+  }
+  const systemTheme = enableSystem ? matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light" : null;
+  let theme = selection;
+  if (systemTheme) {
+    const directMap = systemThemeMap;
+    if (directMap && typeof directMap.light === "string" && typeof directMap.dark === "string") {
+      if (selection === "system")
+        theme = directMap[systemTheme];
+    } else if (systemThemeMap && selection !== "system")
+      theme = systemThemeMap[selection]?.[systemTheme] ?? selection;
+    else if (selection === "system")
+      theme = systemTheme;
+  } else if (selection === "system")
+    theme = defaultTheme;
+  const attributeValue = value?.[theme] || theme, element = target === "html" ? document.documentElement : target === "body" ? document.body : document.querySelector(target);
+  if (!element)
+    return;
+  const attributes = Array.isArray(attribute) ? attribute : [attribute], toRemove = themes.flatMap((current) => (value?.[current] || current).split(" ")), toAdd = attributeValue.split(" ");
+  let changed = !1, classChanged = !1;
+  for (const current of attributes)
+    if (current === "class") {
+      classChanged = toRemove.some((token) => !toAdd.includes(token) && element.classList.contains(token)) || toAdd.some((token) => !element.classList.contains(token));
+      changed = changed || classChanged;
+    } else
+      changed = changed || element.getAttribute(current) !== attributeValue;
+  if (changed && disableTransitionOnChange) {
+    const css = typeof disableTransitionOnChange === "string" ? disableTransitionOnChange : "none", style = document.createElement("style");
+    style.textContent = \`*,*::before,*::after{transition:\${css}!important}\`;
+    document.head.appendChild(style);
+    requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
+  }
+  for (const current of attributes)
+    if (current === "class") {
+      if (classChanged) {
+        element.classList.remove(...toRemove);
+        element.classList.add(...toAdd);
+      }
+    } else if (attributeValue) {
+      if (element.getAttribute(current) !== attributeValue)
+        element.setAttribute(current, attributeValue);
+    } else
+      element.removeAttribute(current);
+  if (enableColorScheme && (theme === "light" || theme === "dark"))
+    element.style.colorScheme = theme;
+  if (themeColors) {
+    const color = typeof themeColors === "string" ? themeColors : themeColors[theme];
+    if (color) {
+      let meta = document.querySelector('meta[name="theme-color"]');
+      if (!meta) {
+        meta = document.createElement("meta");
+        meta.setAttribute("name", "theme-color");
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute("content", color);
+    }
+  }
+})("theme","class","system",true,true,null,["paper","midnight"],null,"html","localStorage",null,null,false,false,{"light":"paper","dark":"midnight"})"
+`;

@@ -12,6 +12,8 @@ mock.module("next/navigation", () => ({
 }));
 
 const { ClientNextThemeProvider } = await import("../providers/client-next-provider.js");
+const { ExtendedClientNextThemeProvider } =
+	await import("../providers/extended-client-next-provider.js");
 
 type ScriptElement = ReactElement<{
 	dangerouslySetInnerHTML?: { __html?: string };
@@ -106,5 +108,50 @@ describe("ClientNextThemeProvider", () => {
 		expect(script).not.toBeNull();
 		expect(script?.getAttribute("nonce")).toBe("body-nonce");
 		expect(content.compareDocumentPosition(script as Node) & 4).toBe(4);
+	});
+});
+
+describe("ExtendedClientNextThemeProvider", () => {
+	test("injects mapped system themes before hydration", () => {
+		render(
+			<ExtendedClientNextThemeProvider
+				themes={["paper", "midnight"]}
+				systemThemeMap={{ light: "paper", dark: "midnight" }}
+			>
+				<span>content</span>
+			</ExtendedClientNextThemeProvider>,
+		);
+
+		const script = insertedHtmlCallbacks[0]?.() as ScriptElement;
+		expect(isValidElement(script)).toBe(true);
+		expect(script.props.suppressHydrationWarning).toBe(true);
+		expect(script.props.dangerouslySetInnerHTML?.__html).toContain('"midnight"');
+	});
+
+	test("preserves scriptProps.nonce when nonce prop is omitted", () => {
+		render(
+			<ExtendedClientNextThemeProvider scriptProps={{ nonce: "from-script-props" }}>
+				<span>content</span>
+			</ExtendedClientNextThemeProvider>,
+		);
+
+		const script = insertedHtmlCallbacks[0]?.() as ScriptElement;
+		expect(isValidElement(script)).toBe(true);
+		expect(script.props.nonce).toBe("from-script-props");
+	});
+
+	test("normalizes defaults against custom themes", () => {
+		render(
+			<ExtendedClientNextThemeProvider
+				themes={["paper", "midnight"]}
+				enableSystem={false}
+				defaultTheme={"invalid" as "paper"}
+			>
+				<span>content</span>
+			</ExtendedClientNextThemeProvider>,
+		);
+
+		const script = insertedHtmlCallbacks[0]?.() as ScriptElement;
+		expect(script.props.dangerouslySetInnerHTML?.__html).toContain('"paper",false');
 	});
 });

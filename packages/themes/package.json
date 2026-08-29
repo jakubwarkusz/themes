@@ -64,6 +64,12 @@
 				"default": "./dist/client/provider.js"
 			}
 		},
+		"./client/extended-provider": {
+			"import": {
+				"types": "./dist/client/extended-provider.d.ts",
+				"default": "./dist/client/extended-provider.js"
+			}
+		},
 		"./client/create-themes": {
 			"import": {
 				"types": "./dist/client/create-themes.d.ts",
@@ -74,6 +80,12 @@
 			"import": {
 				"types": "./dist/next.d.ts",
 				"default": "./dist/next.js"
+			}
+		},
+		"./next/extended": {
+			"import": {
+				"types": "./dist/next/extended.d.ts",
+				"default": "./dist/next/extended.js"
 			}
 		},
 		"./script": {
