@@ -19,7 +19,7 @@
 		"@vercel/analytics": "^2.0.1",
 		"@wrksz/themes": "workspace:*",
 		"fumadocs-core": "16.11.5",
-		"fumadocs-mdx": "15.2.0",
+		"fumadocs-mdx": "15.3.1",
 		"fumadocs-ui": "16.11.5",
 		"motion": "^13.0.0",
 		"next": "16.2.11",
