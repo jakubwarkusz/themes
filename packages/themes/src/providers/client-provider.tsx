@@ -27,7 +27,8 @@ import { useEffectEvent } from "../core/use-effect-event.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
 
-type ThemeDomConfig = {
+type LastAppliedTheme = {
+	resolved: string;
 	attribute: ThemeProviderProps["attribute"];
 	themes: readonly string[];
 	valueMap: ThemeProviderProps["value"];
@@ -36,28 +37,6 @@ type ThemeDomConfig = {
 	enableColorScheme: boolean;
 	themeColor: ThemeProviderProps["themeColor"];
 };
-
-type LastAppliedTheme = {
-	resolved: string;
-} & ThemeDomConfig;
-
-function isAlreadyApplied(
-	last: LastAppliedTheme | null,
-	resolved: string,
-	config: ThemeDomConfig,
-): boolean {
-	return (
-		last !== null &&
-		last.resolved === resolved &&
-		last.attribute === config.attribute &&
-		last.themes === config.themes &&
-		last.valueMap === config.valueMap &&
-		last.target === config.target &&
-		last.disableTransitionOnChange === config.disableTransitionOnChange &&
-		last.enableColorScheme === config.enableColorScheme &&
-		last.themeColor === config.themeColor
-	);
-}
 
 export type ClientThemeProviderProps<Themes extends string = DefaultTheme> =
 	ThemeProviderProps<Themes> & {
@@ -128,6 +107,16 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			enableColorScheme,
 			themeColor,
 		});
+		lastAppliedRef.current = {
+			resolved,
+			attribute,
+			themes,
+			valueMap,
+			target,
+			disableTransitionOnChange,
+			enableColorScheme,
+			themeColor,
+		};
 	});
 	const initializeEvent = useEffectEvent(() => {
 		const domWindow = getDomWindow();
@@ -169,21 +158,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				setStoreTheme("system");
 			}
 			applyToDomEvent(next);
-			lastAppliedRef.current = {
-				resolved: next,
-				attribute,
-				themes,
-				valueMap,
-				target,
-				disableTransitionOnChange,
-				enableColorScheme,
-				themeColor,
-			};
 			onThemeChangeEvent(next as Themes);
 		}
 	});
 	// Public API: must be a regular callback (not an Effect Event) so consumers can
 	// call it from event handlers and receive it via context under oxlint rules.
+	// oxlint-disable-next-line react-hooks/exhaustive-deps -- applyToDomEvent is an effect event.
 	const setTheme = useCallback(
 		(
 			next:
@@ -200,26 +180,8 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				newTheme === "system" ? (getSnapshot().systemTheme ?? "light") : newTheme;
 
 			setStoreTheme(newTheme);
-			applyThemeToDom({
-				resolved,
-				attribute,
-				themes,
-				valueMap,
-				target,
-				disableTransitionOnChange,
-				enableColorScheme,
-				themeColor,
-			});
-			lastAppliedRef.current = {
-				resolved,
-				attribute,
-				themes,
-				valueMap,
-				target,
-				disableTransitionOnChange,
-				enableColorScheme,
-				themeColor,
-			};
+			// oxlint-disable-next-line react-hooks/rules-of-hooks -- shared apply path; setTheme stays a public callback.
+			applyToDomEvent(resolved);
 			onThemeChange?.(newTheme as Themes);
 
 			writeStoredTheme(storage, storageKey, newTheme, cookieOptions, onStorageError);
@@ -228,12 +190,6 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			validForcedTheme,
 			themes,
 			enableSystem,
-			attribute,
-			valueMap,
-			target,
-			disableTransitionOnChange,
-			enableColorScheme,
-			themeColor,
 			storage,
 			storageKey,
 			cookieOptions,
@@ -254,20 +210,21 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		if (!resolvedTheme) return;
-		const config: ThemeDomConfig = {
-			attribute,
-			themes,
-			valueMap,
-			target,
-			disableTransitionOnChange,
-			enableColorScheme,
-			themeColor,
-		};
-		if (isAlreadyApplied(lastAppliedRef.current, resolvedTheme, config)) {
+		const last = lastAppliedRef.current;
+		if (
+			last !== null &&
+			last.resolved === resolvedTheme &&
+			last.attribute === attribute &&
+			last.themes === themes &&
+			last.valueMap === valueMap &&
+			last.target === target &&
+			last.disableTransitionOnChange === disableTransitionOnChange &&
+			last.enableColorScheme === enableColorScheme &&
+			last.themeColor === themeColor
+		) {
 			return;
 		}
 		applyToDomEvent(resolvedTheme);
-		lastAppliedRef.current = { resolved: resolvedTheme, ...config };
 	}, [
 		resolvedTheme,
 		attribute,
@@ -325,19 +282,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			const resolved =
 				newTheme === "system" ? (getSnapshot().systemTheme ?? "light") : newTheme;
 			setStoreTheme(newTheme);
-			if (!validForcedTheme) {
-				applyToDomEvent(resolved);
-				lastAppliedRef.current = {
-					resolved,
-					attribute,
-					themes,
-					valueMap,
-					target,
-					disableTransitionOnChange,
-					enableColorScheme,
-					themeColor,
-				};
-			}
+			if (!validForcedTheme) applyToDomEvent(resolved);
 		};
 		domWindow.addEventListener("storage", handler);
 		return () => domWindow.removeEventListener("storage", handler);

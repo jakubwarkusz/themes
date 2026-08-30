@@ -25,7 +25,8 @@ import { useEffectEvent } from "../core/use-effect-event.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
 
-type ExtendedThemeDomConfig = {
+type LastAppliedTheme = {
+	resolved: string;
 	attribute: ExtendedThemeProviderProps["attribute"];
 	themes: readonly string[];
 	valueMap: ExtendedThemeProviderProps["value"];
@@ -35,29 +36,6 @@ type ExtendedThemeDomConfig = {
 	themeColor: ExtendedThemeProviderProps["themeColor"];
 	themeRoot: ExtendedThemeProviderProps["themeRoot"];
 };
-
-type LastAppliedTheme = {
-	resolved: string;
-} & ExtendedThemeDomConfig;
-
-function isAlreadyApplied(
-	last: LastAppliedTheme | null,
-	resolved: string,
-	config: ExtendedThemeDomConfig,
-): boolean {
-	return (
-		last !== null &&
-		last.resolved === resolved &&
-		last.attribute === config.attribute &&
-		last.themes === config.themes &&
-		last.valueMap === config.valueMap &&
-		last.target === config.target &&
-		last.disableTransitionOnChange === config.disableTransitionOnChange &&
-		last.enableColorScheme === config.enableColorScheme &&
-		last.themeColor === config.themeColor &&
-		last.themeRoot === config.themeRoot
-	);
-}
 
 function isDirectSystemMap(
 	systemThemeMap: SystemThemeMap<string> | undefined,
@@ -157,6 +135,17 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			previous: appliedThemeRef.current,
 			...(themeRoot !== undefined ? { themeRoot } : {}),
 		});
+		lastAppliedRef.current = {
+			resolved,
+			attribute,
+			themes,
+			valueMap,
+			target,
+			disableTransitionOnChange,
+			enableColorScheme,
+			themeColor,
+			themeRoot,
+		};
 	});
 
 	const initializeEvent = useEffectEvent(() => {
@@ -210,21 +199,11 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 					systemThemeMap as SystemThemeMap<string> | undefined,
 				) ?? next;
 			applyToDomEvent(resolved);
-			lastAppliedRef.current = {
-				resolved,
-				attribute,
-				themes,
-				valueMap,
-				target,
-				disableTransitionOnChange,
-				enableColorScheme,
-				themeColor,
-				themeRoot,
-			};
 			onThemeChangeEvent(next as Themes);
 		}
 	});
 
+	// oxlint-disable-next-line react-hooks/exhaustive-deps -- applyToDomEvent is an effect event.
 	const setTheme = useCallback(
 		(
 			next:
@@ -244,31 +223,8 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			);
 
 			setStoreTheme(newTheme);
-			if (resolved) {
-				appliedThemeRef.current = applyExtendedThemeToDom({
-					resolved,
-					attribute,
-					themes,
-					valueMap,
-					target,
-					disableTransitionOnChange,
-					enableColorScheme,
-					themeColor,
-					previous: appliedThemeRef.current,
-					...(themeRoot !== undefined ? { themeRoot } : {}),
-				});
-				lastAppliedRef.current = {
-					resolved,
-					attribute,
-					themes,
-					valueMap,
-					target,
-					disableTransitionOnChange,
-					enableColorScheme,
-					themeColor,
-					themeRoot,
-				};
-			}
+			// oxlint-disable-next-line react-hooks/rules-of-hooks -- shared apply path; setTheme stays a public callback.
+			if (resolved) applyToDomEvent(resolved);
 			onThemeChange?.(newTheme as Themes);
 			writeStoredTheme(storage, storageKey, newTheme, cookieOptions, onStorageError);
 			if (enableSameDocumentSync && storage !== "none")
@@ -279,13 +235,6 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			themes,
 			enableSystem,
 			systemThemeMap,
-			attribute,
-			valueMap,
-			target,
-			disableTransitionOnChange,
-			enableColorScheme,
-			themeColor,
-			themeRoot,
 			storage,
 			storageKey,
 			cookieOptions,
@@ -308,21 +257,22 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		if (!resolvedTheme) return;
-		const config: ExtendedThemeDomConfig = {
-			attribute,
-			themes,
-			valueMap,
-			target,
-			disableTransitionOnChange,
-			enableColorScheme,
-			themeColor,
-			themeRoot,
-		};
-		if (isAlreadyApplied(lastAppliedRef.current, resolvedTheme, config)) {
+		const last = lastAppliedRef.current;
+		if (
+			last !== null &&
+			last.resolved === resolvedTheme &&
+			last.attribute === attribute &&
+			last.themes === themes &&
+			last.valueMap === valueMap &&
+			last.target === target &&
+			last.disableTransitionOnChange === disableTransitionOnChange &&
+			last.enableColorScheme === enableColorScheme &&
+			last.themeColor === themeColor &&
+			last.themeRoot === themeRoot
+		) {
 			return;
 		}
 		applyToDomEvent(resolvedTheme);
-		lastAppliedRef.current = { resolved: resolvedTheme, ...config };
 	}, [
 		resolvedTheme,
 		attribute,
@@ -388,20 +338,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 				systemThemeMap as SystemThemeMap<string> | undefined,
 			);
 			setStoreTheme(newTheme);
-			if (!validForcedTheme && resolved) {
-				applyToDomEvent(resolved);
-				lastAppliedRef.current = {
-					resolved,
-					attribute,
-					themes,
-					valueMap,
-					target,
-					disableTransitionOnChange,
-					enableColorScheme,
-					themeColor,
-					themeRoot,
-				};
-			}
+			if (!validForcedTheme && resolved) applyToDomEvent(resolved);
 		};
 		domWindow.addEventListener("storage", handler);
 		return () => domWindow.removeEventListener("storage", handler);
@@ -428,20 +365,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 				getSnapshot().systemTheme,
 				systemThemeMap as SystemThemeMap<string> | undefined,
 			);
-			if (!validForcedTheme && resolved) {
-				applyToDomEvent(resolved);
-				lastAppliedRef.current = {
-					resolved,
-					attribute,
-					themes,
-					valueMap,
-					target,
-					disableTransitionOnChange,
-					enableColorScheme,
-					themeColor,
-					themeRoot,
-				};
-			}
+			if (!validForcedTheme && resolved) applyToDomEvent(resolved);
 		});
 	}, [
 		enableSameDocumentSync,

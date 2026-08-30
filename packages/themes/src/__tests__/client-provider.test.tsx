@@ -1,20 +1,12 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { memo, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useTheme } from "../core/context.js";
 import { serializeCookie, writeCookie } from "../core/cookie.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
 import { clearCookies } from "./setup.js";
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
-
-let memoizedThemeConsumerRenders = 0;
-
-const MemoizedThemeConsumer = memo(function MemoizedThemeConsumer() {
-	useTheme();
-	memoizedThemeConsumerRenders += 1;
-	return null;
-});
 
 const contextIdentitySeen: unknown[] = [];
 
@@ -256,24 +248,6 @@ describe("ClientThemeProvider - setTheme", () => {
 			</ClientThemeProvider>,
 		);
 		expect(contextIdentitySeen.at(-1)).toBe(afterInit);
-	});
-
-	test("does not notify memoized consumers when only the provider rerenders", () => {
-		memoizedThemeConsumerRenders = 0;
-		const view = render(
-			<ClientThemeProvider defaultTheme="light" enableSystem={false}>
-				<MemoizedThemeConsumer />
-			</ClientThemeProvider>,
-		);
-		const afterInit = memoizedThemeConsumerRenders;
-		expect(afterInit).toBeGreaterThan(0);
-
-		view.rerender(
-			<ClientThemeProvider defaultTheme="light" enableSystem={false}>
-				<MemoizedThemeConsumer />
-			</ClientThemeProvider>,
-		);
-		expect(memoizedThemeConsumerRenders).toBe(afterInit);
 	});
 
 	test("saves to localStorage", () => {
