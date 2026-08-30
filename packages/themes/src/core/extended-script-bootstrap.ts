@@ -45,7 +45,7 @@ export function extendedThemeBootstrap(
 					const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
 					let fromCookie: string | null = null;
 					try {
-						fromCookie = encoded ? decodeURIComponent(encoded) || null : null;
+						fromCookie = encoded ? decodeURIComponent(encoded) : null;
 					} catch {}
 					stored =
 						storage === "hybrid"

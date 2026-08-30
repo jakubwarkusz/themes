@@ -1,4 +1,4 @@
-import { THEME_SCRIPT_SOURCE } from "./script-source.js";
+import { THEME_SCRIPT_SOURCE as S } from "./script-source.js";
 import type { Attribute, StorageType } from "./types.js";
 
 export type ScriptConfig = {
@@ -31,14 +31,14 @@ function safeJson(value: unknown): string {
 export function getScript(config: ScriptConfig): string {
 	return (
 		"(" +
-		THEME_SCRIPT_SOURCE +
+		(config.storage[0] == "l" ? S.slice(0,199)+S.slice(463) : S) +
 		")(" +
 		[
 			config.storageKey,
 			config.attribute,
 			config.defaultTheme,
-			!!config.enableSystem,
-			!!config.enableColorScheme,
+			config.enableSystem,
+			config.enableColorScheme,
 			config.forcedTheme ?? null,
 			config.themes,
 			config.value ?? null,
@@ -47,7 +47,7 @@ export function getScript(config: ScriptConfig): string {
 			config.themeColors ?? null,
 			config.initialTheme ?? null,
 			config.disableTransitionOnChange,
-			!!config.followSystem,
+			config.followSystem,
 		]
 			.map(safeJson)
 			.join(",") +
