@@ -64,6 +64,10 @@ function restoreMetaThemeColor(state: AppliedThemeState["themeColorMeta"]): void
 	else state.element.setAttribute("content", state.previousContent);
 }
 
+function splitClassTokens(value: string): string[] {
+	return value ? value.split(" ").filter(Boolean) : [];
+}
+
 function classAttributeNeedsUpdate(
 	el: Element,
 	currentValues: string[],
@@ -171,9 +175,10 @@ export function applyExtendedThemeToDom({
 
 	const attributeValue = valueMap?.[resolved] ?? resolved;
 	const attributes = Array.isArray(attribute) ? attribute : [attribute];
-	const classValues = themes.flatMap((theme) => (valueMap?.[theme] ?? theme).split(" "));
-	const nextClassValues = attributeValue.split(" ");
+	const classValues = themes.flatMap((theme) => splitClassTokens(valueMap?.[theme] ?? theme));
+	const nextClassValues = splitClassTokens(attributeValue);
 	const nextClassValueSet = new Set(nextClassValues);
+	const nextAttrValue = attributeValue || null;
 	const nextDataAttributes = attributes.filter((current) => current !== "class");
 	const nextDataAttributeSet = new Set(nextDataAttributes);
 
@@ -203,7 +208,7 @@ export function applyExtendedThemeToDom({
 			classChanged = classAttributeNeedsUpdate(element, classValues, nextClassValues);
 			needsUpdate = needsUpdate || classChanged;
 		} else {
-			needsUpdate = needsUpdate || element.getAttribute(current) !== attributeValue;
+			needsUpdate = needsUpdate || element.getAttribute(current) !== nextAttrValue;
 		}
 	}
 
@@ -220,16 +225,21 @@ export function applyExtendedThemeToDom({
 	for (const current of attributes) {
 		if (current === "class") {
 			if (classChanged) {
-				element.classList.remove(...classValues);
-				element.classList.add(...nextClassValues);
+				if (classValues.length > 0) element.classList.remove(...classValues);
+				if (nextClassValues.length > 0) element.classList.add(...nextClassValues);
 			}
-		} else if (element.getAttribute(current) !== attributeValue) {
-			element.setAttribute(current, attributeValue);
+		} else if (nextAttrValue) {
+			if (element.getAttribute(current) !== nextAttrValue) {
+				element.setAttribute(current, nextAttrValue);
+			}
+		} else {
+			element.removeAttribute(current);
 		}
 	}
 
-	if (enableColorScheme && (resolved === "light" || resolved === "dark")) {
-		(element as HTMLElement).style.colorScheme = resolved;
+	if (enableColorScheme) {
+		(element as HTMLElement).style.colorScheme =
+			resolved === "light" || resolved === "dark" ? resolved : "";
 	} else if (previous?.colorSchemeApplied) {
 		(element as HTMLElement).style.colorScheme = "";
 	}

@@ -5,6 +5,7 @@ import { getScript } from "../core/script.js";
 import { resolveDefaultTheme } from "../core/theme-validation.js";
 import type { Attribute, ThemeProviderProps } from "../core/types.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
+import { clearCookies } from "./setup.js";
 
 type DomSnapshot = {
 	classes: string[];
@@ -123,22 +124,95 @@ const cases: ParityCase[] = [
 			transitionStyle: null,
 		},
 	},
+	{
+		name: "empty mapped class value does not fall back to the theme name",
+		themes: ["light", "dark"],
+		attribute: "class",
+		enableSystem: false,
+		storedTheme: "dark",
+		value: { dark: "" },
+		enableColorScheme: false,
+		disableTransitionOnChange: noTransition,
+		prefersDark: false,
+		expected: {
+			classes: [],
+			dataTheme: null,
+			colorScheme: "",
+			themeColor: null,
+			transitionStyle: null,
+		},
+	},
+	{
+		name: "empty mapped data attribute is removed",
+		themes: ["light", "dark"],
+		attribute: "data-theme",
+		enableSystem: false,
+		storedTheme: "dark",
+		value: { dark: "" },
+		enableColorScheme: false,
+		disableTransitionOnChange: noTransition,
+		prefersDark: false,
+		expected: {
+			classes: [],
+			dataTheme: null,
+			colorScheme: "",
+			themeColor: null,
+			transitionStyle: null,
+		},
+	},
+	{
+		name: "custom theme does not set color-scheme",
+		themes: ["light", "dark", "high-contrast"],
+		attribute: "class",
+		enableSystem: false,
+		storedTheme: "high-contrast",
+		enableColorScheme: true,
+		disableTransitionOnChange: noTransition,
+		prefersDark: false,
+		expected: {
+			classes: ["high-contrast"],
+			dataTheme: null,
+			colorScheme: "",
+			themeColor: null,
+			transitionStyle: null,
+		},
+	},
 ];
 
 function resetDom(parityCase?: ParityCase): void {
 	cleanup();
 	localStorage.clear();
+	sessionStorage.clear();
+	clearCookies();
 	document.documentElement.className = "";
 	document.documentElement.removeAttribute("data-theme");
 	document.documentElement.style.colorScheme = "";
+	document.body.className = "";
+	document.body.removeAttribute("data-theme");
+	document.body.style.colorScheme = "";
 	for (const element of Array.from(
-		document.querySelectorAll('meta[name="theme-color"], style'),
+		document.querySelectorAll('meta[name="theme-color"], style, #fixture'),
 	)) {
 		element.remove();
 	}
 	if (parityCase?.storedTheme !== undefined) {
 		localStorage.setItem("theme", parityCase.storedTheme);
 	}
+}
+
+const applyOptions = {
+	attribute: "class" as const,
+	themes: ["light", "dark", "high-contrast"],
+	valueMap: undefined,
+	target: "html",
+	disableTransitionOnChange: false,
+	enableColorScheme: true,
+	themeColor: { dark: "#000" } as Record<string, string> | undefined,
+};
+
+function runGeneratedScript(config: Parameters<typeof getScript>[0]): void {
+	// oxlint-disable-next-line no-eval -- executes the generated bootstrap in the test DOM
+	eval(getScript(config));
 }
 
 function captureDom(run: () => void): DomSnapshot {
@@ -286,4 +360,106 @@ describe("bootstrap/runtime/provider parity", () => {
 			expect(providerSnapshot).toEqual(parityCase.expected);
 		});
 	}
+});
+
+describe("bootstrap/runtime sequential apply", () => {
+	const scriptBase = {
+		storageKey: "theme",
+		attribute: "class" as const,
+		defaultTheme: "light",
+		enableSystem: false,
+		enableColorScheme: true,
+		forcedTheme: undefined,
+		themes: ["light", "dark", "high-contrast"],
+		value: undefined,
+		target: "html",
+		storage: "localStorage" as const,
+		themeColors: { dark: "#000" } as Record<string, string> | undefined,
+		initialTheme: undefined,
+		disableTransitionOnChange: false,
+		followSystem: false,
+	};
+
+	test("clears color-scheme when switching from dark to a custom theme", () => {
+		applyThemeToDom({ ...applyOptions, resolved: "dark" });
+		expect(document.documentElement.style.colorScheme).toBe("dark");
+		applyThemeToDom({ ...applyOptions, resolved: "high-contrast" });
+		expect(document.documentElement.style.colorScheme).toBe("");
+
+		resetDom();
+		localStorage.setItem("theme", "dark");
+		runGeneratedScript(scriptBase);
+		expect(document.documentElement.style.colorScheme).toBe("dark");
+		localStorage.setItem("theme", "high-contrast");
+		runGeneratedScript(scriptBase);
+		expect(document.documentElement.style.colorScheme).toBe("");
+	});
+
+	test("restores theme-color when the next theme has no mapped color", () => {
+		applyThemeToDom({ ...applyOptions, resolved: "dark", themeColor: { dark: "#000" } });
+		expect(document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.content).toBe(
+			"#000",
+		);
+		applyThemeToDom({ ...applyOptions, resolved: "light", themeColor: { dark: "#000" } });
+		expect(document.querySelector('meta[name="theme-color"]')).toBeNull();
+	});
+
+	test("removes stale class tokens when the value map remaps", () => {
+		applyThemeToDom({
+			...applyOptions,
+			themes: ["light", "dark"],
+			resolved: "dark",
+			enableColorScheme: false,
+			themeColor: undefined,
+			valueMap: { dark: "dark-one" },
+		});
+		expect(document.documentElement.classList.contains("dark-one")).toBe(true);
+
+		applyThemeToDom({
+			...applyOptions,
+			themes: ["light", "dark"],
+			resolved: "dark",
+			enableColorScheme: false,
+			themeColor: undefined,
+			valueMap: { dark: "dark-two" },
+		});
+		expect(document.documentElement.classList.contains("dark-two")).toBe(true);
+		expect(document.documentElement.classList.contains("dark-one")).toBe(false);
+	});
+
+	test("hybrid storage falls back to localStorage when the cookie is malformed", () => {
+		localStorage.setItem("theme", "dark");
+		document.cookie = "theme=%";
+
+		runGeneratedScript({ ...scriptBase, storage: "hybrid", themes: ["light", "dark"] });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+
+		resetDom();
+		localStorage.setItem("theme", "dark");
+		document.cookie = "theme=%";
+		const view = render(
+			<ClientThemeProvider storage="hybrid" enableSystem={false} defaultTheme="light">
+				<span>content</span>
+			</ClientThemeProvider>,
+		);
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+		view.unmount();
+	});
+
+	test("applies to body and a selector target", () => {
+		applyThemeToDom({ ...applyOptions, resolved: "dark", target: "body" });
+		expect(document.body.classList.contains("dark")).toBe(true);
+		expect(document.documentElement.classList.contains("dark")).toBe(false);
+
+		const fixture = document.createElement("div");
+		fixture.id = "fixture";
+		document.body.appendChild(fixture);
+		applyThemeToDom({ ...applyOptions, resolved: "dark", target: "#fixture" });
+		expect(fixture.classList.contains("dark")).toBe(true);
+
+		resetDom();
+		localStorage.setItem("theme", "dark");
+		runGeneratedScript({ ...scriptBase, target: "body", themes: ["light", "dark"] });
+		expect(document.body.classList.contains("dark")).toBe(true);
+	});
 });

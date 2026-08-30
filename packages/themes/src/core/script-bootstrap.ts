@@ -36,10 +36,13 @@ export function themeBootstrap(
 		if (!followSystem) {
 			try {
 				if (storage === "cookie" || storage === "hybrid") {
-					// biome-ignore lint/style/useTemplate: keep concat so minified source has no `${}` placeholders
 					const parts = ("; " + document.cookie).split("; " + storageKey + "=");
 					const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
-					const fromCookie = encoded ? decodeURIComponent(encoded) : null;
+					let fromCookie: string | null = null;
+					try {
+						fromCookie = encoded ? decodeURIComponent(encoded) : null;
+					} catch {}
+					fromCookie = fromCookie || null;
 					stored =
 						storage === "hybrid"
 							? (fromCookie ?? localStorage.getItem(storageKey))
@@ -63,7 +66,7 @@ export function themeBootstrap(
 			: defaultTheme;
 	}
 
-	const attrValue = value?.[theme] || theme;
+	const attrValue = value?.[theme] ?? theme;
 	const el =
 		target === "html"
 			? document.documentElement
@@ -74,8 +77,9 @@ export function themeBootstrap(
 	if (!el) return;
 
 	const attrs = Array.isArray(attribute) ? attribute : [attribute];
-	const toRemove = themes.flatMap((name) => (value?.[name] || name).split(" "));
-	const toAdd = attrValue.split(" ");
+	const toRemove = themes.flatMap((name) => (value?.[name] ?? name).split(" ").filter(Boolean));
+	const toAdd = attrValue.split(" ").filter(Boolean);
+	const nextAttrValue = attrValue || null;
 	let changed = false;
 	let classChanged = false;
 
@@ -86,7 +90,7 @@ export function themeBootstrap(
 				toAdd.some((token) => !el.classList.contains(token));
 			changed = changed || classChanged;
 		} else {
-			changed = changed || el.getAttribute(attr) !== attrValue;
+			changed = changed || el.getAttribute(attr) !== nextAttrValue;
 		}
 	}
 
@@ -94,7 +98,6 @@ export function themeBootstrap(
 		const css =
 			typeof disableTransitionOnChange === "string" ? disableTransitionOnChange : "none";
 		const style = document.createElement("style");
-		// biome-ignore lint/style/useTemplate: keep concat so minified source has no `${}` placeholders
 		style.textContent = "*,*::before,*::after{transition:" + css + "!important}";
 		document.head.appendChild(style);
 		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
@@ -106,17 +109,17 @@ export function themeBootstrap(
 				el.classList.remove(...toRemove);
 				el.classList.add(...toAdd);
 			}
-		} else if (attrValue) {
-			if (el.getAttribute(attr) !== attrValue) {
-				el.setAttribute(attr, attrValue);
+		} else if (nextAttrValue) {
+			if (el.getAttribute(attr) !== nextAttrValue) {
+				el.setAttribute(attr, nextAttrValue);
 			}
 		} else {
 			el.removeAttribute(attr);
 		}
 	}
 
-	if (enableColorScheme && (theme === "light" || theme === "dark")) {
-		(el as HTMLElement).style.colorScheme = theme;
+	if (enableColorScheme) {
+		(el as HTMLElement).style.colorScheme = theme === "light" || theme === "dark" ? theme : "";
 	}
 
 	if (themeColors) {

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, test } from "bun:test";
 import { applyExtendedThemeToDom } from "../core/extended-client-dom.js";
 import { getExtendedScript } from "../core/extended-script.js";
 import { EXTENDED_THEME_SCRIPT_SOURCE } from "../core/extended-script-source.js";
+import { clearCookies } from "./setup.js";
 
 const base = {
 	storageKey: "theme",
@@ -32,6 +33,7 @@ beforeEach(() => {
 	document.documentElement.style.colorScheme = "";
 	document.querySelector('meta[name="theme-color"]')?.remove();
 	localStorage.clear();
+	clearCookies();
 	window.matchMedia = () => ({ matches: false }) as MediaQueryList;
 });
 
@@ -140,5 +142,24 @@ describe("extended theme script", () => {
 
 	test("snapshot of extended bootstrap output stays reviewable", () => {
 		expect(getExtendedScript(base)).toMatchSnapshot();
+	});
+
+	test("empty mapped class value does not fall back to the theme name", () => {
+		localStorage.setItem("theme", "paper");
+		runScript({ ...base, value: { paper: "" }, enableSystem: false, defaultTheme: "paper" });
+		expect(document.documentElement.classList.contains("paper")).toBe(false);
+	});
+
+	test("clears color-scheme when the resolved theme is not light or dark", () => {
+		document.documentElement.style.colorScheme = "dark";
+		runScript({ ...base, enableSystem: false, defaultTheme: "paper" });
+		expect(document.documentElement.style.colorScheme).toBe("");
+	});
+
+	test("falls back to localStorage when a hybrid cookie is malformed", () => {
+		localStorage.setItem("theme", "paper");
+		document.cookie = "theme=%";
+		runScript({ ...base, storage: "hybrid", enableSystem: false, defaultTheme: "midnight" });
+		expect(document.documentElement.classList.contains("paper")).toBe(true);
 	});
 });

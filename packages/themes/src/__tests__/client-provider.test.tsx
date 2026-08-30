@@ -101,6 +101,40 @@ function dispatchStorageEvent(key: string, newValue: string | null) {
 	window.dispatchEvent(event);
 }
 
+function captureCookieWrites(): { writes: string[]; restore: () => void } {
+	const writes: string[] = [];
+	let current: object = document;
+	let descriptor: PropertyDescriptor | undefined;
+	while (current) {
+		descriptor = Object.getOwnPropertyDescriptor(current, "cookie");
+		if (descriptor?.set) break;
+		current = Object.getPrototypeOf(current) as object;
+	}
+	if (!descriptor?.set) {
+		throw new Error("document.cookie setter is unavailable");
+	}
+	const target = current as Document;
+	const originalSet = descriptor.set;
+	const originalGet = descriptor.get;
+	Object.defineProperty(target, "cookie", {
+		configurable: true,
+		enumerable: descriptor.enumerable ?? false,
+		get() {
+			return originalGet ? originalGet.call(document) : "";
+		},
+		set(value: string) {
+			writes.push(value);
+			originalSet.call(document, value);
+		},
+	});
+	return {
+		writes,
+		restore() {
+			Object.defineProperty(target, "cookie", descriptor);
+		},
+	};
+}
+
 type MQL = {
 	matches: boolean;
 	addEventListener: (type: string, fn: EventListener) => void;
@@ -506,6 +540,19 @@ describe("ClientThemeProvider - cross-tab storage sync", () => {
 
 		expect(screen.getByTestId("theme").textContent).toBe("light");
 	});
+
+	test("ignores cross-tab storage events when followSystem is true", () => {
+		mockMatchMedia(true);
+		wrap(<ThemeConsumer />, { followSystem: true });
+
+		act(() => {
+			dispatchStorageEvent("theme", "light");
+		});
+
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+		expect(document.documentElement.classList.contains("light")).toBe(false);
+		expect(screen.getByTestId("theme").textContent).toBe("system");
+	});
 });
 
 describe("ClientThemeProvider - runtime hardening", () => {
@@ -533,6 +580,7 @@ describe("ClientThemeProvider - runtime hardening", () => {
 
 		expect(screen.getByTestId("theme").textContent).toBe("dark");
 		expect(document.documentElement.classList.contains("dark-two")).toBe(true);
+		expect(document.documentElement.classList.contains("dark-one")).toBe(false);
 		expect(document.querySelector('meta[name="theme-color"]')?.getAttribute("content")).toBe(
 			"#111",
 		);
@@ -663,6 +711,23 @@ describe("ClientThemeProvider - cookie storage", () => {
 		expect(document.cookie).toContain("theme=dark");
 	});
 
+	test("cookieOptions.maxAge and SameSite are serialized onto the cookie write", () => {
+		const { writes, restore } = captureCookieWrites();
+		try {
+			wrap(<ThemeConsumer />, {
+				storage: "cookie",
+				cookieOptions: { maxAge: 3600, sameSite: "Strict" },
+			});
+			act(() => {
+				fireEvent.click(screen.getByTestId("btn-dark"));
+			});
+			expect(writes.some((value) => value.includes("max-age=3600"))).toBe(true);
+			expect(writes.some((value) => value.includes("SameSite=Strict"))).toBe(true);
+		} finally {
+			restore();
+		}
+	});
+
 	test("cookieOptions used when writing initialTheme to cookie", () => {
 		wrap(<ThemeConsumer />, {
 			storage: "cookie",
@@ -684,6 +749,14 @@ describe("ClientThemeProvider - hybrid storage", () => {
 
 	test("falls back to localStorage when cookie is absent", () => {
 		localStorage.setItem("theme", "dark");
+		wrap(<ThemeConsumer />, { storage: "hybrid" });
+		expect(screen.getByTestId("theme").textContent).toBe("dark");
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("falls back to localStorage when the cookie encoding is malformed", () => {
+		localStorage.setItem("theme", "dark");
+		document.cookie = "theme=%";
 		wrap(<ThemeConsumer />, { storage: "hybrid" });
 		expect(screen.getByTestId("theme").textContent).toBe("dark");
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
@@ -771,6 +844,92 @@ describe("ClientThemeProvider - disableTransitionOnChange", () => {
 
 		document.head.appendChild = origAppend;
 		expect(captured.content).toContain("background-color 0s, color 0s");
+	});
+});
+
+describe("ClientThemeProvider - sessionStorage", () => {
+	test("reads stored theme from sessionStorage on mount", () => {
+		sessionStorage.setItem("theme", "dark");
+		wrap(<ThemeConsumer />, { storage: "sessionStorage" });
+		expect(screen.getByTestId("theme").textContent).toBe("dark");
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("writes to sessionStorage when setTheme is called", () => {
+		wrap(<ThemeConsumer />, { storage: "sessionStorage" });
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		expect(sessionStorage.getItem("theme")).toBe("dark");
+	});
+});
+
+describe("ClientThemeProvider - history re-apply", () => {
+	test("re-applies the stored theme on pageshow", () => {
+		wrap(<ThemeConsumer />);
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		document.documentElement.classList.remove("dark");
+		act(() => {
+			window.dispatchEvent(new window.Event("pageshow"));
+		});
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("re-applies the stored theme on popstate", () => {
+		wrap(<ThemeConsumer />);
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		document.documentElement.classList.remove("dark");
+		act(() => {
+			window.dispatchEvent(new window.Event("popstate"));
+		});
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+});
+
+describe("ClientThemeProvider - color-scheme and theme-color", () => {
+	test("clears color-scheme when switching from dark to a custom theme", () => {
+		function HighContrastButton() {
+			const { setTheme } = useTheme();
+			return (
+				<button
+					type="button"
+					data-testid="btn-high-contrast"
+					onClick={() => setTheme("high-contrast" as "dark")}
+				>
+					high-contrast
+				</button>
+			);
+		}
+
+		wrap(<HighContrastButton />, {
+			themes: ["light", "dark", "high-contrast"],
+			enableSystem: false,
+			defaultTheme: "dark",
+			enableColorScheme: true,
+		});
+		expect(document.documentElement.style.colorScheme).toBe("dark");
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-high-contrast"));
+		});
+		expect(document.documentElement.style.colorScheme).toBe("");
+	});
+
+	test("clears theme-color when the next theme has no mapped color", () => {
+		wrap(<ThemeConsumer />, { themeColor: { dark: "#000" } });
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		expect(document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.content).toBe(
+			"#000",
+		);
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-light"));
+		});
+		expect(document.querySelector('meta[name="theme-color"]')).toBeNull();
 	});
 });
 

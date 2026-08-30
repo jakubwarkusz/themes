@@ -18,8 +18,8 @@ export function getExtendedScript(config: ExtendedScriptConfig): string {
 		safeJson(config.storageKey),
 		safeJson(config.attribute),
 		safeJson(config.defaultTheme),
-		String(config.enableSystem),
-		String(config.enableColorScheme),
+		safeJson(Boolean(config.enableSystem)),
+		safeJson(Boolean(config.enableColorScheme)),
 		safeJson(config.forcedTheme ?? null),
 		safeJson(config.themes),
 		safeJson(config.value ?? null),
@@ -28,7 +28,7 @@ export function getExtendedScript(config: ExtendedScriptConfig): string {
 		safeJson(config.themeColors ?? null),
 		safeJson(config.initialTheme ?? null),
 		safeJson(config.disableTransitionOnChange),
-		String(config.followSystem),
+		safeJson(Boolean(config.followSystem)),
 		safeJson(config.systemThemeMap ?? null),
 	].join(",");
 	return `(${EXTENDED_THEME_SCRIPT_SOURCE})(${args})`;

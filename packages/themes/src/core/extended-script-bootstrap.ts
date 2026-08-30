@@ -43,7 +43,11 @@ export function extendedThemeBootstrap(
 				if (storage === "cookie" || storage === "hybrid") {
 					const parts = ("; " + document.cookie).split("; " + storageKey + "=");
 					const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
-					const fromCookie = encoded ? decodeURIComponent(encoded) : null;
+					let fromCookie: string | null = null;
+					try {
+						fromCookie = encoded ? decodeURIComponent(encoded) : null;
+					} catch {}
+					fromCookie = fromCookie || null;
 					stored =
 						storage === "hybrid"
 							? (fromCookie ?? localStorage.getItem(storageKey))
@@ -89,7 +93,7 @@ export function extendedThemeBootstrap(
 		theme = defaultTheme;
 	}
 
-	const attributeValue = value?.[theme] || theme;
+	const attributeValue = value?.[theme] ?? theme;
 	const element: Element | null =
 		target === "html"
 			? document.documentElement
@@ -99,8 +103,11 @@ export function extendedThemeBootstrap(
 	if (!element) return;
 
 	const attributes = Array.isArray(attribute) ? attribute : [attribute];
-	const toRemove = themes.flatMap((current) => (value?.[current] || current).split(" "));
-	const toAdd = attributeValue.split(" ");
+	const toRemove = themes.flatMap((current) =>
+		(value?.[current] ?? current).split(" ").filter(Boolean),
+	);
+	const toAdd = attributeValue.split(" ").filter(Boolean);
+	const nextAttrValue = attributeValue || null;
 	let changed = false;
 	let classChanged = false;
 
@@ -112,7 +119,7 @@ export function extendedThemeBootstrap(
 				) || toAdd.some((token) => !element.classList.contains(token));
 			changed = changed || classChanged;
 		} else {
-			changed = changed || element.getAttribute(current) !== attributeValue;
+			changed = changed || element.getAttribute(current) !== nextAttrValue;
 		}
 	}
 
@@ -131,16 +138,17 @@ export function extendedThemeBootstrap(
 				element.classList.remove(...toRemove);
 				element.classList.add(...toAdd);
 			}
-		} else if (attributeValue) {
-			if (element.getAttribute(current) !== attributeValue)
-				element.setAttribute(current, attributeValue);
+		} else if (nextAttrValue) {
+			if (element.getAttribute(current) !== nextAttrValue)
+				element.setAttribute(current, nextAttrValue);
 		} else {
 			element.removeAttribute(current);
 		}
 	}
 
-	if (enableColorScheme && (theme === "light" || theme === "dark"))
-		(element as HTMLElement).style.colorScheme = theme;
+	if (enableColorScheme)
+		(element as HTMLElement).style.colorScheme =
+			theme === "light" || theme === "dark" ? theme : "";
 
 	if (themeColors) {
 		const color = typeof themeColors === "string" ? themeColors : themeColors[theme];

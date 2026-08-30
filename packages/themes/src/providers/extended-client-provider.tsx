@@ -326,7 +326,13 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	useEffect(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
-		if (storage === "none" || storage === "sessionStorage" || storage === "cookie") return;
+		if (
+			followSystem ||
+			storage === "none" ||
+			storage === "sessionStorage" ||
+			storage === "cookie"
+		)
+			return;
 
 		const handler = (event: StorageEvent) => {
 			if (event.storageArea !== localStorage || event.key !== storageKey) return;
@@ -343,6 +349,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		domWindow.addEventListener("storage", handler);
 		return () => domWindow.removeEventListener("storage", handler);
 	}, [
+		followSystem,
 		storage,
 		storageKey,
 		resolvedDefault,

@@ -12,18 +12,31 @@ type ApplyThemeOptions = {
 	themeColor: ThemeColor | undefined;
 };
 
+const lastClassTokensByElement = new WeakMap<Element, string[]>();
+const createdThemeColorMetas = new WeakSet<HTMLMetaElement>();
+
 function resolveThemeColor(themeColor: ThemeColor, resolved: string): string | undefined {
 	if (typeof themeColor === "string") return themeColor;
 	return themeColor[resolved];
 }
 
+function splitClassTokens(value: string): string[] {
+	return value ? value.split(" ").filter(Boolean) : [];
+}
+
 function updateMetaThemeColor(color: string | undefined): void {
-	if (!color) return;
 	let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+	if (!color) {
+		if (!meta) return;
+		if (createdThemeColorMetas.has(meta)) meta.remove();
+		else meta.removeAttribute("content");
+		return;
+	}
 	if (!meta) {
 		meta = document.createElement("meta");
 		meta.name = "theme-color";
 		document.head.appendChild(meta);
+		createdThemeColorMetas.add(meta);
 	}
 	meta.content = color;
 }
@@ -132,16 +145,18 @@ export function applyThemeToDom({
 
 	const attrValue = valueMap?.[resolved] ?? resolved;
 	const attrs = Array.isArray(attribute) ? attribute : [attribute];
-	const classValues = themes.flatMap((t) => (valueMap?.[t] ?? t).split(" "));
-	const nextClassValues = attrValue.split(" ");
+	const classValues = themes.flatMap((t) => splitClassTokens(valueMap?.[t] ?? t));
+	const nextClassValues = splitClassTokens(attrValue);
+	const removeClassValues = lastClassTokensByElement.get(el) ?? classValues;
+	const nextAttrValue = attrValue || null;
 	let needsUpdate = false;
 	let classChanged = false;
 	for (const attr of attrs) {
 		if (attr === "class") {
-			classChanged = classAttributeNeedsUpdate(el, classValues, nextClassValues);
+			classChanged = classAttributeNeedsUpdate(el, removeClassValues, nextClassValues);
 			needsUpdate = needsUpdate || classChanged;
 		} else {
-			needsUpdate = needsUpdate || el.getAttribute(attr) !== attrValue;
+			needsUpdate = needsUpdate || el.getAttribute(attr) !== nextAttrValue;
 		}
 	}
 
@@ -157,16 +172,22 @@ export function applyThemeToDom({
 	for (const attr of attrs) {
 		if (attr === "class") {
 			if (classChanged) {
-				el.classList.remove(...classValues);
+				el.classList.remove(...removeClassValues);
 				el.classList.add(...nextClassValues);
 			}
-		} else if (el.getAttribute(attr) !== attrValue) {
-			el.setAttribute(attr, attrValue);
+			lastClassTokensByElement.set(el, nextClassValues);
+		} else if (nextAttrValue) {
+			if (el.getAttribute(attr) !== nextAttrValue) {
+				el.setAttribute(attr, nextAttrValue);
+			}
+		} else {
+			el.removeAttribute(attr);
 		}
 	}
 
-	if (enableColorScheme && (resolved === "light" || resolved === "dark")) {
-		(el as HTMLElement).style.colorScheme = resolved;
+	if (enableColorScheme) {
+		(el as HTMLElement).style.colorScheme =
+			resolved === "light" || resolved === "dark" ? resolved : "";
 	}
 
 	if (themeColor) {
