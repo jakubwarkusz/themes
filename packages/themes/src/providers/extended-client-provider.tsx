@@ -1,6 +1,13 @@
 "use client";
 
-import { type ReactElement, useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import {
+	type ReactElement,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useSyncExternalStore,
+} from "react";
 import { ThemeContext } from "../core/context.js";
 import {
 	type AppliedThemeState,
@@ -17,6 +24,40 @@ import type { DefaultTheme, ThemeContextValue } from "../core/types.js";
 import { useEffectEvent } from "../core/use-effect-event.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
+
+type ExtendedThemeDomConfig = {
+	attribute: ExtendedThemeProviderProps["attribute"];
+	themes: readonly string[];
+	valueMap: ExtendedThemeProviderProps["value"];
+	target: string;
+	disableTransitionOnChange: boolean | string;
+	enableColorScheme: boolean;
+	themeColor: ExtendedThemeProviderProps["themeColor"];
+	themeRoot: ExtendedThemeProviderProps["themeRoot"];
+};
+
+type LastAppliedTheme = {
+	resolved: string;
+} & ExtendedThemeDomConfig;
+
+function isAlreadyApplied(
+	last: LastAppliedTheme | null,
+	resolved: string,
+	config: ExtendedThemeDomConfig,
+): boolean {
+	return (
+		last !== null &&
+		last.resolved === resolved &&
+		last.attribute === config.attribute &&
+		last.themes === config.themes &&
+		last.valueMap === config.valueMap &&
+		last.target === config.target &&
+		last.disableTransitionOnChange === config.disableTransitionOnChange &&
+		last.enableColorScheme === config.enableColorScheme &&
+		last.themeColor === config.themeColor &&
+		last.themeRoot === config.themeRoot
+	);
+}
 
 function isDirectSystemMap(
 	systemThemeMap: SystemThemeMap<string> | undefined,
@@ -74,6 +115,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	}
 	const store = storeRef.current;
 	const appliedThemeRef = useRef<AppliedThemeState | undefined>(undefined);
+	const lastAppliedRef = useRef<LastAppliedTheme | null>(null);
 	const {
 		getSnapshot,
 		setState: setStoreState,
@@ -168,6 +210,17 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 					systemThemeMap as SystemThemeMap<string> | undefined,
 				) ?? next;
 			applyToDomEvent(resolved);
+			lastAppliedRef.current = {
+				resolved,
+				attribute,
+				themes,
+				valueMap,
+				target,
+				disableTransitionOnChange,
+				enableColorScheme,
+				themeColor,
+				themeRoot,
+			};
 			onThemeChangeEvent(next as Themes);
 		}
 	});
@@ -204,6 +257,17 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 					previous: appliedThemeRef.current,
 					...(themeRoot !== undefined ? { themeRoot } : {}),
 				});
+				lastAppliedRef.current = {
+					resolved,
+					attribute,
+					themes,
+					valueMap,
+					target,
+					disableTransitionOnChange,
+					enableColorScheme,
+					themeColor,
+					themeRoot,
+				};
 			}
 			onThemeChange?.(newTheme as Themes);
 			writeStoredTheme(storage, storageKey, newTheme, cookieOptions, onStorageError);
@@ -239,9 +303,26 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		initializeEvent();
 	}, []);
 
+	// setTheme / system / storage already write the DOM. Re-apply only when
+	// resolvedTheme or DOM config changed from outside those paths.
 	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
-		if (resolvedTheme) applyToDomEvent(resolvedTheme);
+		if (!resolvedTheme) return;
+		const config: ExtendedThemeDomConfig = {
+			attribute,
+			themes,
+			valueMap,
+			target,
+			disableTransitionOnChange,
+			enableColorScheme,
+			themeColor,
+			themeRoot,
+		};
+		if (isAlreadyApplied(lastAppliedRef.current, resolvedTheme, config)) {
+			return;
+		}
+		applyToDomEvent(resolvedTheme);
+		lastAppliedRef.current = { resolved: resolvedTheme, ...config };
 	}, [
 		resolvedTheme,
 		attribute,
@@ -307,7 +388,20 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 				systemThemeMap as SystemThemeMap<string> | undefined,
 			);
 			setStoreTheme(newTheme);
-			if (!validForcedTheme && resolved) applyToDomEvent(resolved);
+			if (!validForcedTheme && resolved) {
+				applyToDomEvent(resolved);
+				lastAppliedRef.current = {
+					resolved,
+					attribute,
+					themes,
+					valueMap,
+					target,
+					disableTransitionOnChange,
+					enableColorScheme,
+					themeColor,
+					themeRoot,
+				};
+			}
 		};
 		domWindow.addEventListener("storage", handler);
 		return () => domWindow.removeEventListener("storage", handler);
@@ -334,7 +428,20 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 				getSnapshot().systemTheme,
 				systemThemeMap as SystemThemeMap<string> | undefined,
 			);
-			if (!validForcedTheme && resolved) applyToDomEvent(resolved);
+			if (!validForcedTheme && resolved) {
+				applyToDomEvent(resolved);
+				lastAppliedRef.current = {
+					resolved,
+					attribute,
+					themes,
+					valueMap,
+					target,
+					disableTransitionOnChange,
+					enableColorScheme,
+					themeColor,
+					themeRoot,
+				};
+			}
 		});
 	}, [
 		enableSameDocumentSync,
@@ -348,14 +455,17 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		setStoreTheme,
 	]);
 
-	const contextValue: ThemeContextValue<string> = {
-		theme: validForcedTheme ?? theme,
-		resolvedTheme,
-		systemTheme,
-		forcedTheme: validForcedTheme,
-		themes,
-		setTheme: setTheme as ThemeContextValue<string>["setTheme"],
-	};
+	const contextValue = useMemo(
+		(): ThemeContextValue<string> => ({
+			theme: validForcedTheme ?? theme,
+			resolvedTheme,
+			systemTheme,
+			forcedTheme: validForcedTheme,
+			themes,
+			setTheme: setTheme as ThemeContextValue<string>["setTheme"],
+		}),
+		[validForcedTheme, theme, resolvedTheme, systemTheme, themes, setTheme],
+	);
 
 	return <ThemeContext.Provider value={contextValue}>{children}</ThemeContext.Provider>;
 }

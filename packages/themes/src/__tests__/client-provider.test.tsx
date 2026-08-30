@@ -1,12 +1,51 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
-import type { ReactNode } from "react";
+import { memo, type ReactNode } from "react";
 import { useTheme } from "../core/context.js";
 import { serializeCookie, writeCookie } from "../core/cookie.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
 import { clearCookies } from "./setup.js";
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+
+let memoizedThemeConsumerRenders = 0;
+
+const MemoizedThemeConsumer = memo(function MemoizedThemeConsumer() {
+	useTheme();
+	memoizedThemeConsumerRenders += 1;
+	return null;
+});
+
+const contextIdentitySeen: unknown[] = [];
+
+function ContextIdentityProbe() {
+	contextIdentitySeen.push(useTheme());
+	return null;
+}
+
+function spyClassListMutations(el: Element) {
+	const { classList } = el;
+	const originalAdd = classList.add;
+	const originalRemove = classList.remove;
+	const added: string[][] = [];
+	const removed: string[][] = [];
+	classList.add = (...tokens: string[]) => {
+		added.push([...tokens]);
+		originalAdd.apply(classList, tokens);
+	};
+	classList.remove = (...tokens: string[]) => {
+		removed.push([...tokens]);
+		originalRemove.apply(classList, tokens);
+	};
+	return {
+		added,
+		removed,
+		restore() {
+			classList.add = originalAdd;
+			classList.remove = originalRemove;
+		},
+	};
+}
 
 function ThemeConsumer({ prefix = "" }: { prefix?: string }) {
 	const { theme, resolvedTheme, systemTheme, forcedTheme, setTheme } = useTheme();
@@ -184,6 +223,57 @@ describe("ClientThemeProvider - setTheme", () => {
 		});
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 		expect(document.documentElement.classList.contains("light")).toBe(false);
+	});
+
+	test("mutates classList once per setTheme", () => {
+		wrap(<ThemeConsumer />, { defaultTheme: "light", enableSystem: false });
+		const spy = spyClassListMutations(document.documentElement);
+		try {
+			act(() => {
+				fireEvent.click(screen.getByTestId("btn-dark"));
+			});
+			expect(spy.removed).toHaveLength(1);
+			expect(spy.added).toHaveLength(1);
+			expect(document.documentElement.classList.contains("dark")).toBe(true);
+		} finally {
+			spy.restore();
+		}
+	});
+
+	test("keeps context identity when the provider rerenders without a theme change", () => {
+		contextIdentitySeen.length = 0;
+		const view = render(
+			<ClientThemeProvider defaultTheme="light" enableSystem={false}>
+				<ContextIdentityProbe />
+			</ClientThemeProvider>,
+		);
+		const afterInit = contextIdentitySeen.at(-1);
+		expect(afterInit).toBeDefined();
+
+		view.rerender(
+			<ClientThemeProvider defaultTheme="light" enableSystem={false}>
+				<ContextIdentityProbe />
+			</ClientThemeProvider>,
+		);
+		expect(contextIdentitySeen.at(-1)).toBe(afterInit);
+	});
+
+	test("does not notify memoized consumers when only the provider rerenders", () => {
+		memoizedThemeConsumerRenders = 0;
+		const view = render(
+			<ClientThemeProvider defaultTheme="light" enableSystem={false}>
+				<MemoizedThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		const afterInit = memoizedThemeConsumerRenders;
+		expect(afterInit).toBeGreaterThan(0);
+
+		view.rerender(
+			<ClientThemeProvider defaultTheme="light" enableSystem={false}>
+				<MemoizedThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		expect(memoizedThemeConsumerRenders).toBe(afterInit);
 	});
 
 	test("saves to localStorage", () => {
