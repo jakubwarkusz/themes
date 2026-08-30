@@ -2,8 +2,8 @@ import { ThemeProvider } from "@wrksz/themes/next";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
 import "./global.css";
-import { Analytics } from "@vercel/analytics/next";
 import { Inter } from "next/font/google";
+import { Analytics } from "@/components/deferred-analytics";
 import { appThemes, themeProviderDefaults } from "@/lib/theme-config";
 
 const inter = Inter({
