@@ -30,6 +30,10 @@ import type {
 	ThemeProviderProps,
 } from "@wrksz/themes";
 import { getTheme, ThemeProvider as NextThemeProvider } from "@wrksz/themes/next";
+import {
+	createNextThemes,
+	createThemes as createNextCreateThemes,
+} from "@wrksz/themes/next/create-themes";
 import { ThemeScript } from "@wrksz/themes/script";
 
 const themes = ["light", "dark", "high-contrast"] as const;
@@ -43,6 +47,15 @@ const configured = createThemes({
 		dark: "#000",
 		"high-contrast": "#ff0",
 	},
+});
+
+const nextConfigured = createNextCreateThemes({
+	themes,
+	defaultTheme: "system",
+});
+const nextAlias = createNextThemes({
+	themes,
+	defaultTheme: "light",
 });
 
 const providerProps = {
@@ -89,6 +102,8 @@ const syncTheme = getTheme(new Request("https://example.com"), {
 	defaultTheme: "light",
 });
 const checkedTheme: AppTheme = syncTheme;
+const nextThemeScript = nextConfigured.ThemeScript();
+const nextRoot = <nextAlias.NextThemeProvider>{nextThemeScript}</nextAlias.NextThemeProvider>;
 
 export {
 	checkedTheme,
@@ -97,6 +112,9 @@ export {
 	configured,
 	createRootThemes,
 	createThemesSubpath,
+	nextAlias,
+	nextConfigured,
+	nextRoot,
 	NextThemeProvider,
 	providerProps,
 	RootThemeProvider,

@@ -19,6 +19,7 @@ yarn-error.log*
 .env.production.local
 .turbo
 .next
+.worktrees/
 packages/themes/benchmarks/.bundle-size/
 
 .pnpm-store/

@@ -15,6 +15,10 @@ import {
 	type TypedThemedImageProps,
 } from "../index.js";
 import { type GetThemeOptions, getTheme } from "../next.js";
+import {
+	createThemes as createNextThemes,
+	type CreateNextThemesResult,
+} from "../next/create-themes.js";
 
 function expectType<T>(_value: T): void {}
 
@@ -219,3 +223,47 @@ function InvalidTypedImage(): ReactNode {
 	);
 }
 expectType<() => ReactNode>(InvalidTypedImage);
+
+const nextTyped = createNextThemes({
+	themes: appThemes,
+	storage: "hybrid",
+	defaultTheme: "system",
+});
+expectType<CreateNextThemesResult<typeof appThemes>>(nextTyped);
+expectType<CreateThemesResult<typeof appThemes>>(nextTyped);
+
+function NextTypedUsage(): ReactNode {
+	const { setTheme } = nextTyped.useTheme();
+	setTheme("high-contrast");
+	// @ts-expect-error setTheme only accepts configured themes or "system"
+	setTheme("sepia");
+	return (
+		<nextTyped.NextThemeProvider defaultTheme="high-contrast">
+			<nextTyped.ThemeScript nonce="theme-script" />
+			children
+		</nextTyped.NextThemeProvider>
+	);
+}
+expectType<() => ReactNode>(NextTypedUsage);
+
+function InvalidNextProviderOverride(): ReactNode {
+	return (
+		<nextTyped.NextThemeProvider
+			// @ts-expect-error typed NextThemeProvider keeps the configured theme tuple fixed
+			themes={["light", "dark"] as const}
+		>
+			children
+		</nextTyped.NextThemeProvider>
+	);
+}
+expectType<() => ReactNode>(InvalidNextProviderOverride);
+
+function InvalidNextScriptOverride(): ReactNode {
+	return (
+		<nextTyped.ThemeScript
+			// @ts-expect-error typed ThemeScript keeps the configured theme tuple fixed
+			themes={["light", "dark"] as const}
+		/>
+	);
+}
+expectType<() => ReactNode>(InvalidNextScriptOverride);
