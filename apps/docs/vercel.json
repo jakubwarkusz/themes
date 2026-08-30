@@ -1,4 +1,4 @@
 {
 	"installCommand": "pnpm install --frozen-lockfile",
-	"buildCommand": "bunx bun@1.3.9 run build"
+	"buildCommand": "npm install --global bun@1.3.9 && pnpm --filter theme-docs build"
 }

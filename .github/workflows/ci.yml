@@ -12,6 +12,10 @@ on:
       - "pnpm-workspace.yaml"
       - "oxlint.config.ts"
       - "oxfmt.config.ts"
+      - "README.md"
+      - "CONTRIBUTING.md"
+      - "AGENTS.md"
+      - "lefthook.yml"
       - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
@@ -24,6 +28,10 @@ on:
       - "pnpm-workspace.yaml"
       - "oxlint.config.ts"
       - "oxfmt.config.ts"
+      - "README.md"
+      - "CONTRIBUTING.md"
+      - "AGENTS.md"
+      - "lefthook.yml"
       - ".github/workflows/ci.yml"
 
 concurrency:
@@ -44,10 +52,6 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.9
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -92,10 +96,8 @@ jobs:
         run: pnpm --filter @wrksz/themes build
 
       - name: Bundle size
-        run: pnpm --filter @wrksz/themes size
-
-      - name: Bundle size baseline
-        run: pnpm --filter @wrksz/themes size:compare
+        working-directory: packages/themes
+        run: bun scripts/bundle-size.ts --compare benchmarks/baseline.json
 
   react-compatibility:
     name: React ${{ matrix.react }}
@@ -252,8 +254,24 @@ jobs:
       - name: Build fixture
         run: pnpm --filter next-16-3-compat build
 
+      # Local verify:full needs the same browser:
+      # pnpm --filter next-16-3-compat exec playwright install chromium
+      - name: Cache Playwright Chromium
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            playwright-chromium-${{ runner.os }}-
+
       - name: Install Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm --filter next-16-3-compat exec playwright install --with-deps chromium
+
+      - name: Install Chromium OS dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm --filter next-16-3-compat exec playwright install-deps chromium
 
       - name: Test Instant Navigations
         run: pnpm --filter next-16-3-compat test:e2e
