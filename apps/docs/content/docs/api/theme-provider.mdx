@@ -75,7 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `target` | `string` | `"html"` | Element to apply theme to (`"html"`, `"body"`, or a CSS selector) |
 | `storageKey` | `string` | `"theme"` | Key used for storage |
 | `storage` | `"localStorage" \| "sessionStorage" \| "cookie" \| "hybrid" \| "none"` | `"localStorage"` | Where to persist the theme. The bootstrap reads cookies synchronously before paint. `"hybrid"` prefers the cookie and mirrors writes to `localStorage` for cross-tab sync. <Breaking /> Next provider no longer reads the cookie via `cookies()` on the server. |
-| `cookieOptions` | `CookieOptions` | - | Cookie attributes applied when writing the theme cookie. Only used when `storage="cookie"`. See [CookieOptions](#cookieoptions). |
+| `cookieOptions` | `CookieOptions` | - | Cookie attributes applied when writing the theme cookie. Used when `storage` is `"cookie"` or `"hybrid"`. See [CookieOptions](#cookieoptions). |
 | `disableTransitionOnChange` | `boolean \| string` | `false` | Suppress CSS transitions on initial load and when switching themes. `true` disables all transitions. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties while keeping others (transforms, opacity, etc.) intact. |
 | `followSystem` | `boolean` | `false` | Always follow system preference, ignores stored value on mount |
 | `themeColor` | `string \| Record<string, string>` | - | Update `<meta name="theme-color">` on theme change |
@@ -92,7 +92,7 @@ Heavier capabilities stay behind opt-in imports so the default provider bundle d
 |------|------|---------|-------------|
 | `enableSameDocumentSync` | `boolean` | `false` | Synchronize providers that share a storage key in the same document |
 | `systemThemeMap` | `{ light: string; dark: string } \| Record<string, { light: string; dark: string }>` | - | Serializable custom resolution for system-aware variants |
-| `themeRoot` | `Element \| ShadowRoot` | - | Client-only Shadow DOM/custom root. Use `@wrksz/themes/client/extended-provider`. Use `target` when the root must be themed before hydration |
+| `themeRoot` | `Element \| ShadowRoot` | - | Client-only Shadow DOM or custom root. **Not on** `@wrksz/themes/next/extended` — a DOM object cannot go through the inline bootstrap. Import [`@wrksz/themes/client/extended-provider`](/docs/api/client-theme-provider). Worked example: [Shadow DOM](/docs/examples/shadow-dom). Use `target` when the root must be themed before hydration. |
 
 ## Security notes
 
@@ -360,7 +360,7 @@ Works with CSS variables too:
 
 ## CookieOptions
 
-Options applied when writing the theme cookie. Only relevant when `storage="cookie"`.
+Options applied when writing the theme cookie. Used when `storage` is `"cookie"` or `"hybrid"`.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|

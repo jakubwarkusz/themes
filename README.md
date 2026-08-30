@@ -167,26 +167,11 @@ with npm provenance from GitHub Actions.
 
 ### `ThemeProvider`
 
-| Prop                        | Type                                                                   | Default             | Description                                                                                                                                                                      |
-| --------------------------- | ---------------------------------------------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `themes`                    | `string[]`                                                             | `["light", "dark"]` | Available themes                                                                                                                                                                 |
-| `defaultTheme`              | `string`                                                               | `"system"`          | Theme used when no preference is stored                                                                                                                                          |
-| `forcedTheme`               | `string`                                                               | -                   | Force a specific theme, ignoring user preference                                                                                                                                 |
-| `initialTheme`              | `string`                                                               | -                   | Server-provided theme that overrides storage on mount. User can still call `setTheme` to change it                                                                               |
-| `enableSystem`              | `boolean`                                                              | `true`              | Detect system preference via `prefers-color-scheme`                                                                                                                              |
-| `enableColorScheme`         | `boolean`                                                              | `true`              | Set native `color-scheme` CSS property                                                                                                                                           |
-| `attribute`                 | `string \| string[]`                                                   | `"class"`           | HTML attribute(s) to set on target element (`"class"`, `"data-theme"`, etc.)                                                                                                     |
-| `value`                     | `Record<string, string>`                                               | -                   | Map theme names to attribute values                                                                                                                                              |
-| `target`                    | `string`                                                               | `"html"`            | Element to apply theme to (`"html"`, `"body"`, or a CSS selector)                                                                                                                |
-| `storageKey`                | `string`                                                               | `"theme"`           | Key used for storage                                                                                                                                                             |
-| `storage`                   | `"localStorage" \| "sessionStorage" \| "cookie" \| "hybrid" \| "none"` | `"localStorage"`    | Where to persist the theme. The bootstrap reads cookies before paint; `"hybrid"` prefers the cookie and mirrors writes to `localStorage` for cross-tab sync                      |
-| `disableTransitionOnChange` | `boolean \| string`                                                    | `false`             | Suppress CSS transitions when switching themes. `true` disables all. Pass a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to suppress only specific properties |
-| `followSystem`              | `boolean`                                                              | `false`             | Always follow system preference, ignores stored value on mount                                                                                                                   |
-| `themeColor`                | `string \| Record<string, string>`                                     | -                   | Update `<meta name="theme-color">` on theme change                                                                                                                               |
-| `nonce`                     | `string`                                                               | -                   | CSP nonce for the inline script                                                                                                                                                  |
-| `onThemeChange`             | `(theme: string) => void`                                              | -                   | Called when theme changes. Receives the selected value (may be `"system"`). When system preference changes while theme is `"system"`, fires with the resolved value              |
-| `onStorageError`            | `(error: unknown) => void`                                             | -                   | Reports storage failures without interrupting in-memory theme updates                                                                                                            |
-| `scriptProps`               | `ScriptHTMLAttributes<HTMLScriptElement>`                              | -                   | Extra bootstrap script attributes                                                                                                                                                |
+The canonical prop table lives on the docs site: [ThemeProvider](https://themes.wrksz.dev/docs/api/theme-provider).
+
+```tsx
+import { ThemeProvider } from "@wrksz/themes/next";
+```
 
 ### Opt-in extended provider
 
@@ -222,7 +207,7 @@ import { ClientThemeProvider } from "@wrksz/themes/client/extended-provider";
 - `enableSameDocumentSync?: boolean` synchronizes providers with the same storage key.
 - `systemThemeMap?: { light: Theme; dark: Theme } | Record<Theme, { light: Theme; dark: Theme }>`
   maps system preferences to custom names or preserves variant families.
-- `themeRoot?: Element | ShadowRoot` targets a client-owned element or a ShadowRoot host.
+- `themeRoot?: Element | ShadowRoot` targets a client-owned element or a ShadowRoot host. Worked example: [Shadow DOM](https://themes.wrksz.dev/docs/examples/shadow-dom).
 
 ### `useTheme`
 

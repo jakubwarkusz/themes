@@ -20,7 +20,57 @@ Keep `"light"` and `"dark"` as theme selections so `enableSystem` can resolve `"
 </ThemeProvider>
 ```
 
-The default Next provider stays on this light path on purpose. Custom system maps that rename the selection itself (for example resolving system directly to `"paper"` / `"midnight"`) are heavier and belong behind an opt-in extended API so the core bundle stays small.
+The default Next provider stays on this light path on purpose. Custom system maps that rename the selection itself belong behind `@wrksz/themes/next/extended` so the core bundle stays small. See [ThemeProvider Extended](/docs/api/theme-provider#extended-provider).
+
+## Custom system names
+
+When the stored selection should be `"paper"` / `"midnight"` rather than `"light"` / `"dark"`, pass a direct `{ light, dark }` map:
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider } from "@wrksz/themes/next/extended";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider
+          themes={["paper", "midnight"]}
+          defaultTheme="system"
+          systemThemeMap={{ light: "paper", dark: "midnight" }}
+        >
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+`system` then resolves to `"paper"` or `"midnight"` from `prefers-color-scheme`.
+
+## Variant families
+
+A `Record` map keeps a variant family (for example red vs blue) while still following system light/dark. Pair it with `followSystem`:
+
+```tsx
+import { ThemeProvider } from "@wrksz/themes/next/extended";
+
+<ThemeProvider
+  themes={["light-red", "dark-red", "light-blue", "dark-blue"]}
+  defaultTheme="light-red"
+  followSystem
+  systemThemeMap={{
+    "light-red": { light: "light-red", dark: "dark-red" },
+    "dark-red": { light: "light-red", dark: "dark-red" },
+    "light-blue": { light: "light-blue", dark: "dark-blue" },
+    "dark-blue": { light: "light-blue", dark: "dark-blue" },
+  }}
+>
+  {children}
+</ThemeProvider>
+```
+
+Selecting `"light-red"` stays in the red family; OS dark mode resolves to `"dark-red"`. `systemThemeMap` is serializable, so it works on the Next extended bootstrap. For a client-owned `themeRoot`, use [`@wrksz/themes/client/extended-provider`](/docs/examples/shadow-dom) instead.
 
 ## Contrast as an independent axis
 

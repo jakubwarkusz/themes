@@ -86,6 +86,8 @@ export function ThemeToggle() {
 | `@wrksz/themes/client/themed-image` | Direct `ThemedImage` import |
 | `@wrksz/themes/client/provider` | Direct `ClientThemeProvider` import |
 | `@wrksz/themes/client/create-themes` | Direct `createThemes` import |
+| `@wrksz/themes/next/extended` | Opt-in Next.js `ThemeProvider` with `systemThemeMap` and same-document sync |
+| `@wrksz/themes/client/extended-provider` | Opt-in `ClientThemeProvider` with `themeRoot`, `systemThemeMap`, and same-document sync |
 | `@wrksz/themes` | Client-safe `ThemeProvider` alias and `createThemes` for framework-neutral React usage |
 
 <Callout type="info">
@@ -102,4 +104,4 @@ export function ThemeToggle() {
 
 - [ThemeProvider API](/docs/api/theme-provider) - all available props
 - [useTheme API](/docs/api/use-theme) - hook reference
-- [Examples](/docs/examples) - Tailwind, data attributes, scoped theming, and more
+- [Examples](/docs/examples) - Tailwind, scoped theming, [Shadow DOM](/docs/examples/shadow-dom), and more
