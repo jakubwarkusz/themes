@@ -112,6 +112,7 @@ import { useHydrated } from "@wrksz/themes/client/use-hydrated";
 import { ThemedImage } from "@wrksz/themes/client/themed-image";
 import { ClientThemeProvider } from "@wrksz/themes/client/provider";
 import { createThemes } from "@wrksz/themes/client/create-themes";
+import { createThemes as createNextThemes } from "@wrksz/themes/next/create-themes";
 ```
 
 Full API docs and examples live at [themes.wrksz.dev](https://themes.wrksz.dev).

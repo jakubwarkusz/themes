@@ -9,7 +9,11 @@ import {
 } from "react";
 import type { ThemedImageProps } from "../components/themed-image.js";
 import { ThemedImage } from "../components/themed-image.js";
-import { createThemeContext, useThemeFromContext } from "../core/context.js";
+import {
+	createThemeContext,
+	type ThemeContextInstance,
+	useThemeFromContext,
+} from "../core/context.js";
 import { resolveThemeValue, type ThemeValueMap } from "../core/theme-value.js";
 import type {
 	ResolvedTheme,
@@ -45,9 +49,14 @@ export type CreateThemesResult<Themes extends readonly string[]> = {
 	ThemedImage: (props: TypedThemedImageProps<Themes[number]>) => ReactElement;
 };
 
-export function createThemes<const Themes extends readonly [string, ...string[]]>(
+/** Isolated factory bindings. Not a public export — used by the Next factory to share context. */
+export type CreateThemesBindings<Themes extends readonly string[]> = CreateThemesResult<Themes> & {
+	themeContext: ThemeContextInstance<Themes[number]>;
+};
+
+export function createThemesBindings<const Themes extends readonly [string, ...string[]]>(
 	config: CreateThemesConfig<Themes>,
-): CreateThemesResult<Themes> {
+): CreateThemesBindings<Themes> {
 	const defaults = config;
 	type ThemeName = Themes[number];
 	const context = createThemeContext<ThemeName>();
@@ -97,10 +106,24 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 	}
 
 	return {
+		themeContext: context,
 		ThemeProvider: TypedThemeProvider,
 		useTheme: useTypedTheme,
 		useThemeValue: useTypedThemeValue,
 		useThemeEffect: useTypedThemeEffect,
 		ThemedImage: TypedThemedImage,
+	};
+}
+
+export function createThemes<const Themes extends readonly [string, ...string[]]>(
+	config: CreateThemesConfig<Themes>,
+): CreateThemesResult<Themes> {
+	const bindings = createThemesBindings(config);
+	return {
+		ThemeProvider: bindings.ThemeProvider,
+		useTheme: bindings.useTheme,
+		useThemeValue: bindings.useThemeValue,
+		useThemeEffect: bindings.useThemeEffect,
+		ThemedImage: bindings.ThemedImage,
 	};
 }

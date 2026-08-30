@@ -11,6 +11,7 @@ export const PUBLIC_BUILD_ENTRIES: readonly string[] = [
 	"src/client/create-themes.ts",
 	"src/next.ts",
 	"src/next/extended.ts",
+	"src/next/create-themes.ts",
 	"src/script.ts",
 ];
 

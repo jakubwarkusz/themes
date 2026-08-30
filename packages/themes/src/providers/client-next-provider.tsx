@@ -3,13 +3,13 @@ import { useServerInsertedHTML } from "next/navigation";
 import { type ReactElement, useEffect, useRef } from "react";
 import { getScript } from "../core/script.js";
 import { resolveDefaultTheme } from "../core/theme-validation.js";
-import type { DefaultTheme, ThemeProviderProps } from "../core/types.js";
-import { ClientThemeProvider } from "./client-provider.js";
+import type { DefaultTheme } from "../core/types.js";
+import { type ClientThemeProviderProps, ClientThemeProvider } from "./client-provider.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
 
 export function ClientNextThemeProvider<Themes extends string = DefaultTheme>(
-	props: ThemeProviderProps<Themes>,
+	props: ClientThemeProviderProps<Themes>,
 ): ReactElement {
 	const {
 		themes = DEFAULT_THEMES as Themes[],
