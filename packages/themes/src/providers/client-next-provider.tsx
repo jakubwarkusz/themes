@@ -38,7 +38,6 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>(
 			data-wrksz-theme-target={target}
 			ref={scriptRef}
 			suppressHydrationWarning
-			// inline script required to prevent flash of unstyled theme
 			dangerouslySetInnerHTML={{
 				__html: getScript({
 					storageKey,
@@ -57,19 +56,18 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>(
 					followSystem,
 				}),
 			}}
-			{...(nonce !== undefined ? { nonce } : null)}
+			{...(nonce != null ? { nonce } : null)}
 		/>
 	);
 
 	useServerInsertedHTML(() => {
-		if (target !== "html") return null;
-		if (inserted.current) return null;
+		if (target != "html" || inserted.current) return null;
 		inserted.current = true;
 		return script;
 	});
 
 	useEffect(() => {
-		if (target === "html") return;
+		if (target == "html") return;
 		const current = scriptRef.current;
 		if (!current) return;
 		const scripts = document.querySelectorAll<HTMLScriptElement>(
@@ -77,14 +75,14 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>(
 		);
 		for (let i = 0; i < scripts.length; i++) {
 			const el = scripts[i];
-			if (el && el !== current && el.dataset.wrkszThemeTarget === target) {
+			if (el && el != current && el.dataset.wrkszThemeTarget == target) {
 				current.remove();
 				return;
 			}
 		}
 	}, [target]);
 
-	if (target === "html") return <ClientThemeProvider {...props} />;
+	if (target == "html") return <ClientThemeProvider {...props} />;
 	return (
 		<>
 			<ClientThemeProvider {...props} />
