@@ -40,9 +40,8 @@ export function themeBootstrap(
 					const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
 					let fromCookie: string | null = null;
 					try {
-						fromCookie = encoded ? decodeURIComponent(encoded) : null;
+						fromCookie = encoded ? decodeURIComponent(encoded) || null : null;
 					} catch {}
-					fromCookie = fromCookie || null;
 					stored =
 						storage === "hybrid"
 							? (fromCookie ?? localStorage.getItem(storageKey))
@@ -109,12 +108,9 @@ export function themeBootstrap(
 				el.classList.remove(...toRemove);
 				el.classList.add(...toAdd);
 			}
-		} else if (nextAttrValue) {
-			if (el.getAttribute(attr) !== nextAttrValue) {
-				el.setAttribute(attr, nextAttrValue);
-			}
-		} else {
-			el.removeAttribute(attr);
+		} else if (el.getAttribute(attr) !== nextAttrValue) {
+			if (nextAttrValue) el.setAttribute(attr, nextAttrValue);
+			else el.removeAttribute(attr);
 		}
 	}
 

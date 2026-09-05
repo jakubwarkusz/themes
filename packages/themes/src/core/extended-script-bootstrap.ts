@@ -45,9 +45,8 @@ export function extendedThemeBootstrap(
 					const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
 					let fromCookie: string | null = null;
 					try {
-						fromCookie = encoded ? decodeURIComponent(encoded) : null;
+						fromCookie = encoded ? decodeURIComponent(encoded) || null : null;
 					} catch {}
-					fromCookie = fromCookie || null;
 					stored =
 						storage === "hybrid"
 							? (fromCookie ?? localStorage.getItem(storageKey))
@@ -138,11 +137,9 @@ export function extendedThemeBootstrap(
 				element.classList.remove(...toRemove);
 				element.classList.add(...toAdd);
 			}
-		} else if (nextAttrValue) {
-			if (element.getAttribute(current) !== nextAttrValue)
-				element.setAttribute(current, nextAttrValue);
-		} else {
-			element.removeAttribute(current);
+		} else if (element.getAttribute(current) !== nextAttrValue) {
+			if (nextAttrValue) element.setAttribute(current, nextAttrValue);
+			else element.removeAttribute(current);
 		}
 	}
 

@@ -65,19 +65,7 @@ function restoreMetaThemeColor(state: AppliedThemeState["themeColorMeta"]): void
 }
 
 function splitClassTokens(value: string): string[] {
-	return value ? value.split(" ").filter(Boolean) : [];
-}
-
-function classAttributeNeedsUpdate(
-	el: Element,
-	currentValues: string[],
-	nextValues: string[],
-): boolean {
-	const nextValueSet = new Set(nextValues);
-	return (
-		currentValues.some((token) => !nextValueSet.has(token) && el.classList.contains(token)) ||
-		nextValues.some((token) => !el.classList.contains(token))
-	);
+	return value.split(" ").filter(Boolean);
 }
 
 function getTargetElement(target: string, themeRoot?: Element | ShadowRoot): Element | null {
@@ -101,7 +89,7 @@ function readCookieValue(key: string): string | null {
 	const parts = `; ${document.cookie}`.split(`; ${key}=`);
 	const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
 	try {
-		return encoded ? decodeURIComponent(encoded) : null;
+		return encoded ? decodeURIComponent(encoded) || null : null;
 	} catch {
 		return null;
 	}
@@ -177,10 +165,9 @@ export function applyExtendedThemeToDom({
 	const attributes = Array.isArray(attribute) ? attribute : [attribute];
 	const classValues = themes.flatMap((theme) => splitClassTokens(valueMap?.[theme] ?? theme));
 	const nextClassValues = splitClassTokens(attributeValue);
-	const nextClassValueSet = new Set(nextClassValues);
 	const nextAttrValue = attributeValue || null;
 	const nextDataAttributes = attributes.filter((current) => current !== "class");
-	const nextDataAttributeSet = new Set(nextDataAttributes);
+	const removeClassValues = previous?.element === element ? previous.classTokens : classValues;
 
 	if (previous) {
 		if (previous.element !== element) {
@@ -190,13 +177,8 @@ export function applyExtendedThemeToDom({
 			if (previous.colorSchemeApplied)
 				(previous.element as HTMLElement).style.colorScheme = "";
 		} else {
-			const obsoleteClasses = previous.classTokens.filter(
-				(token) => !nextClassValueSet.has(token),
-			);
-			if (obsoleteClasses.length > 0) element.classList.remove(...obsoleteClasses);
 			for (const current of previous.dataAttributes) {
-				if (!nextDataAttributeSet.has(current as Attribute))
-					element.removeAttribute(current);
+				if (!nextDataAttributes.includes(current)) element.removeAttribute(current);
 			}
 		}
 	}
@@ -205,7 +187,11 @@ export function applyExtendedThemeToDom({
 	let classChanged = false;
 	for (const current of attributes) {
 		if (current === "class") {
-			classChanged = classAttributeNeedsUpdate(element, classValues, nextClassValues);
+			classChanged =
+				removeClassValues.some(
+					(token) =>
+						!nextClassValues.includes(token) && element.classList.contains(token),
+				) || nextClassValues.some((token) => !element.classList.contains(token));
 			needsUpdate = needsUpdate || classChanged;
 		} else {
 			needsUpdate = needsUpdate || element.getAttribute(current) !== nextAttrValue;
@@ -225,15 +211,12 @@ export function applyExtendedThemeToDom({
 	for (const current of attributes) {
 		if (current === "class") {
 			if (classChanged) {
-				if (classValues.length > 0) element.classList.remove(...classValues);
-				if (nextClassValues.length > 0) element.classList.add(...nextClassValues);
+				element.classList.remove(...removeClassValues);
+				element.classList.add(...nextClassValues);
 			}
-		} else if (nextAttrValue) {
-			if (element.getAttribute(current) !== nextAttrValue) {
-				element.setAttribute(current, nextAttrValue);
-			}
-		} else {
-			element.removeAttribute(current);
+		} else if (element.getAttribute(current) !== nextAttrValue) {
+			if (nextAttrValue) element.setAttribute(current, nextAttrValue);
+			else element.removeAttribute(current);
 		}
 	}
 
