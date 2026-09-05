@@ -865,3 +865,57 @@ describe("serializeCookie", () => {
 		);
 	});
 });
+
+describe("ClientThemeProvider - history re-apply", () => {
+	test("re-applies the stored theme on pageshow", () => {
+		wrap(<ThemeConsumer />);
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		document.documentElement.classList.remove("dark");
+		act(() => {
+			window.dispatchEvent(new window.Event("pageshow"));
+		});
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("re-applies the stored theme on popstate", () => {
+		wrap(<ThemeConsumer />);
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		document.documentElement.classList.remove("dark");
+		act(() => {
+			window.dispatchEvent(new window.Event("popstate"));
+		});
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("re-applies after a later popstate listener restores a classless snapshot", () => {
+		wrap(<ThemeConsumer />);
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+
+		const frames: FrameRequestCallback[] = [];
+		const originalRaf = window.requestAnimationFrame;
+		window.requestAnimationFrame = ((cb: FrameRequestCallback) => {
+			frames.push(cb);
+			return 1;
+		}) as typeof window.requestAnimationFrame;
+		window.addEventListener("popstate", () => {
+			document.documentElement.classList.remove("dark");
+		});
+
+		act(() => {
+			window.dispatchEvent(new window.Event("popstate"));
+		});
+		expect(document.documentElement.classList.contains("dark")).toBe(false);
+
+		act(() => {
+			for (const frame of frames) frame(0);
+		});
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+		window.requestAnimationFrame = originalRaf;
+	});
+});
