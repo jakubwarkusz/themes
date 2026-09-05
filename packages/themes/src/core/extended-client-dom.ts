@@ -43,7 +43,7 @@ function updateMetaThemeColor(
 	if (!meta) {
 		meta = document.createElement("meta");
 		meta.name = "theme-color";
-		document.head.appendChild(meta);
+		document.head.append(meta);
 	}
 	const state = previous ?? {
 		element: meta,
@@ -64,21 +64,15 @@ function restoreMetaThemeColor(state: AppliedThemeState["themeColorMeta"]): void
 	else state.element.setAttribute("content", state.previousContent);
 }
 
-function classAttributeNeedsUpdate(
-	el: Element,
-	currentValues: string[],
-	nextValues: string[],
-): boolean {
-	const nextValueSet = new Set(nextValues);
-	return (
-		currentValues.some((token) => !nextValueSet.has(token) && el.classList.contains(token)) ||
-		nextValues.some((token) => !el.classList.contains(token))
-	);
+function splitClassTokens(value: string): string[] {
+	return value.split(" ").filter((t) => t);
 }
 
 function getTargetElement(target: string, themeRoot?: Element | ShadowRoot): Element | null {
-	if (themeRoot && "host" in themeRoot) return themeRoot.host;
-	if (typeof Element !== "undefined" && themeRoot instanceof Element) return themeRoot;
+	if (themeRoot) {
+		if ("host" in themeRoot) return themeRoot.host;
+		if ("tagName" in themeRoot) return themeRoot;
+	}
 	if (target === "html") return document.documentElement;
 	if (target === "body") return document.body;
 	return document.querySelector(target);
@@ -97,7 +91,7 @@ function readCookieValue(key: string): string | null {
 	const parts = `; ${document.cookie}`.split(`; ${key}=`);
 	const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
 	try {
-		return encoded ? decodeURIComponent(encoded) : null;
+		return encoded ? decodeURIComponent(encoded) || null : null;
 	} catch {
 		return null;
 	}
@@ -171,11 +165,11 @@ export function applyExtendedThemeToDom({
 
 	const attributeValue = valueMap?.[resolved] ?? resolved;
 	const attributes = Array.isArray(attribute) ? attribute : [attribute];
-	const classValues = themes.flatMap((theme) => (valueMap?.[theme] ?? theme).split(" "));
-	const nextClassValues = attributeValue.split(" ");
-	const nextClassValueSet = new Set(nextClassValues);
+	const classValues = themes.flatMap((theme) => splitClassTokens(valueMap?.[theme] ?? theme));
+	const nextClassValues = splitClassTokens(attributeValue);
+	const nextAttrValue = attributeValue || null;
 	const nextDataAttributes = attributes.filter((current) => current !== "class");
-	const nextDataAttributeSet = new Set(nextDataAttributes);
+	const removeClassValues = previous?.element === element ? previous.classTokens : classValues;
 
 	if (previous) {
 		if (previous.element !== element) {
@@ -185,13 +179,8 @@ export function applyExtendedThemeToDom({
 			if (previous.colorSchemeApplied)
 				(previous.element as HTMLElement).style.colorScheme = "";
 		} else {
-			const obsoleteClasses = previous.classTokens.filter(
-				(token) => !nextClassValueSet.has(token),
-			);
-			if (obsoleteClasses.length > 0) element.classList.remove(...obsoleteClasses);
 			for (const current of previous.dataAttributes) {
-				if (!nextDataAttributeSet.has(current as Attribute))
-					element.removeAttribute(current);
+				if (!nextDataAttributes.includes(current)) element.removeAttribute(current);
 			}
 		}
 	}
@@ -200,10 +189,14 @@ export function applyExtendedThemeToDom({
 	let classChanged = false;
 	for (const current of attributes) {
 		if (current === "class") {
-			classChanged = classAttributeNeedsUpdate(element, classValues, nextClassValues);
-			needsUpdate = needsUpdate || classChanged;
+			classChanged =
+				removeClassValues.some(
+					(token) =>
+						!nextClassValues.includes(token) && element.classList.contains(token),
+				) || nextClassValues.some((token) => !element.classList.contains(token));
+			needsUpdate ||= classChanged;
 		} else {
-			needsUpdate = needsUpdate || element.getAttribute(current) !== attributeValue;
+			needsUpdate ||= element.getAttribute(current) !== nextAttrValue;
 		}
 	}
 
@@ -213,23 +206,25 @@ export function applyExtendedThemeToDom({
 		const style = document.createElement("style");
 		style.textContent = `*,*::before,*::after{transition:${transitionValue}!important}`;
 		const styleRoot = themeRoot && "host" in themeRoot ? themeRoot : document.head;
-		styleRoot.appendChild(style);
+		styleRoot.append(style);
 		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
 	}
 
 	for (const current of attributes) {
 		if (current === "class") {
 			if (classChanged) {
-				element.classList.remove(...classValues);
+				element.classList.remove(...removeClassValues);
 				element.classList.add(...nextClassValues);
 			}
-		} else if (element.getAttribute(current) !== attributeValue) {
-			element.setAttribute(current, attributeValue);
+		} else if (element.getAttribute(current) !== nextAttrValue) {
+			if (nextAttrValue) element.setAttribute(current, nextAttrValue);
+			else element.removeAttribute(current);
 		}
 	}
 
-	if (enableColorScheme && (resolved === "light" || resolved === "dark")) {
-		(element as HTMLElement).style.colorScheme = resolved;
+	if (enableColorScheme) {
+		(element as HTMLElement).style.colorScheme =
+			resolved === "light" || resolved === "dark" ? resolved : "";
 	} else if (previous?.colorSchemeApplied) {
 		(element as HTMLElement).style.colorScheme = "";
 	}

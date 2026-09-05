@@ -16,6 +16,7 @@ import {
 	readStoredTheme,
 	writeStoredTheme,
 } from "../core/extended-client-dom.js";
+import { subscribeHistoryReapply } from "../core/history-reapply.js";
 import type { ExtendedThemeProviderProps, SystemThemeMap } from "../core/extended-types.js";
 import { createThemeStore } from "../core/store.js";
 import { publishThemeChannel, subscribeThemeChannel } from "../core/sync.js";
@@ -186,7 +187,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		const current = getSnapshot().theme;
 		if (current === "system" || current === undefined || followSystem) {
 			const followsVariant =
-				followSystem && Boolean(systemThemeMap) && !isDirectSystemMap(systemThemeMap);
+				followSystem && !!systemThemeMap && !isDirectSystemMap(systemThemeMap);
 			if (followSystem && !followsVariant) setStoreTheme("system");
 			const resolved =
 				resolveSelection(
@@ -250,6 +251,12 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		initializeEvent();
+		const domWindow = getDomWindow();
+		if (!domWindow) return;
+		return subscribeHistoryReapply(domWindow, () => {
+			const last = lastAppliedRef.current;
+			if (last) applyToDomEvent(last.resolved);
+		});
 	}, []);
 
 	// setTheme / system / storage already write the DOM. Re-apply only when
@@ -302,31 +309,13 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	useEffect(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
-		const handler = () => {
-			const { theme: currentTheme, systemTheme: currentSystemTheme } = getSnapshot();
-			const selection = validForcedTheme ?? currentTheme;
-			const resolved = selection
-				? resolveSelection(
-						selection,
-						currentSystemTheme,
-						systemThemeMap as SystemThemeMap<string> | undefined,
-					)
-				: undefined;
-			if (resolved) applyToDomEvent(resolved);
-		};
-		domWindow.addEventListener("pageshow", handler);
-		domWindow.addEventListener("popstate", handler);
-		return () => {
-			domWindow.removeEventListener("pageshow", handler);
-			domWindow.removeEventListener("popstate", handler);
-		};
-	}, [validForcedTheme, getSnapshot, systemThemeMap]);
-
-	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
-	useEffect(() => {
-		const domWindow = getDomWindow();
-		if (!domWindow) return;
-		if (storage === "none" || storage === "sessionStorage" || storage === "cookie") return;
+		if (
+			followSystem ||
+			storage === "none" ||
+			storage === "sessionStorage" ||
+			storage === "cookie"
+		)
+			return;
 
 		const handler = (event: StorageEvent) => {
 			if (event.storageArea !== localStorage || event.key !== storageKey) return;
@@ -343,6 +332,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		domWindow.addEventListener("storage", handler);
 		return () => domWindow.removeEventListener("storage", handler);
 	}, [
+		followSystem,
 		storage,
 		storageKey,
 		resolvedDefault,

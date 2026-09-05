@@ -15,6 +15,7 @@ import {
 	writeStoredTheme,
 } from "../core/client-dom.js";
 import { ThemeContext, type ThemeContextInstance } from "../core/context.js";
+import { subscribeHistoryReapply } from "../core/history-reapply.js";
 import { createThemeStore } from "../core/store.js";
 import { isThemeSelection, resolveDefaultTheme } from "../core/theme-validation.js";
 import type {
@@ -203,6 +204,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		initializeEvent();
+		const domWindow = getDomWindow();
+		if (!domWindow) return;
+		return subscribeHistoryReapply(domWindow, () => {
+			const last = lastAppliedRef.current;
+			if (last) applyToDomEvent(last.resolved);
+		});
 	}, []);
 
 	// setTheme / system / storage already write the DOM. Re-apply only when
@@ -249,31 +256,17 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		return () => mq.removeEventListener?.("change", handler);
 	}, [enableSystem, setStoreSystemTheme]);
 
-	// Re-apply theme on bfcache restore (pageshow) and history navigation (popstate)
 	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
-		const handler = () => {
-			const { theme, systemTheme } = getSnapshot();
-			const resolved =
-				validForcedTheme ??
-				(theme === "system" || theme === undefined ? systemTheme : theme);
-			if (resolved) applyToDomEvent(resolved);
-		};
-		domWindow.addEventListener("pageshow", handler);
-		domWindow.addEventListener("popstate", handler);
-		return () => {
-			domWindow.removeEventListener("pageshow", handler);
-			domWindow.removeEventListener("popstate", handler);
-		};
-	}, [validForcedTheme, getSnapshot]);
-
-	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
-	useEffect(() => {
-		const domWindow = getDomWindow();
-		if (!domWindow) return;
-		if (storage === "none" || storage === "sessionStorage" || storage === "cookie") return;
+		if (
+			followSystem ||
+			storage === "none" ||
+			storage === "sessionStorage" ||
+			storage === "cookie"
+		)
+			return;
 
 		const handler = (e: StorageEvent) => {
 			if (e.storageArea !== localStorage || e.key !== storageKey) return;
@@ -287,6 +280,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		domWindow.addEventListener("storage", handler);
 		return () => domWindow.removeEventListener("storage", handler);
 	}, [
+		followSystem,
 		storage,
 		storageKey,
 		resolvedDefault,

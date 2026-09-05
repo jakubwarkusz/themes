@@ -82,6 +82,7 @@ describe("getScript", () => {
 		const disabled = getScript({ ...base, enableSystem: false });
 		expect(enabled).toContain(",true,");
 		expect(disabled).toContain(",false,");
+		expect(enabled).not.toContain(String(undefined));
 	});
 
 	test("inlines enableColorScheme as boolean literal", () => {
@@ -149,5 +150,33 @@ describe("getScript", () => {
 		expect(script.startsWith("(")).toBe(true);
 		expect(script.endsWith(")")).toBe(true);
 		expect(script).toMatch(/^\(function\(/);
+	});
+
+	test("omits cookie-parser bytecode for the localStorage default", () => {
+		const script = getScript(base);
+		expect(script).not.toContain("document.cookie");
+		expect(script).not.toContain("decodeURIComponent");
+		expect(script).toContain("localStorage.getItem");
+	});
+
+	test("keeps cookie-parser bytecode when storage is cookie or hybrid", () => {
+		expect(getScript({ ...base, storage: "cookie" })).toContain("document.cookie");
+		expect(getScript({ ...base, storage: "hybrid" })).toContain("decodeURIComponent");
+	});
+
+	test("keeps theme-color bytecode when themeColors is set", () => {
+		const script = getScript({ ...base, themeColors: { dark: "#000" } });
+		expect(script).toContain("theme-color");
+	});
+
+	test("keeps transition bytecode when disableTransitionOnChange is set", () => {
+		const script = getScript({ ...base, disableTransitionOnChange: true });
+		expect(script).toContain("requestAnimationFrame");
+	});
+
+	test("omits cookie-parser bytecode for followSystem with localStorage", () => {
+		const script = getScript({ ...base, followSystem: true });
+		expect(script).not.toContain("document.cookie");
+		expect(script).not.toContain("decodeURIComponent");
 	});
 });

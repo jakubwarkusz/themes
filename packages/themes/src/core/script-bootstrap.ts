@@ -35,19 +35,21 @@ export function themeBootstrap(
 
 		if (!followSystem) {
 			try {
-				if (storage === "cookie" || storage === "hybrid") {
-					// biome-ignore lint/style/useTemplate: keep concat so minified source has no `${}` placeholders
+				if (storage === "localStorage") {
+					stored = localStorage.getItem(storageKey);
+				} else if (storage === "cookie" || storage === "hybrid") {
 					const parts = ("; " + document.cookie).split("; " + storageKey + "=");
 					const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
-					const fromCookie = encoded ? decodeURIComponent(encoded) : null;
+					let fromCookie: string | null = null;
+					try {
+						fromCookie = encoded ? decodeURIComponent(encoded) : null;
+					} catch {}
 					stored =
 						storage === "hybrid"
 							? (fromCookie ?? localStorage.getItem(storageKey))
 							: fromCookie;
 				} else if (storage !== "none") {
-					stored = (storage === "localStorage" ? localStorage : sessionStorage).getItem(
-						storageKey,
-					);
+					stored = sessionStorage.getItem(storageKey);
 				}
 			} catch {}
 		}
@@ -63,7 +65,7 @@ export function themeBootstrap(
 			: defaultTheme;
 	}
 
-	const attrValue = value?.[theme] || theme;
+	const attrValue = value?.[theme] ?? theme;
 	const el =
 		target === "html"
 			? document.documentElement
@@ -74,8 +76,9 @@ export function themeBootstrap(
 	if (!el) return;
 
 	const attrs = Array.isArray(attribute) ? attribute : [attribute];
-	const toRemove = themes.flatMap((name) => (value?.[name] || name).split(" "));
-	const toAdd = attrValue.split(" ");
+	const toRemove = themes.flatMap((name) => (value?.[name] ?? name).split(" ").filter((t) => t));
+	const toAdd = attrValue.split(" ").filter((t) => t);
+	const nextAttrValue = attrValue || null;
 	let changed = false;
 	let classChanged = false;
 
@@ -84,9 +87,9 @@ export function themeBootstrap(
 			classChanged =
 				toRemove.some((token) => !toAdd.includes(token) && el.classList.contains(token)) ||
 				toAdd.some((token) => !el.classList.contains(token));
-			changed = changed || classChanged;
+			changed ||= classChanged;
 		} else {
-			changed = changed || el.getAttribute(attr) !== attrValue;
+			changed ||= el.getAttribute(attr) !== nextAttrValue;
 		}
 	}
 
@@ -94,9 +97,8 @@ export function themeBootstrap(
 		const css =
 			typeof disableTransitionOnChange === "string" ? disableTransitionOnChange : "none";
 		const style = document.createElement("style");
-		// biome-ignore lint/style/useTemplate: keep concat so minified source has no `${}` placeholders
 		style.textContent = "*,*::before,*::after{transition:" + css + "!important}";
-		document.head.appendChild(style);
+		document.head.append(style);
 		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
 	}
 
@@ -106,17 +108,14 @@ export function themeBootstrap(
 				el.classList.remove(...toRemove);
 				el.classList.add(...toAdd);
 			}
-		} else if (attrValue) {
-			if (el.getAttribute(attr) !== attrValue) {
-				el.setAttribute(attr, attrValue);
-			}
-		} else {
-			el.removeAttribute(attr);
+		} else if (el.getAttribute(attr) !== nextAttrValue) {
+			if (nextAttrValue) el.setAttribute(attr, nextAttrValue);
+			else el.removeAttribute(attr);
 		}
 	}
 
-	if (enableColorScheme && (theme === "light" || theme === "dark")) {
-		(el as HTMLElement).style.colorScheme = theme;
+	if (enableColorScheme) {
+		(el as HTMLElement).style.colorScheme = theme === "light" || theme === "dark" ? theme : "";
 	}
 
 	if (themeColors) {
@@ -125,10 +124,10 @@ export function themeBootstrap(
 			let meta = document.querySelector('meta[name="theme-color"]');
 			if (!meta) {
 				meta = document.createElement("meta");
-				meta.setAttribute("name", "theme-color");
-				document.head.appendChild(meta);
+				(meta as HTMLMetaElement).name = "theme-color";
+				document.head.append(meta);
 			}
-			meta.setAttribute("content", color);
+			(meta as HTMLMetaElement).content = color;
 		}
 	}
 }

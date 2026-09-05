@@ -255,18 +255,18 @@ export function measureText(name: string, text: string): BundleReport {
 async function generatedScriptCase(): Promise<BundleReport> {
 	const source = getScript({
 		storageKey: "theme",
-		attribute: ["class", "data-theme"],
+		attribute: "class",
 		defaultTheme: "system",
 		enableSystem: true,
 		enableColorScheme: true,
 		forcedTheme: undefined,
 		themes: ["light", "dark"],
-		value: { dark: "dark dark-palette" },
+		value: undefined,
 		target: "html",
-		storage: "hybrid",
-		themeColors: { light: "#fff", dark: "#000" },
+		storage: "localStorage",
+		themeColors: undefined,
 		initialTheme: undefined,
-		disableTransitionOnChange: true,
+		disableTransitionOnChange: false,
 		followSystem: false,
 	});
 	await mkdir(outputDir, { recursive: true });
