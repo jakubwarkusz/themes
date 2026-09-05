@@ -43,7 +43,7 @@ function updateMetaThemeColor(
 	if (!meta) {
 		meta = document.createElement("meta");
 		meta.name = "theme-color";
-		document.head.appendChild(meta);
+		document.head.append(meta);
 	}
 	const state = previous ?? {
 		element: meta,
@@ -65,12 +65,14 @@ function restoreMetaThemeColor(state: AppliedThemeState["themeColorMeta"]): void
 }
 
 function splitClassTokens(value: string): string[] {
-	return value.split(" ").filter(Boolean);
+	return value.split(" ").filter((t) => t);
 }
 
 function getTargetElement(target: string, themeRoot?: Element | ShadowRoot): Element | null {
-	if (themeRoot && "host" in themeRoot) return themeRoot.host;
-	if (typeof Element !== "undefined" && themeRoot instanceof Element) return themeRoot;
+	if (themeRoot) {
+		if ("host" in themeRoot) return themeRoot.host;
+		if ("tagName" in themeRoot) return themeRoot;
+	}
 	if (target === "html") return document.documentElement;
 	if (target === "body") return document.body;
 	return document.querySelector(target);
@@ -192,9 +194,9 @@ export function applyExtendedThemeToDom({
 					(token) =>
 						!nextClassValues.includes(token) && element.classList.contains(token),
 				) || nextClassValues.some((token) => !element.classList.contains(token));
-			needsUpdate = needsUpdate || classChanged;
+			needsUpdate ||= classChanged;
 		} else {
-			needsUpdate = needsUpdate || element.getAttribute(current) !== nextAttrValue;
+			needsUpdate ||= element.getAttribute(current) !== nextAttrValue;
 		}
 	}
 
@@ -204,7 +206,7 @@ export function applyExtendedThemeToDom({
 		const style = document.createElement("style");
 		style.textContent = `*,*::before,*::after{transition:${transitionValue}!important}`;
 		const styleRoot = themeRoot && "host" in themeRoot ? themeRoot : document.head;
-		styleRoot.appendChild(style);
+		styleRoot.append(style);
 		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
 	}
 

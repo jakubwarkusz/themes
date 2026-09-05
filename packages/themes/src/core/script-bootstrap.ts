@@ -76,8 +76,8 @@ export function themeBootstrap(
 	if (!el) return;
 
 	const attrs = Array.isArray(attribute) ? attribute : [attribute];
-	const toRemove = themes.flatMap((name) => (value?.[name] ?? name).split(" ").filter(Boolean));
-	const toAdd = attrValue.split(" ").filter(Boolean);
+	const toRemove = themes.flatMap((name) => (value?.[name] ?? name).split(" ").filter((t) => t));
+	const toAdd = attrValue.split(" ").filter((t) => t);
 	const nextAttrValue = attrValue || null;
 	let changed = false;
 	let classChanged = false;

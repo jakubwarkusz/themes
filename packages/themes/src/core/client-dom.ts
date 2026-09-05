@@ -12,8 +12,8 @@ type ApplyThemeOptions = {
 	themeColor: ThemeColor | undefined;
 };
 
-const LAST_CLASS_TOKENS = "_wt";
-const CREATED_THEME_COLOR = "_wc";
+const LAST_CLASS_TOKENS = "_";
+const CREATED_THEME_COLOR = "$";
 
 type ThemedElement = Element & { [LAST_CLASS_TOKENS]?: string[] };
 type MarkedThemeColorMeta = HTMLMetaElement & { [CREATED_THEME_COLOR]?: 1 };
@@ -24,7 +24,7 @@ function resolveThemeColor(themeColor: ThemeColor, resolved: string): string | u
 }
 
 function splitClassTokens(value: string): string[] {
-	return value.split(" ").filter(Boolean);
+	return value.split(" ").filter((t) => t);
 }
 
 function updateMetaThemeColor(color: string | undefined): void {
@@ -134,7 +134,7 @@ export function applyThemeToDom({
 	if (!el) return;
 
 	const attrValue = valueMap?.[resolved] ?? resolved;
-	const attrs = Array.isArray(attribute) ? attribute : [attribute];
+	const attrs = ([] as Attribute[]).concat(attribute);
 	const classValues = themes.flatMap((t) => splitClassTokens(valueMap?.[t] ?? t));
 	const nextClassValues = splitClassTokens(attrValue);
 	const themed = el as ThemedElement;
@@ -148,9 +148,9 @@ export function applyThemeToDom({
 				removeClassValues.some(
 					(token) => !nextClassValues.includes(token) && el.classList.contains(token),
 				) || nextClassValues.some((token) => !el.classList.contains(token));
-			needsUpdate = needsUpdate || classChanged;
+			needsUpdate ||= classChanged;
 		} else {
-			needsUpdate = needsUpdate || el.getAttribute(attr) !== nextAttrValue;
+			needsUpdate ||= el.getAttribute(attr) !== nextAttrValue;
 		}
 	}
 

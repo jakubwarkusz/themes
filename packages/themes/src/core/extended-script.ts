@@ -14,22 +14,29 @@ function safeJson(value: unknown): string {
 }
 
 export function getExtendedScript(config: ExtendedScriptConfig): string {
-	const args = [
-		safeJson(config.storageKey),
-		safeJson(config.attribute),
-		safeJson(config.defaultTheme),
-		safeJson(Boolean(config.enableSystem)),
-		safeJson(Boolean(config.enableColorScheme)),
-		safeJson(config.forcedTheme ?? null),
-		safeJson(config.themes),
-		safeJson(config.value ?? null),
-		safeJson(config.target),
-		safeJson(config.storage),
-		safeJson(config.themeColors ?? null),
-		safeJson(config.initialTheme ?? null),
-		safeJson(config.disableTransitionOnChange),
-		safeJson(Boolean(config.followSystem)),
-		safeJson(config.systemThemeMap ?? null),
-	].join(",");
-	return `(${EXTENDED_THEME_SCRIPT_SOURCE})(${args})`;
+	return (
+		"(" +
+		EXTENDED_THEME_SCRIPT_SOURCE +
+		")(" +
+		[
+			config.storageKey,
+			config.attribute,
+			config.defaultTheme,
+			!!config.enableSystem,
+			!!config.enableColorScheme,
+			config.forcedTheme ?? null,
+			config.themes,
+			config.value ?? null,
+			config.target,
+			config.storage,
+			config.themeColors ?? null,
+			config.initialTheme ?? null,
+			config.disableTransitionOnChange,
+			!!config.followSystem,
+			config.systemThemeMap ?? null,
+		]
+			.map(safeJson)
+			.join(",") +
+		")"
+	);
 }

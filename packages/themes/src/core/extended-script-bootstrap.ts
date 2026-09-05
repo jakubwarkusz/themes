@@ -72,11 +72,7 @@ export function extendedThemeBootstrap(
 
 	if (systemTheme) {
 		const directMap = systemThemeMap as { light?: unknown; dark?: unknown } | null;
-		if (
-			directMap &&
-			typeof directMap.light === "string" &&
-			typeof directMap.dark === "string"
-		) {
+		if (directMap && typeof directMap.light + typeof directMap.dark === "stringstring") {
 			if (selection === "system")
 				theme = (directMap as { light: string; dark: string })[systemTheme];
 		} else if (systemThemeMap && selection !== "system") {
@@ -103,9 +99,9 @@ export function extendedThemeBootstrap(
 
 	const attributes = Array.isArray(attribute) ? attribute : [attribute];
 	const toRemove = themes.flatMap((current) =>
-		(value?.[current] ?? current).split(" ").filter(Boolean),
+		(value?.[current] ?? current).split(" ").filter((t) => t),
 	);
-	const toAdd = attributeValue.split(" ").filter(Boolean);
+	const toAdd = attributeValue.split(" ").filter((t) => t);
 	const nextAttrValue = attributeValue || null;
 	let changed = false;
 	let classChanged = false;
@@ -116,9 +112,9 @@ export function extendedThemeBootstrap(
 				toRemove.some(
 					(token) => !toAdd.includes(token) && element.classList.contains(token),
 				) || toAdd.some((token) => !element.classList.contains(token));
-			changed = changed || classChanged;
+			changed ||= classChanged;
 		} else {
-			changed = changed || element.getAttribute(current) !== nextAttrValue;
+			changed ||= element.getAttribute(current) !== nextAttrValue;
 		}
 	}
 
@@ -127,7 +123,7 @@ export function extendedThemeBootstrap(
 			typeof disableTransitionOnChange === "string" ? disableTransitionOnChange : "none";
 		const style = document.createElement("style");
 		style.textContent = "*,*::before,*::after{transition:" + css + "!important}";
-		document.head.appendChild(style);
+		document.head.append(style);
 		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
 	}
 
@@ -153,10 +149,10 @@ export function extendedThemeBootstrap(
 			let meta = document.querySelector('meta[name="theme-color"]');
 			if (!meta) {
 				meta = document.createElement("meta");
-				meta.setAttribute("name", "theme-color");
-				document.head.appendChild(meta);
+				(meta as HTMLMetaElement).name = "theme-color";
+				document.head.append(meta);
 			}
-			meta.setAttribute("content", color);
+			(meta as HTMLMetaElement).content = color;
 		}
 	}
 }
