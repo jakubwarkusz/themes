@@ -9,6 +9,9 @@ beforeEach(() => {
 	document.documentElement.className = "";
 	document.documentElement.removeAttribute("data-theme");
 	document.documentElement.style.colorScheme = "";
+	document.body.className = "";
+	document.body.removeAttribute("data-theme");
+	document.body.style.colorScheme = "";
 	for (const el of Array.from(document.head.querySelectorAll('meta[name="theme-color"]'))) {
 		el.remove();
 	}
@@ -141,6 +144,13 @@ describe("themeScript - data attribute", () => {
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 		expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
 	});
+
+	test("empty mapped data attribute is removed", () => {
+		document.documentElement.setAttribute("data-theme", "dark");
+		localStorage.setItem("theme", "dark");
+		runScript({ ...base, attribute: "data-theme", value: { dark: "" } });
+		expect(document.documentElement.getAttribute("data-theme")).toBeNull();
+	});
 });
 
 describe("themeScript - value map", () => {
@@ -168,6 +178,18 @@ describe("themeScript - colorScheme", () => {
 	test("does not set colorScheme when disabled", () => {
 		localStorage.setItem("theme", "dark");
 		runScript({ ...base, enableColorScheme: false });
+		expect(document.documentElement.style.colorScheme).toBe("");
+	});
+
+	test("clears colorScheme when the resolved theme is not light or dark", () => {
+		document.documentElement.style.colorScheme = "dark";
+		localStorage.setItem("theme", "high-contrast");
+		runScript({
+			...base,
+			themes: ["light", "dark", "high-contrast"],
+			enableSystem: false,
+			defaultTheme: "light",
+		});
 		expect(document.documentElement.style.colorScheme).toBe("");
 	});
 });
@@ -240,6 +262,13 @@ describe("themeScript - hybrid storage", () => {
 		runScript({ ...base, storage: "hybrid" });
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});
+
+	test("falls back to localStorage when the cookie encoding is malformed", () => {
+		localStorage.setItem("theme", "dark");
+		document.cookie = "theme=%";
+		runScript({ ...base, storage: "hybrid" });
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
 });
 
 describe("themeScript - themeColor", () => {
@@ -301,6 +330,13 @@ describe("themeScript - multiple classes via value map", () => {
 		expect(document.documentElement.classList.contains("dark")).toBe(false);
 		expect(document.documentElement.classList.contains("dark-palette")).toBe(false);
 		expect(document.documentElement.classList.contains("light")).toBe(true);
+	});
+
+	test("empty mapped class value does not fall back to the theme name", () => {
+		localStorage.setItem("theme", "dark");
+		runScript({ ...base, value: { dark: "" } });
+		expect(document.documentElement.classList.contains("dark")).toBe(false);
+		expect(document.documentElement.className).toBe("");
 	});
 });
 
@@ -430,5 +466,24 @@ describe("themeScript - disableTransitionOnChange", () => {
 		const stylesBefore = document.head.querySelectorAll("style").length;
 		runScript({ ...base, disableTransitionOnChange: false });
 		expect(document.head.querySelectorAll("style").length).toBe(stylesBefore);
+	});
+});
+
+describe("themeScript - targets", () => {
+	test("applies to body", () => {
+		localStorage.setItem("theme", "dark");
+		runScript({ ...base, target: "body" });
+		expect(document.body.classList.contains("dark")).toBe(true);
+		expect(document.documentElement.classList.contains("dark")).toBe(false);
+	});
+
+	test("applies to a selector target", () => {
+		const fixture = document.createElement("div");
+		fixture.id = "fixture";
+		document.body.appendChild(fixture);
+		localStorage.setItem("theme", "dark");
+		runScript({ ...base, target: "#fixture" });
+		expect(fixture.classList.contains("dark")).toBe(true);
+		fixture.remove();
 	});
 });

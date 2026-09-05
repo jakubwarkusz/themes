@@ -12,33 +12,36 @@ type ApplyThemeOptions = {
 	themeColor: ThemeColor | undefined;
 };
 
+const LAST_CLASS_TOKENS = "_";
+const CREATED_THEME_COLOR = "$";
+
+type ThemedElement = Element & { [LAST_CLASS_TOKENS]?: string[] };
+type MarkedThemeColorMeta = HTMLMetaElement & { [CREATED_THEME_COLOR]?: 1 };
+
 function resolveThemeColor(themeColor: ThemeColor, resolved: string): string | undefined {
 	if (typeof themeColor === "string") return themeColor;
 	return themeColor[resolved];
 }
 
+function splitClassTokens(value: string): string[] {
+	return value.split(" ").filter((t) => t);
+}
+
 function updateMetaThemeColor(color: string | undefined): void {
-	if (!color) return;
 	let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+	if (!color) {
+		if (!meta) return;
+		if ((meta as MarkedThemeColorMeta)[CREATED_THEME_COLOR]) meta.remove();
+		else meta.removeAttribute("content");
+		return;
+	}
 	if (!meta) {
 		meta = document.createElement("meta");
 		meta.name = "theme-color";
 		document.head.appendChild(meta);
+		(meta as MarkedThemeColorMeta)[CREATED_THEME_COLOR] = 1;
 	}
 	meta.content = color;
-}
-
-function classAttributeNeedsUpdate(
-	el: Element,
-	currentValues: string[],
-	nextValues: string[],
-): boolean {
-	// Match bootstrap: theme class lists are tiny, so includes() beats Set alloc.
-	return (
-		currentValues.some(
-			(token) => !nextValues.includes(token) && el.classList.contains(token),
-		) || nextValues.some((token) => !el.classList.contains(token))
-	);
 }
 
 function getTargetEl(target: string): Element | null {
@@ -59,11 +62,11 @@ function reportStorageError(
 function readCookieValue(key: string): string | null {
 	const parts = `; ${document.cookie}`.split(`; ${key}=`);
 	const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
-	let decoded: string | null = null;
 	try {
-		decoded = encoded ? decodeURIComponent(encoded) : null;
-	} catch {}
-	return decoded ? decoded : null;
+		return encoded ? decodeURIComponent(encoded) || null : null;
+	} catch {
+		return null;
+	}
 }
 
 export function getDomWindow(): (Window & typeof globalThis) | null {
@@ -131,17 +134,23 @@ export function applyThemeToDom({
 	if (!el) return;
 
 	const attrValue = valueMap?.[resolved] ?? resolved;
-	const attrs = Array.isArray(attribute) ? attribute : [attribute];
-	const classValues = themes.flatMap((t) => (valueMap?.[t] ?? t).split(" "));
-	const nextClassValues = attrValue.split(" ");
+	const attrs = ([] as Attribute[]).concat(attribute);
+	const classValues = themes.flatMap((t) => splitClassTokens(valueMap?.[t] ?? t));
+	const nextClassValues = splitClassTokens(attrValue);
+	const themed = el as ThemedElement;
+	const removeClassValues = themed[LAST_CLASS_TOKENS] ?? classValues;
+	const nextAttrValue = attrValue || null;
 	let needsUpdate = false;
 	let classChanged = false;
 	for (const attr of attrs) {
 		if (attr === "class") {
-			classChanged = classAttributeNeedsUpdate(el, classValues, nextClassValues);
-			needsUpdate = needsUpdate || classChanged;
+			classChanged =
+				removeClassValues.some(
+					(token) => !nextClassValues.includes(token) && el.classList.contains(token),
+				) || nextClassValues.some((token) => !el.classList.contains(token));
+			needsUpdate ||= classChanged;
 		} else {
-			needsUpdate = needsUpdate || el.getAttribute(attr) !== attrValue;
+			needsUpdate ||= el.getAttribute(attr) !== nextAttrValue;
 		}
 	}
 
@@ -151,22 +160,25 @@ export function applyThemeToDom({
 		const style = document.createElement("style");
 		style.textContent = `*,*::before,*::after{transition:${transitionValue}!important}`;
 		document.head.appendChild(style);
-		requestAnimationFrame(() => requestAnimationFrame(() => document.head.removeChild(style)));
+		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
 	}
 
 	for (const attr of attrs) {
 		if (attr === "class") {
 			if (classChanged) {
-				el.classList.remove(...classValues);
+				el.classList.remove(...removeClassValues);
 				el.classList.add(...nextClassValues);
 			}
-		} else if (el.getAttribute(attr) !== attrValue) {
-			el.setAttribute(attr, attrValue);
+			themed[LAST_CLASS_TOKENS] = nextClassValues;
+		} else if (el.getAttribute(attr) !== nextAttrValue) {
+			if (nextAttrValue) el.setAttribute(attr, nextAttrValue);
+			else el.removeAttribute(attr);
 		}
 	}
 
-	if (enableColorScheme && (resolved === "light" || resolved === "dark")) {
-		(el as HTMLElement).style.colorScheme = resolved;
+	if (enableColorScheme) {
+		(el as HTMLElement).style.colorScheme =
+			resolved === "light" || resolved === "dark" ? resolved : "";
 	}
 
 	if (themeColor) {

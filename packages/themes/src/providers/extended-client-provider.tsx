@@ -16,18 +16,19 @@ import {
 	readStoredTheme,
 	writeStoredTheme,
 } from "../core/extended-client-dom.js";
+import { subscribeHistoryReapply } from "../core/history-reapply.js";
 import type { ExtendedThemeProviderProps, SystemThemeMap } from "../core/extended-types.js";
 import { createThemeStore } from "../core/store.js";
 import { publishThemeChannel, subscribeThemeChannel } from "../core/sync.js";
 import { isThemeSelection, resolveDefaultTheme } from "../core/theme-validation.js";
-import type { DefaultTheme, ThemeContextValue } from "../core/types.js";
+import type { Attribute, DefaultTheme, ThemeContextValue } from "../core/types.js";
 import { useEffectEvent } from "../core/use-effect-event.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
 
 type LastAppliedTheme = {
 	resolved: string;
-	attribute: ExtendedThemeProviderProps["attribute"];
+	attribute: Attribute | readonly Attribute[];
 	themes: readonly string[];
 	valueMap: ExtendedThemeProviderProps["value"];
 	target: string;
@@ -123,19 +124,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	});
 
 	const applyToDomEvent = useEffectEvent((resolved: string) => {
-		appliedThemeRef.current = applyExtendedThemeToDom({
-			resolved,
-			attribute,
-			themes,
-			valueMap,
-			target,
-			disableTransitionOnChange,
-			enableColorScheme,
-			themeColor,
-			previous: appliedThemeRef.current,
-			...(themeRoot !== undefined ? { themeRoot } : {}),
-		});
-		lastAppliedRef.current = {
+		const last: LastAppliedTheme = {
 			resolved,
 			attribute,
 			themes,
@@ -146,6 +135,11 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			themeColor,
 			themeRoot,
 		};
+		appliedThemeRef.current = applyExtendedThemeToDom({
+			...last,
+			previous: appliedThemeRef.current,
+		});
+		lastAppliedRef.current = last;
 	});
 
 	const initializeEvent = useEffectEvent(() => {
@@ -186,7 +180,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		const current = getSnapshot().theme;
 		if (current === "system" || current === undefined || followSystem) {
 			const followsVariant =
-				followSystem && Boolean(systemThemeMap) && !isDirectSystemMap(systemThemeMap);
+				followSystem && !!systemThemeMap && !isDirectSystemMap(systemThemeMap);
 			if (followSystem && !followsVariant) setStoreTheme("system");
 			const resolved =
 				resolveSelection(
@@ -250,6 +244,12 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		initializeEvent();
+		const domWindow = getDomWindow();
+		if (!domWindow) return;
+		return subscribeHistoryReapply(domWindow, () => {
+			const last = lastAppliedRef.current;
+			if (last) applyToDomEvent(last.resolved);
+		});
 	}, []);
 
 	// setTheme / system / storage already write the DOM. Re-apply only when
@@ -259,13 +259,12 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		if (!resolvedTheme) return;
 		const last = lastAppliedRef.current;
 		if (
-			last !== null &&
+			last &&
 			last.resolved === resolvedTheme &&
 			last.attribute === attribute &&
 			last.themes === themes &&
 			last.valueMap === valueMap &&
 			last.target === target &&
-			last.disableTransitionOnChange === disableTransitionOnChange &&
 			last.enableColorScheme === enableColorScheme &&
 			last.themeColor === themeColor &&
 			last.themeRoot === themeRoot
@@ -302,31 +301,13 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	useEffect(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
-		const handler = () => {
-			const { theme: currentTheme, systemTheme: currentSystemTheme } = getSnapshot();
-			const selection = validForcedTheme ?? currentTheme;
-			const resolved = selection
-				? resolveSelection(
-						selection,
-						currentSystemTheme,
-						systemThemeMap as SystemThemeMap<string> | undefined,
-					)
-				: undefined;
-			if (resolved) applyToDomEvent(resolved);
-		};
-		domWindow.addEventListener("pageshow", handler);
-		domWindow.addEventListener("popstate", handler);
-		return () => {
-			domWindow.removeEventListener("pageshow", handler);
-			domWindow.removeEventListener("popstate", handler);
-		};
-	}, [validForcedTheme, getSnapshot, systemThemeMap]);
-
-	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
-	useEffect(() => {
-		const domWindow = getDomWindow();
-		if (!domWindow) return;
-		if (storage === "none" || storage === "sessionStorage" || storage === "cookie") return;
+		if (
+			followSystem ||
+			storage === "none" ||
+			storage === "sessionStorage" ||
+			storage === "cookie"
+		)
+			return;
 
 		const handler = (event: StorageEvent) => {
 			if (event.storageArea !== localStorage || event.key !== storageKey) return;
@@ -343,6 +324,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		domWindow.addEventListener("storage", handler);
 		return () => domWindow.removeEventListener("storage", handler);
 	}, [
+		followSystem,
 		storage,
 		storageKey,
 		resolvedDefault,
