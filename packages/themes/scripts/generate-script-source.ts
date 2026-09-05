@@ -209,10 +209,10 @@ function analyzeThemeScriptSource(minified: string): ThemeScriptSpecialization {
 
 const scriptPath = resolve(rootDir, "src/core/script.ts");
 const scriptDisplayPath = "src/core/script.ts";
-const SCRIPT_SLICE_RE = /S\.slice\(0,\d+\)\+S\.slice\(\d+\)/;
+const SCRIPT_SLICE_RE = /S\.slice\(0,\s*\d+\)\s*\+\s*S\.slice\(\d+\)/;
 
 function applyScriptSliceOffsets(source: string, range: ScriptRange): string {
-	const next = source.replace(SCRIPT_SLICE_RE, `S.slice(0,${range[0]})+S.slice(${range[1]})`);
+	const next = source.replace(SCRIPT_SLICE_RE, `S.slice(0, ${range[0]}) + S.slice(${range[1]})`);
 	if (!SCRIPT_SLICE_RE.test(next)) {
 		throw new Error("Expected getScript to contain S.slice(0,N)+S.slice(M)");
 	}
