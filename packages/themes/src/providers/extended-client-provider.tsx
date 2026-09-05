@@ -187,7 +187,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		const current = getSnapshot().theme;
 		if (current === "system" || current === undefined || followSystem) {
 			const followsVariant =
-				followSystem && Boolean(systemThemeMap) && !isDirectSystemMap(systemThemeMap);
+				followSystem && !!systemThemeMap && !isDirectSystemMap(systemThemeMap);
 			if (followSystem && !followsVariant) setStoreTheme("system");
 			const resolved =
 				resolveSelection(

@@ -891,18 +891,11 @@ describe("ClientThemeProvider - history re-apply", () => {
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});
 
-	test("re-applies after a later popstate listener restores a classless snapshot", () => {
+	test("re-applies after a later popstate listener restores a classless snapshot", async () => {
 		wrap(<ThemeConsumer />);
 		act(() => {
 			fireEvent.click(screen.getByTestId("btn-dark"));
 		});
-
-		const frames: FrameRequestCallback[] = [];
-		const originalRaf = window.requestAnimationFrame;
-		window.requestAnimationFrame = ((cb: FrameRequestCallback) => {
-			frames.push(cb);
-			return 1;
-		}) as typeof window.requestAnimationFrame;
 		window.addEventListener("popstate", () => {
 			document.documentElement.classList.remove("dark");
 		});
@@ -910,12 +903,21 @@ describe("ClientThemeProvider - history re-apply", () => {
 		act(() => {
 			window.dispatchEvent(new window.Event("popstate"));
 		});
-		expect(document.documentElement.classList.contains("dark")).toBe(false);
-
-		act(() => {
-			for (const frame of frames) frame(0);
+		await act(async () => {
+			await Promise.resolve();
 		});
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
-		window.requestAnimationFrame = originalRaf;
+	});
+
+	test("re-applies when html class is cleared without a history event", async () => {
+		wrap(<ThemeConsumer />);
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		document.documentElement.className = "";
+		await act(async () => {
+			await Promise.resolve();
+		});
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});
 });
