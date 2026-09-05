@@ -1,23 +1,22 @@
-let htmlObs: boolean | undefined;
+let n = 0;
+let obs: MutationObserver | undefined;
+let run: (() => void) | undefined;
 
 export function subscribeHistoryReapply(w: Window, apply: () => void): () => void {
-	let obs: MutationObserver | undefined;
+	run = apply;
 	const Observer = (w as unknown as { MutationObserver?: typeof MutationObserver })
 		.MutationObserver;
-	if (!htmlObs && Observer) {
-		htmlObs = true;
-		(obs = new Observer(apply)).observe(w.document, {
-			childList: true,
-			subtree: true,
+	if (!n && Observer) {
+		(obs = new Observer(() => run?.())).observe(w.document, { childList: true });
+		obs.observe(w.document.documentElement, {
+			attributes: true,
 			attributeFilter: ["class"],
 		});
 	}
+	n++;
 	w.addEventListener("popstate", apply);
 	return () => {
-		if (obs) {
-			obs.disconnect();
-			htmlObs = false;
-		}
 		w.removeEventListener("popstate", apply);
+		if (!--n) obs?.disconnect();
 	};
 }

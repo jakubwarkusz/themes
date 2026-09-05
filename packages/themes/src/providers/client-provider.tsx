@@ -19,6 +19,7 @@ import { subscribeHistoryReapply } from "../core/history-reapply.js";
 import { createThemeStore } from "../core/store.js";
 import { isThemeSelection, resolveDefaultTheme } from "../core/theme-validation.js";
 import type {
+	Attribute,
 	DefaultTheme,
 	ResolvedTheme,
 	ThemeContextValue,
@@ -30,7 +31,7 @@ const DEFAULT_THEMES: string[] = ["light", "dark"];
 
 type LastAppliedTheme = {
 	resolved: string;
-	attribute: ThemeProviderProps["attribute"];
+	attribute: Attribute | readonly Attribute[];
 	themes: readonly string[];
 	valueMap: ThemeProviderProps["value"];
 	target: string;
@@ -98,17 +99,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	});
 
 	const applyToDomEvent = useEffectEvent((resolved: string) => {
-		applyThemeToDom({
-			resolved,
-			attribute,
-			themes,
-			valueMap,
-			target,
-			disableTransitionOnChange,
-			enableColorScheme,
-			themeColor,
-		});
-		lastAppliedRef.current = {
+		const last: LastAppliedTheme = {
 			resolved,
 			attribute,
 			themes,
@@ -118,6 +109,8 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			enableColorScheme,
 			themeColor,
 		};
+		applyThemeToDom(last);
+		lastAppliedRef.current = last;
 	});
 	const initializeEvent = useEffectEvent(() => {
 		const domWindow = getDomWindow();
@@ -219,7 +212,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		if (!resolvedTheme) return;
 		const last = lastAppliedRef.current;
 		if (
-			last !== null &&
+			last &&
 			last.resolved === resolvedTheme &&
 			last.attribute === attribute &&
 			last.themes === themes &&

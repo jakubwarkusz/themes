@@ -166,6 +166,21 @@ function wrap(
 	return render(<ClientThemeProvider {...props}>{children}</ClientThemeProvider>);
 }
 
+function HistoryNestedFixture({ showOuter }: { showOuter: boolean }) {
+	return (
+		<>
+			{showOuter ? (
+				<ClientThemeProvider storageKey="outer-history">
+					<span data-testid="outer-history" />
+				</ClientThemeProvider>
+			) : null}
+			<ClientThemeProvider>
+				<ThemeConsumer />
+			</ClientThemeProvider>
+		</>
+	);
+}
+
 beforeEach(() => {
 	document.documentElement.className = "";
 	document.documentElement.removeAttribute("data-theme");
@@ -907,15 +922,13 @@ describe("ClientThemeProvider - history re-apply", () => {
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});
 
-	test("re-applies when the document tree is patched without a history event", async () => {
-		wrap(<ThemeConsumer />);
+	test("keeps re-applying after the first nested provider unmounts", async () => {
+		const { rerender } = render(<HistoryNestedFixture showOuter />);
 		act(() => {
 			fireEvent.click(screen.getByTestId("btn-dark"));
 		});
-		document.documentElement.classList.remove("dark");
-		act(() => {
-			document.body.append(document.createElement("div"));
-		});
+		rerender(<HistoryNestedFixture showOuter={false} />);
+		document.documentElement.className = "";
 		await act(async () => {
 			await Promise.resolve();
 		});

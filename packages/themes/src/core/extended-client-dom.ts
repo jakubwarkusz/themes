@@ -11,7 +11,7 @@ type ApplyExtendedThemeOptions = {
 	disableTransitionOnChange: boolean | string;
 	enableColorScheme: boolean;
 	themeColor: ThemeColor | undefined;
-	themeRoot?: Element | ShadowRoot;
+	themeRoot?: Element | ShadowRoot | undefined;
 	previous: AppliedThemeState | undefined;
 };
 

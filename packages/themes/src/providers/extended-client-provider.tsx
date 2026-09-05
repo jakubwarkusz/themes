@@ -21,14 +21,14 @@ import type { ExtendedThemeProviderProps, SystemThemeMap } from "../core/extende
 import { createThemeStore } from "../core/store.js";
 import { publishThemeChannel, subscribeThemeChannel } from "../core/sync.js";
 import { isThemeSelection, resolveDefaultTheme } from "../core/theme-validation.js";
-import type { DefaultTheme, ThemeContextValue } from "../core/types.js";
+import type { Attribute, DefaultTheme, ThemeContextValue } from "../core/types.js";
 import { useEffectEvent } from "../core/use-effect-event.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
 
 type LastAppliedTheme = {
 	resolved: string;
-	attribute: ExtendedThemeProviderProps["attribute"];
+	attribute: Attribute | readonly Attribute[];
 	themes: readonly string[];
 	valueMap: ExtendedThemeProviderProps["value"];
 	target: string;
@@ -124,19 +124,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	});
 
 	const applyToDomEvent = useEffectEvent((resolved: string) => {
-		appliedThemeRef.current = applyExtendedThemeToDom({
-			resolved,
-			attribute,
-			themes,
-			valueMap,
-			target,
-			disableTransitionOnChange,
-			enableColorScheme,
-			themeColor,
-			previous: appliedThemeRef.current,
-			...(themeRoot !== undefined ? { themeRoot } : {}),
-		});
-		lastAppliedRef.current = {
+		const last: LastAppliedTheme = {
 			resolved,
 			attribute,
 			themes,
@@ -147,6 +135,11 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			themeColor,
 			themeRoot,
 		};
+		appliedThemeRef.current = applyExtendedThemeToDom({
+			...last,
+			previous: appliedThemeRef.current,
+		});
+		lastAppliedRef.current = last;
 	});
 
 	const initializeEvent = useEffectEvent(() => {
@@ -266,7 +259,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		if (!resolvedTheme) return;
 		const last = lastAppliedRef.current;
 		if (
-			last !== null &&
+			last &&
 			last.resolved === resolvedTheme &&
 			last.attribute === attribute &&
 			last.themes === themes &&
