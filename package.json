@@ -25,7 +25,7 @@
 		"@types/react": "^19.2.18",
 		"@types/react-dom": "^19.2.5",
 		"bunup": "^0.16.32",
-		"happy-dom": "^20.11.15",
+		"happy-dom": "^20.12.0",
 		"lefthook": "^2.1.12",
 		"next": ">=16.3.3",
 		"oxfmt": "^0.65.0",
