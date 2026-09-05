@@ -9,6 +9,7 @@ import * as useTheme from "@wrksz/themes/client/use-theme";
 import * as useThemeEffect from "@wrksz/themes/client/use-theme-effect";
 import * as useThemeValue from "@wrksz/themes/client/use-theme-value";
 import * as next from "@wrksz/themes/next";
+import * as nextCreateThemes from "@wrksz/themes/next/create-themes";
 import * as nextExtended from "@wrksz/themes/next/extended";
 import * as script from "@wrksz/themes/script";
 
@@ -24,6 +25,7 @@ const entrypoints = [
 	["./client/use-theme-effect", useThemeEffect, ["useThemeEffect"]],
 	["./client/use-theme-value", useThemeValue, ["useThemeValue"]],
 	["./next", next, ["ThemeProvider", "getTheme"]],
+	["./next/create-themes", nextCreateThemes, ["createThemes", "createNextThemes"]],
 	["./next/extended", nextExtended, ["ThemeProvider"]],
 	["./script", script, ["ThemeScript"]],
 ] as const;

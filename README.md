@@ -307,6 +307,8 @@ export const { ThemeProvider, useTheme, useThemeValue, useThemeEffect } = create
 });
 ```
 
+For a Next.js root layout, import from `@wrksz/themes/next/create-themes` and use `NextThemeProvider` so the theme tuple is not copied into `@wrksz/themes/next`. Full API: [createThemes](https://themes.wrksz.dev/docs/api/create-themes).
+
 ### `ThemedImage`
 
 Shows different images per theme. Renders a transparent placeholder on the server to avoid hydration mismatches.
@@ -446,6 +448,7 @@ import { ThemedImage } from "@wrksz/themes/client/themed-image";
 import { ClientThemeProvider } from "@wrksz/themes/client/provider";
 import { ClientThemeProvider as ExtendedClientThemeProvider } from "@wrksz/themes/client/extended-provider";
 import { createThemes } from "@wrksz/themes/client/create-themes";
+import { createThemes as createNextThemes } from "@wrksz/themes/next/create-themes";
 ```
 
 | Import                                   | Use for                                                                                             |
@@ -460,6 +463,7 @@ import { createThemes } from "@wrksz/themes/client/create-themes";
 | `@wrksz/themes/client/provider`          | Direct `ClientThemeProvider` import                                                                 |
 | `@wrksz/themes/client/extended-provider` | Opt-in `ClientThemeProvider` with synchronization, mapping, and ShadowRoot support                  |
 | `@wrksz/themes/client/create-themes`     | Direct `createThemes` import                                                                        |
+| `@wrksz/themes/next/create-themes`       | Typed factory that also returns `NextThemeProvider` and `ThemeScript`                               |
 | `@wrksz/themes/next/extended`            | Opt-in Next.js `ThemeProvider` with synchronization and system mapping                              |
 | `@wrksz/themes`                          | Client-safe `ThemeProvider` alias and `createThemes` for framework-neutral React usage              |
 | `@wrksz/themes/script`                   | Server-safe `ThemeScript` for non-Next SSR frameworks                                               |

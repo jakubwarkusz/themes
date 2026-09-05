@@ -39,7 +39,7 @@ export function ThemeScope({ children }: { children: React.ReactNode }) {
 
 The `themes` tuple is fixed by the factory. Per-use props like `defaultTheme`, `forcedTheme`, `storageKey`, and `themeColor` can still be overridden, but the theme union remains consistent across the app.
 
-For a Next.js root layout with the anti-flash script, keep using `ThemeProvider` from `@wrksz/themes/next`.
+For a Next.js root layout with the anti-flash script, import `createThemes` from [`@wrksz/themes/next/create-themes`](/docs/api/create-themes#nextjs-root-provider) and use `NextThemeProvider`. Do not copy the `themes` array into `@wrksz/themes/next`.
 
 ## Build typed UI
 
