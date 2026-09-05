@@ -8,6 +8,37 @@ import { clearCookies } from "./setup.js";
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 
+const contextIdentitySeen: unknown[] = [];
+
+function ContextIdentityProbe() {
+	contextIdentitySeen.push(useTheme());
+	return null;
+}
+
+function spyClassListMutations(el: Element) {
+	const { classList } = el;
+	const originalAdd = classList.add;
+	const originalRemove = classList.remove;
+	const added: string[][] = [];
+	const removed: string[][] = [];
+	classList.add = (...tokens: string[]) => {
+		added.push([...tokens]);
+		originalAdd.apply(classList, tokens);
+	};
+	classList.remove = (...tokens: string[]) => {
+		removed.push([...tokens]);
+		originalRemove.apply(classList, tokens);
+	};
+	return {
+		added,
+		removed,
+		restore() {
+			classList.add = originalAdd;
+			classList.remove = originalRemove;
+		},
+	};
+}
+
 function ThemeConsumer({ prefix = "" }: { prefix?: string }) {
 	const { theme, resolvedTheme, systemTheme, forcedTheme, setTheme } = useTheme();
 	return (
@@ -184,6 +215,39 @@ describe("ClientThemeProvider - setTheme", () => {
 		});
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 		expect(document.documentElement.classList.contains("light")).toBe(false);
+	});
+
+	test("mutates classList once per setTheme", () => {
+		wrap(<ThemeConsumer />, { defaultTheme: "light", enableSystem: false });
+		const spy = spyClassListMutations(document.documentElement);
+		try {
+			act(() => {
+				fireEvent.click(screen.getByTestId("btn-dark"));
+			});
+			expect(spy.removed).toHaveLength(1);
+			expect(spy.added).toHaveLength(1);
+			expect(document.documentElement.classList.contains("dark")).toBe(true);
+		} finally {
+			spy.restore();
+		}
+	});
+
+	test("keeps context identity when the provider rerenders without a theme change", () => {
+		contextIdentitySeen.length = 0;
+		const view = render(
+			<ClientThemeProvider defaultTheme="light" enableSystem={false}>
+				<ContextIdentityProbe />
+			</ClientThemeProvider>,
+		);
+		const afterInit = contextIdentitySeen.at(-1);
+		expect(afterInit).toBeDefined();
+
+		view.rerender(
+			<ClientThemeProvider defaultTheme="light" enableSystem={false}>
+				<ContextIdentityProbe />
+			</ClientThemeProvider>,
+		);
+		expect(contextIdentitySeen.at(-1)).toBe(afterInit);
 	});
 
 	test("saves to localStorage", () => {

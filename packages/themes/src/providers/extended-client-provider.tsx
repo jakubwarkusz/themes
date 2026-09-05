@@ -1,6 +1,13 @@
 "use client";
 
-import { type ReactElement, useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import {
+	type ReactElement,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useSyncExternalStore,
+} from "react";
 import { ThemeContext } from "../core/context.js";
 import {
 	type AppliedThemeState,
@@ -17,6 +24,18 @@ import type { DefaultTheme, ThemeContextValue } from "../core/types.js";
 import { useEffectEvent } from "../core/use-effect-event.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
+
+type LastAppliedTheme = {
+	resolved: string;
+	attribute: ExtendedThemeProviderProps["attribute"];
+	themes: readonly string[];
+	valueMap: ExtendedThemeProviderProps["value"];
+	target: string;
+	disableTransitionOnChange: boolean | string;
+	enableColorScheme: boolean;
+	themeColor: ExtendedThemeProviderProps["themeColor"];
+	themeRoot: ExtendedThemeProviderProps["themeRoot"];
+};
 
 function isDirectSystemMap(
 	systemThemeMap: SystemThemeMap<string> | undefined,
@@ -74,6 +93,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	}
 	const store = storeRef.current;
 	const appliedThemeRef = useRef<AppliedThemeState | undefined>(undefined);
+	const lastAppliedRef = useRef<LastAppliedTheme | null>(null);
 	const {
 		getSnapshot,
 		setState: setStoreState,
@@ -115,6 +135,17 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			previous: appliedThemeRef.current,
 			...(themeRoot !== undefined ? { themeRoot } : {}),
 		});
+		lastAppliedRef.current = {
+			resolved,
+			attribute,
+			themes,
+			valueMap,
+			target,
+			disableTransitionOnChange,
+			enableColorScheme,
+			themeColor,
+			themeRoot,
+		};
 	});
 
 	const initializeEvent = useEffectEvent(() => {
@@ -172,6 +203,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		}
 	});
 
+	// oxlint-disable-next-line react-hooks/exhaustive-deps -- applyToDomEvent is an effect event.
 	const setTheme = useCallback(
 		(
 			next:
@@ -191,20 +223,8 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			);
 
 			setStoreTheme(newTheme);
-			if (resolved) {
-				appliedThemeRef.current = applyExtendedThemeToDom({
-					resolved,
-					attribute,
-					themes,
-					valueMap,
-					target,
-					disableTransitionOnChange,
-					enableColorScheme,
-					themeColor,
-					previous: appliedThemeRef.current,
-					...(themeRoot !== undefined ? { themeRoot } : {}),
-				});
-			}
+			// oxlint-disable-next-line react-hooks/rules-of-hooks -- shared apply path; setTheme stays a public callback.
+			if (resolved) applyToDomEvent(resolved);
 			onThemeChange?.(newTheme as Themes);
 			writeStoredTheme(storage, storageKey, newTheme, cookieOptions, onStorageError);
 			if (enableSameDocumentSync && storage !== "none")
@@ -215,13 +235,6 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			themes,
 			enableSystem,
 			systemThemeMap,
-			attribute,
-			valueMap,
-			target,
-			disableTransitionOnChange,
-			enableColorScheme,
-			themeColor,
-			themeRoot,
 			storage,
 			storageKey,
 			cookieOptions,
@@ -239,9 +252,27 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		initializeEvent();
 	}, []);
 
+	// setTheme / system / storage already write the DOM. Re-apply only when
+	// resolvedTheme or DOM config changed from outside those paths.
 	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
-		if (resolvedTheme) applyToDomEvent(resolvedTheme);
+		if (!resolvedTheme) return;
+		const last = lastAppliedRef.current;
+		if (
+			last !== null &&
+			last.resolved === resolvedTheme &&
+			last.attribute === attribute &&
+			last.themes === themes &&
+			last.valueMap === valueMap &&
+			last.target === target &&
+			last.disableTransitionOnChange === disableTransitionOnChange &&
+			last.enableColorScheme === enableColorScheme &&
+			last.themeColor === themeColor &&
+			last.themeRoot === themeRoot
+		) {
+			return;
+		}
+		applyToDomEvent(resolvedTheme);
 	}, [
 		resolvedTheme,
 		attribute,
@@ -348,14 +379,17 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		setStoreTheme,
 	]);
 
-	const contextValue: ThemeContextValue<string> = {
-		theme: validForcedTheme ?? theme,
-		resolvedTheme,
-		systemTheme,
-		forcedTheme: validForcedTheme,
-		themes,
-		setTheme: setTheme as ThemeContextValue<string>["setTheme"],
-	};
+	const contextValue = useMemo(
+		(): ThemeContextValue<string> => ({
+			theme: validForcedTheme ?? theme,
+			resolvedTheme,
+			systemTheme,
+			forcedTheme: validForcedTheme,
+			themes,
+			setTheme: setTheme as ThemeContextValue<string>["setTheme"],
+		}),
+		[validForcedTheme, theme, resolvedTheme, systemTheme, themes, setTheme],
+	);
 
 	return <ThemeContext.Provider value={contextValue}>{children}</ThemeContext.Provider>;
 }
