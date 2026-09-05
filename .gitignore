@@ -22,3 +22,4 @@ yarn-error.log*
 packages/themes/benchmarks/.bundle-size/
 
 .pnpm-store/
+.worktrees/
