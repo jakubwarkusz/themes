@@ -1,19 +1,31 @@
+// Instant Nav restores a classless snapshot by mutating descendants after popstate.
 let n = 0;
 let obs: MutationObserver | undefined;
-let run: (() => void) | undefined;
+let run: () => void;
+let q = 0;
 
 export function subscribeHistoryReapply(w: Window, apply: () => void): () => void {
-	run = apply;
-	const Observer = (w as unknown as { MutationObserver?: typeof MutationObserver })
-		.MutationObserver;
-	if (!n && Observer) {
-		(obs = new Observer(() => run?.())).observe(w.document, { childList: true });
-		obs.observe(w.document.documentElement, {
-			attributes: true,
-			attributeFilter: ["class"],
-		});
+	if (!n++) {
+		run = apply;
+		const Observer = (w as unknown as { MutationObserver?: typeof MutationObserver })
+			.MutationObserver;
+		if (Observer) {
+			(obs = new Observer(() => {
+				if (!q) {
+					q = 1;
+					requestAnimationFrame(() => {
+						q = 0;
+						run();
+					});
+				}
+			})).observe(w.document, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: ["class"],
+			});
+		}
 	}
-	n++;
 	w.addEventListener("popstate", apply);
 	return () => {
 		w.removeEventListener("popstate", apply);

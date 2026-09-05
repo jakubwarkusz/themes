@@ -166,16 +166,34 @@ function wrap(
 	return render(<ClientThemeProvider {...props}>{children}</ClientThemeProvider>);
 }
 
-function HistoryNestedFixture({ showOuter }: { showOuter: boolean }) {
+function HistoryNestedFixture({ showLater }: { showLater: boolean }) {
 	return (
 		<>
-			{showOuter ? (
-				<ClientThemeProvider storageKey="outer-history">
-					<span data-testid="outer-history" />
-				</ClientThemeProvider>
-			) : null}
 			<ClientThemeProvider>
 				<ThemeConsumer />
+			</ClientThemeProvider>
+			{showLater ? (
+				<ClientThemeProvider storageKey="later-history">
+					<span data-testid="later-history" />
+				</ClientThemeProvider>
+			) : null}
+		</>
+	);
+}
+
+function HistoryHtmlWithLaterBodyFixture() {
+	return (
+		<>
+			<ClientThemeProvider>
+				<ThemeConsumer />
+			</ClientThemeProvider>
+			<ClientThemeProvider
+				target="body"
+				defaultTheme="light"
+				enableSystem={false}
+				storage="none"
+			>
+				<span data-testid="later-body-provider" />
 			</ClientThemeProvider>
 		</>
 	);
@@ -905,7 +923,7 @@ describe("ClientThemeProvider - history re-apply", () => {
 			window.dispatchEvent(new window.Event("popstate"));
 		});
 		await act(async () => {
-			await Promise.resolve();
+			await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
 		});
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});
@@ -917,20 +935,32 @@ describe("ClientThemeProvider - history re-apply", () => {
 		});
 		document.documentElement.className = "";
 		await act(async () => {
-			await Promise.resolve();
+			await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
 		});
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});
 
-	test("keeps re-applying after the first nested provider unmounts", async () => {
-		const { rerender } = render(<HistoryNestedFixture showOuter />);
+	test("re-applies html when a later provider targets another element", async () => {
+		render(<HistoryHtmlWithLaterBodyFixture />);
 		act(() => {
 			fireEvent.click(screen.getByTestId("btn-dark"));
 		});
-		rerender(<HistoryNestedFixture showOuter={false} />);
 		document.documentElement.className = "";
 		await act(async () => {
-			await Promise.resolve();
+			await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+		});
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("keeps re-applying after a later nested provider unmounts", async () => {
+		const { rerender } = render(<HistoryNestedFixture showLater />);
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		rerender(<HistoryNestedFixture showLater={false} />);
+		document.documentElement.className = "";
+		await act(async () => {
+			await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
 		});
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
 	});

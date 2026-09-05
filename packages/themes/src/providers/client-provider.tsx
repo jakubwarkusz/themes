@@ -201,7 +201,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		if (!domWindow) return;
 		return subscribeHistoryReapply(domWindow, () => {
 			const last = lastAppliedRef.current;
-			if (last) applyToDomEvent(last.resolved);
+			if (last) applyThemeToDom(last);
 		});
 	}, []);
 

@@ -265,7 +265,6 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			last.themes === themes &&
 			last.valueMap === valueMap &&
 			last.target === target &&
-			last.disableTransitionOnChange === disableTransitionOnChange &&
 			last.enableColorScheme === enableColorScheme &&
 			last.themeColor === themeColor &&
 			last.themeRoot === themeRoot
