@@ -1,0 +1,83 @@
+---
+title: Shadow DOM
+description: Theme a ShadowRoot host from the opt-in extended client provider.
+---
+
+`themeRoot` lives on the **opt-in** client entry `@wrksz/themes/client/extended-provider`. It is omitted from `@wrksz/themes/next/extended` because a DOM object cannot go through the inline bootstrap.
+
+Pass a `ShadowRoot` or an `Element`. A `ShadowRoot` applies class / data attributes / `color-scheme` to **`shadowRoot.host`**. Transition-disable `<style>` is appended **inside the shadow root**, then removed after two frames.
+
+<Callout type="warn">
+  There is no anti-flash script for a client-owned shadow tree. The bootstrap cannot see it, so the host may paint unthemed until the provider mounts. Prefer `storage="none"` for isolated widgets.
+</Callout>
+
+When `themeRoot` is set, `target` is ignored. Use [`target`](/docs/examples/scoped-theming) on the default provider when a light-DOM node must be themed before paint.
+
+## Portal into a shadow root
+
+Keep the host in the light DOM, attach a shadow tree, and portal the provider so it is an ancestor of the themed UI:
+
+```tsx title="components/shadow-widget.tsx"
+"use client";
+
+import { useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { ClientThemeProvider } from "@wrksz/themes/client/extended-provider";
+
+export function ShadowWidget({ children }: { children: React.ReactNode }) {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const [shadowRoot, setShadowRoot] = useState<ShadowRoot | null>(null);
+
+  useLayoutEffect(() => {
+    if (!hostRef.current || hostRef.current.shadowRoot) return;
+    setShadowRoot(hostRef.current.attachShadow({ mode: "open" }));
+  }, []);
+
+  return (
+    <div ref={hostRef}>
+      {shadowRoot
+        ? createPortal(
+            <ClientThemeProvider themeRoot={shadowRoot} storage="none" defaultTheme="dark">
+              {children}
+            </ClientThemeProvider>,
+            shadowRoot,
+          )
+        : null}
+    </div>
+  );
+}
+```
+
+Open vs closed: pass the `ShadowRoot` you got from `attachShadow`. Closed mode still works if you keep that reference.
+
+## Shadow CSS
+
+Class and data attributes land on the **host**, not on `:root`. Style with `:host(...)`. Children typically live in the shadow tree via `createPortal`:
+
+```css
+:host(.dark) {
+  --bg: #0a0a0a;
+  --fg: #fafafa;
+}
+
+:host([data-theme="dark"]) {
+  --bg: #0a0a0a;
+  --fg: #fafafa;
+}
+```
+
+## Light-DOM `themeRoot`
+
+`themeRoot` also accepts a client-owned element when you already have a node and do not want a selector:
+
+```tsx
+<ClientThemeProvider themeRoot={someElement} storage="none" defaultTheme="dark">
+  {children}
+</ClientThemeProvider>
+```
+
+For a CSS selector that the Next bootstrap can see before hydration, use `target="#id"` on the default provider instead. See [Scoped theming](/docs/examples/scoped-theming).
+
+<Callout type="info">
+  `themeColor` still writes `<meta name="theme-color">` on `document.head`. That is document chrome, not per-widget browser chrome, even when `themeRoot` is a shadow root. See [Meta theme-color](/docs/examples/meta-theme-color).
+</Callout>

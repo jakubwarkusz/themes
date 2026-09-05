@@ -3,7 +3,7 @@ title: Hybrid storage
 description: Use cookies for SSR and localStorage for cross-tab sync.
 ---
 
-`storage="hybrid"` stores the theme in a cookie and mirrors it to `localStorage`. The cookie lets `@wrksz/themes/next` read the theme on the server, while `localStorage` keeps other tabs in sync.
+`storage="hybrid"` stores the theme in a cookie and mirrors it to `localStorage`. The pre-paint bootstrap reads the cookie before the first paint. The Next `ThemeProvider` does not call `cookies()`. `localStorage` keeps other tabs in sync.
 
 ## Root layout
 

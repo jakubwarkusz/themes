@@ -5,6 +5,10 @@ description: Update the browser theme color on theme change for Safari and PWAs.
 
 The `themeColor` prop keeps `<meta name="theme-color">` in sync with the current theme. Browsers like Safari use this to color the tab bar and status bar.
 
+<Callout type="info">
+  `themeColor` always writes to `document.head`, including when [`themeRoot`](/docs/examples/shadow-dom) is a shadow root. That is document chrome, not per-widget browser chrome.
+</Callout>
+
 ## Per-theme colors
 
 ```tsx

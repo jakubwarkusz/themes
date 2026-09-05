@@ -67,3 +67,5 @@ The `target` prop accepts any CSS selector, plus the shortcuts `"html"` (default
 <ClientThemeProvider target="#my-element">   // applies to #my-element
 <ClientThemeProvider target=".my-class">     // applies to .my-class (first match)
 ```
+
+`target` is a CSS selector in the light DOM. The Next bootstrap can apply it before paint. For a client-owned `Element` or `ShadowRoot` with no selector and no bootstrap, use `themeRoot` on `@wrksz/themes/client/extended-provider` instead. See [Shadow DOM](/docs/examples/shadow-dom).

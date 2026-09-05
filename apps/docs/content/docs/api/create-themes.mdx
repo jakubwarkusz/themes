@@ -27,7 +27,8 @@ export const { ThemeProvider, useTheme, useThemeValue, useThemeEffect, ThemedIma
 - `useThemeValue` maps are checked against your union (plus optional `default`).
 - `ThemedImage` requires a source for every configured theme.
 - Provider defaults can still be overridden per usage, while the theme tuple stays fixed.
-- The returned `ThemeProvider` is a client provider. Use `@wrksz/themes/next` for the root Next.js provider that injects the anti-flash script.
+- The returned `ThemeProvider` is the **default client** provider. Use `@wrksz/themes/next` for the root Next.js provider that injects the anti-flash script.
+- `themeRoot`, `systemThemeMap`, and `enableSameDocumentSync` are not on the factory. Compose with [`@wrksz/themes/client/extended-provider`](/docs/api/client-theme-provider) when a subtree needs those props.
 
 ```tsx title="app/theme-toggle.tsx"
 "use client";

@@ -5,6 +5,8 @@ description: Theme provider for use inside Client Components.
 
 `ClientThemeProvider` is the client-side counterpart of [`ThemeProvider`](/docs/api/theme-provider). Use it when you need a nested provider inside a Client Component - `ThemeProvider` renders an inline `<script>` which is not allowed in Client Components.
 
+Two client entries exist. The default stays small. Shadow DOM, custom system maps, and same-document sync live on the opt-in extended import.
+
 ```tsx
 "use client";
 
@@ -21,18 +23,21 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
 ## ThemeProvider vs ClientThemeProvider
 
-| | `ThemeProvider` | `ClientThemeProvider` |
-|---|---|---|
-| Renders inline script | Yes - prevents flash on load | No |
-| Use in Server Components | Yes | No |
-| Use in Client Components | No | Yes |
-| Supports all props | Yes | Yes |
+| | `ThemeProvider` (`@wrksz/themes/next`) | `ClientThemeProvider` (`@wrksz/themes/client`) | Extended (`@wrksz/themes/client/extended-provider`) |
+|---|---|---|---|
+| Renders inline script | Yes - prevents flash on load | No | No |
+| Use in Server Components | Yes | No | No |
+| Use in Client Components | No | Yes | Yes |
+| Default props | Yes | Yes (`nonce` unused) | Yes, plus `themeRoot`, `systemThemeMap`, `enableSameDocumentSync` |
+| `themeRoot` | No | No | Yes. Omitted from `@wrksz/themes/next/extended` |
 
 For your root layout, always use `ThemeProvider`. Use `ClientThemeProvider` only for nested providers deeper in the tree.
 
 ## Props
 
-Accepts the same props as [`ThemeProvider`](/docs/api/theme-provider#props), with one exception: the `nonce` prop is not used since `ClientThemeProvider` renders no inline script.
+The default `@wrksz/themes/client` entry accepts the same props as [`ThemeProvider`](/docs/api/theme-provider#props), with one exception: the `nonce` prop is not used since `ClientThemeProvider` renders no inline script.
+
+It does **not** accept `themeRoot`, `systemThemeMap`, or `enableSameDocumentSync`. Those belong on [`@wrksz/themes/client/extended-provider`](/docs/api/theme-provider#extended-provider). See [Shadow DOM](/docs/examples/shadow-dom) for `themeRoot`.
 
 ## Examples
 
@@ -65,12 +70,14 @@ export default function DashboardLayout({ children }) {
 #dashboard-root { --bg: #ffffff; --fg: #0a0a0a; }
 ```
 
+For a client-owned `Element` or `ShadowRoot` (no selector, no bootstrap), use `themeRoot` on the [extended client provider](/docs/examples/shadow-dom).
+
 ### Nested provider in a Client Component
 
 ```tsx
 "use client";
 
-import { ClientThemeProvider, useTheme } from "@wrksz/themes/client";
+import { ClientThemeProvider } from "@wrksz/themes/client";
 
 export function Sidebar({ children }: { children: React.ReactNode }) {
   return (
@@ -82,3 +89,17 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
 ```
 
 Each `ClientThemeProvider` maintains its own independent theme state - nested providers do not affect each other.
+
+### Shadow DOM
+
+Import the extended client provider and pass the `ShadowRoot` from `attachShadow`. There is no anti-flash script: the bootstrap cannot see a client-owned shadow tree.
+
+```tsx
+import { ClientThemeProvider } from "@wrksz/themes/client/extended-provider";
+
+<ClientThemeProvider themeRoot={shadowRoot} storage="none" defaultTheme="dark">
+  {children}
+</ClientThemeProvider>
+```
+
+Full walkthrough, `:host(.dark)` CSS, and why `target` is ignored when `themeRoot` is set: [Shadow DOM](/docs/examples/shadow-dom).

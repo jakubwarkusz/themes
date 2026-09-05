@@ -79,7 +79,7 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	followSystem?: boolean;
 	/** Server-provided theme that overrides storage on mount (e.g. from a database). User can still call setTheme to change it. */
 	initialTheme?: ThemeSelection<Themes>;
-	/** Cookie options, only used when storage="cookie" */
+	/** Cookie options, used when storage is "cookie" or "hybrid" */
 	cookieOptions?: CookieOptions;
 };
 

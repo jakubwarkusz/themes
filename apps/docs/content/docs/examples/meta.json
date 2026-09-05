@@ -9,6 +9,7 @@
     "system-variants",
     "data-attribute",
     "scoped-theming",
+    "shadow-dom",
     "forced-theme",
     "hybrid-storage",
     "server-theme",

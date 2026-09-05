@@ -22,8 +22,10 @@ Two variants depending on context:
 import { NextResponse } from "next/server";
 import { getTheme } from "@wrksz/themes/next";
 
+const themes = ["light", "dark"] as const;
+
 export function proxy(request: Request) {
-  const theme = getTheme(request, { defaultTheme: "dark" });
+  const theme = getTheme(request, { themes, defaultTheme: "dark" });
   const response = NextResponse.next();
   response.headers.set("x-theme", theme);
   return response;
@@ -58,12 +60,12 @@ const theme = await getTheme({
 // theme: "light" | "dark" | "system"
 ```
 
-When `themes` is omitted, `getTheme` returns `string` because an existing cookie can contain any stored value.
+When `themes` is omitted, `getTheme` returns `string` because an existing cookie can contain any stored value. Always pass `themes` when you will put the result on markup or seed a provider.
 
 ## Layout - apply class directly on `<html>`
 
 <Callout type="warn">
-  <Breaking /> Required more often in **`2.0.0-beta.1`** because the provider no longer injects the cookie class for you.
+  <Breaking /> Required more often in **`2.0.0-beta.1`** because the provider no longer injects the cookie class for you. Do not put unresolved `"system"` on `<html className>`. Pass `themes`, and pass `initialTheme` when seeding the provider.
 </Callout>
 
 Use this pattern when server-rendered markup itself must depend on the theme:
@@ -73,13 +75,20 @@ import { ThemeProvider, getTheme } from "@wrksz/themes/next";
 
 export const instant = false;
 
+const themes = ["light", "dark"] as const;
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const theme = await getTheme({ defaultTheme: "dark" });
+  const theme = await getTheme({ themes, defaultTheme: "dark" });
 
   return (
     <html lang="en" className={theme} suppressHydrationWarning>
       <body>
-        <ThemeProvider storage="cookie" defaultTheme="dark">
+        <ThemeProvider
+          themes={themes}
+          storage="cookie"
+          defaultTheme="dark"
+          initialTheme={theme}
+        >
           {children}
         </ThemeProvider>
       </body>

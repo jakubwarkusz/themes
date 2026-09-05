@@ -23,7 +23,7 @@ export function Document({ children }: { children: React.ReactNode }) {
 }
 ```
 
-`ThemeScript` and `getScript` use a build-generated deterministic bootstrap so bundlers cannot rewrite behavior through `Function#toString()`. Keep script configuration equal to the provider configuration.
+`ThemeScript` and `getScript` use a build-generated deterministic bootstrap so bundlers cannot rewrite behavior through `Function#toString()`. Keep script configuration equal to the provider configuration. `ThemeScript` / `getScript` cannot take `themeRoot` — Shadow widgets stay on `@wrksz/themes/client/extended-provider` after mount. See [Shadow DOM](/docs/examples/shadow-dom).
 
 ```tsx
 import { getScript, ThemeScript } from "@wrksz/themes/script";

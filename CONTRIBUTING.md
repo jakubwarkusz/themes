@@ -20,6 +20,6 @@ Use `pnpm verify:full` before requesting release review. It adds TypeScript 5.9/
 - Review bundle baselines after correctness work; never raise a threshold solely to pass CI.
 - Use conventional commit messages.
 
-The supported minimums are React and React DOM 19.2, Next.js 16, and TypeScript 5.9. The `apps/next-16-3` preview fixture protects behavior against upcoming Next.js routing changes.
+The supported minimums are React 18+, React DOM 18+, Next.js 16, and TypeScript 5.9. React 19.2+ uses the native `useEffectEvent`; React 18 and earlier React 19 releases use the compatibility fallback. The `apps/next-16-3` preview fixture protects behavior against upcoming Next.js routing changes.
 
 API documentation belongs in `apps/docs/content/docs`; avoid parallel prop tables in README files. Releases are tag-driven from `vMAJOR.MINOR.PATCH` tags, optionally with dot-separated prerelease identifiers, and are published only by the provenance-enabled workflow.
