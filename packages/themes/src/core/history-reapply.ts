@@ -6,17 +6,18 @@ export function subscribeHistoryReapply(w: Window, apply: () => void): () => voi
 		.MutationObserver;
 	if (!htmlObs && Observer) {
 		htmlObs = true;
-		(obs = new Observer(apply)).observe(w.document.documentElement, {
+		(obs = new Observer(apply)).observe(w.document, {
+			childList: true,
+			subtree: true,
 			attributeFilter: ["class"],
 		});
 	}
-	const ev = ["popstate", "pageshow"];
-	for (const e of ev) w.addEventListener(e, apply);
+	w.addEventListener("popstate", apply);
 	return () => {
 		if (obs) {
 			obs.disconnect();
 			htmlObs = false;
 		}
-		for (const e of ev) w.removeEventListener(e, apply);
+		w.removeEventListener("popstate", apply);
 	};
 }

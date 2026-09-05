@@ -867,18 +867,6 @@ describe("serializeCookie", () => {
 });
 
 describe("ClientThemeProvider - history re-apply", () => {
-	test("re-applies the stored theme on pageshow", () => {
-		wrap(<ThemeConsumer />);
-		act(() => {
-			fireEvent.click(screen.getByTestId("btn-dark"));
-		});
-		document.documentElement.classList.remove("dark");
-		act(() => {
-			window.dispatchEvent(new window.Event("pageshow"));
-		});
-		expect(document.documentElement.classList.contains("dark")).toBe(true);
-	});
-
 	test("re-applies the stored theme on popstate", () => {
 		wrap(<ThemeConsumer />);
 		act(() => {
@@ -915,6 +903,21 @@ describe("ClientThemeProvider - history re-apply", () => {
 			fireEvent.click(screen.getByTestId("btn-dark"));
 		});
 		document.documentElement.className = "";
+		await act(async () => {
+			await Promise.resolve();
+		});
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("re-applies when the document tree is patched without a history event", async () => {
+		wrap(<ThemeConsumer />);
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		document.documentElement.classList.remove("dark");
+		act(() => {
+			document.body.append(document.createElement("div"));
+		});
 		await act(async () => {
 			await Promise.resolve();
 		});
