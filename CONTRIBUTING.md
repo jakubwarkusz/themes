@@ -2,14 +2,14 @@
 
 ## Setup
 
-Install pnpm 11.x and Bun 1.3.x (pnpm manages dependencies; Bun runs tests and builds), then run:
+Install pnpm 11.x and Bun 1.3.x (pnpm manages dependencies; Bun runs tests and builds). Docs Vercel deploys also pin Bun 1.3.9 because `@wrksz/themes` minify uses `Bun.build` / bunup inside `pnpm --filter theme-docs build`. Then run:
 
 ```sh
 CI=true pnpm install --frozen-lockfile
 pnpm verify
 ```
 
-Use `pnpm verify:full` before requesting release review. It adds TypeScript 5.9/6/7 declaration checks, bundle comparison, production builds, dependency audit, and the Next.js Playwright fixture.
+Use `pnpm verify:full` before requesting release review. It adds TypeScript 5.9/6/7 declaration checks, bundle comparison, production builds, dependency audit, and the Next.js Playwright fixture. Install Chromium once with `pnpm --filter next-16-3-compat exec playwright install chromium`.
 
 ## Change expectations
 
