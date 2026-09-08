@@ -70,7 +70,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 	const validForcedTheme = forcedTheme && themes.includes(forcedTheme) ? forcedTheme : undefined;
 	const storeRef = useRef<ReturnType<typeof createThemeStore> | null>(null);
-	if (storeRef.current === null) {
+	if (!storeRef.current) {
 		storeRef.current = createThemeStore(
 			validForcedTheme ??
 				(initialTheme && isThemeSelection(initialTheme, themes, enableSystem)
