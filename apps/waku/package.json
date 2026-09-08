@@ -1,0 +1,25 @@
+{
+	"name": "waku-compat",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "waku build",
+		"dev": "waku dev",
+		"start": "waku start --port 3142",
+		"test:e2e": "playwright test",
+		"type-check": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@wrksz/themes": "workspace:*",
+		"react": "^19.2.8",
+		"react-dom": "^19.2.8",
+		"waku": "^0.27.5"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.62.1",
+		"@types/node": "^26.4.0",
+		"@types/react": "^19.2.18",
+		"@types/react-dom": "^19.2.5",
+		"typescript": "^7.0.2"
+	}
+}

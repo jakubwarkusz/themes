@@ -5,8 +5,7 @@ on:
     branches: [main]
     paths:
       - "packages/themes/**"
-      - "apps/docs/**"
-      - "apps/next-16-3/**"
+      - "apps/**"
       - "package.json"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
@@ -21,8 +20,7 @@ on:
     branches: [main]
     paths:
       - "packages/themes/**"
-      - "apps/docs/**"
-      - "apps/next-16-3/**"
+      - "apps/**"
       - "package.json"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
@@ -275,3 +273,67 @@ jobs:
 
       - name: Test Instant Navigations
         run: pnpm --filter next-16-3-compat test:e2e
+
+  framework-fixtures:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Vite React
+            filter: vite-react
+          - name: React Router
+            filter: react-router-compat
+          - name: TanStack Start
+            filter: tanstack-start
+          - name: Astro
+            filter: astro-react
+          - name: Waku
+            filter: waku-compat
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build library
+        run: pnpm --filter @wrksz/themes build
+
+      - name: Type check
+        run: pnpm --filter ${{ matrix.filter }} type-check
+
+      - name: Build fixture
+        run: pnpm --filter ${{ matrix.filter }} build
+
+      - name: Cache Playwright Chromium
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            playwright-chromium-${{ runner.os }}-
+
+      - name: Install Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm --filter ${{ matrix.filter }} exec playwright install --with-deps chromium
+
+      - name: Install Chromium OS dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm --filter ${{ matrix.filter }} exec playwright install-deps chromium
+
+      - name: Test first-paint theming
+        run: pnpm --filter ${{ matrix.filter }} test:e2e
