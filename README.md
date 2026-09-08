@@ -38,6 +38,7 @@ npm install @wrksz/themes@beta
 | `meta theme-color` support                      | ❌          | ✅ `themeColor` prop       |
 | Server-provided theme                           | ❌          | ✅ `initialTheme` prop     |
 | `disableTransitionOnChange` per property        | ❌          | ✅ pass a CSS string       |
+| View Transitions on theme switch                | ❌          | ✅ `enableViewTransition`  |
 | Read theme outside React                        | ❌          | ✅ `getTheme()` helper     |
 | Generic types                                   | ❌          | ✅ `useTheme<AppTheme>()`  |
 | Typed factory                                   | ❌          | ✅ `createThemes(...)`     |

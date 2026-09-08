@@ -159,6 +159,41 @@ function mockMatchMedia(prefersDark: boolean): MQL {
 	return mql;
 }
 
+function mockMatchMediaQueries(
+	options: { prefersDark?: boolean; reduceMotion?: boolean } = {},
+): void {
+	const prefersDark = options.prefersDark ?? false;
+	const reduceMotion = options.reduceMotion ?? false;
+	window.matchMedia = (query: string) => {
+		const matches = query.includes("prefers-reduced-motion")
+			? reduceMotion
+			: query.includes("prefers-color-scheme: dark")
+				? prefersDark
+				: false;
+		return {
+			matches,
+			addEventListener() {},
+			removeEventListener() {},
+		} as unknown as MediaQueryList;
+	};
+}
+
+function stubStartViewTransition(impl?: (update: () => void) => void): Array<() => void> {
+	const calls: Array<() => void> = [];
+	document.startViewTransition = ((update: () => void) => {
+		calls.push(update);
+		impl?.(update);
+		return {
+			finished: Promise.resolve(),
+			ready: Promise.resolve(),
+			updateCallbackDone: Promise.resolve(),
+			skipTransition() {},
+			types: new Set<string>(),
+		};
+	}) as typeof document.startViewTransition;
+	return calls;
+}
+
 function wrap(
 	children: ReactNode,
 	props: Omit<Parameters<typeof ClientThemeProvider>[0], "children"> = {},
@@ -877,6 +912,116 @@ describe("ClientThemeProvider - disableTransitionOnChange", () => {
 
 		document.head.appendChild = origAppend;
 		expect(captured.content).toContain("background-color 0s, color 0s");
+	});
+});
+
+describe("ClientThemeProvider - enableViewTransition", () => {
+	const vtProps = {
+		enableViewTransition: true,
+		defaultTheme: "dark" as const,
+		enableSystem: false,
+	};
+
+	afterEach(() => {
+		Object.defineProperty(document, "startViewTransition", {
+			configurable: true,
+			writable: true,
+			value: undefined,
+		});
+	});
+
+	test("applies the theme synchronously when the API is missing", () => {
+		wrap(<ThemeConsumer />, vtProps);
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-light"));
+		});
+
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+		expect(screen.getByTestId("theme").textContent).toBe("light");
+	});
+
+	test("defers store and DOM writes until the view-transition callback runs", () => {
+		const calls = stubStartViewTransition();
+		wrap(<ThemeConsumer />, vtProps);
+
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-light"));
+		});
+
+		expect(calls).toHaveLength(1);
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+		expect(document.documentElement.classList.contains("light")).toBe(false);
+		expect(screen.getByTestId("theme").textContent).toBe("dark");
+
+		act(() => {
+			calls[0]?.();
+		});
+
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+		expect(screen.getByTestId("theme").textContent).toBe("light");
+	});
+
+	test("does not start a view transition while hydrating", () => {
+		const calls = stubStartViewTransition();
+		wrap(<ThemeConsumer />, vtProps);
+		expect(calls).toHaveLength(0);
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("applies synchronously when the user prefers reduced motion", () => {
+		mockMatchMediaQueries({ reduceMotion: true });
+		const calls = stubStartViewTransition();
+		wrap(<ThemeConsumer />, vtProps);
+
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-light"));
+		});
+
+		expect(calls).toHaveLength(0);
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+		expect(screen.getByTestId("theme").textContent).toBe("light");
+	});
+
+	test("falls back to a synchronous update when startViewTransition throws", () => {
+		document.startViewTransition = (() => {
+			throw new Error("InvalidStateError");
+		}) as typeof document.startViewTransition;
+		wrap(<ThemeConsumer />, vtProps);
+
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-light"));
+		});
+
+		expect(document.documentElement.classList.contains("light")).toBe(true);
+		expect(screen.getByTestId("theme").textContent).toBe("light");
+	});
+
+	test("still injects disableTransitionOnChange styles inside the callback", () => {
+		const calls = stubStartViewTransition();
+		wrap(<ThemeConsumer />, { ...vtProps, disableTransitionOnChange: true });
+
+		const captured = { content: null as string | null };
+		const origAppend = document.head.appendChild.bind(document.head);
+		document.head.appendChild = <T extends Node>(node: T): T => {
+			if ((node as unknown as Element).tagName === "STYLE")
+				captured.content = (node as unknown as Element).textContent;
+			return origAppend(node) as T;
+		};
+
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-light"));
+		});
+		expect(captured.content).toBeNull();
+
+		act(() => {
+			calls[0]?.();
+		});
+
+		document.head.appendChild = origAppend;
+		expect(captured.content).toContain("transition:none");
+		expect(document.documentElement.classList.contains("light")).toBe(true);
 	});
 });
 
