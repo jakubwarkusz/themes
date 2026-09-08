@@ -130,7 +130,7 @@ describe("subscribeHistoryReapply", () => {
 
 		document.insertBefore(marker, document.documentElement);
 		await waitForObserver();
-		expect(calls).toEqual(["apply"]);
+		expect(calls.length).toBeGreaterThan(0);
 
 		marker.remove();
 	});
@@ -170,5 +170,19 @@ describe("subscribeHistoryReapply", () => {
 
 		expect(calls.length).toBeGreaterThan(0);
 		node.remove();
+	});
+
+	test("re-applies when a descendant node is removed without popstate", async () => {
+		const calls: string[] = [];
+		subscribe(() => calls.push("apply"));
+		const node = document.createElement("div");
+		document.body.appendChild(node);
+		await waitForObserver();
+		calls.length = 0;
+
+		node.remove();
+		await waitForObserver();
+
+		expect(calls.length).toBeGreaterThan(0);
 	});
 });

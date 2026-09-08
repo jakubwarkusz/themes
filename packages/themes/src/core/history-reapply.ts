@@ -25,10 +25,33 @@ function watchHtml(Observer: typeof MutationObserver, root: Element): void {
 	html = root;
 	htmlObs?.disconnect();
 	(htmlObs = new Observer(flush)).observe(root, {
-		childList: true,
 		attributes: true,
 		attributeFilter: ["class"],
 	});
+}
+
+function armSubtree(w: Window, Observer: typeof MutationObserver): void {
+	const root = w.document.documentElement;
+	watchHtml(Observer, root);
+	subtree?.disconnect();
+	const bump = () => {
+		if (close) w.clearTimeout(close);
+		close = w.setTimeout(() => {
+			close = 0;
+			subtree?.disconnect();
+			subtree = undefined;
+		}, 500);
+	};
+	(subtree = new Observer(() => {
+		flush();
+		bump();
+	})).observe(root, {
+		childList: true,
+		subtree: true,
+		attributes: true,
+		attributeFilter: ["class"],
+	});
+	bump();
 }
 
 export function subscribeHistoryReapply(w: Window, apply: () => void): () => void {
@@ -37,37 +60,32 @@ export function subscribeHistoryReapply(w: Window, apply: () => void): () => voi
 		.MutationObserver;
 	if (!n++) {
 		if (Observer) {
-			docObs = new Observer(() => {
-				watchHtml(Observer, w.document.documentElement);
-				flush();
+			docObs = new Observer((records) => {
+				const root = w.document.documentElement;
+				const rebound = html !== root;
+				watchHtml(Observer, root);
+				if (rebound && subtree) armSubtree(w, Observer);
+				for (const record of records) {
+					if (record.target === w.document || record.removedNodes.length) {
+						flush();
+						return;
+					}
+				}
 			});
-			docObs.observe(w.document, { childList: true });
+			docObs.observe(w.document, { childList: true, subtree: true });
 			watchHtml(Observer, w.document.documentElement);
 		}
 	}
 	const onPopstate = () => {
 		apply();
-		if (!Observer) return;
-		const root = w.document.documentElement;
-		watchHtml(Observer, root);
-		subtree?.disconnect();
-		(subtree = new Observer(flush)).observe(root, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: ["class"],
-		});
-		if (close) clearTimeout(close);
-		close = w.setTimeout(() => {
-			close = 0;
-			subtree?.disconnect();
-			subtree = undefined;
-		}, 2000);
+		if (Observer) armSubtree(w, Observer);
 	};
 	w.addEventListener("popstate", onPopstate);
+	w.addEventListener("pageshow", onPopstate);
 	return () => {
 		applies.delete(apply);
 		w.removeEventListener("popstate", onPopstate);
+		w.removeEventListener("pageshow", onPopstate);
 		if (!--n) {
 			docObs?.disconnect();
 			htmlObs?.disconnect();
