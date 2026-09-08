@@ -82,6 +82,7 @@ describe("getScript", () => {
 		const disabled = getScript({ ...base, enableSystem: false });
 		expect(enabled).toContain(",true,");
 		expect(disabled).toContain(",false,");
+		expect(enabled).not.toContain(String(undefined));
 	});
 
 	test("inlines enableColorScheme as boolean literal", () => {

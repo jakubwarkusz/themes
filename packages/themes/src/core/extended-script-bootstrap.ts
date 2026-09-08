@@ -43,7 +43,10 @@ export function extendedThemeBootstrap(
 				if (storage === "cookie" || storage === "hybrid") {
 					const parts = ("; " + document.cookie).split("; " + storageKey + "=");
 					const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
-					const fromCookie = encoded ? decodeURIComponent(encoded) : null;
+					let fromCookie: string | null = null;
+					try {
+						fromCookie = encoded ? decodeURIComponent(encoded) || null : null;
+					} catch {}
 					stored =
 						storage === "hybrid"
 							? (fromCookie ?? localStorage.getItem(storageKey))
@@ -69,11 +72,7 @@ export function extendedThemeBootstrap(
 
 	if (systemTheme) {
 		const directMap = systemThemeMap as { light?: unknown; dark?: unknown } | null;
-		if (
-			directMap &&
-			typeof directMap.light === "string" &&
-			typeof directMap.dark === "string"
-		) {
+		if (directMap && typeof directMap.light + typeof directMap.dark === "stringstring") {
 			if (selection === "system")
 				theme = (directMap as { light: string; dark: string })[systemTheme];
 		} else if (systemThemeMap && selection !== "system") {
@@ -89,7 +88,7 @@ export function extendedThemeBootstrap(
 		theme = defaultTheme;
 	}
 
-	const attributeValue = value?.[theme] || theme;
+	const attributeValue = value?.[theme] ?? theme;
 	const element: Element | null =
 		target === "html"
 			? document.documentElement
@@ -99,8 +98,11 @@ export function extendedThemeBootstrap(
 	if (!element) return;
 
 	const attributes = Array.isArray(attribute) ? attribute : [attribute];
-	const toRemove = themes.flatMap((current) => (value?.[current] || current).split(" "));
-	const toAdd = attributeValue.split(" ");
+	const toRemove = themes.flatMap((current) =>
+		(value?.[current] ?? current).split(" ").filter((t) => t),
+	);
+	const toAdd = attributeValue.split(" ").filter((t) => t);
+	const nextAttrValue = attributeValue || null;
 	let changed = false;
 	let classChanged = false;
 
@@ -110,9 +112,9 @@ export function extendedThemeBootstrap(
 				toRemove.some(
 					(token) => !toAdd.includes(token) && element.classList.contains(token),
 				) || toAdd.some((token) => !element.classList.contains(token));
-			changed = changed || classChanged;
+			changed ||= classChanged;
 		} else {
-			changed = changed || element.getAttribute(current) !== attributeValue;
+			changed ||= element.getAttribute(current) !== nextAttrValue;
 		}
 	}
 
@@ -121,7 +123,7 @@ export function extendedThemeBootstrap(
 			typeof disableTransitionOnChange === "string" ? disableTransitionOnChange : "none";
 		const style = document.createElement("style");
 		style.textContent = "*,*::before,*::after{transition:" + css + "!important}";
-		document.head.appendChild(style);
+		document.head.append(style);
 		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
 	}
 
@@ -131,16 +133,15 @@ export function extendedThemeBootstrap(
 				element.classList.remove(...toRemove);
 				element.classList.add(...toAdd);
 			}
-		} else if (attributeValue) {
-			if (element.getAttribute(current) !== attributeValue)
-				element.setAttribute(current, attributeValue);
-		} else {
-			element.removeAttribute(current);
+		} else if (element.getAttribute(current) !== nextAttrValue) {
+			if (nextAttrValue) element.setAttribute(current, nextAttrValue);
+			else element.removeAttribute(current);
 		}
 	}
 
-	if (enableColorScheme && (theme === "light" || theme === "dark"))
-		(element as HTMLElement).style.colorScheme = theme;
+	if (enableColorScheme)
+		(element as HTMLElement).style.colorScheme =
+			theme === "light" || theme === "dark" ? theme : "";
 
 	if (themeColors) {
 		const color = typeof themeColors === "string" ? themeColors : themeColors[theme];
@@ -148,10 +149,10 @@ export function extendedThemeBootstrap(
 			let meta = document.querySelector('meta[name="theme-color"]');
 			if (!meta) {
 				meta = document.createElement("meta");
-				meta.setAttribute("name", "theme-color");
-				document.head.appendChild(meta);
+				(meta as HTMLMetaElement).name = "theme-color";
+				document.head.append(meta);
 			}
-			meta.setAttribute("content", color);
+			(meta as HTMLMetaElement).content = color;
 		}
 	}
 }

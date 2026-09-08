@@ -86,4 +86,26 @@ describe("public hydration and script APIs", () => {
 		);
 		expect(view.getByAltText("Theme preview").getAttribute("src")).toContain("data:image/gif");
 	});
+
+	test("ThemedImage uses the resolved theme source", () => {
+		const resolved: ThemeContextValue<string> = {
+			theme: "dark",
+			resolvedTheme: "dark",
+			systemTheme: "dark",
+			forcedTheme: undefined,
+			themes: ["light", "dark"],
+			setTheme: () => {},
+		};
+		const view = render(
+			<ThemeContext.Provider value={resolved}>
+				<ThemedImage
+					src={{ light: "/light.png", dark: "/dark.png" }}
+					alt="Theme preview"
+					width={100}
+					height={50}
+				/>
+			</ThemeContext.Provider>,
+		);
+		expect(view.getByAltText("Theme preview").getAttribute("src")).toBe("/dark.png");
+	});
 });
