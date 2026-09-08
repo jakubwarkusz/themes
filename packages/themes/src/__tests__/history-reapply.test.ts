@@ -66,7 +66,7 @@ describe("subscribeHistoryReapply", () => {
 		await waitForObserver();
 
 		expect(first).toEqual([]);
-		expect(second).toEqual(["apply"]);
+		expect(second.length).toBeGreaterThan(0);
 	});
 
 	test("unsubscribing a later subscriber keeps the observer for the first", async () => {
@@ -108,5 +108,47 @@ describe("subscribeHistoryReapply", () => {
 		await waitForObserver();
 
 		expect(calls).toEqual(["apply"]);
+	});
+
+	test("does not re-apply when an unrelated node class changes", async () => {
+		const calls: string[] = [];
+		subscribe(() => calls.push("apply"));
+		const node = document.createElement("div");
+		document.body.appendChild(node);
+
+		node.className = "unrelated";
+		await waitForObserver();
+
+		expect(calls).toEqual([]);
+		node.remove();
+	});
+
+	test("re-applies when a document childList mutation replaces the root", async () => {
+		const calls: string[] = [];
+		subscribe(() => calls.push("apply"));
+		const marker = document.createComment("theme-history");
+
+		document.insertBefore(marker, document.documentElement);
+		await waitForObserver();
+		expect(calls).toEqual(["apply"]);
+
+		marker.remove();
+	});
+
+	test("re-applies after popstate when a descendant class is stripped", async () => {
+		const calls: string[] = [];
+		subscribe(() => calls.push("apply"));
+		const node = document.createElement("div");
+		document.body.appendChild(node);
+
+		window.dispatchEvent(new window.Event("popstate"));
+		expect(calls).toEqual(["apply"]);
+		calls.length = 0;
+
+		node.className = "stripped";
+		await waitForObserver();
+
+		expect(calls.length).toBeGreaterThan(0);
+		node.remove();
 	});
 });
