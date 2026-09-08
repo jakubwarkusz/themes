@@ -317,6 +317,43 @@ describe("ClientThemeProvider - setTheme", () => {
 		expect(contextIdentitySeen.at(-1)).toBe(afterInit);
 	});
 
+	test("keeps context identity when themes/value/themeColor rerender with equal contents", () => {
+		contextIdentitySeen.length = 0;
+		const view = render(
+			<ClientThemeProvider
+				defaultTheme="light"
+				enableSystem={false}
+				themes={["light", "dark"]}
+				value={{ dark: "dark" }}
+				themeColor={{ dark: "#000" }}
+			>
+				<ContextIdentityProbe />
+			</ClientThemeProvider>,
+		);
+		const afterInit = contextIdentitySeen.at(-1);
+		expect(afterInit).toBeDefined();
+		const spy = spyClassListMutations(document.documentElement);
+		try {
+			view.rerender(
+				<ClientThemeProvider
+					defaultTheme="light"
+					enableSystem={false}
+					themes={["light", "dark"]}
+					value={{ dark: "dark" }}
+					themeColor={{ dark: "#000" }}
+				>
+					<ContextIdentityProbe />
+				</ClientThemeProvider>,
+			);
+
+			expect(contextIdentitySeen.at(-1)).toBe(afterInit);
+			expect(spy.added).toHaveLength(0);
+			expect(spy.removed).toHaveLength(0);
+		} finally {
+			spy.restore();
+		}
+	});
+
 	test("saves to localStorage", () => {
 		wrap(<ThemeConsumer />);
 		act(() => {

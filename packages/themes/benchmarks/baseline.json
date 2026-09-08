@@ -31,27 +31,27 @@
 	},
 	{
 		"name": "next-provider",
-		"bytes": 9945,
-		"gzipBytes": 3799
+		"bytes": 11963,
+		"gzipBytes": 4483
 	},
 	{
 		"name": "script",
-		"bytes": 3007,
-		"gzipBytes": 1415
+		"bytes": 3039,
+		"gzipBytes": 1394
 	},
 	{
 		"name": "client-provider",
-		"bytes": 6508,
-		"gzipBytes": 2731
-	},
-	{
-		"name": "generated-script",
-		"bytes": 1772,
-		"gzipBytes": 927
+		"bytes": 8553,
+		"gzipBytes": 3423
 	},
 	{
 		"name": "extended-next-provider",
-		"bytes": 12253,
-		"gzipBytes": 4506
+		"bytes": 14027,
+		"gzipBytes": 5141
+	},
+	{
+		"name": "generated-script",
+		"bytes": 1482,
+		"gzipBytes": 746
 	}
 ]
