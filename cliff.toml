@@ -52,7 +52,7 @@ conventional_commits = true
 filter_unconventional = false
 split_commits = false
 commit_parsers = [
-    { message = "^docs: update CHANGELOG\\.md", skip = true },
+    { message = "^docs: (update|generate) CHANGELOG\\.md", skip = true },
     { message = "^Merge (pull request|branch|remote-tracking branch)", skip = true },
     { breaking = true, group = "<!-- 0 -->Breaking Changes" },
     { message = "^feat", group = "<!-- 1 -->Added" },
