@@ -5,7 +5,9 @@ description: Render theme controls safely and choose when preferences may be per
 
 ## Hydration-safe controls
 
-Theme state is unknown in server HTML when it comes from browser storage. Use `useHydrated()` instead of setting mount state inside an effect:
+Theme state is unknown in server HTML when it comes from browser storage. Use `useHydrated()` instead of setting mount state inside an effect.
+
+When `initialTheme` or `forcedTheme` is a concrete theme (not `"system"`), `useTheme().theme` is already known in server HTML, so the real selected value can render without a hydration placeholder. `"system"` still cannot resolve to light or dark without `matchMedia`.
 
 ```tsx
 "use client";

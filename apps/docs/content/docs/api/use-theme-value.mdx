@@ -3,7 +3,7 @@ title: useThemeValue
 description: Hook that returns a value from a map keyed by the current resolved theme.
 ---
 
-`useThemeValue` returns the value from a map that matches the current resolved theme. Returns `undefined` before the theme resolves on the client.
+`useThemeValue` returns the value from a map that matches the current resolved theme. Returns `undefined` while `resolvedTheme` is unknown (browser storage, or `initialTheme`/`forcedTheme` set to `"system"`).
 
 ```tsx
 "use client";
@@ -54,7 +54,7 @@ const icon = useThemeValue({
 
 ### next/image
 
-`useThemeValue` returns `undefined` before the theme resolves, which `next/image` does not accept as `src`. Use a fallback with `??`:
+`useThemeValue` returns `undefined` while `resolvedTheme` is unknown, which `next/image` does not accept as `src`. Use a fallback with `??`:
 
 ```tsx
 "use client";
