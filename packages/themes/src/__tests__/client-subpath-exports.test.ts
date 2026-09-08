@@ -44,6 +44,7 @@ describe("client subpath exports", () => {
 			expect(buildEntries).toContain(`"src/client/${subpath}.ts"`);
 		}
 		expect(buildEntries).toContain('"src/next/extended.ts"');
+		expect(buildEntries).toContain('"src/next/create-themes.ts"');
 		expect(buildEntries).toContain('"src/providers/extended-client-next-provider.tsx"');
 	});
 
@@ -56,6 +57,19 @@ describe("client subpath exports", () => {
 			import: {
 				types: "./dist/next/extended.d.ts",
 				default: "./dist/next/extended.js",
+			},
+		});
+	});
+
+	test("package.json exposes the Next createThemes factory", () => {
+		const packageJson = JSON.parse(readFileSync(resolve(rootDir, "package.json"), "utf-8")) as {
+			exports: Record<string, { import?: { types?: string; default?: string } }>;
+		};
+
+		expect(packageJson.exports["./next/create-themes"]).toEqual({
+			import: {
+				types: "./dist/next/create-themes.d.ts",
+				default: "./dist/next/create-themes.js",
 			},
 		});
 	});

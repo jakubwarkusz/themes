@@ -88,6 +88,12 @@
 				"default": "./dist/next/extended.js"
 			}
 		},
+		"./next/create-themes": {
+			"import": {
+				"types": "./dist/next/create-themes.d.ts",
+				"default": "./dist/next/create-themes.js"
+			}
+		},
 		"./script": {
 			"import": {
 				"types": "./dist/script.d.ts",

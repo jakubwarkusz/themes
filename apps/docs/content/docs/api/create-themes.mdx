@@ -27,7 +27,7 @@ export const { ThemeProvider, useTheme, useThemeValue, useThemeEffect, ThemedIma
 - `useThemeValue` maps are checked against your union (plus optional `default`).
 - `ThemedImage` requires a source for every configured theme.
 - Provider defaults can still be overridden per usage, while the theme tuple stays fixed.
-- The returned `ThemeProvider` is the **default client** provider. Use `@wrksz/themes/next` for the root Next.js provider that injects the anti-flash script.
+- The returned `ThemeProvider` is the **default client** provider. Use `@wrksz/themes/next` or `@wrksz/themes/next/create-themes` for the root Next.js provider that injects the anti-flash script.
 - `themeRoot`, `systemThemeMap`, and `enableSameDocumentSync` are not on the factory. Compose with [`@wrksz/themes/client/extended-provider`](/docs/api/client-theme-provider) when a subtree needs those props.
 
 ```tsx title="app/theme-toggle.tsx"
@@ -58,15 +58,62 @@ export function ThemeToggle() {
 }
 ```
 
+## Next.js root provider
+
+For App Router layouts, import the same factory from `@wrksz/themes/next/create-themes`. One config object yields the client pieces **and** a `NextThemeProvider` that injects the anti-flash script, so the layout does not re-list `themes`.
+
+```tsx title="app/theme.ts"
+"use client";
+import { createThemes } from "@wrksz/themes/next/create-themes";
+
+export const {
+  ThemeProvider,
+  NextThemeProvider,
+  ThemeScript,
+  useTheme,
+  useThemeValue,
+  useThemeEffect,
+  ThemedImage,
+} = createThemes({
+  themes: ["light", "dark", "high-contrast"] as const,
+  defaultTheme: "system",
+  storage: "hybrid",
+  disableTransitionOnChange: true,
+});
+```
+
+```tsx title="app/layout.tsx"
+import { NextThemeProvider } from "@/app/theme";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <NextThemeProvider>{children}</NextThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+`createNextThemes` is the same function if you prefer that name. Keep using `ThemeProvider` from `@wrksz/themes/next` when you are not using the factory — that entry stays a thin wrapper and does not pull factory code.
+
+`ThemeScript` on the factory result is for non-Next SSR. It is typed to the same tuple. Next apps should prefer `NextThemeProvider` (`useServerInsertedHTML`) over mounting `ThemeScript` by hand.
+
 ## Return value
 
-`createThemes(config)` returns:
+`createThemes(config)` from `@wrksz/themes/client` returns:
 
 - `ThemeProvider`
 - `useTheme`
 - `useThemeValue`
 - `useThemeEffect`
 - `ThemedImage`
+
+`createThemes(config)` from `@wrksz/themes/next/create-themes` returns those plus:
+
+- `NextThemeProvider` — root Next.js provider with the anti-flash script, bound to the same context as `useTheme`
+- `ThemeScript` — typed bootstrap for non-Next SSR
 
 ## Exported types
 
@@ -95,6 +142,8 @@ export type AppThemeApi = CreateThemesResult<typeof themes>;
 export type AppThemeValueMap<Value> = ThemeValueMap<AppTheme, Value>;
 export type AppThemedImageProps = TypedThemedImageProps<AppTheme>;
 ```
+
+The Next factory also exports `CreateNextThemesResult`.
 
 ## Per-usage overrides
 
@@ -147,3 +196,11 @@ The resulting attributes are independent, for example `data-mode="dark"` and `da
 
 - Use `createThemes` for shipped app code with one canonical theme configuration.
 - Use `useTheme<T>()` for quick experiments and local prototypes.
+
+## Leaving beta
+
+Short 2.0 checklist for factory users:
+
+- **Default vs extended:** `createThemes` always binds the default provider. `systemThemeMap`, `themeRoot`, and `enableSameDocumentSync` stay on `@wrksz/themes/next/extended` and `@wrksz/themes/client/extended-provider`.
+- **Hybrid / SSR:** the pre-paint bootstrap reads the cookie. The Next provider does not call `cookies()`. Pass `initialTheme` from [`getTheme`](/docs/api/get-theme) only when server markup must know the theme.
+- **React 18+** is the public support floor (native `useEffectEvent` on React 19.2+).
