@@ -14,6 +14,7 @@ import {
 	getDomWindow,
 	getTargetEl,
 	readStoredTheme,
+	runThemeUpdate,
 	writeStoredTheme,
 } from "../core/client-dom.js";
 import { ThemeContext, type ThemeContextInstance } from "../core/context.js";
@@ -58,6 +59,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	value: valueMap,
 	target = "html",
 	disableTransitionOnChange = false,
+	enableViewTransition = false,
 	storage = "localStorage",
 	storageKey = "theme",
 	enableColorScheme = true,
@@ -152,10 +154,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		if (validForcedTheme) return;
 		const current = getSnapshot().theme;
 		if (current === "system" || current === undefined || followSystem) {
-			if (followSystem) {
-				setStoreTheme("system");
-			}
-			applyToDomEvent(next);
+			runThemeUpdate(enableViewTransition, () => {
+				if (followSystem) {
+					setStoreTheme("system");
+				}
+				applyToDomEvent(next);
+			});
 			onThemeChangeEvent(next as Themes);
 		}
 	});
@@ -177,9 +181,11 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			const resolved =
 				newTheme === "system" ? (getSnapshot().systemTheme ?? "light") : newTheme;
 
-			setStoreTheme(newTheme);
-			// oxlint-disable-next-line react-hooks/rules-of-hooks -- shared apply path; setTheme stays a public callback.
-			applyToDomEvent(resolved);
+			runThemeUpdate(enableViewTransition, () => {
+				setStoreTheme(newTheme);
+				// oxlint-disable-next-line react-hooks/rules-of-hooks -- shared apply path; setTheme stays a public callback.
+				applyToDomEvent(resolved);
+			});
 			onThemeChange?.(newTheme as Themes);
 
 			writeStoredTheme(storage, storageKey, newTheme, cookieOptions, onStorageError);
@@ -188,6 +194,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			validForcedTheme,
 			themes,
 			enableSystem,
+			enableViewTransition,
 			storage,
 			storageKey,
 			cookieOptions,

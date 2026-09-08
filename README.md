@@ -48,6 +48,7 @@ npm install @wrksz/themes
 | Theme-change effect hook                        | No          | Yes (`useThemeEffect(...)`)     |
 | Hydration state without mount effects           | No          | Yes (`useHydrated()`)           |
 | Framework-neutral SSR bootstrap                 | No          | Yes (`@wrksz/themes/script`)    |
+| View Transitions on theme switch                | No          | Yes (`enableViewTransition`)   |
 | Zero runtime dependencies                       | Yes         | Yes                             |
 
 ## Table of Contents
