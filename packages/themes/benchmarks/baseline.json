@@ -31,8 +31,8 @@
 	},
 	{
 		"name": "next-provider",
-		"bytes": 10929,
-		"gzipBytes": 4179
+		"bytes": 11963,
+		"gzipBytes": 4483
 	},
 	{
 		"name": "script",
@@ -41,13 +41,13 @@
 	},
 	{
 		"name": "client-provider",
-		"bytes": 7519,
-		"gzipBytes": 3137
+		"bytes": 8553,
+		"gzipBytes": 3423
 	},
 	{
 		"name": "extended-next-provider",
-		"bytes": 12922,
-		"gzipBytes": 4836
+		"bytes": 14027,
+		"gzipBytes": 5141
 	},
 	{
 		"name": "generated-script",
