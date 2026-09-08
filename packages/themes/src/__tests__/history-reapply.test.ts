@@ -151,4 +151,24 @@ describe("subscribeHistoryReapply", () => {
 		expect(calls.length).toBeGreaterThan(0);
 		node.remove();
 	});
+
+	test("re-applies descendant class changes several frames after popstate", async () => {
+		const calls: string[] = [];
+		subscribe(() => calls.push("apply"));
+		const node = document.createElement("div");
+		document.body.appendChild(node);
+
+		window.dispatchEvent(new window.Event("popstate"));
+		calls.length = 0;
+		await frame();
+		await frame();
+		await frame();
+		await frame();
+
+		node.className = "late-strip";
+		await waitForObserver();
+
+		expect(calls.length).toBeGreaterThan(0);
+		node.remove();
+	});
 });

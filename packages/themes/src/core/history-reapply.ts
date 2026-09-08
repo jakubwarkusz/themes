@@ -2,10 +2,10 @@
 let n = 0;
 let obs: MutationObserver | undefined;
 let subtree: MutationObserver | undefined;
+let html: Element | undefined;
 let flushRaf = 0;
 let applying = 0;
-let subtreeFrames = 0;
-let subtreeRaf = 0;
+let subtreeClose: ReturnType<typeof setTimeout> | 0 = 0;
 const applies = new Set<() => void>();
 
 function flush(): void {
@@ -14,11 +14,15 @@ function flush(): void {
 		flushRaf = 0;
 		applying = 1;
 		for (const subscriber of applies) subscriber();
+		obs?.takeRecords();
+		subtree?.takeRecords();
 		applying = 0;
 	});
 }
 
-function observeHtml(observer: MutationObserver, root: Element): void {
+function bindHtml(observer: MutationObserver, root: Element): void {
+	if (html === root) return;
+	html = root;
 	observer.observe(root, {
 		attributes: true,
 		attributeFilter: ["class"],
@@ -26,27 +30,21 @@ function observeHtml(observer: MutationObserver, root: Element): void {
 }
 
 function armSubtree(w: Window, Observer: typeof MutationObserver): void {
-	if (!subtree) {
-		subtree = new Observer(flush);
-		subtree.observe(w.document.documentElement, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: ["class"],
-		});
-	}
-	subtreeFrames = 2;
-	if (subtreeRaf) return;
-	const tick = () => {
-		subtreeRaf = 0;
-		if (--subtreeFrames > 0) {
-			subtreeRaf = requestAnimationFrame(tick);
-			return;
-		}
+	const root = w.document.documentElement;
+	if (!subtree) subtree = new Observer(flush);
+	else subtree.disconnect();
+	subtree.observe(root, {
+		childList: true,
+		subtree: true,
+		attributes: true,
+		attributeFilter: ["class"],
+	});
+	if (subtreeClose) clearTimeout(subtreeClose);
+	subtreeClose = setTimeout(() => {
+		subtreeClose = 0;
 		subtree?.disconnect();
 		subtree = undefined;
-	};
-	subtreeRaf = requestAnimationFrame(tick);
+	}, 1000);
 }
 
 export function subscribeHistoryReapply(w: Window, apply: () => void): () => void {
@@ -55,9 +53,16 @@ export function subscribeHistoryReapply(w: Window, apply: () => void): () => voi
 		.MutationObserver;
 	if (!n++) {
 		if (Observer) {
-			obs = new Observer(flush);
+			obs = new Observer(() => {
+				const root = w.document.documentElement;
+				if (obs && html !== root) {
+					bindHtml(obs, root);
+					if (subtree) armSubtree(w, Observer);
+				}
+				flush();
+			});
 			obs.observe(w.document, { childList: true });
-			observeHtml(obs, w.document.documentElement);
+			bindHtml(obs, w.document.documentElement);
 		}
 	}
 	const onPopstate = () => {
@@ -73,15 +78,15 @@ export function subscribeHistoryReapply(w: Window, apply: () => void): () => voi
 			obs = undefined;
 			subtree?.disconnect();
 			subtree = undefined;
+			html = undefined;
 			if (flushRaf) {
 				cancelAnimationFrame(flushRaf);
 				flushRaf = 0;
 			}
-			if (subtreeRaf) {
-				cancelAnimationFrame(subtreeRaf);
-				subtreeRaf = 0;
+			if (subtreeClose) {
+				clearTimeout(subtreeClose);
+				subtreeClose = 0;
 			}
-			subtreeFrames = 0;
 			applying = 0;
 		}
 	};
