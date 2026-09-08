@@ -14,8 +14,9 @@ export function subscribeHistoryReapply(w: Window, apply: () => void): () => voi
 				if (!q) {
 					q = 1;
 					requestAnimationFrame(() => {
-						q = 0;
 						for (const subscriber of applies) subscriber();
+						obs?.takeRecords();
+						q = 0;
 					});
 				}
 			})).observe(w.document, {
