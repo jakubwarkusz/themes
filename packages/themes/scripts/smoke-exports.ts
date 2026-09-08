@@ -15,6 +15,7 @@ import * as next from "@wrksz/themes/next";
 import * as nextCreateThemes from "@wrksz/themes/next/create-themes";
 import * as nextExtended from "@wrksz/themes/next/extended";
 import * as script from "@wrksz/themes/script";
+import * as server from "@wrksz/themes/server";
 
 const entrypoints = [
 	[".", root, ["ThemeProvider", "createThemes"]],
@@ -31,6 +32,7 @@ const entrypoints = [
 	["./next/create-themes", nextCreateThemes, ["createThemes", "createNextThemes"]],
 	["./next/extended", nextExtended, ["ThemeProvider"]],
 	["./script", script, ["ThemeScript"]],
+	["./server", server, ["getTheme", "parseThemeCookie"]],
 ] as const;
 
 const packageRoot = resolve(import.meta.dirname, "..");
@@ -60,7 +62,14 @@ for (const sourcePath of await readdir(resolve(packageRoot, "src"), { recursive:
 	assert.match(output, /^(["'])use client\1;/, `${outputPath} lost its client directive`);
 }
 
-for (const serverEntry of ["next.js", "next/extended.js", "script.js"]) {
+for (const serverEntry of ["next.js", "next/extended.js", "script.js", "server.js"]) {
 	const output = await readFile(resolve(packageRoot, "dist", serverEntry), "utf8");
 	assert.doesNotMatch(output, /^(["'])use client\1;/, `${serverEntry} became a client entry`);
 }
+
+const serverBundle = await readFile(resolve(packageRoot, "dist/server.js"), "utf8");
+assert.doesNotMatch(
+	serverBundle,
+	/next\/headers/,
+	"@wrksz/themes/server must not reference next/headers",
+);
