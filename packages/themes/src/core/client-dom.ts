@@ -51,6 +51,16 @@ function getTargetEl(target: string): Element | null {
 	return document.querySelector(target);
 }
 
+export function runThemeUpdate(on: boolean, fn: () => void): void {
+	try {
+		if (on && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+			document.startViewTransition(fn);
+			return;
+		}
+	} catch {}
+	fn();
+}
+
 export function applyThemeToDom({
 	resolved,
 	attribute,

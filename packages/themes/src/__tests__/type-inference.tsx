@@ -62,6 +62,7 @@ const validProviderProps = {
 	defaultTheme: "high-contrast",
 	forcedTheme: "dark",
 	initialTheme: "system",
+	enableViewTransition: true,
 	value: {
 		light: "theme-light",
 		dark: "theme-dark",
