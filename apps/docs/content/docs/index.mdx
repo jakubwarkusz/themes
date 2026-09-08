@@ -78,7 +78,9 @@ export function ThemeToggle() {
 
 | Import | Use for |
 |--------|---------|
-| `@wrksz/themes/next` | `ThemeProvider` in Next.js (recommended) |
+| `@wrksz/themes/next` | `ThemeProvider` and `getTheme` in Next.js (recommended) |
+| `@wrksz/themes/server` | Framework-neutral `getTheme(request)` and `parseThemeCookie` |
+| `@wrksz/themes/script` | Server-safe `ThemeScript` for non-Next SSR frameworks |
 | `@wrksz/themes/client` | `useTheme`, `useThemeValue`, `useThemeEffect`, `ThemedImage`, `ClientThemeProvider`, `createThemes` |
 | `@wrksz/themes/client/use-theme` | Direct `useTheme` import |
 | `@wrksz/themes/client/use-theme-value` | Direct `useThemeValue` import |

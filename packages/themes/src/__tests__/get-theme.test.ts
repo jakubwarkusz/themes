@@ -1,31 +1,15 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
-import { getTheme } from "../get-theme.js";
+import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { getTheme, parseThemeCookie } from "../get-theme.js";
 
-let nextCookieValue: string | undefined;
-let nextCookieReads = 0;
-
-mock.module("next/headers", () => ({
-	cookies: async () => {
-		nextCookieReads += 1;
-		return {
-			get: (_key: string) =>
-				nextCookieValue === undefined
-					? undefined
-					: { name: "theme", value: nextCookieValue },
-		};
-	},
-}));
+const srcDir = resolve(import.meta.dir, "..");
 
 function makeRequest(cookieHeader: string): Request {
 	return new Request("https://example.com", {
 		headers: { cookie: cookieHeader },
 	});
 }
-
-beforeEach(() => {
-	nextCookieValue = undefined;
-	nextCookieReads = 0;
-});
 
 describe("getTheme - sync (Request)", () => {
 	test("returns stored theme from cookie", () => {
@@ -82,93 +66,66 @@ describe("getTheme - sync (Request)", () => {
 	});
 });
 
-describe("getTheme - async (no Request)", () => {
-	test("returns defaultTheme when the cookie is absent", async () => {
-		expect(await getTheme({ defaultTheme: "dark" })).toBe("dark");
+describe("parseThemeCookie", () => {
+	test("returns stored theme from cookie header", () => {
+		expect(parseThemeCookie("theme=dark")).toBe("dark");
 	});
 
-	test("returns 'system' as default when no options provided", async () => {
-		expect(await getTheme()).toBe("system");
+	test("returns defaultTheme when cookie is absent", () => {
+		expect(parseThemeCookie("", { defaultTheme: "dark" })).toBe("dark");
 	});
 
-	test("returns a valid stored theme", async () => {
-		nextCookieValue = "dark";
-		expect(await getTheme({ themes: ["light", "dark"] })).toBe("dark");
+	test("returns 'system' as default when no defaultTheme provided", () => {
+		expect(parseThemeCookie("")).toBe("system");
 	});
 
-	test("accepts system when a themes allowlist is provided", async () => {
-		nextCookieValue = "system";
-		expect(await getTheme({ themes: ["light", "dark"] })).toBe("system");
+	test("uses custom storageKey", () => {
+		expect(parseThemeCookie("app-theme=light", { storageKey: "app-theme" })).toBe("light");
 	});
 
-	test("returns defaultTheme for unknown, encoded, or malformed values outside the allowlist", async () => {
-		for (const stored of ["unknown", "high%2Dcontrast", "%E0%A4%A"]) {
-			nextCookieValue = stored;
-			expect(
-				await getTheme({
-					themes: ["light", "dark"],
-					defaultTheme: "light",
-				}),
-			).toBe("light");
-		}
-	});
-});
-
-describe("Next ThemeProvider App Shell behavior", () => {
-	test("leaves cookie reads to the pre-hydration script", async () => {
-		nextCookieValue = "dark";
-		const { ThemeProvider } = await import("../providers/next-provider.js");
-		const element = ThemeProvider({
-			children: null,
-			storage: "cookie",
-			themes: ["light", "dark"],
-		});
-
-		expect(nextCookieReads).toBe(0);
-		expect((element.props as { storage?: string }).storage).toBe("cookie");
-		expect((element.props as { initialTheme?: string }).initialTheme).toBeUndefined();
+	test("ignores stored value not in themes list", () => {
+		expect(
+			parseThemeCookie("theme=unknown", {
+				themes: ["light", "dark"],
+				defaultTheme: "light",
+			}),
+		).toBe("light");
 	});
 
-	test("preserves an explicit initialTheme without reading request data", async () => {
-		const { ThemeProvider } = await import("../providers/next-provider.js");
-		const element = ThemeProvider({
-			children: null,
-			storage: "cookie",
-			themes: ["light", "dark"],
-			initialTheme: "dark",
-		});
+	test("accepts stored value when in themes list", () => {
+		expect(parseThemeCookie("theme=dark", { themes: ["light", "dark"] })).toBe("dark");
+	});
 
-		expect(nextCookieReads).toBe(0);
-		expect((element.props as { initialTheme?: string }).initialTheme).toBe("dark");
+	test("decodes URL-encoded cookie value", () => {
+		expect(parseThemeCookie("theme=high%2Dcontrast")).toBe("high-contrast");
+	});
+
+	test("ignores malformed URL-encoded cookie values", () => {
+		expect(parseThemeCookie("theme=%E0%A4%A", { defaultTheme: "dark" })).toBe("dark");
+	});
+
+	test("handles multiple cookies", () => {
+		expect(parseThemeCookie("other=value; theme=dark; another=foo")).toBe("dark");
+	});
+
+	test("handles storageKey with special regex characters", () => {
+		expect(parseThemeCookie("theme.v2=light", { storageKey: "theme.v2" })).toBe("light");
+	});
+
+	test("does not match partial cookie name", () => {
+		expect(parseThemeCookie("xtheme=dark", { defaultTheme: "light" })).toBe("light");
+	});
+
+	test("empty cookie value returns defaultTheme", () => {
+		expect(parseThemeCookie("theme=", { defaultTheme: "dark" })).toBe("dark");
 	});
 });
 
-describe("Extended Next ThemeProvider App Shell behavior", () => {
-	test("leaves cookie reads to the pre-hydration script", async () => {
-		nextCookieValue = "midnight";
-		const { ExtendedThemeProvider } = await import("../providers/extended-next-provider.js");
-		const element = ExtendedThemeProvider({
-			children: null,
-			storage: "cookie",
-			themes: ["paper", "midnight"],
-			systemThemeMap: { light: "paper", dark: "midnight" },
-		});
-
-		expect(nextCookieReads).toBe(0);
-		expect((element.props as { initialTheme?: string }).initialTheme).toBeUndefined();
-	});
-
-	test("preserves an explicit initialTheme without reading request data", async () => {
-		const { ExtendedThemeProvider } = await import("../providers/extended-next-provider.js");
-		const element = ExtendedThemeProvider({
-			children: null,
-			storage: "cookie",
-			themes: ["paper", "midnight"],
-			initialTheme: "midnight",
-			systemThemeMap: { light: "paper", dark: "midnight" },
-		});
-
-		expect(nextCookieReads).toBe(0);
-		expect((element.props as { initialTheme?: string }).initialTheme).toBe("midnight");
+describe("server helpers stay Next-free", () => {
+	test("get-theme.ts and server.ts do not import next/headers", () => {
+		expect(readFileSync(resolve(srcDir, "get-theme.ts"), "utf-8")).not.toContain(
+			"next/headers",
+		);
+		expect(readFileSync(resolve(srcDir, "server.ts"), "utf-8")).not.toContain("next/headers");
 	});
 });

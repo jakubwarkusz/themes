@@ -234,17 +234,19 @@ const { theme, setTheme } = useTheme<AppTheme>();
 
 ### `getTheme`
 
-Reads the current theme from a cookie outside React. Available in `@wrksz/themes/next`.
+Reads the current theme from a cookie outside React. Use [`@wrksz/themes/server`](https://themes.wrksz.dev/docs/api/get-theme) for the `Request` helper (Remix, TanStack, Vite). `@wrksz/themes/next` re-exports it and adds `await getTheme()` via `cookies()`.
 
 ```ts
-// proxy.ts - sync, reads from Request
-import { getTheme } from "@wrksz/themes/next";
+// Request — any SSR framework
+import { getTheme } from "@wrksz/themes/server";
 
-export function proxy(request: Request) {
+export function loader({ request }: { request: Request }) {
   const theme = getTheme(request, { defaultTheme: "dark" });
 }
 
-// layout.tsx - async, reads via cookies() from next/headers
+// Next.js layout — async, reads via cookies() from next/headers
+import { getTheme } from "@wrksz/themes/next";
+
 const theme = await getTheme({ defaultTheme: "dark" });
 return <html className={theme}>...</html>;
 ```
@@ -454,6 +456,8 @@ import { createThemes as createNextThemes } from "@wrksz/themes/next/create-them
 | Import                                   | Use for                                                                                             |
 | ---------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `@wrksz/themes/next`                     | `ThemeProvider`, `getTheme` in Next.js (recommended)                                                |
+| `@wrksz/themes/server`                   | Framework-neutral `getTheme(request)` and `parseThemeCookie`                                        |
+| `@wrksz/themes/script`                   | Server-safe `ThemeScript` for non-Next SSR frameworks                                               |
 | `@wrksz/themes/client`                   | `useTheme`, `useThemeValue`, `useThemeEffect`, `createThemes`, `ThemedImage`, `ClientThemeProvider` |
 | `@wrksz/themes/client/use-theme`         | Direct `useTheme` import                                                                            |
 | `@wrksz/themes/client/use-theme-value`   | Direct `useThemeValue` import                                                                       |
@@ -466,7 +470,6 @@ import { createThemes as createNextThemes } from "@wrksz/themes/next/create-them
 | `@wrksz/themes/next/create-themes`       | Typed factory that also returns `NextThemeProvider` and `ThemeScript`                               |
 | `@wrksz/themes/next/extended`            | Opt-in Next.js `ThemeProvider` with synchronization and system mapping                              |
 | `@wrksz/themes`                          | Client-safe `ThemeProvider` alias and `createThemes` for framework-neutral React usage              |
-| `@wrksz/themes/script`                   | Server-safe `ThemeScript` for non-Next SSR frameworks                                               |
 
 ## License
 

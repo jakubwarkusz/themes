@@ -20,5 +20,5 @@ export type {
 	TypedThemedImageProps,
 } from "./factory/create-themes.js";
 export type { GetThemeOptions, GetThemeResult } from "./get-theme.js";
-export { getTheme } from "./get-theme.js";
+export { getTheme } from "./next-get-theme.js";
 export { ThemeProvider } from "./providers/next-provider.js";
