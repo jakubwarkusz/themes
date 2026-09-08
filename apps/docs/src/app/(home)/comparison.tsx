@@ -100,6 +100,11 @@ const rows = [
 		wrksz: <Yes note="CSS string + inline script" />,
 	},
 	{
+		label: "View Transitions on theme switch",
+		next: <No />,
+		wrksz: <Yes note="enableViewTransition" />,
+	},
+	{
 		label: "Read theme outside React",
 		next: <No />,
 		wrksz: <Yes note="getTheme()" />,
