@@ -15,6 +15,7 @@ import {
 	type TypedThemedImageProps,
 } from "../index.js";
 import { type GetThemeOptions, getTheme } from "../next.js";
+import { getTheme as getServerTheme, parseThemeCookie } from "../server.js";
 import {
 	createThemes as createNextThemes,
 	type CreateNextThemesResult,
@@ -48,6 +49,26 @@ expectType<Promise<"light" | "dark" | "system">>(asyncTheme);
 
 const looseTheme = getTheme(request, { defaultTheme: "dark" });
 expectType<string>(looseTheme);
+
+const serverTheme = getServerTheme(request, {
+	themes: appThemes,
+	defaultTheme: "light",
+});
+expectType<AppTheme>(serverTheme);
+expectType<Equal<typeof serverTheme, AppTheme>>(true);
+
+const parsedTheme = parseThemeCookie("theme=dark", {
+	themes: appThemes,
+	defaultTheme: "light",
+});
+expectType<AppTheme>(parsedTheme);
+expectType<Equal<typeof parsedTheme, AppTheme>>(true);
+
+function unusedServerGetThemeArityCheck(): void {
+	// @ts-expect-error server getTheme requires a Request
+	getServerTheme();
+}
+expectType<() => void>(unusedServerGetThemeArityCheck);
 
 const invalidGetThemeOptions = {
 	themes: appThemes,
