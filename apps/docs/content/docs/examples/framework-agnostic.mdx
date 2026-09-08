@@ -1,6 +1,6 @@
 ---
 title: Other React frameworks
-description: First-paint theming in TanStack Start, Remix, and other SSR frameworks.
+description: First-paint theming in Vite, React Router, TanStack Start, Astro, Waku, and other SSR frameworks.
 ---
 
 Use the client provider for state and render `ThemeScript` in your framework's server-controlled document head.
@@ -27,6 +27,198 @@ export function Document({ children }: { children: React.ReactNode }) {
 
 ```tsx
 import { getScript, ThemeScript } from "@wrksz/themes/script";
+```
+
+Do not import `@wrksz/themes/next` outside Next.js. That entry uses `useServerInsertedHTML`.
+
+Preview fixtures live in the repo:
+
+- [`apps/vite-react`](https://github.com/jakubwarkusz/themes/tree/main/apps/vite-react) — Vite SPA with `getScript()` injected into `index.html`
+- [`apps/react-router`](https://github.com/jakubwarkusz/themes/tree/main/apps/react-router) — React Router 7 framework mode
+- [`apps/tanstack-start`](https://github.com/jakubwarkusz/themes/tree/main/apps/tanstack-start) — TanStack Start document shell
+- [`apps/astro`](https://github.com/jakubwarkusz/themes/tree/main/apps/astro) — Astro `ThemeScript` with no `client:*` directive, plus one React island
+- [`apps/waku`](https://github.com/jakubwarkusz/themes/tree/main/apps/waku) — Waku `_root.tsx` document shell
+
+## Vite SPA
+
+There is no server document to render `ThemeScript`. Inject `getScript()` into `index.html` before the app bundle:
+
+```ts title="vite.config.ts"
+import { getScript } from "@wrksz/themes/script";
+import react from "@vitejs/plugin-react";
+import { defineConfig, type Plugin } from "vite";
+
+const themeBootstrap = getScript({
+  storageKey: "theme",
+  attribute: "class",
+  defaultTheme: "light",
+  enableSystem: false,
+  enableColorScheme: true,
+  forcedTheme: undefined,
+  themes: ["light", "dark"],
+  value: undefined,
+  target: "html",
+  storage: "hybrid",
+  themeColors: undefined,
+  initialTheme: undefined,
+  disableTransitionOnChange: false,
+  followSystem: false,
+});
+
+function themeScriptPlugin(): Plugin {
+  return {
+    name: "theme-script",
+    transformIndexHtml(html) {
+      return html.replace(
+        "<head>",
+        `<head><script data-theme-bootstrap="true">${themeBootstrap}</script>`,
+      );
+    },
+  };
+}
+
+export default defineConfig({
+  plugins: [themeScriptPlugin(), react()],
+});
+```
+
+Wrap the React tree with `ThemeProvider` using the same `storage` and `defaultTheme`.
+
+## React Router 7
+
+Put `ThemeScript` in the root `Layout` `<head>`:
+
+```tsx title="src/root.tsx"
+import { ThemeProvider } from "@wrksz/themes";
+import { ThemeScript } from "@wrksz/themes/script";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <Meta />
+        <Links />
+        <ThemeScript storage="hybrid" defaultTheme="light" />
+      </head>
+      <body>
+        <ThemeProvider storage="hybrid" defaultTheme="light">
+          {children}
+        </ThemeProvider>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+export default function App() {
+  return <Outlet />;
+}
+```
+
+## TanStack Start
+
+Render `ThemeScript` next to `HeadContent` on the root document:
+
+```tsx title="src/routes/__root.tsx"
+import { ThemeProvider } from "@wrksz/themes";
+import { ThemeScript } from "@wrksz/themes/script";
+import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
+
+export const Route = createRootRoute({
+  component: RootComponent,
+});
+
+function RootComponent() {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <HeadContent />
+        <ThemeScript storage="hybrid" defaultTheme="light" />
+      </head>
+      <body>
+        <ThemeProvider storage="hybrid" defaultTheme="light">
+          <Outlet />
+        </ThemeProvider>
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+```
+
+## Astro
+
+Server-render `ThemeScript` with no `client:*` directive. Keep `ThemeProvider` and interactive controls in one React island so they share context:
+
+```astro title="src/layouts/Layout.astro"
+---
+import { ThemeScript } from "@wrksz/themes/script";
+---
+<html lang="en">
+  <head>
+    <ThemeScript storage="hybrid" defaultTheme="light" enableSystem={false} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+```
+
+```tsx title="src/components/ThemeApp.tsx"
+import { ThemeProvider } from "@wrksz/themes";
+
+export function ThemeApp({ children }: { children: React.ReactNode }) {
+  return (
+    <ThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
+      {children}
+    </ThemeProvider>
+  );
+}
+```
+
+```astro title="src/pages/index.astro"
+---
+import { ThemeApp } from "../components/ThemeApp";
+import Layout from "../layouts/Layout.astro";
+---
+<Layout>
+  <ThemeApp client:load>{/* controls */}</ThemeApp>
+</Layout>
+```
+
+## Waku
+
+Customize the document with `_root.tsx` and wrap pages with the client provider in `_layout.tsx`:
+
+```tsx title="src/pages/_root.tsx"
+import { ThemeScript } from "@wrksz/themes/script";
+import type { ReactNode } from "react";
+
+export default async function RootElement({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript storage="hybrid" defaultTheme="light" enableSystem={false} />
+      </head>
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+```tsx title="src/pages/_layout.tsx"
+import { ThemeProvider } from "@wrksz/themes";
+import type { ReactNode } from "react";
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <ThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
+      {children}
+    </ThemeProvider>
+  );
+}
 ```
 
 ## Cloudflare
