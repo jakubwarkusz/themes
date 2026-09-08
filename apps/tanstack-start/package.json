@@ -13,7 +13,7 @@
 		"@tanstack/react-router": "^1.132.0",
 		"@tanstack/react-start": "^1.132.0",
 		"@wrksz/themes": "workspace:*",
-		"nitro": "^3.0.0",
+		"nitro": "3.0.260903-beta",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8"
 	},
