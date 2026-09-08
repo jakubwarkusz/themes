@@ -67,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `themes` | `readonly string[]` | `["light", "dark"]` | Available themes. Use `as const` to preserve custom theme unions in TypeScript |
 | `defaultTheme` | `string` | `"system"` | Theme used when no preference is stored |
 | `forcedTheme` | `string` | - | Force a specific theme, ignoring user preference. <Breaking /> Does not write to storage on init. |
-| `initialTheme` | `string` | - | Server-provided theme that overrides storage on mount. User can still call `setTheme` to change it. <Breaking /> Mount init is sticky: later prop changes to `storageKey` / `initialTheme` do not re-run initialization (`forcedTheme` still updates via overlay). |
+| `initialTheme` | `string` | - | Server-provided theme that seeds the store snapshot and overrides storage on mount. User can still call `setTheme` to change it. A concrete value (not `"system"`) is available to `useTheme` during SSR; `"system"` does not yield `resolvedTheme` until mount. <Breaking /> Mount init is sticky: later prop changes to `storageKey` / `initialTheme` do not re-run initialization (`forcedTheme` still updates via overlay). |
 | `enableSystem` | `boolean` | `true` | Detect system preference via `prefers-color-scheme` |
 | `enableColorScheme` | `boolean` | `true` | Set native `color-scheme` CSS property |
 | `attribute` | `"class" \| "data-*" \| ("class" \| "data-*")[]` | `"class"` | HTML attribute(s) to set on the target element |
@@ -152,7 +152,7 @@ Map a theme to multiple CSS classes using a space-separated value:
 
 ### Server-provided theme
 
-Use `initialTheme` to initialize from a server-side source (database, session, cookie) on every mount:
+Use `initialTheme` to initialize from a server-side source (database, session, cookie) on every mount. A concrete value also seeds `useTheme` during SSR:
 
 ```tsx title="app/layout.tsx"
 export default async function RootLayout({ children }) {
