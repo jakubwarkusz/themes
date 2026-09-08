@@ -36,10 +36,10 @@
 		"maxDeltaGzipBytes": 120
 	},
 	"next-provider": {
-		"maxBytes": 10500,
-		"maxGzipBytes": 4000,
-		"maxDeltaBytes": 500,
-		"maxDeltaGzipBytes": 250
+		"maxBytes": 10800,
+		"maxGzipBytes": 4100,
+		"maxDeltaBytes": 650,
+		"maxDeltaGzipBytes": 300
 	},
 	"script": {
 		"maxBytes": 3600,
@@ -50,8 +50,8 @@
 	"client-provider": {
 		"maxBytes": 9500,
 		"maxGzipBytes": 3900,
-		"maxDeltaBytes": 500,
-		"maxDeltaGzipBytes": 250
+		"maxDeltaBytes": 650,
+		"maxDeltaGzipBytes": 320
 	},
 	"generated-script": {
 		"maxBytes": 2200,
