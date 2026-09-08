@@ -10,9 +10,9 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@astrojs/react": "^4.4.2",
+		"@astrojs/react": "^6.0.5",
 		"@wrksz/themes": "workspace:*",
-		"astro": "^5.13.7",
+		"astro": "^6.4.8",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8"
 	},
