@@ -1,9 +1,14 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { Activity, type ReactNode } from "react";
+import * as React from "react";
+import type { ReactNode } from "react";
 import { useTheme } from "../core/context.js";
 import { ExtendedClientThemeProvider } from "../providers/extended-client-provider.js";
 import { clearCookies } from "./setup.js";
+
+// React 18 does not export Activity; skip this coverage on the 18.3 support floor.
+type ActivityComponent = (props: { mode: "hidden" | "visible"; children?: ReactNode }) => ReactNode;
+const Activity = (React as unknown as { Activity?: ActivityComponent }).Activity;
 
 (globalThis as unknown as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -147,14 +152,16 @@ describe("ExtendedClientThemeProvider", () => {
 		expect(screen.getByTestId("second-theme").textContent).toBe("dark");
 	});
 
-	test("refreshes an Activity-preserved provider when visible", () => {
+	test.skipIf(!Activity)("refreshes an Activity-preserved provider when visible", () => {
+		const Preserve = Activity;
+		if (!Preserve) return;
 		const providers = (mode: "hidden" | "visible") => (
 			<>
-				<Activity mode={mode}>
+				<Preserve mode={mode}>
 					<ExtendedClientThemeProvider storageKey="activity" enableSameDocumentSync>
 						<ThemeConsumer prefix="preserved-" />
 					</ExtendedClientThemeProvider>
-				</Activity>
+				</Preserve>
 				<ExtendedClientThemeProvider storageKey="activity" enableSameDocumentSync>
 					<ThemeConsumer prefix="active-" />
 				</ExtendedClientThemeProvider>

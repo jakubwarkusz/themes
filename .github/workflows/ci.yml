@@ -102,6 +102,7 @@ jobs:
   react-compatibility:
     name: React ${{ matrix.react }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -151,8 +152,8 @@ jobs:
             "@types/react-dom@${REACT_DOM_TYPES}"
           pnpm install
 
-      - name: Test effect event compatibility
-        run: pnpm --filter @wrksz/themes test src/__tests__/use-effect-event-compat.test.tsx
+      - name: Test
+        run: pnpm --filter @wrksz/themes test
 
       - name: Build
         run: pnpm --filter @wrksz/themes build
