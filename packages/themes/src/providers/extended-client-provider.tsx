@@ -91,9 +91,15 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 }: ExtendedThemeProviderProps<Themes>): ReactElement {
 	const resolvedDefault = resolveDefaultTheme(themes, enableSystem, defaultTheme);
 
+	const validForcedTheme = forcedTheme && themes.includes(forcedTheme) ? forcedTheme : undefined;
 	const storeRef = useRef<ReturnType<typeof createThemeStore> | null>(null);
 	if (storeRef.current === null) {
-		storeRef.current = createThemeStore();
+		storeRef.current = createThemeStore(
+			validForcedTheme ??
+				(initialTheme && isThemeSelection(initialTheme, themes, enableSystem)
+					? initialTheme
+					: undefined),
+		);
 	}
 	const store = storeRef.current;
 	const appliedThemeRef = useRef<AppliedThemeState | undefined>(undefined);
@@ -110,8 +116,6 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		store.getSnapshot,
 		store.getServerSnapshot,
 	);
-
-	const validForcedTheme = forcedTheme && themes.includes(forcedTheme) ? forcedTheme : undefined;
 	const selectedTheme = validForcedTheme ?? theme;
 	const resolvedTheme = selectedTheme
 		? (resolveSelection(
