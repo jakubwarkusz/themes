@@ -14,6 +14,12 @@ import {
 	readStoredTheme,
 	writeStoredTheme,
 } from "../core/client-dom.js";
+import {
+	holdIfEqual,
+	sameStringList,
+	sameStringRecord,
+	sameThemeColor,
+} from "../core/config-equal.js";
 import { ThemeContext, type ThemeContextInstance } from "../core/context.js";
 import { subscribeHistoryReapply } from "../core/history-reapply.js";
 import { createThemeStore } from "../core/store.js";
@@ -86,8 +92,18 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		store.getServerSnapshot,
 	);
 	const lastAppliedRef = useRef<LastAppliedTheme | null>(null);
+	const themesRef = useRef(themes);
+	themesRef.current = holdIfEqual(themesRef.current, themes, sameStringList);
+	const stableThemes = themesRef.current;
+	const valueMapRef = useRef(valueMap);
+	valueMapRef.current = holdIfEqual(valueMapRef.current, valueMap, sameStringRecord);
+	const stableValueMap = valueMapRef.current;
+	const themeColorRef = useRef(themeColor);
+	themeColorRef.current = holdIfEqual(themeColorRef.current, themeColor, sameThemeColor);
+	const stableThemeColor = themeColorRef.current;
 
-	const validForcedTheme = forcedTheme && themes.includes(forcedTheme) ? forcedTheme : undefined;
+	const validForcedTheme =
+		forcedTheme && stableThemes.includes(forcedTheme) ? forcedTheme : undefined;
 	const selectedTheme = validForcedTheme ?? theme;
 	const resolvedTheme: ResolvedTheme<Themes> | undefined =
 		selectedTheme === "system" || selectedTheme === undefined
@@ -102,12 +118,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		const last: LastAppliedTheme = {
 			resolved,
 			attribute,
-			themes,
-			valueMap,
+			themes: stableThemes,
+			valueMap: stableValueMap,
 			target,
 			disableTransitionOnChange,
 			enableColorScheme,
-			themeColor,
+			themeColor: stableThemeColor,
 		};
 		applyThemeToDom(last);
 		lastAppliedRef.current = last;
@@ -169,7 +185,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 			const current = getSnapshot().theme as Themes | "system" | undefined;
 			const newTheme = typeof next === "function" ? next(current) : next;
-			if (!isThemeSelection(newTheme, themes, enableSystem)) return;
+			if (!isThemeSelection(newTheme, stableThemes, enableSystem)) return;
 			const resolved =
 				newTheme === "system" ? (getSnapshot().systemTheme ?? "light") : newTheme;
 
@@ -182,7 +198,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		},
 		[
 			validForcedTheme,
-			themes,
+			stableThemes,
 			enableSystem,
 			storage,
 			storageKey,
@@ -215,12 +231,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			last &&
 			last.resolved === resolvedTheme &&
 			last.attribute === attribute &&
-			last.themes === themes &&
-			last.valueMap === valueMap &&
+			last.themes === stableThemes &&
+			last.valueMap === stableValueMap &&
 			last.target === target &&
 			last.disableTransitionOnChange === disableTransitionOnChange &&
 			last.enableColorScheme === enableColorScheme &&
-			last.themeColor === themeColor
+			last.themeColor === stableThemeColor
 		) {
 			return;
 		}
@@ -228,12 +244,12 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	}, [
 		resolvedTheme,
 		attribute,
-		themes,
-		valueMap,
+		stableThemes,
+		stableValueMap,
 		target,
 		disableTransitionOnChange,
 		enableColorScheme,
-		themeColor,
+		stableThemeColor,
 	]);
 
 	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
@@ -294,10 +310,10 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			resolvedTheme,
 			systemTheme,
 			forcedTheme: validForcedTheme,
-			themes,
+			themes: stableThemes,
 			setTheme,
 		}),
-		[validForcedTheme, contextTheme, resolvedTheme, systemTheme, themes, setTheme],
+		[validForcedTheme, contextTheme, resolvedTheme, systemTheme, stableThemes, setTheme],
 	);
 	const ContextProvider = themeContext.Provider;
 
