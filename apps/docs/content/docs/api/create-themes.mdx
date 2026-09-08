@@ -96,7 +96,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-`createNextThemes` is the same function if you prefer that name. Keep using `ThemeProvider` from `@wrksz/themes/next` when you are not using the factory — that entry stays a thin wrapper and does not pull factory code.
+`createNextThemes` is the same function if you prefer that name. Keep using `ThemeProvider` from `@wrksz/themes/next` when you are not using the factory: that entry stays a thin wrapper and does not pull factory code.
 
 `ThemeScript` on the factory result is for non-Next SSR. It is typed to the same tuple. Next apps should prefer `NextThemeProvider` (`useServerInsertedHTML`) over mounting `ThemeScript` by hand.
 
@@ -112,8 +112,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 `createThemes(config)` from `@wrksz/themes/next/create-themes` returns those plus:
 
-- `NextThemeProvider` — root Next.js provider with the anti-flash script, bound to the same context as `useTheme`
-- `ThemeScript` — typed bootstrap for non-Next SSR
+- `NextThemeProvider`: root Next.js provider with the anti-flash script, bound to the same context as `useTheme`
+- `ThemeScript`: typed bootstrap for non-Next SSR
 
 ## Exported types
 

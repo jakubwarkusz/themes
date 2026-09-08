@@ -92,7 +92,7 @@ Heavier capabilities stay behind opt-in imports so the default provider bundle d
 |------|------|---------|-------------|
 | `enableSameDocumentSync` | `boolean` | `false` | Synchronize providers that share a storage key in the same document |
 | `systemThemeMap` | `{ light: string; dark: string } \| Record<string, { light: string; dark: string }>` | - | Serializable custom resolution for system-aware variants |
-| `themeRoot` | `Element \| ShadowRoot` | - | Client-only Shadow DOM or custom root. **Not on** `@wrksz/themes/next/extended` — a DOM object cannot go through the inline bootstrap. Import [`@wrksz/themes/client/extended-provider`](/docs/api/client-theme-provider). Worked example: [Shadow DOM](/docs/examples/shadow-dom). Use `target` when the root must be themed before hydration. |
+| `themeRoot` | `Element \| ShadowRoot` | - | Client-only Shadow DOM or custom root. **Not on** `@wrksz/themes/next/extended`: a DOM object cannot go through the inline bootstrap. Import [`@wrksz/themes/client/extended-provider`](/docs/api/client-theme-provider). Worked example: [Shadow DOM](/docs/examples/shadow-dom). Use `target` when the root must be themed before hydration. |
 
 ## Security notes
 

@@ -1,7 +1,7 @@
 /**
  * Readable extended bootstrap source of truth.
  *
- * Do not import this module from runtime package code — `scripts/generate-script-source.ts`
+ * Do not import this module from runtime package code: `scripts/generate-script-source.ts`
  * minifies it into `extended-script-source.ts`, which is what `getExtendedScript` ships.
  *
  * Prefer string concatenation over template literals so the minified shipped source stays

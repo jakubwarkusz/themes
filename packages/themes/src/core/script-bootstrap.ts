@@ -1,7 +1,7 @@
 /**
  * Readable bootstrap source of truth.
  *
- * Do not import this module from runtime package code — `scripts/generate-script-source.ts`
+ * Do not import this module from runtime package code: `scripts/generate-script-source.ts`
  * minifies it into `script-source.ts`, which is what `getScript` ships.
  *
  * Prefer string concatenation over template literals so the minified shipped source stays

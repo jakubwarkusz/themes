@@ -49,7 +49,7 @@ export type CreateThemesResult<Themes extends readonly string[]> = {
 	ThemedImage: (props: TypedThemedImageProps<Themes[number]>) => ReactElement;
 };
 
-/** Isolated factory bindings. Not a public export — used by the Next factory to share context. */
+/** Isolated factory bindings. Not a public export: used by the Next factory to share context. */
 export type CreateThemesBindings<Themes extends readonly string[]> = CreateThemesResult<Themes> & {
 	themeContext: ThemeContextInstance<Themes[number]>;
 };

@@ -5,7 +5,7 @@ import { type ReactNode, Suspense } from "react";
 import "../globals.css";
 
 export const metadata: Metadata = {
-	title: "wrksz themes — Next.js fixture",
+	title: "wrksz themes: Next.js fixture",
 	description: "Multi-tenant fixture app for verifying @wrksz/themes with Next.js App Router.",
 };
 

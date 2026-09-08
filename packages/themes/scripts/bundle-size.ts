@@ -57,7 +57,7 @@ export const GENERATED_SCRIPT_REPORT_NAME = "generated-script";
 /**
  * Literal dynamic-import edges so dead-code analysis can see these fixtures as
  * reachable from this script (Bun.build also uses them as entrypoints).
- * Never called at runtime — only for static reachability.
+ * Never called at runtime: only for static reachability.
  */
 export function bundleEntryModuleLoaders(): ReadonlyArray<() => Promise<unknown>> {
 	return [
@@ -213,7 +213,7 @@ async function bundleCase(bundleCase: BundleCase): Promise<BundleReport> {
 		splitting: false,
 		sourcemap: "none",
 		external: externals,
-		// Measure production JSX/runtime paths — app bundlers set this for real builds.
+		// Measure production JSX/runtime paths: app bundlers set this for real builds.
 		define: {
 			"process.env.NODE_ENV": JSON.stringify("production"),
 		},
