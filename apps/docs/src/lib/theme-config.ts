@@ -9,4 +9,5 @@ export const themeProviderDefaults = {
 	enableSystem: true,
 	storage: "localStorage",
 	disableTransitionOnChange: true,
+	enableViewTransition: true,
 } satisfies Omit<ThemeProviderProps<AppTheme>, "children" | "themes">;
