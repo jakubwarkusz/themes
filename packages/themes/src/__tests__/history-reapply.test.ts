@@ -28,7 +28,7 @@ afterEach(() => {
 });
 
 describe("subscribeHistoryReapply", () => {
-	test("observer invokes the first subscriber, not later ones", async () => {
+	test("observer invokes every subscriber", async () => {
 		const first: string[] = [];
 		const second: string[] = [];
 		subscribe(() => first.push("apply"));
@@ -38,7 +38,7 @@ describe("subscribeHistoryReapply", () => {
 		await waitForObserver();
 
 		expect(first).toEqual(["apply"]);
-		expect(second).toEqual([]);
+		expect(second).toEqual(["apply"]);
 	});
 
 	test("every subscriber receives popstate", () => {
@@ -51,6 +51,22 @@ describe("subscribeHistoryReapply", () => {
 
 		expect(first).toEqual(["pop"]);
 		expect(second).toEqual(["pop"]);
+	});
+
+	test("unsubscribing the first subscriber keeps the observer for remaining ones", async () => {
+		const first: string[] = [];
+		const second: string[] = [];
+		const unsubFirst = subscribe(() => first.push("apply"));
+		subscribe(() => second.push("apply"));
+
+		unsubFirst();
+		unsubscribers.shift();
+
+		document.documentElement.className = "keep-second";
+		await waitForObserver();
+
+		expect(first).toEqual([]);
+		expect(second).toEqual(["apply"]);
 	});
 
 	test("unsubscribing a later subscriber keeps the observer for the first", async () => {

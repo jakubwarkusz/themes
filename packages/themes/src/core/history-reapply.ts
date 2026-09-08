@@ -1,12 +1,12 @@
 // Instant Nav restores a classless snapshot by mutating descendants after popstate.
 let n = 0;
 let obs: MutationObserver | undefined;
-let run: () => void;
 let q = 0;
+const applies = new Set<() => void>();
 
 export function subscribeHistoryReapply(w: Window, apply: () => void): () => void {
+	applies.add(apply);
 	if (!n++) {
-		run = apply;
 		const Observer = (w as unknown as { MutationObserver?: typeof MutationObserver })
 			.MutationObserver;
 		if (Observer) {
@@ -15,7 +15,7 @@ export function subscribeHistoryReapply(w: Window, apply: () => void): () => voi
 					q = 1;
 					requestAnimationFrame(() => {
 						q = 0;
-						run();
+						for (const subscriber of applies) subscriber();
 					});
 				}
 			})).observe(w.document, {
@@ -28,6 +28,7 @@ export function subscribeHistoryReapply(w: Window, apply: () => void): () => voi
 	}
 	w.addEventListener("popstate", apply);
 	return () => {
+		applies.delete(apply);
 		w.removeEventListener("popstate", apply);
 		if (!--n) obs?.disconnect();
 	};
