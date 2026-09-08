@@ -90,6 +90,7 @@ wrap request-time themed subtrees in `Suspense` or set `export const instant = f
 
 ```tsx
 import { ThemeProvider, getTheme } from "@wrksz/themes/next";
+import { getTheme as getThemeFromRequest, parseThemeCookie } from "@wrksz/themes/server";
 import {
 	ClientThemeProvider,
 	ThemedImage,

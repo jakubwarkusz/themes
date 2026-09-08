@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import * as root from "@wrksz/themes";
 import * as client from "@wrksz/themes/client";
 import * as createThemes from "@wrksz/themes/client/create-themes";
@@ -12,6 +13,7 @@ import * as next from "@wrksz/themes/next";
 import * as nextCreateThemes from "@wrksz/themes/next/create-themes";
 import * as nextExtended from "@wrksz/themes/next/extended";
 import * as script from "@wrksz/themes/script";
+import * as server from "@wrksz/themes/server";
 
 const entrypoints = [
 	[".", root, ["ThemeProvider", "createThemes"]],
@@ -28,6 +30,7 @@ const entrypoints = [
 	["./next/create-themes", nextCreateThemes, ["createThemes", "createNextThemes"]],
 	["./next/extended", nextExtended, ["ThemeProvider"]],
 	["./script", script, ["ThemeScript"]],
+	["./server", server, ["getTheme", "parseThemeCookie"]],
 ] as const;
 
 for (const [subpath, module, expectedExports] of entrypoints) {
@@ -38,4 +41,9 @@ for (const [subpath, module, expectedExports] of entrypoints) {
 			);
 		}
 	}
+}
+
+const serverBundle = readFileSync(new URL("../dist/server.js", import.meta.url), "utf8");
+if (serverBundle.includes("next/headers")) {
+	throw new Error("@wrksz/themes/server must not reference next/headers");
 }

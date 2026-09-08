@@ -3,18 +3,54 @@ title: getTheme
 description: Read the current theme from a cookie outside React - in proxy, layouts, or server actions.
 ---
 
-`getTheme` reads the current theme from a cookie. Available in `@wrksz/themes/next`.
+`getTheme` reads the current theme from a cookie. Use `@wrksz/themes/server` for the framework-neutral `Request` helper and `parseThemeCookie`. `@wrksz/themes/next` re-exports `getTheme` with an extra async overload that reads `cookies()` from `next/headers`.
 
 <Callout type="warn">
   <Breaking /> In **`2.0.0-beta.1`**, `ThemeProvider` no longer calls `getTheme` / `cookies()` for you. Use this helper only when server markup must know the theme. See [Upgrading from 1.x](/docs/migration#upgrading-from-1x).
 </Callout>
 
-Two variants depending on context:
+| Call | Import | Returns | Use when |
+|------|--------|---------|----------|
+| `getTheme(request)` | `@wrksz/themes/server` or `@wrksz/themes/next` | `string` or inferred theme union | Remix, TanStack Start, Vite, `proxy.ts`, edge functions |
+| `parseThemeCookie(cookieHeader)` | `@wrksz/themes/server` | `string` or inferred theme union | Loaders that already have a `Cookie` header string |
+| `await getTheme()` | `@wrksz/themes/next` | `Promise<string>` or inferred theme union | Next.js Server Components, layouts |
 
-| Call | Returns | Use when |
-|------|---------|----------|
-| `getTheme(request)` | `string` or inferred theme union | `proxy.ts`, edge functions |
-| `await getTheme()` | `Promise<string>` or inferred theme union | Server Components, layouts |
+## Other frameworks
+
+```tsx title="root.tsx"
+import { ThemeScript } from "@wrksz/themes/script";
+import { getTheme } from "@wrksz/themes/server";
+import { ThemeProvider } from "@wrksz/themes";
+
+export function Document({
+  children,
+  request,
+}: {
+  children: React.ReactNode;
+  request: Request;
+}) {
+  const theme = getTheme(request, { defaultTheme: "dark" });
+
+  return (
+    <html className={theme} suppressHydrationWarning>
+      <head>
+        <ThemeScript defaultTheme="dark" />
+      </head>
+      <body>
+        <ThemeProvider defaultTheme="dark">{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+If you have a cookie header string instead of a `Request`:
+
+```ts
+import { parseThemeCookie } from "@wrksz/themes/server";
+
+const theme = parseThemeCookie(cookieHeader, { defaultTheme: "dark" });
+```
 
 ## Proxy
 

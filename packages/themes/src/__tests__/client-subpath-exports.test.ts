@@ -86,6 +86,18 @@ describe("client subpath exports", () => {
 		});
 	});
 
+	test("exposes the framework-neutral server entrypoint", () => {
+		const packageJson = JSON.parse(readFileSync(resolve(rootDir, "package.json"), "utf-8")) as {
+			exports: Record<string, { import?: { types?: string; default?: string } }>;
+		};
+		expect(packageJson.exports["./server"]).toEqual({
+			import: {
+				types: "./dist/server.d.ts",
+				default: "./dist/server.js",
+			},
+		});
+	});
+
 	test("keeps every public export in build, declaration, and smoke coverage", () => {
 		const packageJson = JSON.parse(readFileSync(resolve(rootDir, "package.json"), "utf-8")) as {
 			exports: Record<string, { import?: { types?: string; default?: string } } | string>;
