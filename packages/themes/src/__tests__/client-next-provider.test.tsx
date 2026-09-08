@@ -314,11 +314,7 @@ describe("ExtendedClientNextThemeProvider - SSR snapshots", () => {
 
 	test("forcedTheme wins over initialTheme", () => {
 		const html = renderToStaticMarkup(
-			<ExtendedClientNextThemeProvider
-				storage="none"
-				forcedTheme="dark"
-				initialTheme="light"
-			>
+			<ExtendedClientNextThemeProvider storage="none" forcedTheme="dark" initialTheme="light">
 				<ThemeConsumer />
 			</ExtendedClientNextThemeProvider>,
 		);
