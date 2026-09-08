@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
-const PACKAGE_PATH = resolve(import.meta.dir, "../package.json");
+const PACKAGE_PATH = resolve(import.meta.dirname, "../package.json");
 
 export function parseVersionTag(tag: string): string {
 	const match =

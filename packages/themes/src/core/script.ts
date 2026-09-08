@@ -31,7 +31,7 @@ function safeJson(value: unknown): string {
 export function getScript(config: ScriptConfig): string {
 	return (
 		"(" +
-		(config.storage == "localStorage" ? S.slice(0, 199) + S.slice(463) : S) +
+		(config.storage == "localStorage" ? S.slice(0, 197) + S.slice(461) : S) +
 		")(" +
 		[
 			config.storageKey,

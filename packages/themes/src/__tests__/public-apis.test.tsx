@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "vitest";
 import { cleanup, render, renderHook } from "@testing-library/react";
 import { Suspense } from "react";
 import { renderToReadableStream } from "react-dom/server.browser";

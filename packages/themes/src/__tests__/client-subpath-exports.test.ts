@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
@@ -8,7 +8,7 @@ import {
 	RUNTIME_BUILD_ENTRIES,
 } from "../../build-entries.js";
 
-const rootDir = resolve(import.meta.dir, "../..");
+const rootDir = resolve(import.meta.dirname, "../..");
 
 const clientSubpaths = [
 	"use-theme",

@@ -27,7 +27,6 @@ const trustItems: { icon: IconSvgElement; label: string }[] = [
 ];
 
 const PKG_MANAGERS = [
-	{ label: "bun", command: "bun add @wrksz/themes@beta" },
 	{ label: "npm", command: "npm install @wrksz/themes@beta" },
 	{ label: "pnpm", command: "pnpm add @wrksz/themes@beta" },
 	{ label: "yarn", command: "yarn add @wrksz/themes@beta" },
@@ -36,7 +35,7 @@ const PKG_MANAGERS = [
 type PkgManager = (typeof PKG_MANAGERS)[number]["label"];
 
 function InstallSnippet() {
-	const [pm, setPm] = useState<PkgManager>("bun");
+	const [pm, setPm] = useState<PkgManager>("pnpm");
 	const [copied, setCopied] = useState(false);
 	const command = PKG_MANAGERS.find((m) => m.label === pm)?.command ?? "";
 

@@ -11,7 +11,7 @@ Requires TypeScript 5.9 or newer. TypeScript 5.9, 6, and 7 are supported.
 [Docs](https://themes.wrksz.dev) · [GitHub](https://github.com/jakubwarkusz/themes)
 
 ```bash
-bun add @wrksz/themes@beta
+pnpm add @wrksz/themes@beta
 # or
 npm install @wrksz/themes@beta
 ```

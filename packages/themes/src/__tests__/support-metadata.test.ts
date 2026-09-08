@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type {
@@ -7,7 +7,7 @@ import type {
 } from "../core/extended-types.js";
 import type { ThemeProviderProps } from "../core/types.js";
 
-const repositoryRoot = resolve(import.meta.dir, "../../../..");
+const repositoryRoot = resolve(import.meta.dirname, "../../../..");
 
 type HasKey<T, K extends PropertyKey> = K extends keyof T ? true : false;
 

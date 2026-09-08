@@ -1,10 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
+import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { getScript } from "../core/script.js";
 import { THEME_SCRIPT_SOURCE } from "../core/script-source.js";
 
-const rootDir = resolve(import.meta.dir, "../..");
+const rootDir = resolve(import.meta.dirname, "../..");
 
 const base = {
 	storageKey: "theme",
@@ -35,20 +36,25 @@ describe("script-source generation", () => {
 	});
 
 	test("generated script sources stay in sync with readable bootstraps", async () => {
-		const result = Bun.spawnSync({
-			cmd: ["bun", "scripts/generate-script-source.ts", "--check"],
-			cwd: rootDir,
-			stdout: "pipe",
-			stderr: "pipe",
-		});
+		const result = spawnSync(
+			process.execPath,
+			["--import", "tsx", "scripts/generate-script-source.ts", "--check"],
+			{
+				cwd: rootDir,
+				encoding: "utf8",
+			},
+		);
 
-		expect(result.exitCode).toBe(0);
-		expect(new TextDecoder().decode(result.stderr)).toBe("");
+		expect(result.status).toBe(0);
+		expect(result.stderr).toBe("");
 	});
 
 	test("generated storage range points at the cookie/hybrid parser", () => {
-		const cookie = THEME_SCRIPT_SOURCE.indexOf(';else if(o==="cookie"');
-		const catchEnd = THEME_SCRIPT_SOURCE.indexOf("}catch{}s=");
+		const generator = readFileSync(resolve(rootDir, "src/core/script.ts"), "utf8");
+		const offsets = generator.match(/S\.slice\(0,\s*(\d+)\)\s*\+\s*S\.slice\((\d+)\)/);
+		expect(offsets).not.toBeNull();
+		const cookie = Number(offsets?.[1]);
+		const catchEnd = Number(offsets?.[2]);
 		expect(cookie).toBeGreaterThan(0);
 		expect(catchEnd).toBeGreaterThan(cookie);
 		expect(THEME_SCRIPT_SOURCE.slice(cookie, catchEnd)).toContain("document.cookie");

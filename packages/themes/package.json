@@ -8,8 +8,7 @@
 		"url": "git+https://github.com/jakubwarkusz/themes.git"
 	},
 	"files": [
-		"dist",
-		"!dist/providers"
+		"dist"
 	],
 	"type": "module",
 	"sideEffects": false,
@@ -103,22 +102,24 @@
 		"./package.json": "./package.json"
 	},
 	"scripts": {
-		"generate:script-source": "bun scripts/generate-script-source.ts",
-		"build": "bun run generate:script-source && bunup",
-		"dev": "bunup --watch",
+		"generate:script-source": "tsx scripts/generate-script-source.ts",
+		"build": "pnpm generate:script-source && tsdown",
+		"dev": "pnpm generate:script-source && tsdown --watch",
 		"type-check": "tsc --noEmit",
-		"type-check:compat:5.9": "bun run build && bunx --package typescript@5.9.3 tsc --noEmit && bunx --package typescript@5.9.3 tsc -p tsconfig.compat.json && bun scripts/smoke-exports.ts",
-		"type-check:compat:6": "bun run build && bunx --package typescript@6.0.2 tsc --noEmit --stableTypeOrdering && bunx --package typescript@6.0.2 tsc -p tsconfig.compat.json --stableTypeOrdering && bun scripts/smoke-exports.ts",
-		"type-check:compat:7": "bun run build && bunx --package typescript@7.0.2 tsc --noEmit && bunx --package typescript@7.0.2 tsc -p tsconfig.compat.json && bun scripts/smoke-exports.ts",
-		"type-check:compat": "bun run type-check:compat:5.9 && bun run type-check:compat:6 && bun run type-check:compat:7",
+		"type-check:compat:5.9": "pnpm build && pnpm --package typescript@5.9.3 dlx tsc --noEmit && pnpm --package typescript@5.9.3 dlx tsc -p tsconfig.compat.json && tsx --tsconfig tsconfig.compat.json scripts/smoke-exports.ts",
+		"type-check:compat:6": "pnpm build && pnpm --package typescript@6.0.2 dlx tsc --noEmit --stableTypeOrdering && pnpm --package typescript@6.0.2 dlx tsc -p tsconfig.compat.json --stableTypeOrdering && tsx --tsconfig tsconfig.compat.json scripts/smoke-exports.ts",
+		"type-check:compat:7": "pnpm build && pnpm --package typescript@7.0.2 dlx tsc --noEmit && pnpm --package typescript@7.0.2 dlx tsc -p tsconfig.compat.json && tsx --tsconfig tsconfig.compat.json scripts/smoke-exports.ts",
+		"type-check:compat": "pnpm type-check:compat:5.9 && pnpm type-check:compat:6 && pnpm type-check:compat:7",
 		"lint": "oxlint --config ../../oxlint.config.ts --deny-warnings src scripts",
 		"lint:fix": "oxlint --config ../../oxlint.config.ts --deny-warnings --fix src scripts",
 		"format": "oxfmt --config ../../oxfmt.config.ts src scripts",
-		"test": "bun scripts/generate-script-source.ts --check && bun test",
-		"size": "bun run build && bun scripts/bundle-size.ts",
-		"size:json": "bun run build >/dev/null && bun scripts/bundle-size.ts --json",
-		"size:compare": "bun run build >/dev/null && bun scripts/bundle-size.ts --compare benchmarks/baseline.json",
-		"size:update-baseline": "bun run build >/dev/null && bun scripts/bundle-size.ts --update-baseline"
+		"test": "pnpm generate:script-source --check && vitest run",
+		"size": "pnpm build && tsx scripts/bundle-size.ts",
+		"size:json": "pnpm build >/dev/null && tsx scripts/bundle-size.ts --json",
+		"size:compare": "pnpm build >/dev/null && tsx scripts/bundle-size.ts --compare benchmarks/baseline.json",
+		"size:update-baseline": "pnpm build >/dev/null && tsx scripts/bundle-size.ts --update-baseline",
+		"test:watch": "vitest",
+		"smoke:exports": "tsx --tsconfig tsconfig.compat.json scripts/smoke-exports.ts"
 	},
 	"devDependencies": {
 		"next": ">=16.3.5",

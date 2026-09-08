@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { cleanup, render } from "@testing-library/react";
 import { applyThemeToDom } from "../core/client-dom.js";
 import { getScript } from "../core/script.js";

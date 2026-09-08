@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import "./setup.js";
 import { cleanup, render } from "@testing-library/react";
 import { useThemeValue } from "../hooks/use-theme-value.js";

@@ -1,11 +1,11 @@
-import { afterEach, describe, expect, mock, test } from "bun:test";
+import { afterEach, describe, expect, vi, test } from "vitest";
 import "./setup.js";
 import { cleanup, render } from "@testing-library/react";
 import { isValidElement, type ReactElement, type ReactNode } from "react";
 
 const insertedHtmlCallbacks: Array<() => ReactNode> = [];
 
-mock.module("next/navigation", () => ({
+vi.mock("next/navigation", () => ({
 	useServerInsertedHTML: (callback: () => ReactNode) => {
 		insertedHtmlCallbacks.push(callback);
 	},

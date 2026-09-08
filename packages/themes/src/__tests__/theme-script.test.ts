@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import type { ReactElement } from "react";
 import { writeCookie } from "../core/cookie.js";
 import { getScript } from "../core/script.js";

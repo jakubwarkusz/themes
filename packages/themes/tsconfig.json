@@ -5,14 +5,12 @@
 		"module": "Preserve",
 		"moduleDetection": "force",
 		"jsx": "react-jsx",
-
 		"moduleResolution": "bundler",
 		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
 		"noEmit": true,
 		"rootDir": ".",
-		"types": ["bun"],
-
+		"types": ["node"],
 		"strict": true,
 		"skipLibCheck": true,
 		"exactOptionalPropertyTypes": true,
@@ -28,17 +26,14 @@
 		"allowUnusedLabels": false,
 		"isolatedModules": true,
 		"erasableSyntaxOnly": true,
-
 		"declaration": true,
 		"isolatedDeclarations": true,
-
 		"paths": {
 			"@/*": ["./src/*"],
 			"@wrksz/themes": ["./src/index.ts"],
 			"@wrksz/themes/*": ["./src/*"]
 		}
 	},
-
 	"include": ["src/**/*"],
-	"exclude": ["node_modules", "dist", "bunup.config.ts"]
+	"exclude": ["node_modules", "dist", "tsdown.config.ts", "vitest.config.ts"]
 }

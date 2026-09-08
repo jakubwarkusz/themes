@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, expect, test } from "vitest";
 import { cleanup, renderHook } from "@testing-library/react";
 import { useEffect } from "react";
 import { useEffectEvent } from "../core/use-effect-event.js";

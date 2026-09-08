@@ -21,10 +21,9 @@
 	},
 	"devDependencies": {
 		"@testing-library/react": "^16.3.3",
-		"@types/bun": "^1.4.2",
+		"@types/node": "^24.13.3",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
-		"bunup": "^0.16.32",
 		"happy-dom": "^20.14.5",
 		"lefthook": "^2.1.12",
 		"next": ">=16.3.5",
@@ -32,10 +31,14 @@
 		"oxlint": "^1.82.0",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0",
-		"typescript": "^7.0.2"
+		"rolldown": "^1.2.7",
+		"tsdown": "^0.23.0",
+		"tsx": "^4.23.13",
+		"typescript": "^7.0.2",
+		"vitest": "^5.0.0"
 	},
 	"engines": {
-		"node": ">=24",
+		"node": "^24.11.0 || >=26.0.0",
 		"pnpm": ">=11.0.0"
 	},
 	"packageManager": "pnpm@11.24.0"

@@ -2,7 +2,7 @@
 
 ## Setup
 
-Install pnpm 11.x and Bun 1.3.x (pnpm manages dependencies; Bun runs tests and builds). Docs Vercel deploys also pin Bun 1.3.9 because `@wrksz/themes` minify uses `Bun.build` / bunup inside `pnpm --filter theme-docs build`. Then run:
+Install Node.js 24.11+ LTS or 26+ and pnpm 11.x. pnpm manages dependencies and runs workspace scripts; Vitest runs tests and tsdown builds the library. Then run:
 
 ```sh
 CI=true pnpm install --frozen-lockfile
@@ -16,7 +16,7 @@ Use `pnpm verify:full` before requesting release review. It adds TypeScript 5.9/
 - Add characterization tests before changing bootstrap or provider behavior.
 - Exercise equivalent configurations through `getScript`, direct DOM application, and provider wiring.
 - Keep the package free of runtime dependencies.
-- Update package exports, Bunup JavaScript/declaration entries, and `scripts/smoke-exports.ts` together.
+- Update package exports, tsdown JavaScript/declaration entries, and `scripts/smoke-exports.ts` together.
 - Review bundle baselines after correctness work; never raise a threshold solely to pass CI.
 - Use conventional commit messages.
 

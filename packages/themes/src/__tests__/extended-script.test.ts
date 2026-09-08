@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "vitest";
 import { applyExtendedThemeToDom } from "../core/extended-client-dom.js";
 import { getExtendedScript } from "../core/extended-script.js";
 import { EXTENDED_THEME_SCRIPT_SOURCE } from "../core/extended-script-source.js";

@@ -2,6 +2,7 @@ import { Buffer } from "node:buffer";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { gzipSync } from "node:zlib";
+import { build } from "rolldown";
 import { getScript } from "../src/core/script.js";
 
 export type BundleReport = {
@@ -33,7 +34,7 @@ type BundleCase = {
 	entry: string;
 };
 
-const rootDir = resolve(import.meta.dir, "..");
+const rootDir = resolve(import.meta.dirname, "..");
 const benchmarkDir = join(rootDir, "benchmarks");
 const outputDir = join(benchmarkDir, ".bundle-size");
 const thresholdsPath = join(benchmarkDir, "bundle-size-thresholds.json");
@@ -56,7 +57,7 @@ export const GENERATED_SCRIPT_REPORT_NAME = "generated-script";
 
 /**
  * Literal dynamic-import edges so dead-code analysis can see these fixtures as
- * reachable from this script (Bun.build also uses them as entrypoints).
+ * reachable from this script (Rolldown also uses them as entrypoints).
  * Never called at runtime: only for static reachability.
  */
 export function bundleEntryModuleLoaders(): ReadonlyArray<() => Promise<unknown>> {
@@ -205,37 +206,30 @@ async function writeBaseline(reports: BundleReport[]): Promise<void> {
 
 async function bundleCase(bundleCase: BundleCase): Promise<BundleReport> {
 	const entrypoint = join(benchmarkDir, bundleCase.entry);
-	const result = await Bun.build({
-		entrypoints: [entrypoint],
-		target: "browser",
-		format: "esm",
-		minify: true,
-		splitting: false,
-		sourcemap: "none",
+	const result = await build({
+		input: entrypoint,
+		platform: "browser",
+		write: false,
+		output: { format: "esm", minify: true, codeSplitting: false, sourcemap: false },
 		external: externals,
 		// Measure production JSX/runtime paths: app bundlers set this for real builds.
-		define: {
-			"process.env.NODE_ENV": JSON.stringify("production"),
+		transform: {
+			define: { "process.env.NODE_ENV": JSON.stringify("production") },
 		},
 	});
 
-	if (!result.success) {
-		const logs = result.logs.map((log) => log.message).join("\n");
-		throw new Error(`Failed to bundle ${bundleCase.name}\n${logs}`);
-	}
-
-	const output = result.outputs[0];
+	const output = result.output.find((entry) => entry.type === "chunk");
 	if (!output) {
 		throw new Error(`No output generated for ${bundleCase.name}`);
 	}
 
-	const code = await output.text();
+	const code = output.code;
 	const bytes = Buffer.byteLength(code);
 	const gzipBytes = gzipSync(code, { level: 9 }).byteLength;
 	const outputPath = join(outputDir, `${bundleCase.name}.js`);
 
 	await mkdir(outputDir, { recursive: true });
-	await Bun.write(outputPath, code);
+	await writeFile(outputPath, code);
 
 	return {
 		name: bundleCase.name,
@@ -270,7 +264,7 @@ async function generatedScriptCase(): Promise<BundleReport> {
 		followSystem: false,
 	});
 	await mkdir(outputDir, { recursive: true });
-	await Bun.write(join(outputDir, `${GENERATED_SCRIPT_REPORT_NAME}.js`), source);
+	await writeFile(join(outputDir, `${GENERATED_SCRIPT_REPORT_NAME}.js`), source);
 	return measureText(GENERATED_SCRIPT_REPORT_NAME, source);
 }
 

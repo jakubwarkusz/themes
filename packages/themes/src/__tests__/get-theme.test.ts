@@ -1,10 +1,11 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+// @vitest-environment node
+import { beforeEach, describe, expect, vi, test } from "vitest";
 import { getTheme } from "../get-theme.js";
 
 let nextCookieValue: string | undefined;
 let nextCookieReads = 0;
 
-mock.module("next/headers", () => ({
+vi.mock("next/headers", () => ({
 	cookies: async () => {
 		nextCookieReads += 1;
 		return {

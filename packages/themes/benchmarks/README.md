@@ -15,13 +15,15 @@ These fixtures measure small, realistic `@wrksz/themes` consumption cases:
 Run the benchmark from the repository root:
 
 ```bash
-bun run --cwd packages/themes size
+pnpm --filter @wrksz/themes size
 ```
 
-The script builds the package, bundles each fixture with React and Next peer dependencies
+The script builds the package with tsdown, bundles each fixture with Rolldown and React/Next peer dependencies
 externalized, `process.env.NODE_ENV` set to `"production"` (so JSX uses the production
 runtime), prints raw and gzip sizes, and fails when a fixture exceeds
 `bundle-size-thresholds.json`.
+
+Changing the bundler or minifier can change these measurements independently of runtime source changes.
 
 When an intentional change increases size, update only the affected threshold and mention the
 measured before/after values in the pull request.
@@ -31,13 +33,13 @@ measured before/after values in the pull request.
 CI compares every run against the committed baseline:
 
 ```bash
-bun run --cwd packages/themes size:compare benchmarks/baseline.json
+pnpm --filter @wrksz/themes size:compare benchmarks/baseline.json
 ```
 
 When an intentional change changes bundle size, update `baseline.json` with the new report:
 
 ```bash
-bun run --cwd packages/themes size:update-baseline
+pnpm --filter @wrksz/themes size:update-baseline
 ```
 
 Then review the `benchmarks/baseline.json` diff before committing it.
@@ -45,13 +47,13 @@ Then review the `benchmarks/baseline.json` diff before committing it.
 For one-off local comparisons, save a temporary baseline before making a change:
 
 ```bash
-bun run --cwd packages/themes size:json > /tmp/wrksz-themes-before.json
+pnpm --filter @wrksz/themes size:json > /tmp/wrksz-themes-before.json
 ```
 
 Then compare the current branch against it:
 
 ```bash
-bun run --cwd packages/themes size:compare /tmp/wrksz-themes-before.json
+pnpm --filter @wrksz/themes size:compare /tmp/wrksz-themes-before.json
 ```
 
 The comparison table prints current size, baseline size, raw/gzip byte deltas, and percentage

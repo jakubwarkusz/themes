@@ -1,3 +1,6 @@
+import assert from "node:assert/strict";
+import { readFile, readdir } from "node:fs/promises";
+import { resolve } from "node:path";
 import * as root from "@wrksz/themes";
 import * as client from "@wrksz/themes/client";
 import * as createThemes from "@wrksz/themes/client/create-themes";
@@ -30,12 +33,34 @@ const entrypoints = [
 	["./script", script, ["ThemeScript"]],
 ] as const;
 
+const packageRoot = resolve(import.meta.dirname, "..");
+
 for (const [subpath, module, expectedExports] of entrypoints) {
+	const specifier = `@wrksz/themes${subpath === "." ? "" : subpath.slice(1)}`;
+	assert.ok(
+		import.meta.resolve(specifier).includes("/dist/"),
+		`${specifier} must resolve to the built package, not a TypeScript source alias`,
+	);
 	for (const exportName of expectedExports) {
 		if (!(exportName in module)) {
 			throw new Error(
-				`Missing ${exportName} export from @wrksz/themes${subpath === "." ? "" : subpath}`,
+				`Missing ${exportName} export from @wrksz/themes${subpath === "." ? "" : subpath.slice(1)}`,
 			);
 		}
 	}
+}
+
+// Module-preserving output must retain the client boundaries used by Next.js.
+for (const sourcePath of await readdir(resolve(packageRoot, "src"), { recursive: true })) {
+	if (!/\.tsx?$/.test(sourcePath) || sourcePath.includes("__tests__")) continue;
+	const source = await readFile(resolve(packageRoot, "src", sourcePath), "utf8");
+	if (!source.startsWith('"use client";')) continue;
+	const outputPath = sourcePath.replace(/\.tsx?$/, ".js");
+	const output = await readFile(resolve(packageRoot, "dist", outputPath), "utf8");
+	assert.match(output, /^(["'])use client\1;/, `${outputPath} lost its client directive`);
+}
+
+for (const serverEntry of ["next.js", "next/extended.js", "script.js"]) {
+	const output = await readFile(resolve(packageRoot, "dist", serverEntry), "utf8");
+	assert.doesNotMatch(output, /^(["'])use client\1;/, `${serverEntry} became a client entry`);
 }

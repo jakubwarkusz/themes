@@ -1,7 +1,8 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { build } from "rolldown";
 
-const rootDir = resolve(import.meta.dir, "..");
+const rootDir = resolve(import.meta.dirname, "..");
 const checkOnly = process.argv.includes("--check");
 const BOOTSTRAP_PARAM_COUNT = 14;
 
@@ -105,7 +106,7 @@ function indexOfMatchingBrace(source: string, openBraceIndex: number): number {
 function extractMinifiedFunction(bundle: string): string {
 	const start = bundle.search(/function\s+\w+\s*\(/u);
 	if (start < 0) {
-		throw new Error("Expected Bun minify output to contain a named function declaration");
+		throw new Error("Expected Rolldown minify output to contain a named function declaration");
 	}
 
 	const bodyStart = bundle.indexOf("{", start);
@@ -225,24 +226,18 @@ function renderSourceFile(target: SourceTarget, minified: string): string {
 }
 
 async function minifyBootstrap(target: SourceTarget): Promise<string> {
-	const result = await Bun.build({
-		entrypoints: [target.bootstrapPath],
-		minify: true,
-		target: "browser",
+	const result = await build({
+		input: target.bootstrapPath,
+		platform: "browser",
 		write: false,
+		output: { format: "esm", minify: true },
 	});
-
-	if (!result.success) {
-		const messages = result.logs.map((log) => log.message ?? String(log)).join("\n");
-		throw new Error(`Failed to minify ${target.label}:\n${messages}`);
-	}
-
-	const output = result.outputs[0];
+	const output = result.output.find((entry) => entry.type === "chunk");
 	if (!output) {
-		throw new Error(`Bun.build produced no minify output for ${target.label}`);
+		throw new Error(`Rolldown produced no minify output for ${target.label}`);
 	}
 
-	return extractMinifiedFunction(await output.text());
+	return extractMinifiedFunction(output.code);
 }
 
 const generated = await Promise.all(
@@ -279,7 +274,7 @@ if (checkOnly) {
 
 	if (stalePaths.length > 0) {
 		console.error(
-			`${stalePaths.join(", ")} ${stalePaths.length === 1 ? "is" : "are"} out of date. Run \`bun scripts/generate-script-source.ts\`.`,
+			`${stalePaths.join(", ")} ${stalePaths.length === 1 ? "is" : "are"} out of date. Run \`pnpm generate:script-source\`.`,
 		);
 		process.exit(1);
 	}
