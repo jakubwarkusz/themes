@@ -1,0 +1,30 @@
+{
+	"name": "react-router-compat",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "react-router build",
+		"dev": "react-router dev",
+		"start": "react-router-serve ./build/server/index.js",
+		"test:e2e": "playwright test",
+		"type-check": "react-router typegen && tsc --noEmit"
+	},
+	"dependencies": {
+		"@react-router/node": "^7.9.4",
+		"@react-router/serve": "^7.9.4",
+		"@wrksz/themes": "workspace:*",
+		"isbot": "^5.1.31",
+		"react": "^19.2.8",
+		"react-dom": "^19.2.8",
+		"react-router": "^7.9.4"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.62.1",
+		"@react-router/dev": "^7.9.4",
+		"@types/node": "^26.4.0",
+		"@types/react": "^19.2.18",
+		"@types/react-dom": "^19.2.5",
+		"typescript": "^7.0.2",
+		"vite": "^7.1.5"
+	}
+}

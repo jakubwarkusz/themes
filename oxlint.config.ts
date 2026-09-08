@@ -48,6 +48,12 @@ export default defineConfig({
 		"**/test-results/**",
 		"**/next-env.d.ts",
 		"**/.source/**",
+		"**/.astro/**",
+		"**/.output/**",
+		"**/.nitro/**",
+		"**/.waku/**",
+		"**/.react-router/**",
+		"**/routeTree.gen.ts",
 		"apps/docs/content/**",
 	],
 }) satisfies OxlintConfig;

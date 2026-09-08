@@ -17,7 +17,8 @@ const plans: Plan[] = [
 	{
 		icon: frameworks,
 		label: "Framework agnostic",
-		description: "Remix, Vite, SvelteKit, and other React-based frameworks.",
+		description:
+			"Vite, React Router, TanStack Start, Astro, and Waku fixtures live in the repo.",
 	},
 	{
 		icon: moreFeatures,

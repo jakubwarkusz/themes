@@ -1,0 +1,26 @@
+{
+	"name": "vite-react",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build",
+		"dev": "vite",
+		"start": "vite preview --host 127.0.0.1 --port 3138 --strictPort",
+		"test:e2e": "playwright test",
+		"type-check": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@wrksz/themes": "workspace:*",
+		"react": "^19.2.8",
+		"react-dom": "^19.2.8"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.62.1",
+		"@types/node": "^26.4.0",
+		"@types/react": "^19.2.18",
+		"@types/react-dom": "^19.2.5",
+		"@vitejs/plugin-react": "^5.0.4",
+		"typescript": "^7.0.2",
+		"vite": "^7.1.5"
+	}
+}
