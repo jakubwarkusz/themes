@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import "./setup.js";
 import { cleanup, render } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { useThemeValue } from "../hooks/use-theme-value.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
 
@@ -59,5 +60,14 @@ describe("useThemeValue", () => {
 		);
 
 		expect(view.getByTestId("value").textContent).toBe("Fallback");
+	});
+
+	test("returns the seeded resolved value during SSR", () => {
+		const html = renderToStaticMarkup(
+			<ClientThemeProvider storage="none" initialTheme="dark">
+				<ValueReader values={{ light: "Light", dark: "Dark" }} />
+			</ClientThemeProvider>,
+		);
+		expect(html).toContain('data-testid="value">Dark</span>');
 	});
 });

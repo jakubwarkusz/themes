@@ -3,8 +3,6 @@ type ThemeState = {
 	systemTheme: "light" | "dark" | undefined;
 };
 
-const SERVER_SNAPSHOT: ThemeState = { theme: undefined, systemTheme: undefined };
-
 export type ThemeStore = {
 	subscribe(listener: () => void): () => void;
 	getSnapshot(): ThemeState;
@@ -14,46 +12,25 @@ export type ThemeStore = {
 	setSystemTheme(systemTheme: "light" | "dark" | undefined): void;
 };
 
-export function createThemeStore(): ThemeStore {
-	let state: ThemeState = { theme: undefined, systemTheme: undefined };
+export function createThemeStore(seedTheme?: string): ThemeStore {
+	const serverSnapshot: ThemeState = { theme: seedTheme, systemTheme: undefined };
+	let state: ThemeState = serverSnapshot;
 	const listeners = new Set<() => void>();
-
-	function emit(): void {
-		for (const listener of listeners) listener();
-	}
-
-	function setState(nextState: ThemeState): void {
+	const setState = (nextState: ThemeState): void => {
 		if (state.theme === nextState.theme && state.systemTheme === nextState.systemTheme) return;
 		state = nextState;
-		emit();
-	}
+		for (const listener of listeners) listener();
+	};
 
 	return {
-		subscribe(listener: () => void): () => void {
+		subscribe(listener) {
 			listeners.add(listener);
-			return () => {
-				listeners.delete(listener);
-			};
+			return () => void listeners.delete(listener);
 		},
-
-		getSnapshot(): ThemeState {
-			return state;
-		},
-
-		getServerSnapshot(): ThemeState {
-			return SERVER_SNAPSHOT;
-		},
-
-		setState(nextState: ThemeState): void {
-			setState(nextState);
-		},
-
-		setTheme(theme: string | undefined): void {
-			setState({ ...state, theme });
-		},
-
-		setSystemTheme(systemTheme: "light" | "dark" | undefined): void {
-			setState({ ...state, systemTheme });
-		},
+		getSnapshot: () => state,
+		getServerSnapshot: () => serverSnapshot,
+		setState,
+		setTheme: (theme) => setState({ ...state, theme }),
+		setSystemTheme: (systemTheme) => setState({ ...state, systemTheme }),
 	};
 }

@@ -62,7 +62,7 @@ That's it for most apps.
 ### Migration path
 
 - For zero-flash without request-time APIs, keep `storage="cookie"` or `"hybrid"`. The pre-paint bootstrap still reads the cookie before hydration.
-- If server-rendered markup must know the theme, do this explicitly:
+- If server-rendered markup must know the theme, do this explicitly. Passing `initialTheme` from [`getTheme`](/docs/api/get-theme) also seeds React theme state (`useTheme`, `useThemeValue`, `ThemedImage`), not only `<html className>`:
 
 ```tsx title="app/layout.tsx"
 import { ThemeProvider, getTheme } from "@wrksz/themes/next";
