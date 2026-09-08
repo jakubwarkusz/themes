@@ -1045,6 +1045,18 @@ describe("serializeCookie", () => {
 		expect(result).toContain("Secure");
 	});
 
+	test("sameSite None implies Secure even when secure is omitted", () => {
+		const result = serializeCookie("theme", "dark", { sameSite: "None" });
+		expect(result).toContain("SameSite=None");
+		expect(result).toContain("Secure");
+	});
+
+	test("sameSite None implies Secure even when secure is false", () => {
+		const result = serializeCookie("theme", "dark", { sameSite: "None", secure: false });
+		expect(result).toContain("SameSite=None");
+		expect(result).toContain("Secure");
+	});
+
 	test("path override", () => {
 		const result = serializeCookie("theme", "dark", { path: "/app" });
 		expect(result).toContain("path=/app");
