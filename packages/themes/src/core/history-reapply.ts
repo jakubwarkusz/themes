@@ -1,50 +1,34 @@
 // Instant Nav restores a classless snapshot by mutating descendants after popstate.
 let n = 0;
-let obs: MutationObserver | undefined;
+let docObs: MutationObserver | undefined;
+let htmlObs: MutationObserver | undefined;
 let subtree: MutationObserver | undefined;
 let html: Element | undefined;
-let flushRaf = 0;
-let applying = 0;
-let subtreeClose: ReturnType<typeof setTimeout> | 0 = 0;
+let q = 0;
+let close = 0;
 const applies = new Set<() => void>();
 
 function flush(): void {
-	if (applying || flushRaf) return;
-	flushRaf = requestAnimationFrame(() => {
-		flushRaf = 0;
-		applying = 1;
+	if (q) return;
+	q = 1;
+	requestAnimationFrame(() => {
 		for (const subscriber of applies) subscriber();
-		obs?.takeRecords();
+		docObs?.takeRecords();
+		htmlObs?.takeRecords();
 		subtree?.takeRecords();
-		applying = 0;
+		q = 0;
 	});
 }
 
-function bindHtml(observer: MutationObserver, root: Element): void {
-	if (html === root) return;
+function watchHtml(Observer: typeof MutationObserver, root: Element): void {
+	if (html === root && htmlObs) return;
 	html = root;
-	observer.observe(root, {
-		attributes: true,
-		attributeFilter: ["class"],
-	});
-}
-
-function armSubtree(w: Window, Observer: typeof MutationObserver): void {
-	const root = w.document.documentElement;
-	if (!subtree) subtree = new Observer(flush);
-	else subtree.disconnect();
-	subtree.observe(root, {
+	htmlObs?.disconnect();
+	(htmlObs = new Observer(flush)).observe(root, {
 		childList: true,
-		subtree: true,
 		attributes: true,
 		attributeFilter: ["class"],
 	});
-	if (subtreeClose) clearTimeout(subtreeClose);
-	subtreeClose = setTimeout(() => {
-		subtreeClose = 0;
-		subtree?.disconnect();
-		subtree = undefined;
-	}, 1000);
 }
 
 export function subscribeHistoryReapply(w: Window, apply: () => void): () => void {
@@ -53,41 +37,45 @@ export function subscribeHistoryReapply(w: Window, apply: () => void): () => voi
 		.MutationObserver;
 	if (!n++) {
 		if (Observer) {
-			obs = new Observer(() => {
-				const root = w.document.documentElement;
-				if (obs && html !== root) {
-					bindHtml(obs, root);
-					if (subtree) armSubtree(w, Observer);
-				}
+			docObs = new Observer(() => {
+				watchHtml(Observer, w.document.documentElement);
 				flush();
 			});
-			obs.observe(w.document, { childList: true });
-			bindHtml(obs, w.document.documentElement);
+			docObs.observe(w.document, { childList: true });
+			watchHtml(Observer, w.document.documentElement);
 		}
 	}
 	const onPopstate = () => {
 		apply();
-		if (Observer) armSubtree(w, Observer);
+		if (!Observer) return;
+		const root = w.document.documentElement;
+		watchHtml(Observer, root);
+		subtree?.disconnect();
+		(subtree = new Observer(flush)).observe(root, {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+		if (close) clearTimeout(close);
+		close = w.setTimeout(() => {
+			close = 0;
+			subtree?.disconnect();
+			subtree = undefined;
+		}, 2000);
 	};
 	w.addEventListener("popstate", onPopstate);
 	return () => {
 		applies.delete(apply);
 		w.removeEventListener("popstate", onPopstate);
 		if (!--n) {
-			obs?.disconnect();
-			obs = undefined;
+			docObs?.disconnect();
+			htmlObs?.disconnect();
 			subtree?.disconnect();
-			subtree = undefined;
+			docObs = htmlObs = subtree = undefined;
 			html = undefined;
-			if (flushRaf) {
-				cancelAnimationFrame(flushRaf);
-				flushRaf = 0;
-			}
-			if (subtreeClose) {
-				clearTimeout(subtreeClose);
-				subtreeClose = 0;
-			}
-			applying = 0;
+			if (close) w.clearTimeout(close);
+			close = q = 0;
 		}
 	};
 }

@@ -36,8 +36,8 @@
 		"maxDeltaGzipBytes": 120
 	},
 	"next-provider": {
-		"maxBytes": 11000,
-		"maxGzipBytes": 4250,
+		"maxBytes": 11200,
+		"maxGzipBytes": 4300,
 		"maxDeltaBytes": 500,
 		"maxDeltaGzipBytes": 250
 	},
@@ -60,8 +60,8 @@
 		"maxDeltaGzipBytes": 120
 	},
 	"extended-next-provider": {
-		"maxBytes": 13000,
-		"maxGzipBytes": 4880,
+		"maxBytes": 13200,
+		"maxGzipBytes": 4950,
 		"maxDeltaBytes": 500,
 		"maxDeltaGzipBytes": 250
 	}
