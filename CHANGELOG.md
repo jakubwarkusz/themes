@@ -7,29 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- _(themes)_ Add opt-in extended providers
+- _(themes)_ Pair createThemes with NextThemeProvider and ThemeScript
+
 ### Fixed
 
-- *(next)* Keep theme provider in app shells
-- *(next)* Add metadata for tenant pages
-- *(themes)* Stabilize provider initialization and bootstrap parity
-- *(docs)* Trim unused theme exports and use dvh height
-- *(ci)* Clear audit advisories and build library before docs tests
+- _(next)_ Keep theme provider in app shells
+- _(next)_ Add metadata for tenant pages
+- _(themes)_ Stabilize provider initialization and bootstrap parity
+- _(docs)_ Trim unused theme exports and use dvh height
+- _(ci)_ Clear audit advisories and build library before docs tests
+- _(tooling)_ Keep generated script-source out of oxfmt
+- _(tooling)_ Restore library build before docs tests in verify
+- _(themes)_ Keep setTheme off useEffectEvent for oxlint
+- _(themes)_ Satisfy exactOptionalPropertyTypes in extended providers
+- _(themes)_ Adapt extended provider tests after rebase onto main
+- _(themes)_ Satisfy oxfmt and oxlint after rebase onto main
+- _(themes)_ Carry merged-PR review feedback into extended providers
+- _(tooling)_ Sync pnpm lockfile with oxfmt/oxlint bumps
+- _(docs)_ Keep Vercel on pinned Bun and use pnpm --filter
+- _(provider)_ Keep the skip/memo pattern inside bundle budgets
+- Unify bootstrap and runtime theme DOM apply
+- Re-apply theme after Instant Navigation restores the DOM
+- Restore theme when Instant Navigation clears html class
+- Observe document replacements during Instant Navigation
+- Narrow Instant Navigation observers and keep nested providers subscribed
+- Keep html theme across Instant Navigation descendant restores
+- Format getScript slice offsets for oxfmt
+- Reclaim next-provider gzip under the 3.91 KiB ceiling
+- Update documentation for clarity and consistency
+
+### Performance
+
+- _(themes)_ Reclaim bundle budget headroom without raising limits
+- _(docs)_ Keep Analytics and below-fold home JS off the critical path
+- _(provider)_ Apply theme once per toggle and keep context identity stable
+- Omit cookie-parser bytecode from the default inline bootstrap
 
 ### Documentation
 
-- *(themes)* Add upgrading-from-1.x layout example
-- *(themes)* Call out TypeScript 5.9 peer requirement
-- *(themes)* Document upstream compatibility features
-- *(themes)* Dogfood package in documentation app
+- _(themes)_ Add upgrading-from-1.x layout example
+- _(themes)_ Call out TypeScript 5.9 peer requirement
+- _(themes)_ Document upstream compatibility features
+- _(themes)_ Dogfood package in documentation app
 - Add contributor and agent guidance
 - Preserve React 18 support metadata
 - Update README and migration guides for `2.0.0-beta.1` release, highlighting breaking changes and installation instructions with `@beta` tag
 - Update migration guides and API documentation for `2.0.0-beta.1`, clarifying breaking changes and enhancing MDX component integration
+- Normalize README spacing
+- Document Shadow DOM themeRoot and align 2.0 public API copy
 
 ### Miscellaneous
 
 - Add project agent skills for React and Next work
-- *(themes)* Test TypeScript 5.9 through 7
+- _(themes)_ Test TypeScript 5.9 through 7
 - Verify library and docs independently
 - Align release and support gates
 - Align final stack tooling state
@@ -37,6 +70,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Exclude .agents dir from Linguist
 - Update package manager to bun@1.3.9 and add install command in vercel.json
 - Update build command in vercel.json to use bunx for consistency
+- _(tooling)_ Replace Biome with Oxc lint and format
+- _(tooling)_ Bump oxfmt and oxlint to latest
+- _(tooling)_ Switch package management from Bun to pnpm
+- _(ci)_ Group Dependabot updates into fewer PRs
+- _(themes)_ Generate extended bootstrap source
+- _(ci)_ Stop triple-building the library and finish pnpm leftover drift
 
 ### Other
 
@@ -47,35 +86,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- *(themes)* Isolate typed factory contexts
-- *(themes)* Tighten public TypeScript contracts
-- *(themes)* Adopt useEffectEvent with React 18 fallback
+- _(themes)_ Isolate typed factory contexts
+- _(themes)_ Tighten public TypeScript contracts
+- _(themes)_ Adopt useEffectEvent with React 18 fallback
 
 ## [1.1.0] - 2026-08-03
 
 ### Added
 
-- *(themes)* Add a stable framework-neutral bootstrap
-- *(themes)* Expose portable client APIs
+- _(themes)_ Add a stable framework-neutral bootstrap
+- _(themes)_ Expose portable client APIs
 
 ### Fixed
 
-- *(themes)* Harden runtime theme synchronization
-- *(themes)* Validate stored selections consistently
-- *(themes)* Keep default provider lightweight
-- *(themes)* Forward storage errors in Next provider
-- *(themes)* Resolve package imports during type-check
-- *(themes)* Keep next-provider bootstrap within size budget
-- *(themes)* Address portable SSR review feedback
-- *(themes)* Honor enableSystem when resolving system theme
+- _(themes)_ Harden runtime theme synchronization
+- _(themes)_ Validate stored selections consistently
+- _(themes)_ Keep default provider lightweight
+- _(themes)_ Forward storage errors in Next provider
+- _(themes)_ Resolve package imports during type-check
+- _(themes)_ Keep next-provider bootstrap within size budget
+- _(themes)_ Address portable SSR review feedback
+- _(themes)_ Honor enableSystem when resolving system theme
 
 ### Performance
 
-- *(themes)* Use set lookups and register benchmark fixtures
+- _(themes)_ Use set lookups and register benchmark fixtures
 
 ### Documentation
 
-- *(themes)* Document portable APIs
+- _(themes)_ Document portable APIs
 
 ### Miscellaneous
 
@@ -85,19 +124,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- *(publish)* Enhance NPM publishing logic for prereleases and stable releases
+- _(publish)_ Enhance NPM publishing logic for prereleases and stable releases
 
 ### Fixed
 
-- *(theme)* Enable TypeScript declaration file splitting in bunup.config.ts
-- *(theme)* Update size comparison script to use baseline benchmarks
-- *(theme)* Enhance cookie handling and class attribute management
-- *(theme)* Add entry points for TypeScript declaration file generation in bunup.config.ts
+- _(theme)_ Enable TypeScript declaration file splitting in bunup.config.ts
+- _(theme)_ Update size comparison script to use baseline benchmarks
+- _(theme)_ Enhance cookie handling and class attribute management
+- _(theme)_ Add entry points for TypeScript declaration file generation in bunup.config.ts
 
 ### Changed
 
 - Split client provider DOM helpers
-- *(themes)* Make root entry client-only and remove duplicate provider
+- _(themes)_ Make root entry client-only and remove duplicate provider
 
 ### Miscellaneous
 
@@ -107,33 +146,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- *(theme)* Enhance bundle size management and comparison
-- *(animation)* Improve motion handling with reduced motion support
-- *(config)* Add support for next-themes compatibility and enhance webpack configuration
-- *(layout)* Integrate ThemeProvider for enhanced theme management and update metadata
-- *(docs)* Add Vercel configuration and update build script for documentation
+- _(theme)_ Enhance bundle size management and comparison
+- _(animation)_ Improve motion handling with reduced motion support
+- _(config)_ Add support for next-themes compatibility and enhance webpack configuration
+- _(layout)_ Integrate ThemeProvider for enhanced theme management and update metadata
+- _(docs)_ Add Vercel configuration and update build script for documentation
 
 ### Fixed
 
-- *(hero-content)* Adjust layout and typography for improved responsiveness and visual consistency
-- *(docs)* Resolve react-doctor warnings
-- *(layout)* Update ThemeProvider import path for compatibility with next.js
-- *(build)* Add next-provider as explicit bunup entry to prevent 'use client' chunk contamination
-- *(docs)* Remove next-themes alias causing SSR prerender crash on Vercel
-- *(theme)* Improve cookie handling and validation, enhance script safety
-- *(theme)* Update baseline sizes and improve cookie handling logic
-- *(theme)* Remove unused client-next-provider entry and update baseline sizes
-- *(theme)* Preserve Next server entrypoint boundary
+- _(hero-content)_ Adjust layout and typography for improved responsiveness and visual consistency
+- _(docs)_ Resolve react-doctor warnings
+- _(layout)_ Update ThemeProvider import path for compatibility with next.js
+- _(build)_ Add next-provider as explicit bunup entry to prevent 'use client' chunk contamination
+- _(docs)_ Remove next-themes alias causing SSR prerender crash on Vercel
+- _(theme)_ Improve cookie handling and validation, enhance script safety
+- _(theme)_ Update baseline sizes and improve cookie handling logic
+- _(theme)_ Remove unused client-next-provider entry and update baseline sizes
+- _(theme)_ Preserve Next server entrypoint boundary
 
 ### Changed
 
-- *(docs)* Remove old Vercel configuration and add new build script for documentation
-- *(layout)* Remove ThemeProvider
+- _(docs)_ Remove old Vercel configuration and add new build script for documentation
+- _(layout)_ Remove ThemeProvider
 
 ### Documentation
 
 - Update comparison and features sections for clarity and accuracy
-- *(theme)* Add security notes and model to ThemeProvider documentation
+- _(theme)_ Add security notes and model to ThemeProvider documentation
 
 ### Other
 
@@ -143,40 +182,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- *(theme)* Enhance theme type definitions and improve theme selection logic
-- *(theme)* Enhance theme management with typed themes and improved documentation
-- *(theme)* Add new types for theme configuration and value mapping
+- _(theme)_ Enhance theme type definitions and improve theme selection logic
+- _(theme)_ Enhance theme management with typed themes and improved documentation
+- _(theme)_ Add new types for theme configuration and value mapping
 
 ### Documentation
 
-- *(theme)* Update README with new badge styles
-- *(theme)* Update documentation for typed themes and hybrid storage
+- _(theme)_ Update README with new badge styles
+- _(theme)_ Update documentation for typed themes and hybrid storage
 
 ## [0.9.4] - 2026-05-21
 
 ### Fixed
 
-- *(readme->docs)* Fixed fields values in API reference
+- _(readme->docs)_ Fixed fields values in API reference
 
 ### Changed
 
-- *(theme)* Improve transition suppression logic and update documentation
+- _(theme)_ Improve transition suppression logic and update documentation
 
 ## [0.9.2] - 2026-05-07
 
 ### Added
 
-- *(themes)* Introduce fine-grained client subpath exports and update documentation
+- _(themes)_ Introduce fine-grained client subpath exports and update documentation
 
 ## [0.9.1] - 2026-05-07
 
 ### Added
 
-- *(github->dx)* Added configuration of Dependabot
-- *(github->funding)* Added funding file
-- *(themes)* Add bundle size benchmarks
-- *(themes)* Add followSystem option to theme configuration and update related tests
-- *(themes)* Enhance cookie serialization with validation for names, paths, and domains
+- _(github->dx)_ Added configuration of Dependabot
+- _(github->funding)_ Added funding file
+- _(themes)_ Add bundle size benchmarks
+- _(themes)_ Add followSystem option to theme configuration and update related tests
+- _(themes)_ Enhance cookie serialization with validation for names, paths, and domains
 
 ### Documentation
 
@@ -186,16 +225,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- *(themes)* Add hybrid storage runtime support
-- *(themes)* Introduce createThemes factory and useThemeEffect hook, along with corresponding tests
+- _(themes)_ Add hybrid storage runtime support
+- _(themes)_ Introduce createThemes factory and useThemeEffect hook, along with corresponding tests
 
 ### Fixed
 
-- *(themes)* Rely on document.defaultView for DOM listeners
+- _(themes)_ Rely on document.defaultView for DOM listeners
 
 ### Changed
 
-- *(themes)* Improve regex usage in cookie handling and add lint ignore comments for test helpers and image component
+- _(themes)_ Improve regex usage in cookie handling and add lint ignore comments for test helpers and image component
 
 ### Documentation
 
@@ -203,8 +242,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Miscellaneous
 
-- *(ci)* Update bun version to 1.3.9 in CI workflow
-- *(ci)* Update lint command in CI workflow to use biome check
+- _(ci)_ Update bun version to 1.3.9 in CI workflow
+- _(ci)_ Update lint command in CI workflow to use biome check
 
 ## [0.8.3] - 2026-04-10
 
