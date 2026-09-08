@@ -2,6 +2,7 @@
 
 [![npm](https://shieldcn.dev/badge/npm-%40wrksz%2Fthemes-CB3837.png?logo=npm&variant=secondary&size=sm)](https://www.npmjs.com/package/@wrksz/themes)
 [![docs](https://shieldcn.dev/badge/docs-themes.wrksz.dev-7C3AED.png?logo=readthedocs&variant=secondary&size=sm)](https://themes.wrksz.dev)
+[![changelog](https://shieldcn.dev/badge/changelog-Keep%20a%20Changelog-E05735.png?variant=secondary&size=sm)](./CHANGELOG.md)
 ![Next.js](https://shieldcn.dev/badge/Next.js-16-000000.png?logo=nextdotjs&variant=secondary&size=sm)
 ![React](https://shieldcn.dev/badge/React-19-087EA4.png?logo=react&variant=secondary&size=sm)
 ![TypeScript](https://shieldcn.dev/badge/TypeScript-5.9%E2%80%937-3178C6.png?logo=typescript&variant=secondary&size=sm)
@@ -48,6 +49,7 @@ npm install @wrksz/themes@beta
 
 ## Table of Contents
 
+- [Changelog](./CHANGELOG.md)
 - [Setup](#setup)
 - [Usage](#usage)
 - [Zero-flash SSR with cookie storage](#zero-flash-ssr-with-cookie-storage)
