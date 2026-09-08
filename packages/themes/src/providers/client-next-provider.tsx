@@ -56,7 +56,7 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>(
 					followSystem,
 				}),
 			}}
-			{...(nonce != null ? { nonce } : null)}
+			{...(nonce != null && { nonce })}
 		/>
 	);
 
@@ -70,12 +70,10 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>(
 		if (target == "html") return;
 		const current = scriptRef.current;
 		if (!current) return;
-		const scripts = document.querySelectorAll<HTMLScriptElement>(
+		for (const el of document.querySelectorAll(
 			"script[data-wrksz-theme-target]",
-		);
-		for (let i = 0; i < scripts.length; i++) {
-			const el = scripts[i];
-			if (el && el != current && el.dataset.wrkszThemeTarget == target) {
+		) as unknown as Iterable<HTMLScriptElement>) {
+			if (el != current && el.dataset.wrkszThemeTarget == target) {
 				current.remove();
 				return;
 			}
