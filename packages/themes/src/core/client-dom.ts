@@ -139,8 +139,9 @@ export function applyThemeToDom({
 	const nextClassValues = splitClassTokens(attrValue);
 	const themed = el as ThemedElement;
 	const removeClassValues = themed[LAST_CLASS_TOKENS] ?? classValues;
+	const staleClasses = !attrs.includes("class") ? themed[LAST_CLASS_TOKENS] : undefined;
 	const nextAttrValue = attrValue || null;
-	let needsUpdate = false;
+	let needsUpdate = staleClasses?.some((token) => el.classList.contains(token)) ?? false;
 	let classChanged = false;
 	for (const attr of attrs) {
 		if (attr === "class") {
@@ -163,6 +164,10 @@ export function applyThemeToDom({
 		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
 	}
 
+	if (staleClasses) {
+		el.classList.remove(...staleClasses);
+		delete themed[LAST_CLASS_TOKENS];
+	}
 	for (const attr of attrs) {
 		if (attr === "class") {
 			if (classChanged) {

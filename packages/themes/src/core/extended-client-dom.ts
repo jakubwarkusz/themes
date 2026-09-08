@@ -166,10 +166,12 @@ export function applyExtendedThemeToDom({
 	const attributeValue = valueMap?.[resolved] ?? resolved;
 	const attributes = Array.isArray(attribute) ? attribute : [attribute];
 	const classValues = themes.flatMap((theme) => splitClassTokens(valueMap?.[theme] ?? theme));
-	const nextClassValues = splitClassTokens(attributeValue);
+	const hasClass = attributes.includes("class");
+	const nextClassValues = hasClass ? splitClassTokens(attributeValue) : [];
 	const nextAttrValue = attributeValue || null;
 	const nextDataAttributes = attributes.filter((current) => current !== "class");
 	const removeClassValues = previous?.element === element ? previous.classTokens : classValues;
+	const staleClasses = !hasClass && previous?.element === element ? previous.classTokens : [];
 
 	if (previous) {
 		if (previous.element !== element) {
@@ -185,7 +187,7 @@ export function applyExtendedThemeToDom({
 		}
 	}
 
-	let needsUpdate = false;
+	let needsUpdate = staleClasses.some((token) => element.classList.contains(token));
 	let classChanged = false;
 	for (const current of attributes) {
 		if (current === "class") {
@@ -210,6 +212,7 @@ export function applyExtendedThemeToDom({
 		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
 	}
 
+	if (staleClasses.length) element.classList.remove(...staleClasses);
 	for (const current of attributes) {
 		if (current === "class") {
 			if (classChanged) {

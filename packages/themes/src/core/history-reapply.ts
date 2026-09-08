@@ -1,34 +1,55 @@
-// Instant Nav restores a classless snapshot by mutating descendants after popstate.
-let n = 0;
-let obs: MutationObserver | undefined;
-let run: () => void;
-let q = 0;
+// Instant Nav can restore a classless snapshot after popstate listeners run.
+const listeners = new Set<() => void>();
+let observer: MutationObserver | undefined;
+let frame: number | undefined;
+
+const options = {
+	childList: true,
+	subtree: true,
+	attributes: true,
+	attributeFilter: ["class"],
+};
 
 export function subscribeHistoryReapply(w: Window, apply: () => void): () => void {
-	if (!n++) {
-		run = apply;
+	listeners.add(apply);
+	if (listeners.size === 1) {
 		const Observer = (w as unknown as { MutationObserver?: typeof MutationObserver })
 			.MutationObserver;
 		if (Observer) {
-			(obs = new Observer(() => {
-				if (!q) {
-					q = 1;
-					requestAnimationFrame(() => {
-						q = 0;
-						run();
-					});
-				}
-			})).observe(w.document, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: ["class"],
+			observer = new Observer((records) => {
+				// Transition styles are removed on later frames; they cannot restore a target.
+				if (
+					!records.some(
+						(record) =>
+							record.type === "attributes" ||
+							Array.from(record.addedNodes)
+								.concat(Array.from(record.removedNodes))
+								.some((node) => node.nodeName !== "STYLE"),
+					)
+				)
+					return;
+				frame ??= w.requestAnimationFrame(() => {
+					frame = undefined;
+					// Ignore our own writes, including conflicting themes on one target.
+					observer?.disconnect();
+					try {
+						for (const listener of listeners) listener();
+					} finally {
+						if (listeners.size) observer?.observe(w.document, options);
+					}
+				});
 			});
+			observer.observe(w.document, options);
 		}
 	}
 	w.addEventListener("popstate", apply);
 	return () => {
 		w.removeEventListener("popstate", apply);
-		if (!--n) obs?.disconnect();
+		listeners.delete(apply);
+		if (!listeners.size) {
+			observer?.disconnect();
+			if (frame !== undefined) w.cancelAnimationFrame(frame);
+			frame = undefined;
+		}
 	};
 }

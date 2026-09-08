@@ -177,6 +177,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 
 	const handleSystemChangeEvent = useEffectEvent((next: "light" | "dark") => {
 		setStoreSystemTheme(next);
+		if (validForcedTheme) return;
 		const current = getSnapshot().theme;
 		if (current === "system" || current === undefined || followSystem) {
 			const followsVariant =
