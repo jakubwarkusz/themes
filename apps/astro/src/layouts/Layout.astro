@@ -1,0 +1,29 @@
+---
+import { ClientRouter } from "astro:transitions";
+import { ThemeScript } from "@wrksz/themes/script";
+import "../styles/global.css";
+
+type Props = {
+	title: string;
+};
+
+const { title } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{title}</title>
+		<ThemeScript
+			storage="hybrid"
+			defaultTheme="light"
+			enableSystem={false}
+			scriptProps={{ "data-theme-bootstrap": "true" }}
+		/>
+		<ClientRouter />
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>

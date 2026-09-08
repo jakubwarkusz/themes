@@ -5,6 +5,7 @@
 - `packages/themes`: publishable library, tests, build configuration, and bundle budgets.
 - `apps/docs`: canonical API documentation and examples.
 - `apps/next-16-3`: preview fixture for Next.js Instant Navigation, hydration, and bootstrap behavior.
+- `apps/vite-react`, `apps/react-router`, `apps/tanstack-start`, `apps/astro`, `apps/waku`: first-paint fixtures for other React frameworks.
 
 ## Working rules
 
