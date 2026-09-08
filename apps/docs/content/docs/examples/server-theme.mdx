@@ -68,7 +68,7 @@ export default async function RootLayout({ children }) {
 }
 ```
 
-`initialTheme` also writes to storage on mount, so `setTheme` and cross-tab sync continue to work normally.
+`initialTheme` also writes to storage on mount, so `setTheme` and cross-tab sync continue to work normally. A concrete `initialTheme` (not `"system"`) seeds `useTheme`, `useThemeValue`, and `ThemedImage` during SSR, not only the `<html>` class.
 
 ## Priority
 

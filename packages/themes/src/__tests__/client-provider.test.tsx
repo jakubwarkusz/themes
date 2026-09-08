@@ -1,8 +1,11 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { ThemedImage } from "../components/themed-image.js";
 import { useTheme } from "../core/context.js";
 import { serializeCookie, writeCookie } from "../core/cookie.js";
+import { useThemeValue } from "../hooks/use-theme-value.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
 import { clearCookies } from "./setup.js";
 
@@ -70,6 +73,15 @@ function ThemeConsumer({ prefix = "" }: { prefix?: string }) {
 			</button>
 		</div>
 	);
+}
+
+function ValueReader({
+	values,
+}: {
+	values: Partial<Record<"light" | "dark" | "system" | "default", string>>;
+}) {
+	const value = useThemeValue(values);
+	return <span data-testid="value">{value ?? "-"}</span>;
 }
 
 function InvalidThemeConsumer() {
@@ -420,6 +432,98 @@ describe("ClientThemeProvider - initialTheme", () => {
 		});
 		expect(screen.getByTestId("theme").textContent).toBe("light");
 		expect(localStorage.getItem("theme")).toBe("light");
+	});
+});
+
+describe("ClientThemeProvider - SSR snapshots", () => {
+	test("seeds theme and resolvedTheme from initialTheme", () => {
+		const html = renderToStaticMarkup(
+			<ClientThemeProvider storage="none" initialTheme="dark">
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		expect(html).toContain('data-testid="theme">dark</span>');
+		expect(html).toContain('data-testid="resolved">dark</span>');
+	});
+
+	test("leaves theme unknown when neither initialTheme nor forcedTheme is set", () => {
+		const html = renderToStaticMarkup(
+			<ClientThemeProvider storage="none">
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		expect(html).toContain('data-testid="theme">-</span>');
+		expect(html).toContain('data-testid="resolved">-</span>');
+	});
+
+	test("seeds theme and resolvedTheme from forcedTheme", () => {
+		const html = renderToStaticMarkup(
+			<ClientThemeProvider storage="none" forcedTheme="dark">
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		expect(html).toContain('data-testid="theme">dark</span>');
+		expect(html).toContain('data-testid="resolved">dark</span>');
+	});
+
+	test("forcedTheme wins over initialTheme", () => {
+		const html = renderToStaticMarkup(
+			<ClientThemeProvider storage="none" forcedTheme="dark" initialTheme="light">
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		expect(html).toContain('data-testid="theme">dark</span>');
+		expect(html).toContain('data-testid="resolved">dark</span>');
+	});
+
+	test("initialTheme=system reports theme but not resolvedTheme", () => {
+		const html = renderToStaticMarkup(
+			<ClientThemeProvider storage="none" initialTheme="system">
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		expect(html).toContain('data-testid="theme">system</span>');
+		expect(html).toContain('data-testid="resolved">-</span>');
+	});
+
+	test("ignores initialTheme that is not in the themes list", () => {
+		const html = renderToStaticMarkup(
+			<ClientThemeProvider storage="none" initialTheme={"invalid" as "light"}>
+				<ThemeConsumer />
+			</ClientThemeProvider>,
+		);
+		expect(html).toContain('data-testid="theme">-</span>');
+		expect(html).toContain('data-testid="resolved">-</span>');
+	});
+
+	test("ThemedImage uses the seeded theme source", () => {
+		const html = renderToStaticMarkup(
+			<ClientThemeProvider storage="none" initialTheme="dark">
+				<ThemedImage src={{ light: "/light.png", dark: "/dark.png" }} alt="Theme preview" />
+			</ClientThemeProvider>,
+		);
+		expect(html).toContain('src="/dark.png"');
+		expect(html).not.toContain("data:image/gif");
+	});
+
+	test("ThemedImage keeps the placeholder when initialTheme is system", () => {
+		const html = renderToStaticMarkup(
+			<ClientThemeProvider storage="none" initialTheme="system">
+				<ThemedImage src={{ light: "/light.png", dark: "/dark.png" }} alt="Theme preview" />
+			</ClientThemeProvider>,
+		);
+		expect(html).toContain("data:image/gif");
+		expect(html).not.toContain("/dark.png");
+		expect(html).not.toContain("/light.png");
+	});
+
+	test("useThemeValue returns the seeded resolved value", () => {
+		const html = renderToStaticMarkup(
+			<ClientThemeProvider storage="none" initialTheme="dark">
+				<ValueReader values={{ light: "Light", dark: "Dark" }} />
+			</ClientThemeProvider>,
+		);
+		expect(html).toContain('data-testid="value">Dark</span>');
 	});
 });
 

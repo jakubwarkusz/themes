@@ -267,7 +267,7 @@ const theme = getTheme(request, {
 
 ### `useThemeValue`
 
-Returns the value from a map matching the current resolved theme. Returns `undefined` before the theme resolves on the client.
+Returns the value from a map matching the current resolved theme. Returns `undefined` while `resolvedTheme` is unknown.
 
 ```tsx
 "use client";

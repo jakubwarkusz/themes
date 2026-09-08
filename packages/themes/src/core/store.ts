@@ -3,8 +3,6 @@ type ThemeState = {
 	systemTheme: "light" | "dark" | undefined;
 };
 
-const SERVER_SNAPSHOT: ThemeState = { theme: undefined, systemTheme: undefined };
-
 export type ThemeStore = {
 	subscribe(listener: () => void): () => void;
 	getSnapshot(): ThemeState;
@@ -14,8 +12,9 @@ export type ThemeStore = {
 	setSystemTheme(systemTheme: "light" | "dark" | undefined): void;
 };
 
-export function createThemeStore(): ThemeStore {
-	let state: ThemeState = { theme: undefined, systemTheme: undefined };
+export function createThemeStore(seedTheme?: string): ThemeStore {
+	const serverSnapshot: ThemeState = { theme: seedTheme, systemTheme: undefined };
+	let state: ThemeState = serverSnapshot;
 	const listeners = new Set<() => void>();
 
 	function emit(): void {
@@ -41,7 +40,7 @@ export function createThemeStore(): ThemeStore {
 		},
 
 		getServerSnapshot(): ThemeState {
-			return SERVER_SNAPSHOT;
+			return serverSnapshot;
 		},
 
 		setState(nextState: ThemeState): void {

@@ -29,7 +29,7 @@ export function ThemeToggle() {
 | Property | Type | Description |
 |----------|------|-------------|
 | `theme` | `string \| undefined` | Current theme - may be `"system"` |
-| `resolvedTheme` | `string \| undefined` | Actual applied theme - never `"system"`. `undefined` before hydration |
+| `resolvedTheme` | `string \| undefined` | Actual applied theme - never `"system"`. `undefined` until the resolved theme is known |
 | `systemTheme` | `"light" \| "dark" \| undefined` | Current system preference |
 | `forcedTheme` | `string \| undefined` | Forced theme if set via `forcedTheme` prop |
 | `themes` | `string[]` | Available themes |
@@ -62,7 +62,11 @@ resolvedTheme // "dark"
 
 ## Hydration
 
-Both `theme` and `resolvedTheme` are `undefined` on the server and during the first client render to avoid hydration mismatch. Use `resolvedTheme` with a fallback or conditional rendering:
+When the theme comes from browser storage, `theme` and `resolvedTheme` are `undefined` on the server and during the first client render so the snapshots match.
+
+When `initialTheme` or `forcedTheme` is a concrete theme (not `"system"`), both values are available during SSR and the first client render. `"system"` still leaves `resolvedTheme` unknown until `matchMedia` runs on mount.
+
+Use `resolvedTheme` with a fallback or conditional rendering when it may still be unknown:
 
 ```tsx
 const { resolvedTheme } = useTheme();
@@ -71,7 +75,7 @@ const { resolvedTheme } = useTheme();
 if (!resolvedTheme) return null;
 ```
 
-For images, use [`ThemedImage`](/docs/api/themed-image) or [`useThemeValue`](/docs/api/use-theme-value) which handle this automatically.
+For images, use [`ThemedImage`](/docs/api/themed-image) or [`useThemeValue`](/docs/api/use-theme-value) which handle the unresolved state automatically.
 
 ## `setTheme` with a function
 
