@@ -1,0 +1,26 @@
+{
+	"name": "astro-react",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "astro build",
+		"dev": "astro dev",
+		"start": "astro preview --host 127.0.0.1 --port 3141 --strictPort",
+		"test:e2e": "playwright test",
+		"type-check": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@astrojs/react": "^4.4.2",
+		"@wrksz/themes": "workspace:*",
+		"astro": "^5.13.7",
+		"react": "^19.2.8",
+		"react-dom": "^19.2.8"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.62.1",
+		"@types/node": "^26.4.0",
+		"@types/react": "^19.2.18",
+		"@types/react-dom": "^19.2.5",
+		"typescript": "^7.0.2"
+	}
+}
