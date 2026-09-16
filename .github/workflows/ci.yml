@@ -109,9 +109,9 @@ jobs:
           - react: "18.3.1"
             react-types: "18.3.23"
             react-dom-types: "18.3.7"
-          - react: "19.2.8"
-            react-types: "19.2.18"
-            react-dom-types: "19.2.5"
+          - react: "19.3.0"
+            react-types: "19.3.0"
+            react-dom-types: "19.3.0"
     steps:
       - uses: actions/checkout@v7
 

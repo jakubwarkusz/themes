@@ -120,6 +120,11 @@
 		"size:compare": "bun run build >/dev/null && bun scripts/bundle-size.ts --compare benchmarks/baseline.json",
 		"size:update-baseline": "bun run build >/dev/null && bun scripts/bundle-size.ts --update-baseline"
 	},
+	"devDependencies": {
+		"next": ">=16.3.5",
+		"react": "^19.3.0",
+		"react-dom": "^19.3.0"
+	},
 	"peerDependencies": {
 		"next": ">=16.0.0",
 		"react": "^18.0.0 || ^19.0.0",

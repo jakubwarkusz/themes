@@ -9,7 +9,7 @@ updates:
           interval: "weekly"
       commit-message:
           prefix: "chore(deps):"
-      labels: ["🔄 dependencies"]
+      labels: ["dependencies"]
       groups:
           npm-workspace:
               patterns:
@@ -24,7 +24,7 @@ updates:
           interval: "weekly"
       commit-message:
           prefix: "chore(deps->actions):"
-      labels: ["🔄 dependencies"]
+      labels: ["dependencies"]
       groups:
           github-actions:
               patterns:
