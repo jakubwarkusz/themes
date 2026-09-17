@@ -538,6 +538,38 @@ describe("ClientThemeProvider - nested providers", () => {
 		expect(screen.getByTestId("outer-theme").textContent).toBe("light");
 		expect(screen.getByTestId("inner-forced").textContent).toBe("dark");
 	});
+
+	test("html still re-applies when a nested provider mounts first", async () => {
+		function NestedHistoryOwner() {
+			return (
+				<ClientThemeProvider>
+					<ThemeConsumer />
+					<div id="nested-history-target">
+						<ClientThemeProvider
+							target="#nested-history-target"
+							forcedTheme="dark"
+							storage="none"
+							storageKey="nested-history"
+						>
+							<span data-testid="nested-history" />
+						</ClientThemeProvider>
+					</div>
+				</ClientThemeProvider>
+			);
+		}
+
+		render(<NestedHistoryOwner />);
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+
+		document.documentElement.className = "";
+		await act(async () => {
+			await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+		});
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
 });
 
 describe("ClientThemeProvider - cross-tab storage sync", () => {
