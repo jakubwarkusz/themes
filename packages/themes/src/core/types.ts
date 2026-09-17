@@ -59,6 +59,8 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	target?: "html" | "body" | string;
 	/** Disable CSS transitions on theme change. Pass `true` to disable all transitions, or a CSS `transition` value (e.g. `"background-color 0s, color 0s"`) to disable only specific properties while keeping others. */
 	disableTransitionOnChange?: boolean | string;
+	/** When true, wrap user-initiated theme updates in `document.startViewTransition` when the API exists and the user has not requested reduced motion. Default false. Pair with `disableTransitionOnChange` so CSS color transitions do not fight the snapshot animation. Not applied by the bootstrap script. */
+	enableViewTransition?: boolean;
 	/** Where to persist theme */
 	storage?: StorageType;
 	/** Storage key */

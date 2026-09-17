@@ -74,6 +74,16 @@ export function getDomWindow(): (Window & typeof globalThis) | null {
 	return document.defaultView;
 }
 
+export function runThemeUpdate(on: boolean, fn: () => void): void {
+	try {
+		if (on && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+			document.startViewTransition(fn);
+			return;
+		}
+	} catch {}
+	fn();
+}
+
 export function readStoredTheme(
 	storage: ThemeProviderProps["storage"],
 	storageKey: string,
