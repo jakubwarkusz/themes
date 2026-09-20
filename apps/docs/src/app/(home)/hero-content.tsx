@@ -27,9 +27,9 @@ const trustItems: { icon: IconSvgElement; label: string }[] = [
 ];
 
 const PKG_MANAGERS = [
-	{ label: "npm", command: "npm install @wrksz/themes@beta" },
-	{ label: "pnpm", command: "pnpm add @wrksz/themes@beta" },
-	{ label: "yarn", command: "yarn add @wrksz/themes@beta" },
+	{ label: "npm", command: "npm install @wrksz/themes" },
+	{ label: "pnpm", command: "pnpm add @wrksz/themes" },
+	{ label: "yarn", command: "yarn add @wrksz/themes" },
 ] as const;
 
 type PkgManager = (typeof PKG_MANAGERS)[number]["label"];
