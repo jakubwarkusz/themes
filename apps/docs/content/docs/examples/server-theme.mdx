@@ -39,16 +39,16 @@ Theme changes are written to `document.cookie` automatically. On subsequent docu
 </Callout>
 
 <Callout type="warn">
-  Cookie storage does not support cross-tab theme sync. If you need it, use the `initialTheme` approach below with `localStorage`.
+  Cookie storage does not support cross-tab theme sync. Use `storage="hybrid"` to combine cookies with cross-tab synchronization.
 </Callout>
 
 ## Custom server-side source
 
-Use `initialTheme` to initialize the theme from any server-side source (database, session, cookie) on every mount. The user can still call `setTheme` - use `onThemeChange` to persist the change back.
+Use `initialTheme` to initialize the theme from any server-side source (database, session, cookie) on every mount. The user can still call `setTheme`. To persist changes back, define `onThemeChange` in client code, for example in a [typed Next.js theme module](/docs/api/create-themes#nextjs-root-provider). Do not pass an ordinary server-side function as the callback.
 
 ```tsx title="app/layout.tsx"
 import { ThemeProvider } from "@wrksz/themes/next";
-import { getUserTheme, saveUserTheme } from "@/lib/user";
+import { getUserTheme } from "@/lib/user";
 
 export default async function RootLayout({ children }) {
   const userTheme = await getUserTheme(); // "light" | "dark" | null
@@ -58,7 +58,6 @@ export default async function RootLayout({ children }) {
       <body>
         <ThemeProvider
           initialTheme={userTheme ?? undefined}
-          onThemeChange={saveUserTheme}
         >
           {children}
         </ThemeProvider>

@@ -1,0 +1,141 @@
+---
+title: Agent integration guide
+description: Import choices, integration patterns, migration checks and troubleshooting for coding agents.
+---
+
+This guide covers `@wrksz/themes` 2.x. Check your installed version and type declarations; online docs may include APIs from a newer release.
+
+For a shorter reference, ask your agent to read `node_modules/@wrksz/themes/AGENTS.md`. Some agents skip instructions inside dependencies.
+
+[Plain Markdown](/llms.mdx/docs/agents) · [Documentation index](/llms.txt) · [Full documentation](/llms-full.txt)
+
+## Imports
+
+| Use case | Import | What it provides |
+| --- | --- | --- |
+| Next.js server root layout | `ThemeProvider` from `@wrksz/themes/next` | Bootstrap plus client theme state |
+| Client component | Hooks or `ClientThemeProvider` from `@wrksz/themes/client` | Read/update state or create a nested scope |
+| Typed Next.js theme module | `createThemes` from `@wrksz/themes/next/create-themes` | Export `NextThemeProvider` and matching hooks from one factory |
+| React without Next.js | `ClientThemeProvider` from `@wrksz/themes/client` | Client theme state |
+| Other React SSR frameworks | Also render `ThemeScript` from `@wrksz/themes/script` | Apply the initial theme before hydration |
+| Custom system mappings or same-document synchronization | `@wrksz/themes/next/extended` or `@wrksz/themes/client/extended-provider` | Extended provider features |
+| Client-owned element or ShadowRoot | `ClientThemeProvider` from `@wrksz/themes/client/extended-provider` | Set `themeRoot` in client code |
+
+The package root exports the client provider and factory without a bootstrap script. For Next.js, use `/next` in server layouts. That entry also exports server-only `getTheme`, so client modules must use `/client` or `/next/create-themes`.
+
+## Next.js layout and toggle
+
+Keep the root layout on the server and leave existing auth or query providers in place.
+
+```tsx title="app/layout.tsx"
+import type { ReactNode } from "react";
+import { ThemeProvider } from "@wrksz/themes/next";
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider attribute="class">{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+```tsx title="app/theme-toggle.tsx"
+"use client";
+
+import { useTheme } from "@wrksz/themes/client";
+
+export function ThemeToggle() {
+  const { resolvedTheme, forcedTheme, setTheme } = useTheme();
+  return (
+    <button
+      type="button"
+      disabled={!resolvedTheme || !!forcedTheme}
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+    >
+      Toggle theme
+    </button>
+  );
+}
+```
+
+The button renders the same label before hydration. For icons or text that depend on the theme, render a placeholder until `useHydrated()` returns true. `suppressHydrationWarning` on `html` covers only that element's attribute changes.
+
+The default provider uses `class`, `localStorage`, key `theme`, light/dark themes and system detection. CSS must match the chosen attribute; the provider does not supply styles.
+
+## Typed configuration
+
+```tsx title="app/theme.ts"
+"use client";
+
+import { createThemes } from "@wrksz/themes/next/create-themes";
+
+export const { NextThemeProvider, useTheme, useThemeValue } = createThemes({
+  themes: ["light", "dark", "high-contrast"] as const,
+  attribute: "class",
+  defaultTheme: "system",
+});
+```
+
+Import the provider and hooks from this same module. Each factory creates a separate context, so global hooks cannot read its provider. Call `createThemes` once at module scope.
+
+Use the [extended provider](/docs/api/theme-provider) for `systemThemeMap`, `themeRoot` or `enableSameDocumentSync`; the factory does not accept these options. Custom system names such as `paper`/`midnight` need `systemThemeMap` on the extended provider, or `enableSystem={false}` with an explicit default.
+
+## Storage and server rendering
+
+The Next.js provider applies the stored theme in the browser without calling `cookies()` on the server. Choose storage based on where you need the preference:
+
+- `localStorage` retains the preference and synchronizes browser tabs.
+- `sessionStorage` retains it for the tab; the library does not subscribe to cross-tab updates.
+- `cookie` makes it readable by the server but does not synchronize tabs.
+- `hybrid` reads cookies first and mirrors writes to localStorage for cross-tab updates.
+- `none` avoids persistence, useful for independent widgets or forced themes.
+
+`getTheme()` reads cookies, not localStorage, and cannot determine the browser's system preference. It can return `"system"`, even with `defaultTheme: "light"` when the stored cookie contains `"system"`. Do not copy an unresolved selection directly into `html.className`.
+
+If server-rendered content needs the theme, read the cookie per request and pass the selection as `initialTheme`. With Cache Components, keep that read inside the app's request-time boundary. See [getTheme](/docs/api/get-theme) and [server themes](/docs/examples/server-theme).
+
+In other SSR frameworks, render `ThemeScript` before theme-dependent content and match its `themes`, `attribute`, `value`, `storage`, `storageKey` and defaults to the client provider. See [framework integration](/docs/examples/framework-agnostic).
+
+## Antipatterns
+
+| Avoid | Use instead |
+| --- | --- |
+| Replacing imports without inspecting existing CSS | Preserve `attribute` and `value`; `next-themes` defaults to `data-theme`, this package to `class` |
+| Moving `@wrksz/themes/next` into a client wrapper | Render it in the server layout; keep unrelated client providers nested inside |
+| Wrapping the same root in two theme providers | Use one root provider; give independent scopes their own target and storage key |
+| Calling `setTheme` with an undeclared custom name | Add the name to `themes`; invalid selections are ignored |
+| Rendering `resolvedTheme` as if it always exists | Handle `undefined` before hydration |
+| Passing ordinary callback functions from a Server Component | Define `onThemeChange` and `onStorageError` in a client module; a typed Next factory can hold client callbacks |
+| Using `initialTheme` as a controlled prop | Use `setTheme` for selection; initialization runs at mount |
+| Assuming `forcedTheme` saves the user's preference | It overrides the active theme without writing storage; disable switching UI |
+| Assuming `useTheme().themes` includes `system` | Render the system option separately when `enableSystem` is enabled |
+| Treating `followSystem` as ordinary system support | `enableSystem` offers a system option; `followSystem` ignores stored selection and follows later system changes |
+
+Changing `initialTheme` or `storageKey` does not reload stored state. To initialize again after switching accounts or workspaces, remount the provider.
+
+## Troubleshooting
+
+| Symptom | Inspect first |
+| --- | --- |
+| `useTheme must be used within its ThemeProvider` | Check that the hook is below the matching provider and that the app uses one installed copy of the package |
+| Build error involving `next/headers` in a client module | Replace the client module's `/next` import with `/client` or `/next/create-themes` |
+| Theme changes in state but not visually | CSS selectors, `attribute`, mapped values, target existence and competing providers |
+| Custom theme selection does nothing | The `themes` allowlist, `forcedTheme`, and custom system mappings |
+| Flash or hydration warning | Initial HTML contains the bootstrap; CSP permits it; CSS selectors match; server and first client markup agree |
+| Theme returns to an old value on mount | `initialTheme` overrides storage; hybrid reads cookie before localStorage; inspect the actual keys |
+| No synchronization between tabs | Storage mode, same origin and storage key; cookie/session/none do not use the cross-tab listener |
+| No synchronization between providers in one page | Use the extended provider with `enableSameDocumentSync`; same key alone is insufficient |
+| Storage access fails | Browser restrictions or cookie options; observe `onStorageError` from client code |
+
+With CSP, pass the request's script nonce to authorize the bootstrap. It does not need `unsafe-eval`. Transition suppression also creates a style element; check `style-src` separately because a script nonce does not authorize styles.
+
+## Migration and verification
+
+Follow the [migration guide](/docs/migration) before removing `next-themes`.
+
+Run the app's type check and production build. Test cold loads with empty and saved storage, then reload and use browser back/forward. Exercise the system option and any forced or scoped themes. For localStorage/hybrid, test a second tab; for extended same-document sync, test two providers.
+
+Report the checks you ran in the consuming app, including any CSS, CSP or hydration issues that remain.
