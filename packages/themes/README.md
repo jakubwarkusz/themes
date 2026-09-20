@@ -1,29 +1,29 @@
 # @wrksz/themes
 
-Modern theme management for Next.js and React. It keeps the `next-themes` style API, adds typed helpers, and fixes React 19 / Next.js App Router edge cases around inline scripts, server themes, cookies, and hydration.
+Theme management for React and Next.js. Supports light, dark and custom themes, system preferences, and persistent selection. No runtime dependencies.
 
-> **Pre-release:** current `main` / docs track **`2.0.0-beta.1`** (`npm install @wrksz/themes@beta`). npm `latest` is still **1.2.0**.
->
-> **Breaking vs 1.2.0:** Next `ThemeProvider` is sync and no longer calls `cookies()`; explicit `getTheme` + `initialTheme` when SSR markup needs the theme; TypeScript peer `>=5.9`; `forcedTheme` does not write storage; mount init for `initialTheme`/`storageKey` is sticky. Guide: [Upgrading from 1.x](https://themes.wrksz.dev/docs/migration#upgrading-from-1x).
+[Documentation](https://themes.wrksz.dev) · [npm](https://www.npmjs.com/package/@wrksz/themes) · [GitHub](https://github.com/jakubwarkusz/themes)
 
-Requires TypeScript 5.9 or newer. TypeScript 5.9, 6, and 7 are supported.
+## Install
 
-[Docs](https://themes.wrksz.dev) · [GitHub](https://github.com/jakubwarkusz/themes)
-
-```bash
-pnpm add @wrksz/themes@beta
+```sh
+pnpm add @wrksz/themes
 # or
-npm install @wrksz/themes@beta
+npm install @wrksz/themes
 ```
 
-## Setup
+Requires React and React DOM 18 or 19. The Next.js integration requires Next.js 16+. TypeScript users need 5.9 or newer.
 
-Use the Next.js entry in `app/layout.tsx`:
+## Next.js setup
+
+Add the provider directly to your server layout:
 
 ```tsx
+// app/layout.tsx
+import type { ReactNode } from "react";
 import { ThemeProvider } from "@wrksz/themes/next";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body>
@@ -34,7 +34,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-Use client hooks from the client entry:
+By default, the provider applies a `light` or `dark` class to `<html>`, follows the system preference until the user chooses a theme, and saves that choice in `localStorage`. Its inline script applies the theme before hydration. `suppressHydrationWarning` handles the resulting attribute difference on `<html>`.
+
+Add theme styles in your global CSS:
+
+```css
+:root {
+	color: #18181b;
+	background: #fff;
+}
+
+:root.dark {
+	color: #fafafa;
+	background: #18181b;
+}
+```
+
+Use the client entry for a theme toggle:
 
 ```tsx
 "use client";
@@ -45,77 +61,33 @@ export function ThemeToggle() {
 	const { resolvedTheme, setTheme } = useTheme();
 
 	return (
-		<button onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
+		<button
+			type="button"
+			disabled={!resolvedTheme}
+			onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+		>
 			Toggle theme
 		</button>
 	);
 }
 ```
 
-## Highlights
+For React apps outside Next.js, use `ClientThemeProvider` from `@wrksz/themes/client`. Other SSR frameworks can pair it with `ThemeScript` from `@wrksz/themes/script`. See [framework setup](https://themes.wrksz.dev/docs/examples/framework-agnostic).
 
-- React 19 friendly Next.js provider using `useServerInsertedHTML`.
-- Static provider compatible with Next.js 16.3 App Shells and Partial Prefetching.
-- `localStorage`, `sessionStorage`, `cookie`, `hybrid`, and disabled storage modes.
-- Zero-flash cookie theming via a synchronous pre-paint bootstrap.
-- `initialTheme`, `themeColor`, nested providers, scoped targets, and multi-class theme values.
-- Typed `useTheme`, `useThemeValue`, `useThemeEffect`, `useHydrated`, `ThemedImage`, and isolated `createThemes` factories.
-- Deterministic `ThemeScript` export for non-Next SSR frameworks.
-- Fine-grained client subpath exports for smaller app bundles.
-- No runtime dependencies.
+## Configuration
 
-## Cookie SSR
+- Choose `localStorage`, `sessionStorage`, `cookie`, `hybrid`, or no storage. [Hybrid storage](https://themes.wrksz.dev/docs/examples/hybrid-storage) combines cookies with cross-tab synchronization.
+- Apply custom theme names, classes, or [data attributes](https://themes.wrksz.dev/docs/examples/data-attribute). Use [scoped providers](https://themes.wrksz.dev/docs/examples/scoped-theming) to theme individual sections.
+- Use [`createThemes`](https://themes.wrksz.dev/docs/api/create-themes) to share typed configuration and hooks.
+- Import the [extended provider](https://themes.wrksz.dev/docs/api/theme-provider) for same-document synchronization and custom system mappings. The extended client provider also supports [Shadow DOM](https://themes.wrksz.dev/docs/examples/shadow-dom).
 
-```tsx
-import { ThemeProvider } from "@wrksz/themes/next";
+The Next.js provider does not read cookies on the server. If server-rendered content needs the stored theme, read it explicitly with [`getTheme`](https://themes.wrksz.dev/docs/api/get-theme) and pass `initialTheme`. See the [server theme example](https://themes.wrksz.dev/docs/examples/server-theme).
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-	return (
-		<html lang="en" suppressHydrationWarning>
-			<body>
-				<ThemeProvider storage="cookie" defaultTheme="dark" disableTransitionOnChange>
-					{children}
-				</ThemeProvider>
-			</body>
-		</html>
-	);
-}
-```
+Full props and hooks are documented in the [API reference](https://themes.wrksz.dev/docs/api/theme-provider).
 
-The provider itself does not call `cookies()`, so it remains part of a reusable App Shell.
-Use `getTheme()` explicitly when server-rendered markup needs the cookie; with Cache Components,
-wrap request-time themed subtrees in `Suspense` or set `export const instant = false`.
+## Migration
 
-## Import Paths
-
-```tsx
-import { ThemeProvider, getTheme } from "@wrksz/themes/next";
-import {
-	ClientThemeProvider,
-	ThemedImage,
-	createThemes,
-	useTheme,
-	useThemeEffect,
-	useHydrated,
-	useThemeValue,
-} from "@wrksz/themes/client";
-import { ThemeScript } from "@wrksz/themes/script";
-```
-
-Fine-grained client modules are also available:
-
-```tsx
-import { useTheme } from "@wrksz/themes/client/use-theme";
-import { useThemeValue } from "@wrksz/themes/client/use-theme-value";
-import { useThemeEffect } from "@wrksz/themes/client/use-theme-effect";
-import { useHydrated } from "@wrksz/themes/client/use-hydrated";
-import { ThemedImage } from "@wrksz/themes/client/themed-image";
-import { ClientThemeProvider } from "@wrksz/themes/client/provider";
-import { createThemes } from "@wrksz/themes/client/create-themes";
-import { createThemes as createNextThemes } from "@wrksz/themes/next/create-themes";
-```
-
-Full API docs and examples live at [themes.wrksz.dev](https://themes.wrksz.dev).
+Version 2 changes cookie handling, forced-theme persistence, and initialization behavior. Read [Upgrading from 1.x](https://themes.wrksz.dev/docs/migration#upgrading-from-1x) before upgrading. The same page covers migration from `next-themes`.
 
 ## License
 

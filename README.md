@@ -3,23 +3,21 @@
 [![npm](https://shieldcn.dev/badge/npm-%40wrksz%2Fthemes-CB3837.png?logo=npm&variant=secondary&size=sm)](https://www.npmjs.com/package/@wrksz/themes)
 [![docs](https://shieldcn.dev/badge/docs-themes.wrksz.dev-7C3AED.png?logo=readthedocs&variant=secondary&size=sm)](https://themes.wrksz.dev)
 ![Next.js](https://shieldcn.dev/badge/Next.js-16-000000.png?logo=nextdotjs&variant=secondary&size=sm)
-![React](https://shieldcn.dev/badge/React-19-087EA4.png?logo=react&variant=secondary&size=sm)
+![React](https://shieldcn.dev/badge/React-18%20%2F%2019-087EA4.png?logo=react&variant=secondary&size=sm)
 ![TypeScript](https://shieldcn.dev/badge/TypeScript-5.9%E2%80%937-3178C6.png?logo=typescript&variant=secondary&size=sm)
 
-Modern theme management for Next.js 16+ and React 18+. Near drop-in replacement for `next-themes` - fixes every known bug and adds missing features, including native `useEffectEvent` integration on React 19.2+. Migrating requires changing one import line.
+Theme management for Next.js 16+ and React 18 or 19. Supports custom themes, cookie and browser storage, scoped providers, and typed hooks. No runtime dependencies.
+
+The API follows `next-themes` conventions. See the [migration guide](https://themes.wrksz.dev/docs/migration) for import changes and behavior differences.
 
 TypeScript 5.9 or newer is required. TypeScript 5.9, 6, and 7 are supported and checked against the published package declarations in CI.
 
-> **`2.0.0-beta.1`:** install with `@wrksz/themes@beta`. npm `latest` remains **1.2.0** until 2.0 is stable.
->
-> **Breaking vs 1.2.0:** Next `ThemeProvider` no longer calls `cookies()` (sync App Shell provider); pass `initialTheme` via `getTheme()` when SSR markup needs the cookie; TypeScript peer `>=5.9`; `forcedTheme` does not persist; sticky mount init for `initialTheme`/`storageKey`. Full guide: [Upgrading from 1.x](https://themes.wrksz.dev/docs/migration#upgrading-from-1x).
+> **Upgrading from 1.x:** The Next.js provider no longer reads cookies on the server. Use `getTheme()` and `initialTheme` when server-rendered content needs the theme. Version 2 also changes forced-theme persistence and initialization behavior. See [Upgrading from 1.x](https://themes.wrksz.dev/docs/migration#upgrading-from-1x).
 
 ```bash
-pnpm add @wrksz/themes@beta
+pnpm add @wrksz/themes
 # or
-npm install @wrksz/themes@beta
-# stable 1.x:
-# npm install @wrksz/themes@1.2.0
+npm install @wrksz/themes
 ```
 
 ## Why not `next-themes`?
@@ -54,16 +52,19 @@ npm install @wrksz/themes@beta
 - [Security model](#security-model)
 - [API](#api)
     - [ThemeProvider](#themeprovider)
+    - [Extended provider](#opt-in-extended-provider)
     - [useTheme](#usetheme)
     - [getTheme](#gettheme)
     - [useThemeValue](#usethemevalue)
+    - [useThemeEffect](#usethemeeffect)
+    - [createThemes](#createthemes)
     - [ThemedImage](#themedimage)
 - [Examples](#examples)
 - [Import paths](#import-paths)
 
 ## Setup
 
-Add the provider to your root layout. Import from `@wrksz/themes/next` for Next.js - this avoids the React 19 inline script warning by using `useServerInsertedHTML`. Add `suppressHydrationWarning` to `<html>` to prevent hydration mismatches.
+Add the provider to your root layout. Import from `@wrksz/themes/next` for Next.js - this avoids the React 19 inline script warning by using `useServerInsertedHTML`. Add `suppressHydrationWarning` to `<html>` to suppress the expected attribute mismatch when the bootstrap applies the theme before hydration.
 
 ```tsx
 // app/layout.tsx
@@ -146,7 +147,7 @@ For apps using CSS media queries (`@media (prefers-color-scheme: dark)`) alongsi
 }
 ```
 
-> Cookie storage does not support cross-tab theme sync. Use `localStorage` with `initialTheme` if you need it.
+> Cookie storage alone does not support cross-tab theme sync. Use `storage="hybrid"` to combine cookies with cross-tab synchronization, or `localStorage` if you do not need cookies.
 
 ## Security model
 
@@ -259,11 +260,7 @@ const theme = getTheme(request, {
 // theme: "light" | "dark" | "high-contrast"
 ```
 
-| Option         | Type                | Default    | Description                                                                                                        |
-| -------------- | ------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------ |
-| `storageKey`   | `string`            | `"theme"`  | Cookie name to read from                                                                                           |
-| `defaultTheme` | `string`            | `"system"` | Returned when no valid theme is found                                                                              |
-| `themes`       | `readonly string[]` | -          | When provided, stored values not in the list fall back to `defaultTheme`. Use `as const` for return type inference |
+See the [`getTheme` reference](https://themes.wrksz.dev/docs/api/get-theme) for options and server-rendering examples.
 
 ### `useThemeValue`
 
@@ -386,7 +383,7 @@ Apply the theme to a specific element instead of `<html>`, so different sections
 
 ### Server-provided theme
 
-Initialize from a server-side source (database, session) - overrides stored value on every mount:
+Use `initialTheme` to initialize from a server-side source such as a database or session. It takes precedence over storage at mount; later prop changes do not reinitialize the provider:
 
 ```tsx
 export default async function RootLayout({ children }) {
@@ -395,7 +392,7 @@ export default async function RootLayout({ children }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body>
-				<ThemeProvider initialTheme={userTheme ?? undefined} onThemeChange={saveUserTheme}>
+				<ThemeProvider initialTheme={userTheme ?? undefined}>
 					{children}
 				</ThemeProvider>
 			</body>
