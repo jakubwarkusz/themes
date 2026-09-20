@@ -6,7 +6,7 @@ description: Eliminate SSR theme flash with cookie storage or a custom server-si
 ## Cookie storage
 
 <Callout type="warn">
-  <Breaking /> **1.x** automatically read the cookie on the server via `cookies()`. **`2.0.0-beta.1`** uses a static bootstrap only. See [Upgrading from 1.x](/docs/migration#upgrading-from-1x).
+  <Breaking /> **1.x** automatically read the cookie on the server via `cookies()`. **`2.0.0`** uses a static bootstrap only. See [Upgrading from 1.x](/docs/migration#upgrading-from-1x).
 </Callout>
 
 The simplest way to eliminate theme flash. Use `storage="cookie"` with `@wrksz/themes/next` - its static bootstrap reads the cookie synchronously before paint:

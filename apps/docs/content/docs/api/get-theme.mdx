@@ -6,7 +6,7 @@ description: Read the current theme from a cookie outside React - in proxy, layo
 `getTheme` reads the current theme from a cookie. Available in `@wrksz/themes/next`.
 
 <Callout type="warn">
-  <Breaking /> In **`2.0.0-beta.1`**, `ThemeProvider` no longer calls `getTheme` / `cookies()` for you. Use this helper only when server markup must know the theme. See [Upgrading from 1.x](/docs/migration#upgrading-from-1x).
+  <Breaking /> In **`2.0.0`**, `ThemeProvider` no longer calls `getTheme` / `cookies()` for you. Use this helper only when server markup must know the theme. See [Upgrading from 1.x](/docs/migration#upgrading-from-1x).
 </Callout>
 
 Two variants depending on context:
@@ -65,7 +65,7 @@ When `themes` is omitted, `getTheme` returns `string` because an existing cookie
 ## Layout - apply class directly on `<html>`
 
 <Callout type="warn">
-  <Breaking /> Required more often in **`2.0.0-beta.1`** because the provider no longer injects the cookie class for you. Do not put unresolved `"system"` on `<html className>`. Pass `themes`, and pass `initialTheme` when seeding the provider.
+  <Breaking /> Required more often in **`2.0.0`** because the provider no longer injects the cookie class for you. Do not put unresolved `"system"` on `<html className>`. Pass `themes`, and pass `initialTheme` when seeding the provider.
 </Callout>
 
 Use this pattern when server-rendered markup itself must depend on the theme:

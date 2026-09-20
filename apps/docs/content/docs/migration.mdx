@@ -8,23 +8,23 @@ description: Step-by-step guide for migrating from next-themes to @wrksz/themes.
 ## Step 1: Install
 
 <Callout type="info">
-  Current docs target **`2.0.0-beta.1`**. Use `@wrksz/themes@beta`. For stable 1.x, install `@wrksz/themes@1.2.0` and skip [Upgrading from 1.x](#upgrading-from-1x).
+  These instructions cover **2.x**. If you use 1.x, also follow [Upgrading from 1.x](#upgrading-from-1x).
 </Callout>
 
 <Tabs items={["pnpm", "npm", "yarn"]}>
   <Tab value="npm">
     ```bash
-    npm install @wrksz/themes@beta
+    npm install @wrksz/themes
     ```
   </Tab>
   <Tab value="pnpm">
     ```bash
-    pnpm add @wrksz/themes@beta
+    pnpm add @wrksz/themes
     ```
   </Tab>
   <Tab value="yarn">
     ```bash
-    yarn add @wrksz/themes@beta
+    yarn add @wrksz/themes
     ```
   </Tab>
 </Tabs>
@@ -41,12 +41,12 @@ That's it for most apps.
 ## Upgrading from 1.x
 
 <Callout type="warn">
-  <Breaking /> Breaking changes below ship in **`2.0.0-beta.1`** (`npm install @wrksz/themes@beta`). npm `latest` is still **1.2.0**. Skip this section if you stay on 1.x.
+  <Breaking /> These changes apply when upgrading from **1.x to 2.x**. Skip this section if you already use 2.x.
 </Callout>
 
 ### What broke vs 1.2.0
 
-| Change | 1.x | 2.0.0-beta.1 |
+| Change | 1.x | 2.0.0 |
 |--------|-----|--------------|
 | Next `ThemeProvider` | `async`, called `cookies()` for `storage="cookie"\|"hybrid"` and set `initialTheme` for you | Sync passthrough. No request-time cookie read. |
 | SSR `<html className={theme}>` | Often came "for free" from the provider | You must call [`getTheme`](/docs/api/get-theme) and pass `initialTheme` (and usually `export const instant = false`) |
@@ -84,7 +84,7 @@ export default async function RootLayout({ children }) {
 `@wrksz/themes/next` is the server-layout entry and also exports the server-only `getTheme` helper. If you have a client wrapper (common in Next.js `next-themes` setups), remove it.
 
 <Callout type="info">
-  <Breaking /> In 1.x this entry was an **async** Server Component. From `2.0.0-beta.1` it is synchronous, but it still must not be imported from a `"use client"` module because it re-exports `getTheme`.
+  <Breaking /> In 1.x this entry was an **async** Server Component. From `2.0.0` it is synchronous, but it still must not be imported from a `"use client"` module because it re-exports `getTheme`.
 </Callout>
 
 ```diff
