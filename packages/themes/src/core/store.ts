@@ -15,17 +15,13 @@ export type ThemeStore = {
 };
 
 export function createThemeStore(): ThemeStore {
-	let state: ThemeState = { theme: undefined, systemTheme: undefined };
+	let state: ThemeState = { ...SERVER_SNAPSHOT };
 	const listeners = new Set<() => void>();
-
-	function emit(): void {
-		for (const listener of listeners) listener();
-	}
 
 	function setState(nextState: ThemeState): void {
 		if (state.theme === nextState.theme && state.systemTheme === nextState.systemTheme) return;
 		state = nextState;
-		emit();
+		for (const listener of listeners) listener();
 	}
 
 	return {
@@ -44,9 +40,7 @@ export function createThemeStore(): ThemeStore {
 			return SERVER_SNAPSHOT;
 		},
 
-		setState(nextState: ThemeState): void {
-			setState(nextState);
-		},
+		setState,
 
 		setTheme(theme: string | undefined): void {
 			setState({ ...state, theme });

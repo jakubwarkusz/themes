@@ -1,5 +1,6 @@
-import { writeCookie } from "./cookie.js";
-import type { Attribute, ThemeColor, ThemeProviderProps } from "./types.js";
+import type { Attribute, ThemeColor } from "./types.js";
+
+export { getDomWindow, readStoredTheme, writeStoredTheme } from "./storage.js";
 
 type ApplyThemeOptions = {
 	resolved: string;
@@ -41,83 +42,13 @@ function updateMetaThemeColor(color: string | undefined): void {
 		document.head.appendChild(meta);
 		(meta as MarkedThemeColorMeta)[CREATED_THEME_COLOR] = 1;
 	}
-	meta.content = color;
+	if (meta.content !== color) meta.content = color;
 }
 
 function getTargetEl(target: string): Element | null {
 	if (target === "html") return document.documentElement;
 	if (target === "body") return document.body;
 	return document.querySelector(target);
-}
-
-function reportStorageError(
-	onStorageError: ((error: unknown) => void) | undefined,
-	error: unknown,
-): void {
-	try {
-		onStorageError?.(error);
-	} catch {}
-}
-
-function readCookieValue(key: string): string | null {
-	const parts = `; ${document.cookie}`.split(`; ${key}=`);
-	const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
-	try {
-		return encoded ? decodeURIComponent(encoded) || null : null;
-	} catch {
-		return null;
-	}
-}
-
-export function getDomWindow(): (Window & typeof globalThis) | null {
-	if (typeof document === "undefined") return null;
-	return document.defaultView;
-}
-
-export function readStoredTheme(
-	storage: ThemeProviderProps["storage"],
-	storageKey: string,
-	onStorageError?: (error: unknown) => void,
-): string | null {
-	try {
-		if (storage === "none") return null;
-		if (storage === "cookie") return readCookieValue(storageKey);
-		if (storage === "hybrid")
-			return readCookieValue(storageKey) ?? localStorage.getItem(storageKey);
-		if (storage === "localStorage") return localStorage.getItem(storageKey);
-		return sessionStorage.getItem(storageKey);
-	} catch (error) {
-		reportStorageError(onStorageError, error);
-		return null;
-	}
-}
-
-export function writeStoredTheme(
-	storage: ThemeProviderProps["storage"],
-	storageKey: string,
-	theme: string,
-	cookieOptions: ThemeProviderProps["cookieOptions"],
-	onStorageError?: (error: unknown) => void,
-): void {
-	try {
-		if (storage === "none") return;
-		if (storage === "cookie") {
-			writeCookie(storageKey, theme, cookieOptions);
-			return;
-		}
-		if (storage === "hybrid") {
-			writeCookie(storageKey, theme, cookieOptions);
-			localStorage.setItem(storageKey, theme);
-			return;
-		}
-		if (storage === "localStorage") {
-			localStorage.setItem(storageKey, theme);
-			return;
-		}
-		sessionStorage.setItem(storageKey, theme);
-	} catch (error) {
-		reportStorageError(onStorageError, error);
-	}
 }
 
 export function applyThemeToDom({
@@ -134,12 +65,14 @@ export function applyThemeToDom({
 	if (!el) return;
 
 	const attrValue = valueMap?.[resolved] ?? resolved;
-	const attrs = ([] as Attribute[]).concat(attribute);
-	const classValues = themes.flatMap((t) => splitClassTokens(valueMap?.[t] ?? t));
-	const nextClassValues = splitClassTokens(attrValue);
+	const attrs = Array.isArray(attribute) ? attribute : [attribute];
+	const hasClass = attrs.includes("class");
+	const nextClassValues = hasClass ? splitClassTokens(attrValue) : [];
 	const themed = el as ThemedElement;
-	const removeClassValues = themed[LAST_CLASS_TOKENS] ?? classValues;
-	const staleClasses = !attrs.includes("class") ? themed[LAST_CLASS_TOKENS] : undefined;
+	const removeClassValues =
+		themed[LAST_CLASS_TOKENS] ??
+		(hasClass ? themes.flatMap((t) => splitClassTokens(valueMap?.[t] ?? t)) : []);
+	const staleClasses = !hasClass ? themed[LAST_CLASS_TOKENS] : undefined;
 	const nextAttrValue = attrValue || null;
 	let needsUpdate = staleClasses?.some((token) => el.classList.contains(token)) ?? false;
 	let classChanged = false;
@@ -182,8 +115,9 @@ export function applyThemeToDom({
 	}
 
 	if (enableColorScheme) {
-		(el as HTMLElement).style.colorScheme =
-			resolved === "light" || resolved === "dark" ? resolved : "";
+		const style = (el as HTMLElement).style;
+		const colorScheme = resolved === "light" || resolved === "dark" ? resolved : "";
+		if (style.colorScheme !== colorScheme) style.colorScheme = colorScheme;
 	}
 
 	if (themeColor) {
