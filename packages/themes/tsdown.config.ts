@@ -8,6 +8,7 @@ export default defineConfig({
 	root: "src",
 	fixedExtension: false,
 	unbundle: true,
+	minify: true,
 	dts: { entry: [...DECLARATION_BUILD_ENTRIES] },
 	deps: { neverBundle: [/^react(?:-dom)?(?:\/|$)/, /^next(?:\/|$)/] },
 	env: { NODE_ENV: "production" },

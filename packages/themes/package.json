@@ -115,6 +115,7 @@
 		"format": "oxfmt --config ../../oxfmt.config.ts src scripts",
 		"test": "pnpm generate:script-source --check && vitest run",
 		"size": "pnpm build && tsx scripts/bundle-size.ts",
+		"size:package": "tsx scripts/package-size.ts",
 		"size:json": "pnpm build >/dev/null && tsx scripts/bundle-size.ts --json",
 		"size:compare": "pnpm build >/dev/null && tsx scripts/bundle-size.ts --compare benchmarks/baseline.json",
 		"size:update-baseline": "pnpm build >/dev/null && tsx scripts/bundle-size.ts --update-baseline",

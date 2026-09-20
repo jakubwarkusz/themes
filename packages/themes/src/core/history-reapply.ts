@@ -22,9 +22,9 @@ export function subscribeHistoryReapply(w: Window, apply: () => void): () => voi
 					!records.some(
 						(record) =>
 							record.type === "attributes" ||
-							Array.from(record.addedNodes)
-								.concat(Array.from(record.removedNodes))
-								.some((node) => node.nodeName !== "STYLE"),
+							[...record.addedNodes, ...record.removedNodes].some(
+								(node) => node.nodeName !== "STYLE",
+							),
 					)
 				)
 					return;

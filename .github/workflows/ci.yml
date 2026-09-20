@@ -98,6 +98,9 @@ jobs:
         working-directory: packages/themes
         run: pnpm exec tsx scripts/bundle-size.ts --compare benchmarks/baseline.json
 
+      - name: Installed package size
+        run: pnpm --filter @wrksz/themes size:package
+
   react-compatibility:
     name: React ${{ matrix.react }}
     runs-on: ubuntu-latest

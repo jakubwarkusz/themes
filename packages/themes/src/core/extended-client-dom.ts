@@ -1,6 +1,6 @@
-import { writeCookie } from "./cookie.js";
-import type { ExtendedThemeProviderProps } from "./extended-types.js";
 import type { Attribute, ThemeColor } from "./types.js";
+
+export { getDomWindow, readStoredTheme, writeStoredTheme } from "./storage.js";
 
 type ApplyExtendedThemeOptions = {
 	resolved: string;
@@ -50,7 +50,7 @@ function updateMetaThemeColor(
 		created,
 		previousContent: created ? null : meta.getAttribute("content"),
 	};
-	meta.content = color;
+	if (meta.content !== color) meta.content = color;
 	return state;
 }
 
@@ -78,76 +78,6 @@ function getTargetElement(target: string, themeRoot?: Element | ShadowRoot): Ele
 	return document.querySelector(target);
 }
 
-function reportStorageError(
-	onStorageError: ((error: unknown) => void) | undefined,
-	error: unknown,
-): void {
-	try {
-		onStorageError?.(error);
-	} catch {}
-}
-
-function readCookieValue(key: string): string | null {
-	const parts = `; ${document.cookie}`.split(`; ${key}=`);
-	const encoded = parts.length > 1 ? parts.pop()?.split(";")[0] : null;
-	try {
-		return encoded ? decodeURIComponent(encoded) || null : null;
-	} catch {
-		return null;
-	}
-}
-
-export function getDomWindow(): (Window & typeof globalThis) | null {
-	if (typeof document === "undefined") return null;
-	return document.defaultView;
-}
-
-export function readStoredTheme(
-	storage: ExtendedThemeProviderProps["storage"],
-	storageKey: string,
-	onStorageError?: (error: unknown) => void,
-): string | null {
-	try {
-		if (storage === "none") return null;
-		if (storage === "cookie") return readCookieValue(storageKey);
-		if (storage === "hybrid")
-			return readCookieValue(storageKey) ?? localStorage.getItem(storageKey);
-		if (storage === "localStorage") return localStorage.getItem(storageKey);
-		return sessionStorage.getItem(storageKey);
-	} catch (error) {
-		reportStorageError(onStorageError, error);
-		return null;
-	}
-}
-
-export function writeStoredTheme(
-	storage: ExtendedThemeProviderProps["storage"],
-	storageKey: string,
-	theme: string,
-	cookieOptions: ExtendedThemeProviderProps["cookieOptions"],
-	onStorageError?: (error: unknown) => void,
-): void {
-	try {
-		if (storage === "none") return;
-		if (storage === "cookie") {
-			writeCookie(storageKey, theme, cookieOptions);
-			return;
-		}
-		if (storage === "hybrid") {
-			writeCookie(storageKey, theme, cookieOptions);
-			localStorage.setItem(storageKey, theme);
-			return;
-		}
-		if (storage === "localStorage") {
-			localStorage.setItem(storageKey, theme);
-			return;
-		}
-		sessionStorage.setItem(storageKey, theme);
-	} catch (error) {
-		reportStorageError(onStorageError, error);
-	}
-}
-
 export function applyExtendedThemeToDom({
 	resolved,
 	attribute,
@@ -165,12 +95,15 @@ export function applyExtendedThemeToDom({
 
 	const attributeValue = valueMap?.[resolved] ?? resolved;
 	const attributes = Array.isArray(attribute) ? attribute : [attribute];
-	const classValues = themes.flatMap((theme) => splitClassTokens(valueMap?.[theme] ?? theme));
 	const hasClass = attributes.includes("class");
 	const nextClassValues = hasClass ? splitClassTokens(attributeValue) : [];
 	const nextAttrValue = attributeValue || null;
 	const nextDataAttributes = attributes.filter((current) => current !== "class");
-	const removeClassValues = previous?.element === element ? previous.classTokens : classValues;
+	const removeClassValues = hasClass
+		? previous?.element === element
+			? previous.classTokens
+			: themes.flatMap((theme) => splitClassTokens(valueMap?.[theme] ?? theme))
+		: [];
 	const staleClasses = !hasClass && previous?.element === element ? previous.classTokens : [];
 
 	if (previous) {
@@ -226,8 +159,9 @@ export function applyExtendedThemeToDom({
 	}
 
 	if (enableColorScheme) {
-		(element as HTMLElement).style.colorScheme =
-			resolved === "light" || resolved === "dark" ? resolved : "";
+		const style = (element as HTMLElement).style;
+		const colorScheme = resolved === "light" || resolved === "dark" ? resolved : "";
+		if (style.colorScheme !== colorScheme) style.colorScheme = colorScheme;
 	} else if (previous?.colorSchemeApplied) {
 		(element as HTMLElement).style.colorScheme = "";
 	}

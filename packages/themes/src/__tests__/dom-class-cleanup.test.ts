@@ -15,6 +15,7 @@ beforeEach(() => {
 afterEach(() => {
 	target.remove();
 	document.head.querySelectorAll("style").forEach((style) => style.remove());
+	document.head.querySelectorAll('meta[name="theme-color"]').forEach((meta) => meta.remove());
 	vi.restoreAllMocks();
 });
 
@@ -42,6 +43,52 @@ for (const { name, createApply } of [
 	},
 ]) {
 	describe(`${name} DOM class cleanup`, () => {
+		test("does not scan theme mappings for data-only application or repeated class application", () => {
+			const apply = createApply();
+			const readLight = vi.fn(() => "light");
+			const valueMap = {
+				get light() {
+					return readLight();
+				},
+				dark: "dark",
+			};
+			createApply()({ ...options, attribute: "data-theme", valueMap });
+			expect(readLight).not.toHaveBeenCalled();
+			target.classList.add("light");
+			apply({ ...options, valueMap });
+			expect(target.className).toBe("layout dark");
+			readLight.mockClear();
+			for (let i = 0; i < 100; i++) apply({ ...options, valueMap });
+			expect(readLight).not.toHaveBeenCalled();
+			expect(target.className).toBe("layout dark");
+		});
+
+		test("skips unchanged style and meta writes but repairs externally changed values", () => {
+			const apply = createApply();
+			const next = { ...options, enableColorScheme: true, themeColor: "#000" };
+			apply(next);
+			const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')!;
+			const observer = new MutationObserver(() => {});
+			observer.observe(target, { attributes: true });
+			observer.observe(meta, { attributes: true });
+			try {
+				for (let i = 0; i < 100; i++) apply(next);
+				expect(observer.takeRecords()).toHaveLength(0);
+				target.style.colorScheme = "light";
+				meta.content = "#fff";
+				observer.takeRecords();
+				apply(next);
+				expect(target.style.colorScheme).toBe("dark");
+				expect(meta.content).toBe("#000");
+				expect(observer.takeRecords().map((record) => record.attributeName)).toEqual([
+					"style",
+					"content",
+				]);
+			} finally {
+				observer.disconnect();
+			}
+		});
+
 		test("disables transitions before removing obsolete classes even if the data value is unchanged", () => {
 			const apply = createApply();
 			apply({ ...options, attribute: ["class", "data-theme"] });

@@ -53,6 +53,9 @@ jobs:
       - name: Bundle size baseline
         run: pnpm size:compare
 
+      - name: Installed package size
+        run: pnpm size:package
+
       - name: Publish to NPM registry
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
