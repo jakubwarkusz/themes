@@ -89,6 +89,10 @@ Full props and hooks are documented in the [API reference](https://themes.wrksz.
 
 Version 2 changes cookie handling, forced-theme persistence, and initialization behavior. Read [Upgrading from 1.x](https://themes.wrksz.dev/docs/migration#upgrading-from-1x) before upgrading. The same page covers migration from `next-themes`.
 
+## AI agents
+
+Ask your agent to read [AGENTS.md](./AGENTS.md) in the installed package. It covers imports and migration checks. For examples and troubleshooting, use the [agent guide](https://themes.wrksz.dev/docs/agents) or [documentation index](https://themes.wrksz.dev/llms.txt).
+
 ## License
 
 MIT

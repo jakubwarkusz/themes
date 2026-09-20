@@ -3,7 +3,7 @@ title: Migrating from next-themes
 description: Step-by-step guide for migrating from next-themes to @wrksz/themes.
 ---
 
-`@wrksz/themes` is a near drop-in replacement for `next-themes`. For most apps, migration is a single import change. This page covers that change and any behavioral differences to be aware of.
+To migrate to `@wrksz/themes` 2.x, update the imports and check your CSS selectors and provider placement. The [agent guide](/docs/agents) covers integration errors and testing.
 
 ## Step 1: Install
 
@@ -36,7 +36,15 @@ description: Step-by-step guide for migrating from next-themes to @wrksz/themes.
 + import { ThemeProvider } from "@wrksz/themes/next";
 ```
 
-That's it for most apps.
+Preserve the existing `themes`, `value`, `storageKey`, `defaultTheme` and system settings. `next-themes` defaults to `data-theme`; `@wrksz/themes` defaults to `class`. If your CSS uses `[data-theme="dark"]`, retain it explicitly:
+
+```tsx
+<ThemeProvider attribute="data-theme">{children}</ThemeProvider>
+```
+
+Keep `attribute="class"` if the app already uses it. Keeping `storage="localStorage"` and the same `storageKey` preserves saved preferences.
+
+These defaults are documented in the [next-themes API](https://github.com/pacocoursey/next-themes#themeprovider). Check the application's installed version and any local wrapper before migrating.
 
 ## Upgrading from 1.x
 
@@ -48,11 +56,11 @@ That's it for most apps.
 
 | Change | 1.x | 2.0.0 |
 |--------|-----|--------------|
-| Next `ThemeProvider` | `async`, called `cookies()` for `storage="cookie"\|"hybrid"` and set `initialTheme` for you | Sync passthrough. No request-time cookie read. |
-| SSR `<html className={theme}>` | Often came "for free" from the provider | You must call [`getTheme`](/docs/api/get-theme) and pass `initialTheme` (and usually `export const instant = false`) |
+| Next `ThemeProvider` | `async`, called `cookies()` for `storage="cookie"\|"hybrid"` and set `initialTheme` for you | Synchronous; does not read cookies on the server. |
+| Server cookie read | Provider called `cookies()` for cookie/hybrid storage | Call [`getTheme`](/docs/api/get-theme) explicitly when server content needs the selection; pass `initialTheme` to seed the provider |
 | TypeScript peer | `>=4.5.0` | `>=5.9` (5.0–5.8 unsupported) |
 | `forcedTheme` | Could write the forced value into storage on init | Does **not** persist to storage |
-| `initialTheme` / `storageKey` | Prop changes could re-run mount init | Mount init is sticky; later prop changes do not re-initialize |
+| `initialTheme` / `storageKey` | Prop changes could re-run mount init | Initializes at mount; later prop changes do not re-initialize |
 
 ### Migration path
 
@@ -68,7 +76,7 @@ export default async function RootLayout({ children }) {
   const theme = await getTheme();
 
   return (
-    <html className={theme} suppressHydrationWarning>
+    <html suppressHydrationWarning>
       <body>
         <ThemeProvider storage="cookie" initialTheme={theme}>
           {children}
@@ -79,9 +87,9 @@ export default async function RootLayout({ children }) {
 }
 ```
 
-## Step 3: Remove the "use client" wrapper
+## Step 3: Move the root provider to the server layout
 
-`@wrksz/themes/next` is the server-layout entry and also exports the server-only `getTheme` helper. If you have a client wrapper (common in Next.js `next-themes` setups), remove it.
+`@wrksz/themes/next` is the server-layout entry and also exports the server-only `getTheme` helper. Move the root theme provider out of a client wrapper. Keep unrelated auth, query or UI providers in that wrapper and render it inside the new root theme provider.
 
 <Callout type="info">
   <Breaking /> In 1.x this entry was an **async** Server Component. From `2.0.0` it is synchronous, but it still must not be imported from a `"use client"` module because it re-exports `getTheme`.
@@ -119,28 +127,21 @@ If you need a nested provider inside a Client Component, use [`ClientThemeProvid
 
 ## API differences
 
-All `next-themes` props are supported. The following props have changed behavior or are new:
+Check your props against the [provider reference](/docs/api/theme-provider):
+
+- `themes` is an allowlist: declare every custom name passed to `setTheme` or `forcedTheme`.
+- `useTheme().themes` returns the configured list without automatically appending `"system"`. Add a system menu option explicitly when system support is enabled.
+- `theme` and `resolvedTheme` may be `undefined` before hydration. Preserve hydration guards for theme-dependent UI.
+- A nested provider creates its own state. Use distinct DOM targets and storage keys for independent sections.
+- The root package entry is client-only. Use `/next` for the Next.js root bootstrap and `/client` for client hooks.
 
 ### `onThemeChange`
 
-In `next-themes`, `onThemeChange` fires with the resolved theme (e.g. `"dark"`) even when `setTheme("system")` is called.
+`onThemeChange` is an additional `@wrksz/themes` callback, not part of the documented `next-themes` provider API. If the old app used a wrapper with that name, inspect its behavior before replacing it.
 
-In `@wrksz/themes`, `onThemeChange` fires with the selected value - which may be `"system"`. System preference changes while the theme is `"system"` still fire with the resolved value.
+Calling `setTheme("system")` reports the selected value `"system"`. A later system-preference change while following the system reports the resolved value (`"light"` or `"dark"`). Handle both when persisting preferences.
 
-```tsx
-// next-themes: setTheme("system") fires onThemeChange("dark")
-// @wrksz/themes: setTheme("system") fires onThemeChange("system")
-```
-
-If you are persisting the theme server-side via `onThemeChange`, handle `"system"` explicitly:
-
-```tsx
-<ThemeProvider
-  onThemeChange={(theme) => {
-    if (theme !== "system") saveTheme(theme);
-  }}
->
-```
+Define callbacks in client code; do not pass an ordinary function from a Server Component through the Next.js provider. A client module using the [Next.js typed factory](/docs/api/create-themes#nextjs-root-provider) can configure a callback while exporting a root `NextThemeProvider`.
 
 ### `disableTransitionOnChange`
 
@@ -156,17 +157,21 @@ Accepts `boolean | string`. Passing a CSS `transition` string suppresses only th
 
 ## New features
 
-After migrating, these features are available without any additional configuration:
-
-- **`storage="hybrid"`** - cookie-first reads for SSR + `localStorage` mirror for cross-tab sync.
-- **`storage="cookie"`** - zero-flash SSR without boilerplate. Pass `storage="cookie"` to `ThemeProvider` from `@wrksz/themes/next`.
-- **`storage="sessionStorage"`** - persists theme only for the current tab.
-- **`storage="none"`** - no persistence, useful for scoped or forced themes.
-- **`themeColor`** - updates `<meta name="theme-color">` on theme change.
-- **`initialTheme`** - initialize theme from a server-side source.
-- **`followSystem`** - always follow system preference, ignoring stored value.
-- **`getTheme()`** - read the current theme from a cookie outside React.
-- **`createThemes(...)`** - typed factory for provider + hooks from one canonical theme tuple. Use `@wrksz/themes/next/create-themes` when the root layout needs `NextThemeProvider` without re-listing the tuple.
-- **`useThemeEffect(...)`** - side effects that run on theme changes after mount.
+- `storage="hybrid"` - cookie-first reads for SSR + `localStorage` mirror for cross-tab sync.
+- `storage="cookie"` - persists the selection in a cookie; the bootstrap reads it before hydration.
+- `storage="sessionStorage"` - persists theme only for the current tab.
+- `storage="none"` - no persistence, useful for scoped or forced themes.
+- `themeColor` - updates `<meta name="theme-color">` on theme change.
+- `initialTheme` - initialize theme from a server-side source.
+- `followSystem` - always follow system preference, ignoring stored value.
+- `getTheme()` - read the current theme from a cookie outside React.
+- `createThemes(...)` - creates a provider and hooks from one typed theme list. Use `@wrksz/themes/next/create-themes` when the root layout needs `NextThemeProvider` without re-listing the tuple.
+- `useThemeEffect(...)` - side effects that run on theme changes after mount.
 
 See [Why not next-themes?](/docs/why-not-next-themes) for the full comparison.
+
+## Verify before removing next-themes
+
+Search the application for remaining `next-themes` imports, including wrappers and tests. Remove the old dependency with the project's package manager only after replacing them.
+
+Run the app's type check and production build. Test loading with empty and saved storage, then reload and use back/forward navigation. Check custom themes and forced routes if the app uses them. Confirm that CSS selectors match the DOM, hydration produces no warnings, and theme menus still offer the system option when enabled.

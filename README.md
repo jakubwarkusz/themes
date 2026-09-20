@@ -61,6 +61,7 @@ npm install @wrksz/themes
     - [ThemedImage](#themedimage)
 - [Examples](#examples)
 - [Import paths](#import-paths)
+- [AI agents](#ai-agents)
 
 ## Setup
 
@@ -464,6 +465,12 @@ import { createThemes as createNextThemes } from "@wrksz/themes/next/create-them
 | `@wrksz/themes/next/extended`            | Opt-in Next.js `ThemeProvider` with synchronization and system mapping                              |
 | `@wrksz/themes`                          | Client-safe `ThemeProvider` alias and `createThemes` for framework-neutral React usage              |
 | `@wrksz/themes/script`                   | Server-safe `ThemeScript` for non-Next SSR frameworks                                               |
+
+## AI agents
+
+The npm package includes [AGENTS.md](./packages/themes/AGENTS.md) with import guidance and migration checks. The [agent guide](https://themes.wrksz.dev/docs/agents) adds examples and troubleshooting, with a [plain Markdown version](https://themes.wrksz.dev/llms.mdx/docs/agents) and a [documentation index](https://themes.wrksz.dev/llms.txt).
+
+Ask your agent to read `node_modules/@wrksz/themes/AGENTS.md` or the guide URL. Some agents skip instructions inside dependencies.
 
 ## License
 

@@ -21,13 +21,17 @@ describe("support metadata", () => {
 		expect(packageJson.peerDependencies.react).toBe("^18.0.0 || ^19.0.0");
 		expect(packageJson.peerDependencies["react-dom"]).toBe("^18.0.0 || ^19.0.0");
 
-		for (const path of [
-			"README.md",
-			"apps/docs/content/docs/index.mdx",
-			".github/ISSUE_TEMPLATE/framework_support.yml",
-			"CONTRIBUTING.md",
-		]) {
-			expect(readFileSync(resolve(repositoryRoot, path), "utf-8")).toContain("React 18+");
+		for (const [path, requirement] of [
+			["README.md", "React 18 or 19"],
+			["packages/themes/README.md", "React and React DOM 18 or 19"],
+			["apps/docs/content/docs/index.mdx", "React 18+"],
+			[".github/ISSUE_TEMPLATE/framework_support.yml", "React 18+"],
+			["CONTRIBUTING.md", "React 18+"],
+		] as const) {
+			const content = readFileSync(resolve(repositoryRoot, path), "utf-8");
+			expect(content.includes(requirement), `${path} must document ${requirement}`).toBe(
+				true,
+			);
 		}
 
 		expect(readFileSync(resolve(repositoryRoot, "AGENTS.md"), "utf-8")).toContain(

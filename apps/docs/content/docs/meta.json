@@ -2,6 +2,7 @@
   "title": "@wrksz/themes",
   "pages": [
     "index",
+    "agents",
     "---API---",
     "api",
     "---Examples---",

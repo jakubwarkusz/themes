@@ -14,17 +14,14 @@ export const getLibraryVersion = unstable_cache(
 			const res = await fetch("https://registry.npmjs.org/@wrksz/themes");
 			if (!res.ok) return "";
 			const data = (await res.json()) as {
-				"dist-tags"?: { latest?: string; beta?: string };
+				"dist-tags"?: { latest?: string };
 			};
-			const beta = data["dist-tags"]?.beta;
-			const latest = data["dist-tags"]?.latest;
-			if (beta && beta.includes("-")) return beta;
-			return latest ?? beta ?? "";
+			return data["dist-tags"]?.latest ?? "";
 		} catch {
 			return "";
 		}
 	},
-	["library-version"],
+	["library-version-latest"],
 	{ revalidate: 3600 },
 );
 

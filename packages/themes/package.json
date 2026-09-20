@@ -8,7 +8,8 @@
 		"url": "git+https://github.com/jakubwarkusz/themes.git"
 	},
 	"files": [
-		"dist"
+		"dist",
+		"AGENTS.md"
 	],
 	"type": "module",
 	"sideEffects": false,
