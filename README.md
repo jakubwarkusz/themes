@@ -265,7 +265,7 @@ See the [`getTheme` reference](https://themes.wrksz.dev/docs/api/get-theme) for 
 
 ### `useThemeValue`
 
-Returns the value from a map matching the current resolved theme. Returns `undefined` before the theme resolves on the client.
+Returns the value from a map matching the current resolved theme. Returns `undefined` while `resolvedTheme` is unknown.
 
 ```tsx
 "use client";

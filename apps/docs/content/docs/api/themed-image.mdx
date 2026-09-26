@@ -3,7 +3,7 @@ title: ThemedImage
 description: Component that displays the correct image for the current theme.
 ---
 
-`ThemedImage` renders a different image depending on the current resolved theme. Before the theme resolves on the client, it shows a transparent 1x1 placeholder to avoid hydration mismatch.
+`ThemedImage` renders a different image depending on the current resolved theme. While `resolvedTheme` is unknown, it shows a transparent 1x1 placeholder to avoid hydration mismatch. The placeholder is skipped when `initialTheme` or `forcedTheme` is a concrete theme (not `"system"`).
 
 ```tsx
 import { ThemedImage } from "@wrksz/themes/client";
@@ -22,7 +22,7 @@ import { ThemedImage } from "@wrksz/themes/client";
 |------|------|---------|-------------|
 | `src` | `Record<string, string>` | **required** | Map of theme name to image source |
 | `alt` | `string` | **required** | Alt text |
-| `fallback` | `string` | transparent 1x1 GIF | Shown before the theme resolves |
+| `fallback` | `string` | transparent 1x1 GIF | Shown while `resolvedTheme` is unknown |
 | `...rest` | `ImgHTMLAttributes` | - | All other `<img>` attributes |
 
 ## Examples
@@ -44,7 +44,7 @@ import { ThemedImage } from "@wrksz/themes/client";
 
 ### Custom fallback
 
-By default the placeholder is a transparent 1x1 GIF, so the image space is empty until the theme resolves. You can provide a custom fallback - for example a low-quality placeholder or a neutral image:
+By default the placeholder is a transparent 1x1 GIF, so the image space is empty while `resolvedTheme` is unknown. You can provide a custom fallback - for example a low-quality placeholder or a neutral image:
 
 ```tsx
 <ThemedImage
