@@ -30,6 +30,7 @@ import type {
 	ThemeProviderProps,
 } from "@wrksz/themes";
 import { getTheme, ThemeProvider as NextThemeProvider } from "@wrksz/themes/next";
+import { getTheme as getServerTheme, parseThemeCookie } from "@wrksz/themes/server";
 import {
 	createNextThemes,
 	createThemes as createNextCreateThemes,
@@ -102,10 +103,22 @@ const syncTheme = getTheme(new Request("https://example.com"), {
 	defaultTheme: "light",
 });
 const checkedTheme: AppTheme = syncTheme;
+const serverTheme = getServerTheme(new Request("https://example.com"), {
+	themes,
+	defaultTheme: "light",
+});
+const checkedServerTheme: AppTheme = serverTheme;
+const parsedTheme = parseThemeCookie("theme=dark", {
+	themes,
+	defaultTheme: "light",
+});
+const checkedParsedTheme: AppTheme = parsedTheme;
 const nextThemeScript = nextConfigured.ThemeScript();
 const nextRoot = <nextAlias.NextThemeProvider>{nextThemeScript}</nextAlias.NextThemeProvider>;
 
 export {
+	checkedParsedTheme,
+	checkedServerTheme,
 	checkedTheme,
 	ClientThemeProvider,
 	ClientThemeProviderSubpath,

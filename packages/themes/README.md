@@ -81,7 +81,7 @@ For React apps outside Next.js, use `ClientThemeProvider` from `@wrksz/themes/cl
 - Use [`createThemes`](https://themes.wrksz.dev/docs/api/create-themes) to share typed configuration and hooks.
 - Import the [extended provider](https://themes.wrksz.dev/docs/api/theme-provider) for same-document synchronization and custom system mappings. The extended client provider also supports [Shadow DOM](https://themes.wrksz.dev/docs/examples/shadow-dom).
 
-The Next.js provider does not read cookies on the server. If server-rendered content needs the stored theme, read it explicitly with [`getTheme`](https://themes.wrksz.dev/docs/api/get-theme) and pass `initialTheme`. See the [server theme example](https://themes.wrksz.dev/docs/examples/server-theme).
+The Next.js provider does not read cookies on the server. If server-rendered content needs the stored theme, read it explicitly with [`getTheme`](https://themes.wrksz.dev/docs/api/get-theme) and pass `initialTheme`. Next.js imports that helper from `@wrksz/themes/next`. Other servers import `getTheme` and `parseThemeCookie` from `@wrksz/themes/server`. See the [server theme example](https://themes.wrksz.dev/docs/examples/server-theme).
 
 Full props and hooks are documented in the [API reference](https://themes.wrksz.dev/docs/api/theme-provider).
 

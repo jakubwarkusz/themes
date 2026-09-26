@@ -33,39 +33,58 @@ function safeDecodeURIComponent(value: string): string | null {
 	}
 }
 
-function readFromCookieString(
-	cookieString: string,
-	storageKey: string,
-	defaultTheme: string,
-	themes: readonly string[] | undefined,
+/** Shared by cookie-header parsing and Next `cookies()`. Not part of the public `/server` API. */
+export function resolveStoredThemeValue(
+	stored: string | null | undefined,
+	options?: {
+		storageKey?: string | undefined;
+		defaultTheme?: string | undefined;
+		themes?: readonly string[] | undefined;
+	},
 ): string {
-	const re = new RegExp(
-		`(?:^|;\\s*)${storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`,
-	);
-	const match = cookieString.match(re);
-	const stored = match?.[1] != null ? safeDecodeURIComponent(match[1]) : null;
+	const defaultTheme = options?.defaultTheme ?? "system";
+	const themes = options?.themes;
 	if (!stored) return defaultTheme;
 	if (!isThemeSelection(stored, themes)) return defaultTheme;
 	return stored;
 }
 
+function parseThemeCookieRuntime(cookieHeader: string, options?: RuntimeGetThemeOptions): string {
+	const storageKey = options?.storageKey ?? "theme";
+	const re = new RegExp(
+		`(?:^|;\\s*)${storageKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`,
+	);
+	const match = cookieHeader.match(re);
+	const stored = match?.[1] != null ? safeDecodeURIComponent(match[1]) : null;
+	return resolveStoredThemeValue(stored, options);
+}
+
 /**
- * Reads the current theme from a cookie.
- *
- * Pass a `Request` object for synchronous use in middleware or edge functions.
- * Call without arguments for async use in Server Components (reads via `cookies()` from `next/headers`).
+ * Reads the current theme from a `Cookie` header string.
  *
  * @example
- * // Proxy
- * export function proxy(request: Request) {
+ * const theme = parseThemeCookie(request.headers.get("cookie") ?? "", { defaultTheme: "dark" });
+ */
+export function parseThemeCookie<
+	const Themes extends readonly [string, ...string[]],
+	const DefaultThemeValue extends ThemeSelection<ThemeName<Themes>> = "system",
+>(
+	cookieHeader: string,
+	options: GetThemeOptions<Themes> & { themes: Themes; defaultTheme?: DefaultThemeValue },
+): GetThemeResult<Themes, DefaultThemeValue>;
+export function parseThemeCookie(cookieHeader: string, options?: UntypedGetThemeOptions): string;
+export function parseThemeCookie(cookieHeader: string, options?: RuntimeGetThemeOptions): string {
+	return parseThemeCookieRuntime(cookieHeader, options);
+}
+
+/**
+ * Reads the current theme from a `Request` cookie header.
+ *
+ * @example
+ * export function loader({ request }: { request: Request }) {
  *   const theme = getTheme(request, { defaultTheme: "dark" });
- *   // use theme to set a header, rewrite, etc.
+ *   return { theme };
  * }
- *
- * @example
- * // Server Component / layout.tsx
- * const theme = await getTheme({ defaultTheme: "dark" });
- * return <html className={theme}>...</html>;
  */
 export function getTheme<
 	const Themes extends readonly [string, ...string[]],
@@ -75,37 +94,6 @@ export function getTheme<
 	options: GetThemeOptions<Themes> & { themes: Themes; defaultTheme?: DefaultThemeValue },
 ): GetThemeResult<Themes, DefaultThemeValue>;
 export function getTheme(request: Request, options?: UntypedGetThemeOptions): string;
-export function getTheme<
-	const Themes extends readonly [string, ...string[]],
-	const DefaultThemeValue extends ThemeSelection<ThemeName<Themes>> = "system",
->(
-	options: GetThemeOptions<Themes> & { themes: Themes; defaultTheme?: DefaultThemeValue },
-): Promise<GetThemeResult<Themes, DefaultThemeValue>>;
-export function getTheme(options?: UntypedGetThemeOptions): Promise<string>;
-export function getTheme(
-	requestOrOptions?: Request | RuntimeGetThemeOptions,
-	options?: RuntimeGetThemeOptions,
-): string | Promise<string> {
-	const isRequest = requestOrOptions instanceof Request;
-	const opts =
-		(isRequest ? options : (requestOrOptions as RuntimeGetThemeOptions | undefined)) ?? {};
-	const { storageKey = "theme", defaultTheme = "system", themes } = opts;
-
-	if (isRequest) {
-		const cookieHeader = requestOrOptions.headers.get("cookie") ?? "";
-		return readFromCookieString(cookieHeader, storageKey, defaultTheme, themes);
-	}
-
-	return (async () => {
-		try {
-			const { cookies } = await import("next/headers");
-			const cookieStore = await cookies();
-			const stored = cookieStore.get(storageKey)?.value;
-			if (!stored) return defaultTheme;
-			if (!isThemeSelection(stored, themes)) return defaultTheme;
-			return stored;
-		} catch {
-			return defaultTheme;
-		}
-	})();
+export function getTheme(request: Request, options?: RuntimeGetThemeOptions): string {
+	return parseThemeCookieRuntime(request.headers.get("cookie") ?? "", options);
 }

@@ -3,15 +3,24 @@ title: Other React frameworks
 description: First-paint theming in TanStack Start, Remix, and other SSR frameworks.
 ---
 
-Use the client provider for state and render `ThemeScript` in your framework's server-controlled document head.
+Use the client provider for state and render `ThemeScript` in your framework's server-controlled document head. When server-rendered markup must include the theme class, read the cookie with `getTheme` from `@wrksz/themes/server` — do not import `@wrksz/themes/next`.
 
 ```tsx
 import { ThemeScript } from "@wrksz/themes/script";
+import { getTheme } from "@wrksz/themes/server";
 import { ThemeProvider } from "@wrksz/themes";
 
-export function Document({ children }: { children: React.ReactNode }) {
+export function Document({
+  children,
+  request,
+}: {
+  children: React.ReactNode;
+  request: Request;
+}) {
+  const theme = getTheme(request, { defaultTheme: "system" });
+
   return (
-    <html suppressHydrationWarning>
+    <html className={theme} suppressHydrationWarning>
       <head>
         <ThemeScript />
       </head>
@@ -21,6 +30,14 @@ export function Document({ children }: { children: React.ReactNode }) {
     </html>
   );
 }
+```
+
+If the loader gives you a `Cookie` header string instead of a `Request`:
+
+```ts
+import { parseThemeCookie } from "@wrksz/themes/server";
+
+const theme = parseThemeCookie(cookieHeader, { defaultTheme: "dark" });
 ```
 
 `ThemeScript` and `getScript` use a build-generated deterministic bootstrap so bundlers cannot rewrite behavior through `Function#toString()`. Keep script configuration equal to the provider configuration. `ThemeScript` / `getScript` cannot take `themeRoot`: Shadow widgets stay on `@wrksz/themes/client/extended-provider` after mount. See [Shadow DOM](/docs/examples/shadow-dom).
