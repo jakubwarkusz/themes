@@ -1,0 +1,24 @@
+:root {
+	color-scheme: light;
+	font-family: system-ui, sans-serif;
+	background: white;
+	color: #171717;
+}
+
+:root.dark {
+	color-scheme: dark;
+	background: #171717;
+	color: white;
+}
+
+body {
+	margin: 0;
+	padding: 2rem;
+}
+
+nav,
+section {
+	display: flex;
+	gap: 1rem;
+	margin-block: 1rem;
+}
