@@ -33,7 +33,7 @@ export function serializeCookie(key: string, value: string, options: CookieOptio
 	if (domain) assertCookieAttributeValue(domain, "domain");
 
 	let cookie = `${key}=${encodeURIComponent(value)}; path=${path}; max-age=${maxAge}; SameSite=${sameSite}`;
-	if (secure) cookie += "; Secure";
+	if (sameSite === "None" || secure) cookie += "; Secure";
 	if (domain) cookie += `; domain=${domain}`;
 	return cookie;
 }
