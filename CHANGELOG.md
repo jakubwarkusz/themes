@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-09-20
+
+### Documentation
+
+- Update documentation to reflect changes in versioning and installation instructions for @wrksz/themes
+- Update README and package documentation for clarity on theme management features and migration instructions
+- Add AI agents section and integration guide to enhance user support and migration clarity
+
+## [2.0.1] - 2026-09-20
+
+### Added
+
+- Enable minification in tsdown configuration for optimized builds
+
+### Performance
+
+- Reduce theme reapplication work and enforce package size budget
+
+## [2.0.0] - 2026-09-20
+
 ### Added
 
 - _(themes)_ Add opt-in extended providers
@@ -38,6 +58,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Format getScript slice offsets for oxfmt
 - Reclaim next-provider gzip under the 3.91 KiB ceiling
 - Update documentation for clarity and consistency
+- Keep a single React/Next copy after the workspace bump
+- _(docs)_ Await fumadocs llms index in the llms.txt route
 
 ### Performance
 
@@ -45,6 +67,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - _(docs)_ Keep Analytics and below-fold home JS off the critical path
 - _(provider)_ Apply theme once per toggle and keep context identity stable
 - Omit cookie-parser bytecode from the default inline bootstrap
+
+### Changed
+
+- Migrate from Bun to Node.js and update testing framework
 
 ### Documentation
 
@@ -547,7 +573,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial commit
 
-[unreleased]: https://github.com/jakubwarkusz/themes/compare/v1.2.0..HEAD
+[unreleased]: https://github.com/jakubwarkusz/themes/compare/v2.0.2..HEAD
+[2.0.2]: https://github.com/jakubwarkusz/themes/compare/v2.0.1..v2.0.2
+[2.0.1]: https://github.com/jakubwarkusz/themes/compare/v2.0.0..v2.0.1
+[2.0.0]: https://github.com/jakubwarkusz/themes/compare/v1.2.0..v2.0.0
 [1.2.0]: https://github.com/jakubwarkusz/themes/compare/v1.1.0..v1.2.0
 [1.1.0]: https://github.com/jakubwarkusz/themes/compare/v1.0.0..v1.1.0
 [1.0.0]: https://github.com/jakubwarkusz/themes/compare/v0.9.7..v1.0.0
