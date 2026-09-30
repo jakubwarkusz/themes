@@ -1,10 +1,5 @@
 import { describe, expect, test } from "vitest";
-import {
-	holdIfEqual,
-	sameStringList,
-	sameStringRecord,
-	sameThemeColor,
-} from "../core/config-equal.js";
+import { holdIfEqual, sameStringList, sameStringRecord } from "../core/config-equal.js";
 
 describe("config-equal", () => {
 	test("sameStringList compares by contents", () => {
@@ -18,10 +13,11 @@ describe("config-equal", () => {
 		expect(sameStringRecord(undefined, { dark: "night" })).toBe(false);
 	});
 
-	test("sameThemeColor compares strings and maps", () => {
-		expect(sameThemeColor("#000", "#000")).toBe(true);
-		expect(sameThemeColor({ dark: "#000" }, { dark: "#000" })).toBe(true);
-		expect(sameThemeColor("#000", { dark: "#000" })).toBe(false);
+	test("sameStringRecord compares theme-color strings and maps", () => {
+		expect(sameStringRecord("#000", "#000")).toBe(true);
+		expect(sameStringRecord("#000", "#fff")).toBe(false);
+		expect(sameStringRecord({ dark: "#000" }, { dark: "#000" })).toBe(true);
+		expect(sameStringRecord("#000", { dark: "#000" })).toBe(false);
 	});
 
 	test("holdIfEqual reuses the previous reference when equal", () => {
