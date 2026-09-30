@@ -19,6 +19,11 @@ yarn-error.log*
 .env.production.local
 .turbo
 .next
+.astro
+.output
+.nitro
+.waku
+.react-router
 .worktrees/
 packages/themes/benchmarks/.bundle-size/
 

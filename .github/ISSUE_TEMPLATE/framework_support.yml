@@ -7,8 +7,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        @wrksz/themes currently targets **Next.js 16+ (App Router) and React 18+**.
-        Use this template to request support for other frameworks.
+        @wrksz/themes first-classes **Next.js 16+ (App Router) and React 18+**.
+        Preview fixtures also cover Vite, React Router, TanStack Start, Astro, and Waku.
+        Use this template when a framework still flashes or fails to hydrate.
 
   - type: input
     id: framework
