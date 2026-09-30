@@ -8,12 +8,7 @@ import {
 	useRef,
 	useSyncExternalStore,
 } from "react";
-import {
-	holdIfEqual,
-	sameStringList,
-	sameStringRecord,
-	sameThemeColor,
-} from "../core/config-equal.js";
+import { holdIfEqual, sameStringList, sameStringRecord } from "../core/config-equal.js";
 import { ThemeContext } from "../core/context.js";
 import {
 	type AppliedThemeState,
@@ -108,7 +103,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	valueMapRef.current = holdIfEqual(valueMapRef.current, valueMap, sameStringRecord);
 	const stableValueMap = valueMapRef.current;
 	const themeColorRef = useRef(themeColor);
-	themeColorRef.current = holdIfEqual(themeColorRef.current, themeColor, sameThemeColor);
+	themeColorRef.current = holdIfEqual(themeColorRef.current, themeColor, sameStringRecord);
 	const stableThemeColor = themeColorRef.current;
 	const {
 		getSnapshot,

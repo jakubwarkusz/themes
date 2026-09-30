@@ -14,12 +14,7 @@ import {
 	readStoredTheme,
 	writeStoredTheme,
 } from "../core/client-dom.js";
-import {
-	holdIfEqual,
-	sameStringList,
-	sameStringRecord,
-	sameThemeColor,
-} from "../core/config-equal.js";
+import { holdIfEqual, sameStringList, sameStringRecord } from "../core/config-equal.js";
 import { ThemeContext, type ThemeContextInstance } from "../core/context.js";
 import { subscribeHistoryReapply } from "../core/history-reapply.js";
 import { createThemeStore } from "../core/store.js";
@@ -99,7 +94,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	valueMapRef.current = holdIfEqual(valueMapRef.current, valueMap, sameStringRecord);
 	const stableValueMap = valueMapRef.current;
 	const themeColorRef = useRef(themeColor);
-	themeColorRef.current = holdIfEqual(themeColorRef.current, themeColor, sameThemeColor);
+	themeColorRef.current = holdIfEqual(themeColorRef.current, themeColor, sameStringRecord);
 	const stableThemeColor = themeColorRef.current;
 
 	const validForcedTheme =

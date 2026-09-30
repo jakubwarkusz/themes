@@ -7,28 +7,19 @@ export function sameStringList(left: readonly string[], right: readonly string[]
 	return true;
 }
 
+/** Also compares `themeColor`, which may be a plain string instead of a per-theme map. */
 export function sameStringRecord(
-	left: Partial<Record<string, string>> | undefined,
-	right: Partial<Record<string, string>> | undefined,
-): boolean {
-	if (left === right) return true;
-	if (!left || !right) return false;
-	const leftKeys = Object.keys(left);
-	const rightKeys = Object.keys(right);
-	if (leftKeys.length !== rightKeys.length) return false;
-	for (const key of leftKeys) {
-		if (left[key] !== right[key]) return false;
-	}
-	return true;
-}
-
-export function sameThemeColor(
 	left: string | Partial<Record<string, string>> | undefined,
 	right: string | Partial<Record<string, string>> | undefined,
 ): boolean {
 	if (left === right) return true;
-	if (typeof left === "string" || typeof right === "string") return false;
-	return sameStringRecord(left, right);
+	if (typeof left !== "object" || typeof right !== "object") return false;
+	const leftKeys = Object.keys(left);
+	if (leftKeys.length !== Object.keys(right).length) return false;
+	for (const key of leftKeys) {
+		if (left[key] !== right[key]) return false;
+	}
+	return true;
 }
 
 export function holdIfEqual<T>(previous: T, next: T, equal: (left: T, right: T) => boolean): T {
