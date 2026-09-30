@@ -1,57 +1,57 @@
 [
 	{
 		"name": "use-theme",
-		"bytes": 427,
-		"gzipBytes": 284
+		"bytes": 443,
+		"gzipBytes": 296
 	},
 	{
 		"name": "use-theme-subpath",
-		"bytes": 434,
-		"gzipBytes": 289
+		"bytes": 450,
+		"gzipBytes": 301
 	},
 	{
 		"name": "use-theme-value",
-		"bytes": 558,
-		"gzipBytes": 334
+		"bytes": 554,
+		"gzipBytes": 341
 	},
 	{
 		"name": "use-theme-value-subpath",
-		"bytes": 565,
-		"gzipBytes": 349
+		"bytes": 561,
+		"gzipBytes": 346
 	},
 	{
 		"name": "themed-image",
-		"bytes": 641,
-		"gzipBytes": 416
+		"bytes": 624,
+		"gzipBytes": 419
 	},
 	{
 		"name": "themed-image-subpath",
-		"bytes": 648,
-		"gzipBytes": 434
+		"bytes": 631,
+		"gzipBytes": 424
 	},
 	{
 		"name": "next-provider",
-		"bytes": 9945,
-		"gzipBytes": 3799
+		"bytes": 10260,
+		"gzipBytes": 3951
 	},
 	{
 		"name": "script",
-		"bytes": 3007,
-		"gzipBytes": 1415
+		"bytes": 2954,
+		"gzipBytes": 1382
 	},
 	{
 		"name": "client-provider",
-		"bytes": 6508,
-		"gzipBytes": 2731
-	},
-	{
-		"name": "generated-script",
-		"bytes": 1772,
-		"gzipBytes": 927
+		"bytes": 6998,
+		"gzipBytes": 2981
 	},
 	{
 		"name": "extended-next-provider",
-		"bytes": 12253,
-		"gzipBytes": 4506
+		"bytes": 12152,
+		"gzipBytes": 4586
+	},
+	{
+		"name": "generated-script",
+		"bytes": 1444,
+		"gzipBytes": 742
 	}
 ]
