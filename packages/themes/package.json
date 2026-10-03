@@ -124,7 +124,7 @@
 		"smoke:exports": "node scripts/smoke-exports.ts && tsx --tsconfig tsconfig.compat.json scripts/smoke-exports.ts"
 	},
 	"devDependencies": {
-		"next": ">=16.3.5",
+		"next": ">=16.3.7",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0"
 	},
