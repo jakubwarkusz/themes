@@ -77,7 +77,7 @@ export type ThemeProviderProps<Themes extends string = DefaultTheme> = {
 	themeColor?: ThemeColor<Themes>;
 	/** Always follow system preference changes, even after setTheme was called */
 	followSystem?: boolean;
-	/** Server-provided theme that overrides storage on mount (e.g. from a database). User can still call setTheme to change it. */
+	/** Server-provided theme that seeds the store snapshot and overrides storage on mount (e.g. from a database). User can still call setTheme to change it. */
 	initialTheme?: ThemeSelection<Themes>;
 	/** Cookie options, used when storage is "cookie" or "hybrid" */
 	cookieOptions?: CookieOptions;
