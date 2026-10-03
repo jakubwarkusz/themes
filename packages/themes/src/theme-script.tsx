@@ -7,7 +7,7 @@ const DEFAULT_THEMES: string[] = ["light", "dark"];
 
 export type ThemeScriptProps<Themes extends string = DefaultTheme> = Omit<
 	ThemeProviderProps<Themes>,
-	"children" | "onThemeChange" | "onStorageError" | "cookieOptions"
+	"children" | "onThemeChange" | "onStorageError" | "cookieOptions" | "enableViewTransition"
 >;
 
 export function ThemeScript<Themes extends string = DefaultTheme>({
