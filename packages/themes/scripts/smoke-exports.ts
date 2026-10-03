@@ -15,6 +15,8 @@ import * as next from "@wrksz/themes/next";
 import * as nextCreateThemes from "@wrksz/themes/next/create-themes";
 import * as nextExtended from "@wrksz/themes/next/extended";
 import * as script from "@wrksz/themes/script";
+import { createElement } from "react";
+import { renderToString } from "react-dom/server";
 
 const entrypoints = [
 	[".", root, ["ThemeProvider", "createThemes"]],
@@ -48,6 +50,12 @@ for (const [subpath, module, expectedExports] of entrypoints) {
 			);
 		}
 	}
+}
+
+// Exercise SSR without a Next.js bundler or request context.
+const { NextThemeProvider } = nextCreateThemes.createThemes({ themes: ["light", "dark"] });
+for (const ThemeProvider of [next.ThemeProvider, nextExtended.ThemeProvider, NextThemeProvider]) {
+	assert.ok(renderToString(createElement(ThemeProvider, null, "content")).includes("content"));
 }
 
 // Module-preserving output must retain the client boundaries used by Next.js.

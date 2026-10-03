@@ -98,7 +98,7 @@ export function getTheme(
 
 	return (async () => {
 		try {
-			const { cookies } = await import("next/headers");
+			const { cookies } = await import("next/headers.js");
 			const cookieStore = await cookies();
 			const stored = cookieStore.get(storageKey)?.value;
 			if (!stored) return defaultTheme;

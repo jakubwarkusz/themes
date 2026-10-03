@@ -6,7 +6,7 @@ import { clearCookies } from "./setup.js";
 
 const insertedHtmlCallbacks: Array<() => ReactNode> = [];
 
-vi.mock("next/navigation", () => ({
+vi.mock("next/navigation.js", () => ({
 	useServerInsertedHTML: (callback: () => ReactNode) => {
 		insertedHtmlCallbacks.push(callback);
 	},

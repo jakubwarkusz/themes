@@ -1,5 +1,5 @@
 "use client";
-import { useServerInsertedHTML } from "next/navigation";
+import { useServerInsertedHTML } from "next/navigation.js";
 import { type ReactElement, useEffect, useRef } from "react";
 import { getScript } from "../core/script.js";
 import { resolveDefaultTheme } from "../core/theme-validation.js";

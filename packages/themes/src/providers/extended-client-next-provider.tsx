@@ -1,6 +1,6 @@
 "use client";
 
-import { useServerInsertedHTML } from "next/navigation";
+import { useServerInsertedHTML } from "next/navigation.js";
 import { type ReactElement, useEffect, useRef } from "react";
 import { getExtendedScript } from "../core/extended-script.js";
 import type { ExtendedNextThemeProviderProps } from "../core/extended-types.js";

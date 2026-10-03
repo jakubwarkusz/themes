@@ -5,7 +5,7 @@ import { getTheme } from "../get-theme.js";
 let nextCookieValue: string | undefined;
 let nextCookieReads = 0;
 
-vi.mock("next/headers", () => ({
+vi.mock("next/headers.js", () => ({
 	cookies: async () => {
 		nextCookieReads += 1;
 		return {

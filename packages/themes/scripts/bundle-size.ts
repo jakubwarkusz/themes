@@ -79,7 +79,13 @@ export function bundleReportNames(): readonly string[] {
 	return [...cases.map(({ name }) => name), GENERATED_SCRIPT_REPORT_NAME];
 }
 
-const externals = ["react", "react-dom", "react/jsx-runtime", "next/headers", "next/navigation"];
+const externals = [
+	"react",
+	"react-dom",
+	"react/jsx-runtime",
+	"next/headers.js",
+	"next/navigation.js",
+];
 
 export function formatBytes(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;

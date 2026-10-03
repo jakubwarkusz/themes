@@ -121,7 +121,7 @@
 		"size:compare": "pnpm build >/dev/null && tsx scripts/bundle-size.ts --compare benchmarks/baseline.json",
 		"size:update-baseline": "pnpm build >/dev/null && tsx scripts/bundle-size.ts --update-baseline",
 		"test:watch": "vitest",
-		"smoke:exports": "tsx --tsconfig tsconfig.compat.json scripts/smoke-exports.ts"
+		"smoke:exports": "node scripts/smoke-exports.ts && tsx --tsconfig tsconfig.compat.json scripts/smoke-exports.ts"
 	},
 	"devDependencies": {
 		"next": ">=16.3.5",
