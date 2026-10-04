@@ -1,3 +1,5 @@
+![@wrksz/themes: light, dark and any theme you name, for React 18 and 19 and Next.js 16+](./.github/images/banner.png)
+
 # @wrksz/themes
 
 [![npm](https://shieldcn.dev/badge/npm-%40wrksz%2Fthemes-CB3837.png?logo=npm&variant=secondary&size=sm)](https://www.npmjs.com/package/@wrksz/themes)
@@ -395,9 +397,7 @@ export default async function RootLayout({ children }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body>
-				<ThemeProvider initialTheme={userTheme ?? undefined}>
-					{children}
-				</ThemeProvider>
+				<ThemeProvider initialTheme={userTheme ?? undefined}>{children}</ThemeProvider>
 			</body>
 		</html>
 	);
@@ -477,3 +477,5 @@ Ask your agent to read `node_modules/@wrksz/themes/AGENTS.md` or the guide URL. 
 ## License
 
 MIT
+
+[![Sponsored by Hoxger](./.github/images/sponsor.jpg)](https://hoxger.com)
