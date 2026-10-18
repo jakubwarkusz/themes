@@ -53,5 +53,25 @@
 		"name": "extended-next-provider",
 		"bytes": 12253,
 		"gzipBytes": 4506
+	},
+	{
+		"name": "next-client-boundary",
+		"bytes": 10134,
+		"gzipBytes": 3926
+	},
+	{
+		"name": "extended-next-client-boundary",
+		"bytes": 11915,
+		"gzipBytes": 4516
+	},
+	{
+		"name": "next-factory",
+		"bytes": 12350,
+		"gzipBytes": 4572
+	},
+	{
+		"name": "client-factory",
+		"bytes": 8179,
+		"gzipBytes": 3403
 	}
 ]

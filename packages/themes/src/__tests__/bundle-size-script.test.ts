@@ -1,4 +1,6 @@
 import { describe, expect, test } from "vitest";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import {
 	type BundleReport,
 	type BundleThresholds,
@@ -15,7 +17,15 @@ import {
 
 describe("bundle-size script helpers", () => {
 	test("keeps every benchmark fixture statically reachable", () => {
-		expect(bundleEntryModuleLoaders()).toHaveLength(10);
+		expect(bundleEntryModuleLoaders()).toHaveLength(14);
+		expect(bundleReportNames()).toEqual(
+			expect.arrayContaining([
+				"next-client-boundary",
+				"extended-next-client-boundary",
+				"next-factory",
+				"client-factory",
+			]),
+		);
 		expect(bundleReportNames()).toContain(GENERATED_SCRIPT_REPORT_NAME);
 		expect(bundleReportNames()).not.toContain("get-script");
 	});
@@ -25,6 +35,21 @@ describe("bundle-size script helpers", () => {
 		expect(report.name).toBe("generated-script");
 		expect(report.bytes).toBe(3);
 		expect(report.gzipBytes).toBeGreaterThan(0);
+	});
+
+	test("has a baseline and budget for every measured entry", async () => {
+		const baseline = JSON.parse(
+			await readFile(resolve(import.meta.dirname, "../../benchmarks/baseline.json"), "utf8"),
+		) as BundleReport[];
+		const thresholds = JSON.parse(
+			await readFile(
+				resolve(import.meta.dirname, "../../benchmarks/bundle-size-thresholds.json"),
+				"utf8",
+			),
+		) as BundleThresholds;
+		const names = bundleReportNames().toSorted();
+		expect(baseline.map(({ name }) => name).toSorted()).toEqual(names);
+		expect(Object.keys(thresholds).toSorted()).toEqual(names);
 	});
 
 	test("formatBytes formats bytes and kibibytes", () => {
