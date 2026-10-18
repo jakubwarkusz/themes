@@ -5,12 +5,12 @@
 
 # @wrksz/themes
 
-[![npm](https://shieldcn.dev/badge/npm-%40wrksz%2Fthemes-CB3837.png?logo=npm&variant=secondary&size=sm)](https://www.npmjs.com/package/@wrksz/themes)
-[![docs](https://shieldcn.dev/badge/docs-themes.wrksz.dev-18181B.png?logo=readthedocs&variant=secondary&size=sm)](https://themes.wrksz.dev)
-[![changelog](https://shieldcn.dev/badge/changelog-Keep%20a%20Changelog-E05735.png?variant=secondary&size=sm)](./CHANGELOG.md)
-![Next.js](https://shieldcn.dev/badge/Next.js-16-000000.png?logo=nextdotjs&variant=secondary&size=sm)
-![React](https://shieldcn.dev/badge/React-18%20%2F%2019-087EA4.png?logo=react&variant=secondary&size=sm)
-![TypeScript](https://shieldcn.dev/badge/TypeScript-5.9%E2%80%937-3178C6.png?logo=typescript&variant=secondary&size=sm)
+[![npm: @wrksz/themes](./.github/images/badges/npm.svg)](https://www.npmjs.com/package/@wrksz/themes)
+[![docs: themes.wrksz.dev](./.github/images/badges/docs.svg)](https://themes.wrksz.dev)
+[![changelog](./.github/images/badges/changelog.svg)](./CHANGELOG.md)
+![next.js 16+](./.github/images/badges/nextjs.svg)
+![react 18 and 19](./.github/images/badges/react.svg)
+![typescript 5.9 to 7](./.github/images/badges/typescript.svg)
 
 Theme management for Next.js 16+ and React 18 or 19. Supports custom themes, cookie and browser storage, scoped providers, and typed hooks. No runtime dependencies.
 
