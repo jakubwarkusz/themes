@@ -1,19 +1,31 @@
 "use client";
 
-import { GithubIcon, StarIcon } from "@hugeicons/core-free-icons";
+import { Download01Icon, GithubIcon, NpmIcon, StarIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useReducedMotion } from "motion/react";
 import * as m from "motion/react-m";
 import Image from "next/image";
 import Link from "next/link";
 import sticker from "@/assets/home/sticker.png";
-import { formatStars, gitConfig } from "@/lib/layout.shared";
+import { formatCount, gitConfig } from "@/lib/layout.shared";
 import { HeroInstall } from "./hero-install";
 import { HeroSky } from "./hero-sky";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
-export function HeroContent({ stars }: { stars: number | null }) {
+const CHIP =
+	"group inline-flex h-8 cursor-default items-center gap-1.5 rounded-md bg-fd-card px-3 text-sm text-fd-foreground outline-none transition-[background-color,scale] duration-150 ease-out hover:bg-fd-secondary focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.97]";
+
+const STAT =
+	"flex items-center gap-1 text-fd-muted-foreground transition-colors duration-150 group-hover:text-fd-foreground";
+
+export function HeroContent({
+	stars,
+	downloads,
+}: {
+	stars: number | null;
+	downloads: number | null;
+}) {
 	const reduceMotion = useReducedMotion();
 
 	function fadeUp(delay: number) {
@@ -58,7 +70,7 @@ export function HeroContent({ stars }: { stars: number | null }) {
 					href={`https://github.com/${gitConfig.user}/${gitConfig.repo}`}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="group inline-flex h-8 cursor-default items-center gap-1.5 rounded-md bg-fd-card px-3 text-sm text-fd-foreground outline-none transition-[background-color,scale] duration-150 ease-out hover:bg-fd-secondary focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.97]"
+					className={CHIP}
 				>
 					<HugeiconsIcon
 						icon={GithubIcon}
@@ -70,7 +82,7 @@ export function HeroContent({ stars }: { stars: number | null }) {
 					{stars != null && (
 						<>
 							<span aria-hidden className="mx-1 h-3.5 w-px bg-fd-border" />
-							<span className="flex items-center gap-1 text-fd-muted-foreground transition-colors duration-150 group-hover:text-fd-foreground">
+							<span className={STAT}>
 								<HugeiconsIcon
 									icon={StarIcon}
 									size={12}
@@ -78,7 +90,35 @@ export function HeroContent({ stars }: { stars: number | null }) {
 									fill="#f59e0b"
 									strokeWidth={0}
 								/>
-								<span className="tabular-nums">{formatStars(stars)}</span>
+								<span className="tabular-nums">{formatCount(stars)}</span>
+							</span>
+						</>
+					)}
+				</Link>
+				<Link
+					href="https://www.npmjs.com/package/@wrksz/themes"
+					target="_blank"
+					rel="noopener noreferrer"
+					className={CHIP}
+				>
+					<HugeiconsIcon
+						icon={NpmIcon}
+						size={14}
+						color="currentColor"
+						strokeWidth={1.8}
+					/>
+					npm
+					{downloads != null && (
+						<>
+							<span aria-hidden className="mx-1 h-3.5 w-px bg-fd-border" />
+							<span className={STAT}>
+								<HugeiconsIcon
+									icon={Download01Icon}
+									size={12}
+									color="currentColor"
+									strokeWidth={2}
+								/>
+								<span className="tabular-nums">{formatCount(downloads)}/wk</span>
 							</span>
 						</>
 					)}

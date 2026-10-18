@@ -44,7 +44,24 @@ export const getGitHubStars = unstable_cache(
 	{ revalidate: 3600 },
 );
 
-export function formatStars(count: number): string {
+export const getWeeklyDownloads = unstable_cache(
+	async (): Promise<number | null> => {
+		try {
+			const res = await fetch(
+				"https://api.npmjs.org/downloads/point/last-week/@wrksz/themes",
+			);
+			if (!res.ok) return null;
+			const data = (await res.json()) as { downloads?: number };
+			return typeof data.downloads === "number" ? data.downloads : null;
+		} catch {
+			return null;
+		}
+	},
+	["npm-weekly-downloads"],
+	{ revalidate: 3600 },
+);
+
+export function formatCount(count: number): string {
 	if (count >= 1000) return `${(count / 1000).toFixed(1)}k`;
 	return String(count);
 }
