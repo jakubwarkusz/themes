@@ -5,12 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.1.1] - 2026-10-18
 
 ### Added
 
 - *(components)* Add AI logos and integrate them into page actions ([8898ae5](https://github.com/jakubwarkusz/themes/commit/8898ae5ecfc1bace20d042ac32588ea4a5293833))
 - *(changelog)* Implement getChangelogMarkdown function and update LLM text retrieval ([f1f0d0d](https://github.com/jakubwarkusz/themes/commit/f1f0d0df1cd4f512a424cbf075497eb9aa3500d1))
+
+### Fixed
+
+- *(themes)* Restore theme before paint when an Activity root layout is revealed ([bfa0977](https://github.com/jakubwarkusz/themes/commit/bfa0977fe1ab44a8095d0621523eeaa822d15659))
+
+### Performance
+
+- *(themes)* Update benchmark sizes for various providers ([5a03301](https://github.com/jakubwarkusz/themes/commit/5a0330150217e8bc0fba706ca8322928ab6b75cb))
+- *(themes)* Update bundle size thresholds for various providers ([84afacd](https://github.com/jakubwarkusz/themes/commit/84afacd7458b9deb577cc0d2c4f6b21d57c5e1e1))
+
+### Miscellaneous
+
+- Enhance changelog functionality and update formatting ([5e92e54](https://github.com/jakubwarkusz/themes/commit/5e92e54f0cfb037bccc9c00067652c5499dfe1dc))
 
 ## [2.1.0] - 2026-10-18
 
@@ -684,7 +697,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial commit ([b02cc49](https://github.com/jakubwarkusz/themes/commit/b02cc498a9e984409781ca39562eff22c79827d7))
 
-[unreleased]: https://github.com/jakubwarkusz/themes/compare/v2.1.0..HEAD
+[2.1.1]: https://github.com/jakubwarkusz/themes/compare/v2.1.0..v2.1.1
 [2.1.0]: https://github.com/jakubwarkusz/themes/compare/v2.0.4..v2.1.0
 [2.0.4]: https://github.com/jakubwarkusz/themes/compare/v2.0.3..v2.0.4
 [2.0.3]: https://github.com/jakubwarkusz/themes/compare/v2.0.2..v2.0.3
