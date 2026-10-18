@@ -31,8 +31,8 @@
 	},
 	{
 		"name": "next-provider",
-		"bytes": 10331,
-		"gzipBytes": 3994
+		"bytes": 11106,
+		"gzipBytes": 4339
 	},
 	{
 		"name": "script",
@@ -41,33 +41,33 @@
 	},
 	{
 		"name": "client-provider",
-		"bytes": 7010,
-		"gzipBytes": 2983
+		"bytes": 7785,
+		"gzipBytes": 3304
 	},
 	{
 		"name": "extended-next-provider",
-		"bytes": 12216,
-		"gzipBytes": 4635
+		"bytes": 13074,
+		"gzipBytes": 4971
 	},
 	{
 		"name": "next-client-boundary",
-		"bytes": 7621,
-		"gzipBytes": 3261
+		"bytes": 8396,
+		"gzipBytes": 3588
 	},
 	{
 		"name": "extended-next-client-boundary",
-		"bytes": 9267,
-		"gzipBytes": 3818
+		"bytes": 10125,
+		"gzipBytes": 4144
 	},
 	{
 		"name": "next-factory",
-		"bytes": 11929,
-		"gzipBytes": 4494
+		"bytes": 12713,
+		"gzipBytes": 4839
 	},
 	{
 		"name": "client-factory",
-		"bytes": 8179,
-		"gzipBytes": 3403
+		"bytes": 8954,
+		"gzipBytes": 3724
 	},
 	{
 		"name": "generated-script",
