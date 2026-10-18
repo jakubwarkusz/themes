@@ -55,7 +55,7 @@ export function OlderReleases({
 	}, [target]);
 
 	return (
-		<div ref={root} id="older-releases" className="scroll-m-28 border-t">
+		<div ref={root} id="older-releases" className="min-w-0 scroll-m-28 border-t">
 			<div className="grid gap-x-10 gap-y-3 py-8 sm:grid-cols-[8.5rem_minmax(0,1fr)]">
 				<p className="font-mono text-[15px] font-medium text-fd-muted-foreground">
 					{range}
@@ -92,12 +92,12 @@ export function OlderReleases({
 					if (event.target === event.currentTarget && open) setSettled(true);
 				}}
 				className={cn(
-					"grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
+					"grid min-w-0 transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
 					target && "transition-none",
 					open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
 				)}
 			>
-				<div className={cn("min-h-0", !settled && "overflow-clip")}>{children}</div>
+				<div className={cn("min-h-0 min-w-0", !settled && "overflow-clip")}>{children}</div>
 			</div>
 		</div>
 	);

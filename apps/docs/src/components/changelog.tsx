@@ -95,7 +95,7 @@ function ReleaseEntry({
 	const counts = Object.fromEntries(contributors);
 
 	return (
-		<section className="grid gap-x-10 gap-y-4 border-t py-8 sm:grid-cols-[8.5rem_minmax(0,1fr)]">
+		<section className="grid min-w-0 gap-x-10 gap-y-4 border-t py-8 sm:grid-cols-[8.5rem_minmax(0,1fr)]">
 			<div className="flex flex-col gap-1 sm:sticky sm:top-[calc(var(--fd-docs-row-1,0px)+1.5rem)] sm:z-10 sm:self-start sm:focus-within:z-20 sm:hover:z-20">
 				<Heading
 					as="h2"
@@ -188,7 +188,7 @@ function ReleaseEntry({
 					</a>
 				) : null}
 			</div>
-			<div className="flex flex-col gap-6 sm:pt-0.5">
+			<div className="flex min-w-0 flex-col gap-6 sm:pt-0.5">
 				{release.groups.map((group) =>
 					group.items.length ? (
 						<div key={group.name}>
@@ -201,11 +201,11 @@ function ReleaseEntry({
 								/>
 								{group.name}
 							</h3>
-							<ul className="mt-2.5 flex flex-col gap-2 text-sm leading-relaxed text-fd-foreground [&_code]:rounded-sm [&_code]:bg-fd-secondary [&_code]:px-[0.35em] [&_code]:py-[0.15em] [&_code]:font-mono [&_code]:text-[0.9em]">
+							<ul className="mt-2.5 flex min-w-0 flex-col gap-2 text-sm leading-relaxed text-fd-foreground [&_code]:rounded-sm [&_code]:bg-fd-secondary [&_code]:px-[0.35em] [&_code]:py-[0.15em] [&_code]:font-mono [&_code]:text-[0.9em]">
 								{group.items.map((item) => (
 									<li
 										key={item.commit?.hash ?? `${item.scope ?? ""}${item.text}`}
-										className="flex gap-2"
+										className="flex min-w-0 gap-2"
 									>
 										<span
 											aria-hidden
@@ -264,7 +264,7 @@ function ReleaseEntry({
 													target="_blank"
 													rel="noreferrer"
 													aria-label={`Commit ${item.commit.hash}`}
-													className="ms-2 font-mono text-xs text-fd-muted-foreground transition-colors duration-150 hover:text-fd-foreground"
+													className="ms-2 wrap-break-word font-mono text-xs text-fd-muted-foreground transition-colors duration-150 hover:text-fd-foreground"
 												>
 													{item.commit.hash}
 												</a>
@@ -290,7 +290,7 @@ export async function Changelog() {
 	const people = await getPeople(releases);
 
 	return (
-		<div className="not-prose mt-2 flex flex-col [&>section:first-child]:border-t-0 [&>section:first-child]:pt-0">
+		<div className="not-prose mt-2 flex min-w-0 flex-col [&>section:first-child]:border-t-0 [&>section:first-child]:pt-0">
 			{current.map((release) => (
 				<ReleaseEntry
 					key={release.id}
