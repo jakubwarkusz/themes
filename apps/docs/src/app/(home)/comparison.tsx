@@ -1,5 +1,7 @@
 "use client";
 
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import sticker from "@/assets/home/sticker.png";
 import { useReducedMotion } from "motion/react";
@@ -82,29 +84,26 @@ export function Comparison() {
 	const fadeUp = {
 		hidden: {
 			opacity: 0,
-			transform: shouldReduceMotion ? "translateY(0px)" : "translateY(20px)",
+			transform: shouldReduceMotion ? "translateY(0px)" : "translateY(8px)",
 		},
 		show: {
 			opacity: 1,
 			transform: "translateY(0px)",
-			transition: { duration: 0.5, ease: EASE_OUT },
+			transition: { duration: 0.4, ease: EASE_OUT },
 		},
 	};
 
 	return (
-		<section className="w-full max-w-4xl pb-16 sm:pb-24">
+		<section className="w-full max-w-4xl pb-16 sm:pb-20">
 			<m.div
-				className="mb-10 text-center"
+				className="mb-4"
 				variants={fadeUp}
 				initial="hidden"
 				whileInView="show"
 				viewport={{ once: true, margin: "-80px" }}
 			>
-				<p className="mb-2 text-xs font-semibold text-fd-muted-foreground/40">Comparison</p>
-				<h2 className="text-xl font-semibold tracking-tight text-fd-foreground sm:text-2xl">
-					How it compares.
-				</h2>
-				<p className="mt-2 text-sm text-fd-muted-foreground">
+				<h2 className="text-base font-medium text-fd-muted-foreground">Comparison</h2>
+				<p className="mt-1 text-sm text-fd-foreground/80">
 					next-themes still has React 19 bugs open.
 				</p>
 			</m.div>
@@ -191,7 +190,7 @@ export function Comparison() {
 			</m.div>
 
 			<m.div
-				className="mt-4 text-center"
+				className="mt-4"
 				variants={fadeUp}
 				initial="hidden"
 				whileInView="show"
@@ -200,9 +199,16 @@ export function Comparison() {
 			>
 				<Link
 					href="/docs/why-not-next-themes"
-					className="text-xs text-fd-muted-foreground/50 underline-offset-4 transition-colors hover:text-fd-muted-foreground hover:underline"
+					className="group inline-flex items-center gap-1 text-sm text-fd-muted-foreground transition-colors duration-150 hover:text-fd-foreground"
 				>
 					Read the full breakdown
+					<HugeiconsIcon
+						icon={ArrowRight01Icon}
+						size={14}
+						color="currentColor"
+						strokeWidth={1.8}
+						className="transition-transform duration-150 ease-out group-hover:translate-x-0.5"
+					/>
 				</Link>
 			</m.div>
 		</section>
