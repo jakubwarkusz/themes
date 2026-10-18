@@ -12,9 +12,10 @@ html {
 	background-color: var(--color-fd-background);
 }
 
-html,
-body {
-	overscroll-behavior: none;
+@media (hover: hover) and (pointer: fine) {
+	html {
+		overscroll-behavior-y: none;
+	}
 }
 
 @theme inline {
