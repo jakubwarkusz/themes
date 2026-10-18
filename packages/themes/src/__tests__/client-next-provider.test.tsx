@@ -11,9 +11,8 @@ vi.mock("next/navigation.js", () => ({
 	},
 }));
 
-const { ClientNextThemeProvider } = await import("../providers/client-next-provider.js");
-const { ExtendedClientNextThemeProvider } =
-	await import("../providers/extended-client-next-provider.js");
+const { ThemeProvider } = await import("../providers/next-provider.js");
+const { ExtendedThemeProvider } = await import("../providers/extended-next-provider.js");
 
 type ScriptElement = ReactElement<{
 	dangerouslySetInnerHTML?: { __html?: string };
@@ -26,12 +25,43 @@ afterEach(() => {
 	insertedHtmlCallbacks.length = 0;
 });
 
-describe("ClientNextThemeProvider", () => {
+for (const Provider of [ThemeProvider, ExtendedThemeProvider]) {
+	test(`${Provider.name} forwards nonce and script attributes without changing the bootstrap`, () => {
+		const props = {
+			children: null,
+			nonce: "explicit-nonce",
+			scriptProps: { nonce: "fallback-nonce", "data-bootstrap-test": "forwarded" },
+		};
+		const client = Provider(props) as ReactElement<{ bootstrap: string }>;
+		render(client);
+		const script = insertedHtmlCallbacks[0]?.() as ReactElement<{
+			nonce: string;
+			"data-bootstrap-test": string;
+			dangerouslySetInnerHTML: { __html: string };
+		}>;
+		expect(script.props.nonce).toBe("explicit-nonce");
+		expect(script.props["data-bootstrap-test"]).toBe("forwarded");
+		expect(script.props.dangerouslySetInnerHTML.__html).toBe(client.props.bootstrap);
+	});
+}
+
+describe("ThemeProvider", () => {
+	test("escapes server-generated configuration before passing it to the client", () => {
+		const client = ThemeProvider({
+			children: null,
+			storageKey: "</script><script>alert(1)</script>\u2028\u2029",
+		}) as ReactElement<{ bootstrap: string }>;
+		expect(client.props.bootstrap).not.toContain("</script>");
+		expect(client.props.bootstrap).toContain("\\u003c/script>");
+		expect(client.props.bootstrap).not.toContain("\u2028");
+		expect(client.props.bootstrap).not.toContain("\u2029");
+	});
+
 	test("injects a nonce-bearing theme script once", () => {
 		render(
-			<ClientNextThemeProvider storage="hybrid" initialTheme="dark" nonce="test-nonce">
+			<ThemeProvider storage="hybrid" initialTheme="dark" nonce="test-nonce">
 				<span>content</span>
-			</ClientNextThemeProvider>,
+			</ThemeProvider>,
 		);
 
 		const callback = insertedHtmlCallbacks[0];
@@ -47,9 +77,9 @@ describe("ClientNextThemeProvider", () => {
 
 	test("preserves scriptProps.nonce when nonce prop is omitted", () => {
 		render(
-			<ClientNextThemeProvider scriptProps={{ nonce: "from-script-props" }}>
+			<ThemeProvider scriptProps={{ nonce: "from-script-props" }}>
 				<span>content</span>
-			</ClientNextThemeProvider>,
+			</ThemeProvider>,
 		);
 
 		const callback = insertedHtmlCallbacks[0];
@@ -61,13 +91,13 @@ describe("ClientNextThemeProvider", () => {
 
 	test("normalizes defaults against custom themes", () => {
 		render(
-			<ClientNextThemeProvider
+			<ThemeProvider
 				themes={["paper", "midnight"]}
 				enableSystem={false}
 				defaultTheme={"invalid" as "paper"}
 			>
 				<span>content</span>
-			</ClientNextThemeProvider>,
+			</ThemeProvider>,
 		);
 
 		const script = insertedHtmlCallbacks[0]?.() as ScriptElement;
@@ -76,13 +106,13 @@ describe("ClientNextThemeProvider", () => {
 
 	test("rejects system default when system mode is disabled", () => {
 		render(
-			<ClientNextThemeProvider
+			<ThemeProvider
 				themes={["paper", "midnight"]}
 				enableSystem={false}
 				defaultTheme="system"
 			>
 				<span>content</span>
-			</ClientNextThemeProvider>,
+			</ThemeProvider>,
 		);
 
 		const script = insertedHtmlCallbacks[0]?.() as ScriptElement;
@@ -91,13 +121,13 @@ describe("ClientNextThemeProvider", () => {
 
 	test("renders non-html target scripts after the provider subtree", () => {
 		const view = render(
-			<ClientNextThemeProvider
+			<ThemeProvider
 				target="body"
 				nonce="body-nonce"
 				scriptProps={{ "data-theme-bootstrap": "body" }}
 			>
 				<span data-testid="target-content">content</span>
-			</ClientNextThemeProvider>,
+			</ThemeProvider>,
 		);
 
 		expect(insertedHtmlCallbacks[0]?.()).toBeNull();
@@ -111,15 +141,15 @@ describe("ClientNextThemeProvider", () => {
 	});
 });
 
-describe("ExtendedClientNextThemeProvider", () => {
+describe("ExtendedThemeProvider", () => {
 	test("injects mapped system themes before hydration", () => {
 		render(
-			<ExtendedClientNextThemeProvider
+			<ExtendedThemeProvider
 				themes={["paper", "midnight"]}
 				systemThemeMap={{ light: "paper", dark: "midnight" }}
 			>
 				<span>content</span>
-			</ExtendedClientNextThemeProvider>,
+			</ExtendedThemeProvider>,
 		);
 
 		const script = insertedHtmlCallbacks[0]?.() as ScriptElement;
@@ -130,9 +160,9 @@ describe("ExtendedClientNextThemeProvider", () => {
 
 	test("preserves scriptProps.nonce when nonce prop is omitted", () => {
 		render(
-			<ExtendedClientNextThemeProvider scriptProps={{ nonce: "from-script-props" }}>
+			<ExtendedThemeProvider scriptProps={{ nonce: "from-script-props" }}>
 				<span>content</span>
-			</ExtendedClientNextThemeProvider>,
+			</ExtendedThemeProvider>,
 		);
 
 		const script = insertedHtmlCallbacks[0]?.() as ScriptElement;
@@ -142,13 +172,13 @@ describe("ExtendedClientNextThemeProvider", () => {
 
 	test("normalizes defaults against custom themes", () => {
 		render(
-			<ExtendedClientNextThemeProvider
+			<ExtendedThemeProvider
 				themes={["paper", "midnight"]}
 				enableSystem={false}
 				defaultTheme={"invalid" as "paper"}
 			>
 				<span>content</span>
-			</ExtendedClientNextThemeProvider>,
+			</ExtendedThemeProvider>,
 		);
 
 		const script = insertedHtmlCallbacks[0]?.() as ScriptElement;

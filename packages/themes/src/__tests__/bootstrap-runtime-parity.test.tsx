@@ -1,10 +1,14 @@
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { cleanup, render } from "@testing-library/react";
+import type { ReactElement } from "react";
 import { applyThemeToDom } from "../core/client-dom.js";
 import { getScript } from "../core/script.js";
 import { resolveDefaultTheme } from "../core/theme-validation.js";
 import type { Attribute, ThemeProviderProps } from "../core/types.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
+import { ExtendedClientThemeProvider } from "../providers/extended-client-provider.js";
+import { ExtendedThemeProvider } from "../providers/extended-next-provider.js";
+import { ThemeProvider } from "../providers/next-provider.js";
 import { clearCookies } from "./setup.js";
 
 type DomSnapshot = {
@@ -210,9 +214,9 @@ const applyOptions = {
 	themeColor: { dark: "#000" } as Record<string, string> | undefined,
 };
 
-function runGeneratedScript(config: Parameters<typeof getScript>[0]): void {
+function runGeneratedScript(config: Parameters<typeof getScript>[0] | string): void {
 	// oxlint-disable-next-line no-eval -- executes the generated bootstrap in the test DOM
-	eval(getScript(config));
+	eval(typeof config === "string" ? config : getScript(config));
 }
 
 function captureDom(run: () => void): DomSnapshot {
@@ -358,8 +362,39 @@ describe("bootstrap/runtime/provider parity", () => {
 			expect(scriptSnapshot).toEqual(parityCase.expected);
 			expect(directDomSnapshot).toEqual(parityCase.expected);
 			expect(providerSnapshot).toEqual(parityCase.expected);
+			for (const Provider of [ThemeProvider, ExtendedThemeProvider]) {
+				resetDom(parityCase);
+				const client = Provider({
+					...getProviderProps(parityCase),
+					children: null,
+				}) as ReactElement<{ bootstrap: string }>;
+				const serverScriptSnapshot = captureDom(() =>
+					runGeneratedScript(client.props.bootstrap),
+				);
+				expect(serverScriptSnapshot).toEqual(parityCase.expected);
+			}
 		});
 	}
+
+	test("server-generated extended bootstrap matches mapped system runtime", () => {
+		window.matchMedia = () => ({ matches: true }) as MediaQueryList;
+		const props = {
+			themes: ["paper", "midnight"],
+			initialTheme: "system" as const,
+			systemThemeMap: { light: "paper", dark: "midnight" },
+			storage: "none" as const,
+		};
+		const client = ExtendedThemeProvider({ ...props, children: null }) as ReactElement<{
+			bootstrap: string;
+		}>;
+		const bootstrap = captureDom(() => runGeneratedScript(client.props.bootstrap));
+		expect(bootstrap.classes).toEqual(["midnight"]);
+		resetDom();
+		const runtime = captureDom(() =>
+			render(<ExtendedClientThemeProvider {...props}>{null}</ExtendedClientThemeProvider>),
+		);
+		expect(runtime).toEqual(bootstrap);
+	});
 });
 
 describe("bootstrap/runtime sequential apply", () => {

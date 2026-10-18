@@ -60,20 +60,20 @@
 		"maxDeltaGzipBytes": 120
 	},
 	"next-client-boundary": {
-		"maxBytes": 10200,
-		"maxGzipBytes": 3950,
+		"maxBytes": 7700,
+		"maxGzipBytes": 3300,
 		"maxDeltaBytes": 100,
 		"maxDeltaGzipBytes": 40
 	},
 	"extended-next-client-boundary": {
-		"maxBytes": 12000,
-		"maxGzipBytes": 4550,
+		"maxBytes": 9350,
+		"maxGzipBytes": 3860,
 		"maxDeltaBytes": 100,
 		"maxDeltaGzipBytes": 40
 	},
 	"next-factory": {
-		"maxBytes": 12450,
-		"maxGzipBytes": 4600,
+		"maxBytes": 12000,
+		"maxGzipBytes": 4530,
 		"maxDeltaBytes": 100,
 		"maxDeltaGzipBytes": 40
 	},

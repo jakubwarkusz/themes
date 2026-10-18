@@ -1,35 +1,14 @@
 "use client";
 import { useServerInsertedHTML } from "next/navigation.js";
 import { type ReactElement, useEffect, useRef } from "react";
-import { getScript } from "../core/script.js";
-import { resolveDefaultTheme } from "../core/theme-validation.js";
 import type { DefaultTheme } from "../core/types.js";
 import { type ClientThemeProviderProps, ClientThemeProvider } from "./client-provider.js";
 
-const DEFAULT_THEMES: string[] = ["light", "dark"];
-
-export function ClientNextThemeProvider<Themes extends string = DefaultTheme>(
-	props: ClientThemeProviderProps<Themes>,
-): ReactElement {
-	const {
-		themes = DEFAULT_THEMES as Themes[],
-		forcedTheme,
-		enableSystem = true,
-		defaultTheme,
-		attribute = "class",
-		value: valueMap,
-		target = "html",
-		disableTransitionOnChange = false,
-		storage = "localStorage",
-		storageKey = "theme",
-		enableColorScheme = true,
-		nonce,
-		themeColor,
-		followSystem = false,
-		initialTheme,
-		scriptProps,
-	} = props;
-	const resolvedDefault = resolveDefaultTheme(themes, enableSystem, defaultTheme);
+export function ClientNextThemeProvider<Themes extends string = DefaultTheme>({
+	bootstrap,
+	...props
+}: ClientThemeProviderProps<Themes> & { bootstrap: string }): ReactElement {
+	const { target = "html", nonce, scriptProps } = props;
 	const inserted = useRef(false);
 	const scriptRef = useRef<HTMLScriptElement>(null);
 	const script = (
@@ -38,24 +17,7 @@ export function ClientNextThemeProvider<Themes extends string = DefaultTheme>(
 			data-wrksz-theme-target={target}
 			ref={scriptRef}
 			suppressHydrationWarning
-			dangerouslySetInnerHTML={{
-				__html: getScript({
-					storageKey,
-					attribute,
-					defaultTheme: resolvedDefault,
-					enableSystem,
-					enableColorScheme,
-					forcedTheme: forcedTheme as string | undefined,
-					themes,
-					value: valueMap,
-					target,
-					storage,
-					themeColors: themeColor,
-					initialTheme: initialTheme as string | undefined,
-					disableTransitionOnChange,
-					followSystem,
-				}),
-			}}
+			dangerouslySetInnerHTML={{ __html: bootstrap }}
 			{...(nonce != null && { nonce })}
 		/>
 	);

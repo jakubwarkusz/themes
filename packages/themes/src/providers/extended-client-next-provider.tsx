@@ -2,37 +2,15 @@
 
 import { useServerInsertedHTML } from "next/navigation.js";
 import { type ReactElement, useEffect, useRef } from "react";
-import { getExtendedScript } from "../core/extended-script.js";
 import type { ExtendedNextThemeProviderProps } from "../core/extended-types.js";
-import { resolveDefaultTheme } from "../core/theme-validation.js";
 import type { DefaultTheme } from "../core/types.js";
 import { ExtendedClientThemeProvider } from "./extended-client-provider.js";
 
-const DEFAULT_THEMES: string[] = ["light", "dark"];
-
-export function ExtendedClientNextThemeProvider<Themes extends string = DefaultTheme>(
-	props: ExtendedNextThemeProviderProps<Themes>,
-): ReactElement {
-	const {
-		themes = DEFAULT_THEMES as Themes[],
-		forcedTheme,
-		enableSystem = true,
-		defaultTheme,
-		attribute = "class",
-		value: valueMap,
-		target = "html",
-		disableTransitionOnChange = false,
-		storage = "localStorage",
-		storageKey = "theme",
-		enableColorScheme = true,
-		nonce,
-		themeColor,
-		followSystem = false,
-		initialTheme,
-		scriptProps,
-		systemThemeMap,
-	} = props;
-	const resolvedDefault = resolveDefaultTheme(themes, enableSystem, defaultTheme);
+export function ExtendedClientNextThemeProvider<Themes extends string = DefaultTheme>({
+	bootstrap,
+	...props
+}: ExtendedNextThemeProviderProps<Themes> & { bootstrap: string }): ReactElement {
+	const { target = "html", nonce, scriptProps } = props;
 	const inserted = useRef(false);
 	const scriptRef = useRef<HTMLScriptElement>(null);
 	const script = (
@@ -42,25 +20,7 @@ export function ExtendedClientNextThemeProvider<Themes extends string = DefaultT
 			ref={scriptRef}
 			suppressHydrationWarning
 			// inline script required to prevent flash of unstyled theme
-			dangerouslySetInnerHTML={{
-				__html: getExtendedScript({
-					storageKey,
-					attribute,
-					defaultTheme: resolvedDefault,
-					enableSystem,
-					enableColorScheme,
-					forcedTheme: forcedTheme as string | undefined,
-					themes,
-					value: valueMap,
-					target,
-					storage,
-					themeColors: themeColor,
-					initialTheme: initialTheme as string | undefined,
-					disableTransitionOnChange,
-					followSystem,
-					systemThemeMap,
-				}),
-			}}
+			dangerouslySetInnerHTML={{ __html: bootstrap }}
 			{...(nonce !== undefined ? { nonce } : null)}
 		/>
 	);
