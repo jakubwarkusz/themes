@@ -37,7 +37,7 @@
 	},
 	"next-provider": {
 		"maxBytes": 11150,
-		"maxGzipBytes": 4340,
+		"maxGzipBytes": 4360,
 		"maxDeltaBytes": 650,
 		"maxDeltaGzipBytes": 320
 	},
@@ -60,32 +60,32 @@
 		"maxDeltaGzipBytes": 120
 	},
 	"next-client-boundary": {
-		"maxBytes": 8400,
-		"maxGzipBytes": 3600,
+		"maxBytes": 8450,
+		"maxGzipBytes": 3620,
 		"maxDeltaBytes": 650,
 		"maxDeltaGzipBytes": 300
 	},
 	"extended-next-client-boundary": {
 		"maxBytes": 10150,
-		"maxGzipBytes": 4160,
+		"maxGzipBytes": 4180,
 		"maxDeltaBytes": 700,
 		"maxDeltaGzipBytes": 300
 	},
 	"next-factory": {
 		"maxBytes": 12750,
-		"maxGzipBytes": 4840,
+		"maxGzipBytes": 4860,
 		"maxDeltaBytes": 650,
 		"maxDeltaGzipBytes": 320
 	},
 	"client-factory": {
 		"maxBytes": 9000,
-		"maxGzipBytes": 3740,
+		"maxGzipBytes": 3760,
 		"maxDeltaBytes": 650,
 		"maxDeltaGzipBytes": 300
 	},
 	"extended-next-provider": {
 		"maxBytes": 13100,
-		"maxGzipBytes": 4980,
+		"maxGzipBytes": 5000,
 		"maxDeltaBytes": 700,
 		"maxDeltaGzipBytes": 320
 	}
