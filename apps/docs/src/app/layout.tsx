@@ -56,7 +56,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
 		>
 			<body className="flex flex-col min-h-dvh antialiased">
 				<ThemeProvider {...themeProviderDefaults} themes={appThemes}>
-					<RootProvider>{children}</RootProvider>
+					<RootProvider theme={{ enabled: false }}>{children}</RootProvider>
 				</ThemeProvider>
 				<Analytics />
 			</body>

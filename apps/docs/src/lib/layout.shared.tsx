@@ -1,6 +1,7 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { unstable_cache } from "next/cache";
 import Image from "next/image";
+import { ThemeSwitch } from "@/components/theme-switch";
 
 export const gitConfig = {
 	user: "jakubwarkusz",
@@ -72,5 +73,6 @@ export function baseOptions(version?: string): BaseLayoutProps {
 			),
 		},
 		githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
+		slots: { themeSwitch: ThemeSwitch },
 	};
 }
