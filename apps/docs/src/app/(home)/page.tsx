@@ -6,6 +6,7 @@ import { Hero } from "./hero";
 const FeaturesGrid = dynamic(() => import("./features").then((mod) => mod.FeaturesGrid));
 const Comparison = dynamic(() => import("./comparison").then((mod) => mod.Comparison));
 const Roadmap = dynamic(() => import("./roadmap").then((mod) => mod.Roadmap));
+const Sponsors = dynamic(() => import("./sponsors").then((mod) => mod.Sponsors));
 
 export default function HomePage() {
 	return (
@@ -17,6 +18,7 @@ export default function HomePage() {
 				<FeaturesGrid />
 				<Comparison />
 				<Roadmap />
+				<Sponsors />
 			</MotionProvider>
 			<Footer />
 		</main>
