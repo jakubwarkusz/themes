@@ -8,59 +8,104 @@
 	--fd-nav-height: 56px !important;
 }
 
-#nd-sidebar {
-	background-color: var(--color-fd-background) !important;
-	border-inline-end: 1px solid oklch(0.88 0 0 / 40%) !important;
+@theme inline {
+	--font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+	--font-mono:
+		var(--font-ioskeley-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
-.dark #nd-sidebar {
-	border-inline-end-color: oklch(0.28 0 0 / 40%) !important;
+body {
+	font-feature-settings: "cv01", "ss03";
+}
+
+code,
+pre,
+kbd,
+samp,
+.font-mono {
+	font-feature-settings: normal;
+}
+
+#nd-sidebar {
+	background-color: var(--color-fd-background) !important;
+	border-inline-end: 1px solid var(--color-fd-border) !important;
 }
 
 #toc-title {
 	display: none;
 }
 
-/* Light mode */
 :root {
-	--color-fd-background: oklch(0.98 0.002 265);
-	--color-fd-foreground: oklch(0.12 0.005 265);
-	--color-fd-muted: oklch(0.94 0.003 265);
-	--color-fd-muted-foreground: oklch(0.48 0.005 265);
-	--color-fd-popover: oklch(0.97 0.002 265);
-	--color-fd-popover-foreground: oklch(0.18 0.005 265);
-	--color-fd-card: oklch(0.955 0.003 265);
-	--color-fd-card-foreground: oklch(0.12 0.005 265);
-	--color-fd-border: oklch(0.86 0.005 265 / 70%);
-	--color-fd-primary: oklch(0.18 0.005 265);
-	--color-fd-primary-foreground: oklch(0.98 0 0);
-	--color-fd-secondary: oklch(0.93 0.003 265);
-	--color-fd-secondary-foreground: oklch(0.12 0.005 265);
-	--color-fd-accent: oklch(0.93 0.003 265);
-	--color-fd-accent-foreground: oklch(0.12 0.005 265);
-	--color-fd-ring: oklch(0.55 0.005 265);
-	--color-fd-overlay: oklch(0.12 0.005 265 / 20%);
+	--color-fd-background: oklch(0.991 0 0);
+	--color-fd-foreground: oklch(0.21 0 0);
+	--color-fd-muted: oklch(0.973 0 0);
+	--color-fd-muted-foreground: oklch(0.47 0 0);
+	--color-fd-popover: oklch(1 0 0);
+	--color-fd-popover-foreground: oklch(0.21 0 0);
+	--color-fd-card: oklch(0.973 0 0);
+	--color-fd-card-foreground: oklch(0.21 0 0);
+	--color-fd-border: oklch(0.907 0 0);
+	--color-fd-primary: oklch(0.21 0 0);
+	--color-fd-primary-foreground: oklch(0.991 0 0);
+	--color-fd-secondary: oklch(0.955 0 0);
+	--color-fd-secondary-foreground: oklch(0.21 0 0);
+	--color-fd-accent: oklch(0.955 0 0);
+	--color-fd-accent-foreground: oklch(0.21 0 0);
+	--color-fd-ring: oklch(0.62 0 0);
+	--color-fd-overlay: oklch(0.21 0 0 / 20%);
 }
 
-/* Dark mode */
 .dark {
-	--color-fd-background: oklch(0.115 0.006 265);
-	--color-fd-foreground: oklch(0.93 0.005 265);
-	--color-fd-muted: oklch(0.17 0.006 265);
-	--color-fd-muted-foreground: oklch(0.58 0.006 265);
-	--color-fd-popover: oklch(0.155 0.006 265);
-	--color-fd-popover-foreground: oklch(0.9 0.005 265);
-	--color-fd-card: oklch(0.155 0.006 265);
-	--color-fd-card-foreground: oklch(0.93 0.005 265);
-	--color-fd-border: oklch(0.27 0.006 265 / 70%);
-	--color-fd-primary: oklch(0.92 0.005 265);
-	--color-fd-primary-foreground: oklch(0.1 0.005 265);
-	--color-fd-secondary: oklch(0.17 0.006 265);
-	--color-fd-secondary-foreground: oklch(0.93 0.005 265);
-	--color-fd-accent: oklch(0.2 0.006 265);
-	--color-fd-accent-foreground: oklch(0.93 0.005 265);
-	--color-fd-ring: oklch(0.55 0.006 265);
-	--color-fd-overlay: oklch(0.1 0.006 265 / 80%);
+	--color-fd-background: oklch(0.173 0 0);
+	--color-fd-foreground: oklch(0.949 0 0);
+	--color-fd-muted: oklch(0.213 0 0);
+	--color-fd-muted-foreground: oklch(0.75 0 0);
+	--color-fd-popover: oklch(0.213 0 0);
+	--color-fd-popover-foreground: oklch(0.949 0 0);
+	--color-fd-card: oklch(0.213 0 0);
+	--color-fd-card-foreground: oklch(0.949 0 0);
+	--color-fd-border: oklch(0.29 0 0);
+	--color-fd-primary: oklch(0.949 0 0);
+	--color-fd-primary-foreground: oklch(0.173 0 0);
+	--color-fd-secondary: oklch(0.252 0 0);
+	--color-fd-secondary-foreground: oklch(0.949 0 0);
+	--color-fd-accent: oklch(0.252 0 0);
+	--color-fd-accent-foreground: oklch(0.949 0 0);
+	--color-fd-ring: oklch(0.55 0 0);
+	--color-fd-overlay: oklch(0 0 0 / 60%);
+}
+
+figure.shiki:not(.not-fumadocs-codeblock *) {
+	border-color: transparent;
+	box-shadow: none;
+}
+
+figure.shiki pre {
+	font-size: 0.875rem;
+	line-height: 1.625;
+}
+
+.prose div[data-orientation]:has(> [role="tablist"]) {
+	border-color: transparent;
+	background-color: var(--color-fd-card);
+
+	& figure.shiki {
+		background-color: var(--color-fd-card);
+	}
+}
+
+.prose :where(code):not(:where(pre *, .not-prose *)) {
+	border: 0;
+	border-radius: 4px;
+	padding: 0.15em 0.35em;
+	font-size: 0.9em;
+	background-color: var(--color-fd-muted);
+	box-decoration-break: clone;
+	-webkit-box-decoration-break: clone;
+}
+
+.prose :where(table) :where(code):not(:where(pre *, .not-prose *)) {
+	background-color: var(--color-fd-secondary);
 }
 
 @keyframes sky-in {
