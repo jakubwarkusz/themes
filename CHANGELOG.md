@@ -5,6 +5,88 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- *(components)* Add AI logos and integrate them into page actions ([8898ae5](https://github.com/jakubwarkusz/themes/commit/8898ae5ecfc1bace20d042ac32588ea4a5293833))
+
+## [2.1.0] - 2026-10-18
+
+### Added
+
+- Add support for bun package manager and enhance layout in hero content ([a3fd598](https://github.com/jakubwarkusz/themes/commit/a3fd59874c7ba212f8479b5b8db37368eb3cb5cb))
+- Integrate Google Fonts into OG image generation for improved typography ([e15f8f1](https://github.com/jakubwarkusz/themes/commit/e15f8f130bfafa0bea790cb4d9c9b947db3db03a))
+- Add @pierre/theme and shiki for enhanced theming and syntax highlighting; update layout and global styles ([ff3c817](https://github.com/jakubwarkusz/themes/commit/ff3c81758f6ade8731273987f1b962dd892de434))
+- Implement callout component with customizable tones and styles; enhance badge components for improved visual feedback ([bed3da2](https://github.com/jakubwarkusz/themes/commit/bed3da2ec7f8ef317ff18ed541314e55f81fcbfe))
+- Enhance documentation styling and functionality; add ScrollFade component for improved table presentation ([baa0f82](https://github.com/jakubwarkusz/themes/commit/baa0f822e389cb31bb2348cdcfec9e78a9b4a9a6))
+- Enhance documentation with Do and Dont components for best practices; update theme-provider and tailwind examples for clarity ([eaebf73](https://github.com/jakubwarkusz/themes/commit/eaebf73fb64b7bd61e478de80b42380b7eaa7e78))
+- Replace package manager installation tabs with InstallCommand component for streamlined documentation; refactor global styles and enhance button transitions ([3c2b104](https://github.com/jakubwarkusz/themes/commit/3c2b1044683d5c5bd7b368ff56695b5844d08d4a))
+- Enhance InstallCommand component with localStorage support for package manager selection; implement subscription mechanism for state updates ([0a15b8a](https://github.com/jakubwarkusz/themes/commit/0a15b8aa80b44082c2f3870148c6af7b4a2df180))
+- Implement ThemeSwitch component for dynamic theme toggling; update layout to integrate theme provider with disabled state ([37e3808](https://github.com/jakubwarkusz/themes/commit/37e380859dfe17dc7322f1939240e6886685d168))
+- Add ThemeDemo component for showcasing theme variations; enhance global styles and integrate PageActions for improved documentation interactivity ([51ec6c2](https://github.com/jakubwarkusz/themes/commit/51ec6c2ad8c84a78e46fbb11ff2b5b6372aa567b))
+- Add demo-avatar styling and avatarVars function for dynamic avatar generation; enhance theme-demo component with improved visual representation ([9c6e8d1](https://github.com/jakubwarkusz/themes/commit/9c6e8d12f8a9d507ff329d98fc48d5ceb7dbd0fa))
+- Integrate Table of Contents (TOC) functionality with active heading tracking and section progress; enhance documentation layout with new TOC components for improved navigation ([4a0d10c](https://github.com/jakubwarkusz/themes/commit/4a0d10cbe719718b66c86f4a4154652d7645bb49))
+- Implement search dialog component with enhanced styling and animations; integrate scroll fade functionality for improved user experience in documentation search ([b8c3796](https://github.com/jakubwarkusz/themes/commit/b8c3796367f07a947d9711bcefc2d7b0addfd6e4))
+- Add PageFooter component for enhanced navigation and editing capabilities in documentation; integrate previous and next page links along with last modified date display ([f0968fb](https://github.com/jakubwarkusz/themes/commit/f0968fbbaa4ceb482a518b55353de6f7c28d67db))
+- Enhance CodeBlock component with collapsible functionality for long code snippets; integrate line counting for improved user experience in documentation ([55560ba](https://github.com/jakubwarkusz/themes/commit/55560ba6cae5d95a269875f1b90c7e28ef0a327d))
+- Update global styles to include new font weight and enhance typography; modify route file to load custom font from local assets for improved performance ([3d499e4](https://github.com/jakubwarkusz/themes/commit/3d499e4ff24dd92ba431c4f8aad9d2fd5a7d58e2))
+- Add Heading component for enhanced section navigation with copy link functionality; integrate into MDX components for improved documentation structure ([c5bbf85](https://github.com/jakubwarkusz/themes/commit/c5bbf853600155902de0a38bcf1fc368a2a71308))
+- Update sidebar components with improved styling and functionality; enhance global styles and meta.json for better documentation organization ([cf4cd93](https://github.com/jakubwarkusz/themes/commit/cf4cd937cef27a7183b96b0770990af82b0295d5))
+- Refine sidebar button styles for improved aesthetics and hover effects; update layout component for better version display ([80079bc](https://github.com/jakubwarkusz/themes/commit/80079bc4340cc3dd93c0940f3b89d54bf3c13085))
+- Enhance ThemeSwitch component with improved animations and styling; update global styles for better theme toggle visibility and accessibility ([33e5a5e](https://github.com/jakubwarkusz/themes/commit/33e5a5eff316c15c67529e68f499ba598b494479))
+- Implement HomeHeader component for improved navigation and branding; integrate NavTitle for dynamic version display in layout ([8590830](https://github.com/jakubwarkusz/themes/commit/85908309ff313d7492776cd37e7fc50a5a61fede))
+- Enhance theme demo component with improved layout and animations; update global styles to include new demo surface colors for better theme representation ([8d855b5](https://github.com/jakubwarkusz/themes/commit/8d855b51570dce7e8fc5a2197f2379474913ab64))
+- Update HeroContent and Hero components with improved layout and animations; adjust transition durations and refine styling for better responsiveness ([3036547](https://github.com/jakubwarkusz/themes/commit/303654725295870736e4ed2089cccd6ea29ec9b1))
+- Enhance ThemeDemo and CodeBlock components with collapsible code functionality; update theme preview implementation and global styles for improved theme representation ([c3ef297](https://github.com/jakubwarkusz/themes/commit/c3ef297539504981a350f06adf5af9ec1eea1aa7))
+- Update FeaturesGrid component with improved layout and animations; refine item presentation and transition effects for better user experience ([ef256ba](https://github.com/jakubwarkusz/themes/commit/ef256ba11605fe4f1b8950605863a1be0f734305))
+- Enhance Comparison component with updated layout and animations; adjust transition effects and styling for improved user experience ([b962765](https://github.com/jakubwarkusz/themes/commit/b962765a10807185b9f0f27e90cdebd64928556b))
+- Update Roadmap component with refined layout and animations; adjust transition effects and styling for improved presentation and user experience ([6545397](https://github.com/jakubwarkusz/themes/commit/65453977e44ed0d9fbfab0e206319f17812a1d59))
+- Add FooterSearch component for enhanced search functionality in footer; update footer layout and styles for improved user experience ([d7b0ce2](https://github.com/jakubwarkusz/themes/commit/d7b0ce213bf183bc5499ec8ccaa7b033bfca44be))
+- Enhance documentation with new examples for data attributes, forced themes, hybrid storage, meta theme color, scoped theming, and Tailwind CSS integration; add demo components for better user interaction ([e1615a6](https://github.com/jakubwarkusz/themes/commit/e1615a623769186b061b1b88517ba73e4a01a563))
+- Replace InstallCommand with HeroInstall component in HeroContent; introduce HeroInstall for improved package manager selection and command display ([57f2dde](https://github.com/jakubwarkusz/themes/commit/57f2dde7045af40f05435eb68f5d47f5ba35de58))
+- Add new icon and manifest files for improved application branding; update existing apple and favicon images ([4c5ec50](https://github.com/jakubwarkusz/themes/commit/4c5ec50b36b39a7e3d627b809f265d17c6e14220))
+- Redesign NotFound page with new layout and imagery; add OpenGraph image generation for enhanced social sharing ([8071fe3](https://github.com/jakubwarkusz/themes/commit/8071fe38369741a9823316a2a670a7fff7f172fe))
+- Add changelog component and page to document release history; integrate changelog data retrieval and display in the documentation ([bcad6d6](https://github.com/jakubwarkusz/themes/commit/bcad6d65ecae29c6f7d03dcbd5b6a20a86137df2))
+- Enhance changelog functionality by integrating structured data retrieval and improving release entry display with icons; update older releases component for better navigation ([e301ea0](https://github.com/jakubwarkusz/themes/commit/e301ea0725064d2f943ea1c1ed209b31829b8a50))
+- Enhance documentation and layout components by integrating version display and improving navigation; add changelog links and update layout structure for better user experience ([2fab046](https://github.com/jakubwarkusz/themes/commit/2fab0467bbdfaaae4d25a72d0b550a3a0599e604))
+- Add Sponsors component to HomePage and create HoxgerLogo for branding; enhance layout with dynamic imports for improved user engagement ([765ca47](https://github.com/jakubwarkusz/themes/commit/765ca4767478a92bbad45a16daab6c21c34c160b))
+- Enhance TOC functionality by integrating TocPopover for improved navigation and user interaction; update imports and slot configurations for better component structure ([5e22204](https://github.com/jakubwarkusz/themes/commit/5e222045d20125be134d7931a727a78253b1c6ca))
+- Implement page feedback component for user interaction and enhance layout with sidebar sponsor; add animation for feedback display and integrate feedback functionality in page footer ([f3599fa](https://github.com/jakubwarkusz/themes/commit/f3599fa48fd7062ab932c16eaa856265fde7039d))
+- Introduce configurator component for dynamic theme and storage configuration; enhance documentation with configurator page and tests for improved user experience ([a864938](https://github.com/jakubwarkusz/themes/commit/a8649381628217172e9de6dedd304998ba075c3c))
+- Enhance Hero component to display weekly downloads alongside GitHub stars; update layout and formatting for improved user experience ([7b613e2](https://github.com/jakubwarkusz/themes/commit/7b613e2bcad97c4818db6f561f0daa4012bbdc0c))
+- Add new benchmark fixtures and update bundle size thresholds for client and factory components; enhance documentation for clarity ([f91f940](https://github.com/jakubwarkusz/themes/commit/f91f940d9b133c6ca2ad188fe103c359899b7792))
+- Refactor ThemeProvider and ClientNextThemeProvider to utilize script configuration for improved theme management; update benchmarks and tests for enhanced performance and reliability ([6aed1a2](https://github.com/jakubwarkusz/themes/commit/6aed1a26e726544d8029f97b0607bed886596b67))
+
+### Fixed
+
+- Update button components to prevent default cursor behavior; enhance accessibility and user experience across various buttons ([98a29dc](https://github.com/jakubwarkusz/themes/commit/98a29dc1b2527f3795f637aae9a42b98e3ccbf87))
+- Remove unnecessary margin from GitHub icon button in HomeHeader component for cleaner layout ([dbee3bb](https://github.com/jakubwarkusz/themes/commit/dbee3bb8bf7b0dd3c0c2fa36021e883559db5311))
+- Update maxDeltaGzipBytes in bundle-size-thresholds.json to improve performance metrics ([d2657af](https://github.com/jakubwarkusz/themes/commit/d2657af6f478cd4a4f4cb142fdcb061066c89b9d))
+- Update TocRail component styles to improve text wrapping and presentation ([86eedb6](https://github.com/jakubwarkusz/themes/commit/86eedb6c487b9aafd271650c0f9bd85880f25f93))
+- Update HeroContent styles for improved accessibility and visual consistency; enhance star display with better layout and hover effects ([adfcd36](https://github.com/jakubwarkusz/themes/commit/adfcd36a422e8ee92924d703667238c62abb3af6))
+- Adjust marginBottom style in TocGuides component for consistent spacing based on level comparison ([6345be2](https://github.com/jakubwarkusz/themes/commit/6345be26b655d3f1331f74c52592825b3d80ffc7))
+- Update overflow style in OlderReleases component from 'overflow-hidden' to 'overflow-clip' for improved content visibility ([5e27280](https://github.com/jakubwarkusz/themes/commit/5e27280cf8463a3abf9db0ca44af6590aba08df3))
+- Update grid layout in Configurator component for improved responsiveness and alignment ([7e3c64d](https://github.com/jakubwarkusz/themes/commit/7e3c64dcc5ea8e96c6a8058c64e47beb24d19241))
+- Adjust margin and padding styles in Configurator component for improved layout consistency ([9ae29d0](https://github.com/jakubwarkusz/themes/commit/9ae29d0187120770d22c00a62f6419d442794d04))
+- Update GitHub icon import in HeroContent component for consistency ([1290048](https://github.com/jakubwarkusz/themes/commit/1290048b05824bebfff07ee623e5e69611472d5b))
+
+### Performance
+
+- *(themes)* Reduce observer work and reuse transition styles ([f1f33c1](https://github.com/jakubwarkusz/themes/commit/f1f33c18e21509d267d2161337a5d4df2e7fd4bb))
+- *(themes)* Shrink declarations and published package metadata ([5293210](https://github.com/jakubwarkusz/themes/commit/5293210600a3120c53ca9d99490ecf39179211a5))
+- *(themes)* Streamline transition styles and align bundle budgets ([134f645](https://github.com/jakubwarkusz/themes/commit/134f64598017e1bf60de45c3f9a014903db638a1))
+
+### Changed
+
+- Simplify InstallSnippet component layout and update icon usage for improved clarity and accessibility ([2bebe08](https://github.com/jakubwarkusz/themes/commit/2bebe0894aeaa150139510623430cbb7594fc1b9))
+- Update README to include responsive image support and improve theme comparison table; add new dark and light banner images ([d40e8f9](https://github.com/jakubwarkusz/themes/commit/d40e8f957fab1a5989f8117896acddce2b09e2c0))
+
+### Miscellaneous
+
+- Update README badges to use SVG format for better scalability and visual consistency; add new badges for npm, docs, Next.js, React, and TypeScript ([fc958a8](https://github.com/jakubwarkusz/themes/commit/fc958a8a55a399cfaa7564a282ed26ff38ff3254))
+- Update CHANGELOG formatting and improve regex for release entries in changelog parser ([d8477fd](https://github.com/jakubwarkusz/themes/commit/d8477fd3bce3d16940669af1831b842859cc0c09))
+
 ## [2.0.4] - 2026-10-18
 
 ### Added
@@ -601,6 +683,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial commit ([b02cc49](https://github.com/jakubwarkusz/themes/commit/b02cc498a9e984409781ca39562eff22c79827d7))
 
+[unreleased]: https://github.com/jakubwarkusz/themes/compare/v2.1.0..HEAD
+[2.1.0]: https://github.com/jakubwarkusz/themes/compare/v2.0.4..v2.1.0
 [2.0.4]: https://github.com/jakubwarkusz/themes/compare/v2.0.3..v2.0.4
 [2.0.3]: https://github.com/jakubwarkusz/themes/compare/v2.0.2..v2.0.3
 [2.0.2]: https://github.com/jakubwarkusz/themes/compare/v2.0.1..v2.0.2
