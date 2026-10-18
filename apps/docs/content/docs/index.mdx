@@ -11,7 +11,54 @@ description: Install and configure @wrksz/themes in your Next.js app.
 
 A nested `ClientThemeProvider` scoped to this card with `storage="none"`, so it never touches the page theme. Two of the themes are custom.
 
-<ThemeDemo />
+<ThemeDemo>
+
+```tsx title="theme-picker.tsx"
+"use client";
+
+import { ClientThemeProvider, useTheme } from "@wrksz/themes/client";
+
+const themes = ["light", "dark", "sepia", "forest"] as const;
+
+export function ThemePreview({ children }: { children: React.ReactNode }) {
+  return (
+    <ClientThemeProvider
+      themes={themes}
+      defaultTheme="system"
+      attribute="data-theme"
+      target="#preview"
+      storage="none"
+    >
+      <Picker />
+      <div id="preview">{children}</div>
+    </ClientThemeProvider>
+  );
+}
+
+function Picker() {
+  const { theme, setTheme } = useTheme<(typeof themes)[number]>();
+
+  return [...themes, "system" as const].map((name) => (
+    <button key={name} aria-pressed={theme === name} onClick={() => setTheme(name)}>
+      {name}
+    </button>
+  ));
+}
+```
+
+```css title="globals.css"
+#preview { --bg: #fcfcfc; --fg: #1f1f1f; --accent: #1f1f1f; }
+#preview[data-theme="dark"] { --bg: #141414; --fg: #f2f2f2; --accent: #f2f2f2; }
+#preview[data-theme="sepia"] { --bg: #f4ecd8; --fg: #433422; --accent: #8a5a2b; }
+#preview[data-theme="forest"] { --bg: #1d2620; --fg: #e3ead9; --accent: #9cc797; }
+
+#preview {
+  background: var(--bg);
+  color: var(--fg);
+}
+```
+
+</ThemeDemo>
 
 ## Installation
 

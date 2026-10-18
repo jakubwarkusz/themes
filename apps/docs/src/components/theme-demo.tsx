@@ -1,8 +1,19 @@
 "use client";
 
+import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { ClientThemeProvider, useTheme } from "@wrksz/themes/client";
-import { type CSSProperties, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+	type CSSProperties,
+	type ReactNode,
+	useId,
+	useLayoutEffect,
+	useRef,
+	useState,
+	useSyncExternalStore,
+} from "react";
 import { cn } from "@/lib/cn";
+import { CodeCollapse } from "./code-block";
 
 const THEMES = ["light", "dark", "sepia", "forest"] as const;
 const OPTIONS = [...THEMES, "system"] as const;
@@ -160,7 +171,10 @@ function Controls() {
 	);
 }
 
-export function ThemeDemo() {
+export function ThemeDemo({ children }: { children?: ReactNode }) {
+	const [open, setOpen] = useState(false);
+	const id = useId();
+
 	return (
 		<div className="not-prose my-6 flex flex-col gap-1.5 rounded-xl bg-fd-card p-1.5">
 			<ClientThemeProvider
@@ -172,6 +186,44 @@ export function ThemeDemo() {
 			>
 				<Controls />
 			</ClientThemeProvider>
+
+			{children ? (
+				<div className="flex flex-col">
+					<button
+						type="button"
+						aria-expanded={open}
+						aria-controls={id}
+						onClick={() => setOpen(!open)}
+						className="flex h-8 w-fit items-center gap-1.5 rounded-md px-3 text-xs font-medium text-fd-muted-foreground outline-none transition-[color,scale] duration-150 ease-out hover:text-fd-foreground focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.96]"
+					>
+						{open ? "Hide code" : "Show code"}
+						<HugeiconsIcon
+							icon={ArrowDown01Icon}
+							size={12}
+							color="currentColor"
+							strokeWidth={2}
+							className={cn(
+								"transition-transform duration-200 ease-out motion-reduce:transition-none",
+								open && "rotate-180",
+							)}
+						/>
+					</button>
+					<div
+						id={id}
+						inert={!open}
+						className={cn(
+							"grid transition-[grid-template-rows] duration-250 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
+							open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+						)}
+					>
+						<div className="min-h-0 overflow-hidden">
+							<div className="flex flex-col gap-1.5 pt-1.5 [&_figure]:my-0 [&_figure]:bg-fd-background">
+								<CodeCollapse value={false}>{children}</CodeCollapse>
+							</div>
+						</div>
+					</div>
+				</div>
+			) : null}
 		</div>
 	);
 }

@@ -2,11 +2,13 @@
 
 import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { type ReactNode, useId, useRef, useState } from "react";
+import { createContext, type ReactNode, use, useId, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { CopyButton } from "./copy-button";
 
 const COLLAPSE_AFTER = 16;
+
+export const CodeCollapse = createContext(true);
 
 export function CodeBlock({
 	title,
@@ -20,7 +22,7 @@ export function CodeBlock({
 	const viewport = useRef<HTMLDivElement>(null);
 	const id = useId();
 	const [expanded, setExpanded] = useState(false);
-	const collapsible = lines > COLLAPSE_AFTER;
+	const collapsible = use(CodeCollapse) && lines > COLLAPSE_AFTER;
 	const collapsed = collapsible && !expanded;
 
 	return (
