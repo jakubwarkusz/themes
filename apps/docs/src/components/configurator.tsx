@@ -905,7 +905,7 @@ export function Configurator() {
 	return (
 		<div className="not-prose my-6 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
 			<Controls config={config} update={update} />
-			<div className="flex min-w-0 flex-col gap-3 lg:sticky lg:top-[calc(var(--fd-docs-row-1,0px)+1.5rem)] lg:max-h-[calc(100dvh-var(--fd-docs-row-1,0px)-3rem)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:scrollbar-none">
+			<div className="flex min-w-0 flex-col gap-3 lg:sticky lg:top-[calc(var(--fd-docs-row-1,0px)+1.5rem)] lg:max-h-[calc(100dvh-var(--fd-docs-row-1,0px)-3rem)] lg:self-start lg:-m-1 lg:overflow-y-auto lg:overscroll-contain lg:p-1 lg:scrollbar-none">
 				<div className="flex flex-col gap-1.5 rounded-xl bg-fd-card p-1.5">
 					<Preview config={config} />
 				</div>
