@@ -9,6 +9,7 @@ import { Changelog } from "./changelog";
 import { CodeBlock } from "./code-block";
 import { Heading } from "./heading";
 import { InstallCommand } from "./install-command";
+import { MigrateWithAI } from "./migrate-with-ai";
 import { Beta, Breaking, Bug, Fixed, No, Since, Yes } from "./mdx-badges";
 import { Do, Dont } from "./practice";
 import { ScrollFade } from "./scroll-fade";
@@ -41,6 +42,7 @@ export function getMDXComponents(components?: MDXComponents) {
 		Changelog,
 		Configurator: () => <Configurator />,
 		InstallCommand,
+		MigrateWithAI,
 		h2: (props) => <Heading as="h2" {...props} />,
 		h3: (props) => <Heading as="h3" {...props} />,
 		h4: (props) => <Heading as="h4" {...props} />,

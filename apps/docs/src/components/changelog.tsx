@@ -12,8 +12,9 @@ import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import Link from "next/link";
 import { gitConfig } from "@/lib/layout.shared";
 import { getReleases, isLegacy, isMajor, type Release } from "@/lib/changelog";
-import { getGitHubUser, getReleaseReactions, type ReleaseReactions } from "@/lib/github-releases";
-import { AuthorCard, type Person } from "./author-card";
+import { getPeople, type Person } from "@/lib/contributors";
+import { getReleaseReactions, type ReleaseReactions } from "@/lib/github-releases";
+import { AuthorCard } from "./author-card";
 import { Heading } from "./heading";
 import { Badge } from "./mdx-badges";
 import { OlderReleases } from "./older-releases";
@@ -76,25 +77,6 @@ function contributorsOf(release: Release) {
 	return [...counts].toSorted(([a, x], [b, y]) =>
 		a === gitConfig.user ? -1 : b === gitConfig.user ? 1 : y - x,
 	);
-}
-
-async function getPeople(releases: Release[]) {
-	const totals = new Map<string, number>();
-	const first = new Map<string, string>();
-	for (const release of releases.toReversed())
-		for (const group of release.groups)
-			for (const item of group.items) {
-				const login = item.author?.login ?? gitConfig.user;
-				totals.set(login, (totals.get(login) ?? 0) + 1);
-				if (!first.has(login)) first.set(login, release.version);
-			}
-	const people = await Promise.all(
-		[...totals].map(async ([login, total]): Promise<[string, Person]> => [
-			login,
-			{ login, user: await getGitHubUser(login), total, first: first.get(login) ?? "" },
-		]),
-	);
-	return Object.fromEntries(people);
 }
 
 function ReleaseEntry({

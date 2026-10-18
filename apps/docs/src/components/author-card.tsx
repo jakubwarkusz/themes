@@ -1,14 +1,9 @@
 import type { ReactNode } from "react";
-import type { GitHubUser } from "@/lib/github-releases";
-
-export type Person = {
-	login: string;
-	user: GitHubUser | null;
-	total: number;
-	first: string;
-};
+import type { Person } from "@/lib/contributors";
 
 const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
+
+const tag = (version: string) => (/^\d/.test(version) ? `v${version}` : version);
 
 export function AuthorCard({
 	person,
@@ -17,8 +12,8 @@ export function AuthorCard({
 	children,
 }: {
 	person: Person;
-	release: string;
-	inRelease: number;
+	release?: string;
+	inRelease?: number;
 	children: ReactNode;
 }) {
 	const { login, user } = person;
@@ -52,14 +47,21 @@ export function AuthorCard({
 						</span>
 					) : null}
 					<span className="flex flex-col gap-0.5 border-t pt-2.5">
-						<span>
-							<span className="text-fd-foreground tabular-nums">{inRelease}</span>{" "}
-							{inRelease === 1 ? "change" : "changes"} in {release}
-						</span>
+						{release && inRelease ? (
+							<span>
+								<span className="text-fd-foreground tabular-nums">{inRelease}</span>{" "}
+								{inRelease === 1 ? "change" : "changes"} in {tag(release)}
+							</span>
+						) : null}
 						<span>
 							<span className="text-fd-foreground tabular-nums">{person.total}</span>{" "}
 							{person.total === 1 ? "change" : "changes"} in total, first in{" "}
-							{person.first}
+							<a
+								href={`/docs/changelog#${person.first.id}`}
+								className="text-fd-foreground underline decoration-fd-border underline-offset-[3px] transition-[text-decoration-color] duration-150 hover:decoration-fd-foreground"
+							>
+								{tag(person.first.version)}
+							</a>
 						</span>
 					</span>
 				</span>
