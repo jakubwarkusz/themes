@@ -1,8 +1,11 @@
 "use client";
 
+import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useTOCItems } from "fumadocs-ui/components/toc";
+import { useTreePath } from "fumadocs-ui/contexts/tree";
 import type { TOCProps } from "fumadocs-ui/layouts/docs/page/slots/toc";
-import { m } from "motion/react";
+import { m, useMotionValueEvent, useTransform } from "motion/react";
 import {
 	Children,
 	type CSSProperties,
@@ -10,6 +13,7 @@ import {
 	isValidElement,
 	type ReactNode,
 	useEffect,
+	useId,
 	useLayoutEffect,
 	useMemo,
 	useRef,
@@ -209,9 +213,9 @@ function rewind(el: HTMLElement) {
 	el.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
 }
 
-export function Toc({ container }: TOCProps) {
+function useHeadings() {
 	const items = useTOCItems();
-	const headings = useMemo(
+	return useMemo(
 		() =>
 			items.map((item) => ({
 				id: item.url.slice(1),
@@ -220,8 +224,172 @@ export function Toc({ container }: TOCProps) {
 			})),
 		[items],
 	);
+}
 
-	if (items.length === 0) {
+const POPOVER_OFFSET = 112;
+
+function TocPopoverPanel({ headings }: { headings: Heading[] }) {
+	const active = useActiveIndex(headings, POPOVER_OFFSET);
+	const section = useSectionProgress(headings, POPOVER_OFFSET, active);
+	const overall = useTransform(section, (value) => (active + value) / headings.length);
+	const [started, setStarted] = useState(false);
+	const [open, setOpen] = useState(false);
+	const root = useRef<HTMLDivElement>(null);
+	const id = useId();
+	const page = useTreePath().at(-1)?.name;
+	const depths = headingTreeDepths(headings).map((d) => Math.min(d, 2));
+
+	useMotionValueEvent(section, "change", (value) => setStarted(active > 0 || value > 0));
+
+	useEffect(() => {
+		if (!open) return;
+		const close = (event: Event) => {
+			if (
+				event instanceof KeyboardEvent
+					? event.key === "Escape"
+					: !root.current?.contains(event.target as Node)
+			)
+				setOpen(false);
+		};
+		window.addEventListener("pointerdown", close);
+		window.addEventListener("keydown", close);
+		return () => {
+			window.removeEventListener("pointerdown", close);
+			window.removeEventListener("keydown", close);
+		};
+	}, [open]);
+
+	const label = started || active > 0 ? headings[active]?.text : page;
+
+	return (
+		<div
+			ref={root}
+			className={cn(
+				"border-b bg-fd-background/80 backdrop-blur-sm",
+				open && "bg-fd-background shadow-[0_10px_24px_rgb(0_0_0/0.08)]",
+			)}
+		>
+			<button
+				type="button"
+				aria-expanded={open}
+				aria-controls={id}
+				onClick={() => setOpen(!open)}
+				className="flex h-10 w-full items-center gap-3 px-4 text-start text-sm text-fd-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:ring-inset md:px-6"
+			>
+				<svg aria-hidden viewBox="0 0 16 16" className="size-4 shrink-0 -rotate-90">
+					<circle
+						cx="8"
+						cy="8"
+						r="6.5"
+						fill="none"
+						strokeWidth="1.5"
+						className="stroke-fd-border"
+					/>
+					<m.circle
+						cx="8"
+						cy="8"
+						r="6.5"
+						fill="none"
+						strokeWidth="1.5"
+						strokeLinecap="round"
+						className="stroke-fd-foreground"
+						style={{ pathLength: overall }}
+					/>
+				</svg>
+				<span
+					className={cn(
+						"min-w-0 flex-1 truncate transition-colors duration-150 [&_code]:text-[0.9em]",
+						(open || started) && "text-fd-foreground",
+					)}
+				>
+					{label}
+				</span>
+				<HugeiconsIcon
+					icon={ArrowDown01Icon}
+					size={14}
+					color="currentColor"
+					strokeWidth={2}
+					className={cn(
+						"shrink-0 transition-transform duration-200 ease-out motion-reduce:transition-none",
+						open && "rotate-180",
+					)}
+				/>
+			</button>
+			<div
+				id={id}
+				inert={!open}
+				className={cn(
+					"grid transition-[grid-template-rows] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
+					open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+				)}
+			>
+				<div className="min-h-0 overflow-hidden">
+					<ScrollFade className="max-h-[50vh] overflow-y-auto overscroll-contain px-4 pb-3 scrollbar-none md:px-6">
+						<ol className="flex flex-col">
+							{headings.map((heading, index) => {
+								const current = index === active;
+								const depth = depths[index];
+								return (
+									<li
+										key={heading.id}
+										className={cn(
+											"ms-[7.25px] border-s-[1.5px] transition-colors duration-150",
+											current ? "border-fd-foreground" : "border-fd-border",
+										)}
+									>
+										<a
+											href={`#${heading.id}`}
+											aria-current={current ? "location" : undefined}
+											onClick={(event) => {
+												event.preventDefault();
+												setOpen(false);
+												scrollToHeading(heading.id, POPOVER_OFFSET);
+											}}
+											className={cn(
+												"block py-1.5 ps-[19.25px] text-sm outline-none transition-colors duration-150 wrap-anywhere focus-visible:text-fd-foreground [&_code]:text-[0.9em]",
+												current
+													? "text-fd-foreground"
+													: "text-fd-muted-foreground hover:text-fd-foreground",
+											)}
+										>
+											<span
+												className={cn(
+													"block min-w-0",
+													depth === 1 && "ps-3",
+													depth === 2 && "ps-6",
+												)}
+											>
+												{heading.text}
+											</span>
+										</a>
+									</li>
+								);
+							})}
+						</ol>
+					</ScrollFade>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+export function TocPopover() {
+	const headings = useHeadings();
+	if (headings.length === 0) return null;
+
+	return (
+		<div className="sticky top-(--fd-docs-row-2) z-10 [grid-area:toc-popover] h-(--fd-toc-popover-height) xl:hidden max-xl:layout:[--fd-toc-popover-height:--spacing(10)]">
+			<MotionProvider>
+				<TocPopoverPanel headings={headings} />
+			</MotionProvider>
+		</div>
+	);
+}
+
+export function Toc({ container }: TOCProps) {
+	const headings = useHeadings();
+
+	if (headings.length === 0) {
 		return <div id="nd-toc-placeholder" className="hidden xl:layout:[--fd-toc-width:268px]" />;
 	}
 

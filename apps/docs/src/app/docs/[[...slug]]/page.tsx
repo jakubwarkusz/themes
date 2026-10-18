@@ -1,13 +1,13 @@
 import { findNeighbour } from "fumadocs-core/page-tree";
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/layouts/docs/page";
-import { TOCPopover, TOCProvider } from "fumadocs-ui/layouts/docs/page/slots/toc";
+import { TOCProvider } from "fumadocs-ui/layouts/docs/page/slots/toc";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx";
 import { PageActions } from "@/components/page-actions";
 import { PageFooter } from "@/components/page-footer";
-import { Toc } from "@/components/toc";
+import { Toc, TocPopover } from "@/components/toc";
 import { getReleases, isLegacy } from "@/lib/changelog";
 import { gitConfig } from "@/lib/layout.shared";
 import { getPageImage, source } from "@/lib/source";
@@ -43,7 +43,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 				container: { className: "pt-8" },
 			}}
 			footer={{ enabled: false }}
-			slots={{ toc: { provider: TOCProvider, main: Toc, popover: TOCPopover } }}
+			slots={{ toc: { provider: TOCProvider, main: Toc, popover: TocPopover } }}
 		>
 			<DocsTitle>{page.data.title}</DocsTitle>
 			<DocsDescription className="mb-0">{page.data.description}</DocsDescription>
