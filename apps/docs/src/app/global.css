@@ -58,13 +58,29 @@ kbd {
 
 #nd-sidebar button[data-search-full] {
 	border: 0;
-	border-radius: 10px;
-	background: var(--color-fd-card);
-	padding: 6px 6px 6px 10px;
-	transition: background-color 150ms ease-out;
+	border-radius: 8px;
+	background: transparent;
+	padding: 6px 6px 6px 8px;
+	color: var(--color-fd-muted-foreground);
+	transition:
+		background-color 150ms ease-out,
+		color 150ms ease-out;
 
 	&:hover {
-		background: var(--color-fd-secondary);
+		background: var(--color-fd-card);
+		color: var(--color-fd-foreground);
+	}
+}
+
+#nd-sidebar button[data-collapsed] {
+	color: var(--color-fd-muted-foreground);
+	transition:
+		background-color 150ms ease-out,
+		color 150ms ease-out;
+
+	&:hover {
+		background: var(--color-fd-card);
+		color: var(--color-fd-foreground);
 	}
 }
 

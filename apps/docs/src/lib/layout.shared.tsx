@@ -64,7 +64,7 @@ export function baseOptions(version?: string): BaseLayoutProps {
 					<span className="text-fd-muted-foreground">/</span>
 					<span className="font-medium">themes</span>
 					{version && (
-						<span className="rounded-md border border-fd-border bg-fd-muted px-1.5 py-0.5 text-xs font-medium text-fd-muted-foreground">
+						<span className="ms-0.5 font-mono text-xs text-fd-muted-foreground">
 							v{version}
 							{version.includes("beta") ? " · beta" : null}
 						</span>
