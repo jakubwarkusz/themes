@@ -1,7 +1,7 @@
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
-import type { ComponentProps } from "react";
+import { Children, type ComponentProps, isValidElement, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { Callout } from "./callout";
 import { CodeBlock } from "./code-block";
@@ -10,6 +10,16 @@ import { Beta, Breaking, Bug, Fixed, No, Since, Yes } from "./mdx-badges";
 import { Do, Dont } from "./practice";
 import { ScrollFade } from "./scroll-fade";
 import { ThemeDemo } from "./theme-demo";
+
+function countLines(children: ReactNode) {
+	const code = Children.toArray(children).find(isValidElement) as
+		| { props: { children?: ReactNode } }
+		| undefined;
+	return Children.toArray(code?.props.children).filter(
+		(line) =>
+			isValidElement<{ className?: string }>(line) && line.props.className?.includes("line"),
+	).length;
+}
 
 export function getMDXComponents(components?: MDXComponents) {
 	return {
@@ -24,7 +34,7 @@ export function getMDXComponents(components?: MDXComponents) {
 			className,
 			...props
 		}: ComponentProps<"pre"> & { icon?: unknown }) => (
-			<CodeBlock title={title}>
+			<CodeBlock title={title} lines={countLines(props.children)}>
 				<pre
 					className={cn(
 						className,
