@@ -152,6 +152,31 @@ function ReleaseEntry({ release, latest }: { release: Release; latest: boolean }
 												</span>
 											) : null}
 											<Inline text={item.text} />
+											{item.author ? (
+												<span className="ms-2 inline-flex items-center gap-1.5 align-middle">
+													<a
+														href={item.author.url}
+														target="_blank"
+														rel="noreferrer"
+														className="inline-flex items-center gap-1 text-xs text-fd-muted-foreground transition-colors duration-150 hover:text-fd-foreground"
+													>
+														<img
+															src={`https://github.com/${item.author.login}.png?size=32`}
+															alt=""
+															width={16}
+															height={16}
+															loading="lazy"
+															className="size-4 rounded-full bg-fd-secondary"
+														/>
+														@{item.author.login}
+													</a>
+													{item.author.first ? (
+														<Badge tone="success" dot>
+															First contribution
+														</Badge>
+													) : null}
+												</span>
+											) : null}
 											{item.commit ? (
 												<a
 													href={item.commit.url}

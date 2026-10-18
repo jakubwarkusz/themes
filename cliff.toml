@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 """
 body = """
+{% set excluded = ["jakubwarkusz", "zeedivx", "cursoragent"] -%}
+{% set excluded_names = ["Jakub", "Cursor Agent", "Vercel"] -%}
 {% if version -%}
     ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
 {% else -%}
@@ -24,7 +26,9 @@ body = """
 {% for group, commits in commits | group_by(attribute="group") %}
     ### {{ group | striptags | trim | upper_first }}
     {% for commit in commits %}
-        - {% if commit.scope %}*({{ commit.scope }})* {% endif %}{% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | split(pat="\\n") | first | upper_first | trim }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/commit/{{ commit.id }}))\
+        - {% if commit.scope %}*({{ commit.scope }})* {% endif %}{% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | split(pat="\\n") | first | upper_first | trim }}\
+        {% if commit.remote.username %}{% if commit.remote.username is not ending_with("[bot]") and commit.remote.username not in excluded %} by [@{{ commit.remote.username }}](https://github.com/{{ commit.remote.username }}){% endif %}{% elif commit.author.name is not ending_with("[bot]") and commit.author.name not in excluded_names %} by {{ commit.author.name }}{% endif %} \
+        ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/commit/{{ commit.id }}))\
     {% endfor %}
 {% endfor %}\n
 """

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - *(components)* Add AI logos and integrate them into page actions ([8898ae5](https://github.com/jakubwarkusz/themes/commit/8898ae5ecfc1bace20d042ac32588ea4a5293833))
+- *(changelog)* Implement getChangelogMarkdown function and update LLM text retrieval ([f1f0d0d](https://github.com/jakubwarkusz/themes/commit/f1f0d0df1cd4f512a424cbf075497eb9aa3500d1))
 
 ## [2.1.0] - 2026-10-18
 
@@ -114,8 +115,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- Include current unreleased history in CHANGELOG.md ([22c38ca](https://github.com/jakubwarkusz/themes/commit/22c38cae46fe9b4ef5f1b763081e9be845e01604))
-- Refresh CHANGELOG.md through the v2.0.2 tag ([d4de044](https://github.com/jakubwarkusz/themes/commit/d4de0442215624915e9c736c2b7b4e4b52e124dd))
+- Include current unreleased history in CHANGELOG.md by [@martijn00](https://github.com/martijn00) ([22c38ca](https://github.com/jakubwarkusz/themes/commit/22c38cae46fe9b4ef5f1b763081e9be845e01604))
+- Refresh CHANGELOG.md through the v2.0.2 tag by [@martijn00](https://github.com/martijn00) ([d4de044](https://github.com/jakubwarkusz/themes/commit/d4de0442215624915e9c736c2b7b4e4b52e124dd))
 
 ## [2.0.2] - 2026-09-20
 
@@ -139,44 +140,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- *(themes)* Add opt-in extended providers ([859c670](https://github.com/jakubwarkusz/themes/commit/859c670f8b6444aa600b60cd6eb149196c3eb8bc))
-- *(themes)* Pair createThemes with NextThemeProvider and ThemeScript ([48684af](https://github.com/jakubwarkusz/themes/commit/48684af9e1f8d70e4f575e3b4f4d948418a3b072))
+- *(themes)* Add opt-in extended providers by [@martijn00](https://github.com/martijn00) ([859c670](https://github.com/jakubwarkusz/themes/commit/859c670f8b6444aa600b60cd6eb149196c3eb8bc))
+- *(themes)* Pair createThemes with NextThemeProvider and ThemeScript by [@martijn00](https://github.com/martijn00) ([48684af](https://github.com/jakubwarkusz/themes/commit/48684af9e1f8d70e4f575e3b4f4d948418a3b072))
 
 ### Fixed
 
-- *(next)* Keep theme provider in app shells ([555cfe6](https://github.com/jakubwarkusz/themes/commit/555cfe67b94d1e740fc83cf2ec91d311d94ff5a2))
-- *(next)* Add metadata for tenant pages ([b83b62e](https://github.com/jakubwarkusz/themes/commit/b83b62e7e3811a99133a62318c21ad47df58edcf))
-- *(themes)* Stabilize provider initialization and bootstrap parity ([623a1c7](https://github.com/jakubwarkusz/themes/commit/623a1c7516f89d5f6730f5eda191b5400b63267d))
-- *(docs)* Trim unused theme exports and use dvh height ([89af1ca](https://github.com/jakubwarkusz/themes/commit/89af1cae06001949cf3bceb4625644647cb07aaf))
-- *(ci)* Clear audit advisories and build library before docs tests ([d6a9232](https://github.com/jakubwarkusz/themes/commit/d6a923269a8859c2e1aea795422dfa4ad24093b8))
-- *(tooling)* Keep generated script-source out of oxfmt ([4eaf966](https://github.com/jakubwarkusz/themes/commit/4eaf9662a365b602732653329025ca4ddbf27870))
-- *(tooling)* Restore library build before docs tests in verify ([c1a8995](https://github.com/jakubwarkusz/themes/commit/c1a8995ee601133aa9841257d2179a434c1f7d1c))
-- *(themes)* Keep setTheme off useEffectEvent for oxlint ([4f2845b](https://github.com/jakubwarkusz/themes/commit/4f2845bbf2d41a2e826c57428b3d10ad189e4c1d))
-- *(themes)* Satisfy exactOptionalPropertyTypes in extended providers ([a74d5ac](https://github.com/jakubwarkusz/themes/commit/a74d5ac4842ade0bfe9f1e2751035075fdd3b435))
-- *(themes)* Adapt extended provider tests after rebase onto main ([303b8e1](https://github.com/jakubwarkusz/themes/commit/303b8e172b1361d7f52c26d3543891c7c565d562))
-- *(themes)* Satisfy oxfmt and oxlint after rebase onto main ([cdb8fef](https://github.com/jakubwarkusz/themes/commit/cdb8fef44be4197132b1cba45adef58c0a5bcb00))
-- *(themes)* Carry merged-PR review feedback into extended providers ([df166d0](https://github.com/jakubwarkusz/themes/commit/df166d03476d3d096eb100d087f7133ba0962122))
-- *(tooling)* Sync pnpm lockfile with oxfmt/oxlint bumps ([3f952fd](https://github.com/jakubwarkusz/themes/commit/3f952fd9d6290ed1b06b8968abd845ebd9148cfc))
-- *(docs)* Keep Vercel on pinned Bun and use pnpm --filter ([895a406](https://github.com/jakubwarkusz/themes/commit/895a4060b00bac1cf3c76030a0b0c2f73c2523bb))
-- *(provider)* Keep the skip/memo pattern inside bundle budgets ([6b3060a](https://github.com/jakubwarkusz/themes/commit/6b3060a400771392f14454d36fdc6d34f70eb014))
-- Unify bootstrap and runtime theme DOM apply ([b5345d8](https://github.com/jakubwarkusz/themes/commit/b5345d855cab7abc57153449365b412a62c74343))
-- Re-apply theme after Instant Navigation restores the DOM ([84b3b1f](https://github.com/jakubwarkusz/themes/commit/84b3b1ff830c790b2a769d6a7fc3d9fd691db6b1))
-- Restore theme when Instant Navigation clears html class ([67f6f5f](https://github.com/jakubwarkusz/themes/commit/67f6f5fbed7e4d2e7c121a4e82380ca15ffe76cb))
-- Observe document replacements during Instant Navigation ([3a9c352](https://github.com/jakubwarkusz/themes/commit/3a9c352025c25c627832de67efecf589a3cd0912))
-- Narrow Instant Navigation observers and keep nested providers subscribed ([8c95ab1](https://github.com/jakubwarkusz/themes/commit/8c95ab188789ec4f0df5d8093c3843427c17ed6b))
-- Keep html theme across Instant Navigation descendant restores ([ad65e1c](https://github.com/jakubwarkusz/themes/commit/ad65e1cec1f65a6d98d2abd6ce0c81ffcb9ccb42))
-- Format getScript slice offsets for oxfmt ([9a47d7c](https://github.com/jakubwarkusz/themes/commit/9a47d7c3e2fb8c775782a0d10e466e83468db58d))
-- Reclaim next-provider gzip under the 3.91 KiB ceiling ([3e0a53a](https://github.com/jakubwarkusz/themes/commit/3e0a53afa481f9a42b8bdbd4643c960a8f9ecf4a))
+- *(next)* Keep theme provider in app shells by [@martijn00](https://github.com/martijn00) ([555cfe6](https://github.com/jakubwarkusz/themes/commit/555cfe67b94d1e740fc83cf2ec91d311d94ff5a2))
+- *(next)* Add metadata for tenant pages by [@martijn00](https://github.com/martijn00) ([b83b62e](https://github.com/jakubwarkusz/themes/commit/b83b62e7e3811a99133a62318c21ad47df58edcf))
+- *(themes)* Stabilize provider initialization and bootstrap parity by [@martijn00](https://github.com/martijn00) ([623a1c7](https://github.com/jakubwarkusz/themes/commit/623a1c7516f89d5f6730f5eda191b5400b63267d))
+- *(docs)* Trim unused theme exports and use dvh height by [@martijn00](https://github.com/martijn00) ([89af1ca](https://github.com/jakubwarkusz/themes/commit/89af1cae06001949cf3bceb4625644647cb07aaf))
+- *(ci)* Clear audit advisories and build library before docs tests by [@martijn00](https://github.com/martijn00) ([d6a9232](https://github.com/jakubwarkusz/themes/commit/d6a923269a8859c2e1aea795422dfa4ad24093b8))
+- *(tooling)* Keep generated script-source out of oxfmt by [@martijn00](https://github.com/martijn00) ([4eaf966](https://github.com/jakubwarkusz/themes/commit/4eaf9662a365b602732653329025ca4ddbf27870))
+- *(tooling)* Restore library build before docs tests in verify by [@martijn00](https://github.com/martijn00) ([c1a8995](https://github.com/jakubwarkusz/themes/commit/c1a8995ee601133aa9841257d2179a434c1f7d1c))
+- *(themes)* Keep setTheme off useEffectEvent for oxlint by [@martijn00](https://github.com/martijn00) ([4f2845b](https://github.com/jakubwarkusz/themes/commit/4f2845bbf2d41a2e826c57428b3d10ad189e4c1d))
+- *(themes)* Satisfy exactOptionalPropertyTypes in extended providers by [@martijn00](https://github.com/martijn00) ([a74d5ac](https://github.com/jakubwarkusz/themes/commit/a74d5ac4842ade0bfe9f1e2751035075fdd3b435))
+- *(themes)* Adapt extended provider tests after rebase onto main by [@martijn00](https://github.com/martijn00) ([303b8e1](https://github.com/jakubwarkusz/themes/commit/303b8e172b1361d7f52c26d3543891c7c565d562))
+- *(themes)* Satisfy oxfmt and oxlint after rebase onto main by [@martijn00](https://github.com/martijn00) ([cdb8fef](https://github.com/jakubwarkusz/themes/commit/cdb8fef44be4197132b1cba45adef58c0a5bcb00))
+- *(themes)* Carry merged-PR review feedback into extended providers by [@martijn00](https://github.com/martijn00) ([df166d0](https://github.com/jakubwarkusz/themes/commit/df166d03476d3d096eb100d087f7133ba0962122))
+- *(tooling)* Sync pnpm lockfile with oxfmt/oxlint bumps by [@martijn00](https://github.com/martijn00) ([3f952fd](https://github.com/jakubwarkusz/themes/commit/3f952fd9d6290ed1b06b8968abd845ebd9148cfc))
+- *(docs)* Keep Vercel on pinned Bun and use pnpm --filter by [@martijn00](https://github.com/martijn00) ([895a406](https://github.com/jakubwarkusz/themes/commit/895a4060b00bac1cf3c76030a0b0c2f73c2523bb))
+- *(provider)* Keep the skip/memo pattern inside bundle budgets by [@martijn00](https://github.com/martijn00) ([6b3060a](https://github.com/jakubwarkusz/themes/commit/6b3060a400771392f14454d36fdc6d34f70eb014))
+- Unify bootstrap and runtime theme DOM apply by [@martijn00](https://github.com/martijn00) ([b5345d8](https://github.com/jakubwarkusz/themes/commit/b5345d855cab7abc57153449365b412a62c74343))
+- Re-apply theme after Instant Navigation restores the DOM by [@martijn00](https://github.com/martijn00) ([84b3b1f](https://github.com/jakubwarkusz/themes/commit/84b3b1ff830c790b2a769d6a7fc3d9fd691db6b1))
+- Restore theme when Instant Navigation clears html class by [@martijn00](https://github.com/martijn00) ([67f6f5f](https://github.com/jakubwarkusz/themes/commit/67f6f5fbed7e4d2e7c121a4e82380ca15ffe76cb))
+- Observe document replacements during Instant Navigation by [@martijn00](https://github.com/martijn00) ([3a9c352](https://github.com/jakubwarkusz/themes/commit/3a9c352025c25c627832de67efecf589a3cd0912))
+- Narrow Instant Navigation observers and keep nested providers subscribed by [@martijn00](https://github.com/martijn00) ([8c95ab1](https://github.com/jakubwarkusz/themes/commit/8c95ab188789ec4f0df5d8093c3843427c17ed6b))
+- Keep html theme across Instant Navigation descendant restores by [@martijn00](https://github.com/martijn00) ([ad65e1c](https://github.com/jakubwarkusz/themes/commit/ad65e1cec1f65a6d98d2abd6ce0c81ffcb9ccb42))
+- Format getScript slice offsets for oxfmt by [@martijn00](https://github.com/martijn00) ([9a47d7c](https://github.com/jakubwarkusz/themes/commit/9a47d7c3e2fb8c775782a0d10e466e83468db58d))
+- Reclaim next-provider gzip under the 3.91 KiB ceiling by [@martijn00](https://github.com/martijn00) ([3e0a53a](https://github.com/jakubwarkusz/themes/commit/3e0a53afa481f9a42b8bdbd4643c960a8f9ecf4a))
 - Update documentation for clarity and consistency ([16a6211](https://github.com/jakubwarkusz/themes/commit/16a6211e64a8e2974bb62f45a4e0c85a8da2b55b))
 - Keep a single React/Next copy after the workspace bump ([53d6c48](https://github.com/jakubwarkusz/themes/commit/53d6c48f915c6dc042cb763fbf8cbd19e8370702))
 - *(docs)* Await fumadocs llms index in the llms.txt route ([850fac3](https://github.com/jakubwarkusz/themes/commit/850fac3d68b47ae593f785621eab08ecc217dfcf))
 
 ### Performance
 
-- *(themes)* Reclaim bundle budget headroom without raising limits ([a653226](https://github.com/jakubwarkusz/themes/commit/a6532261c6d4f1eb9bf2ef2e2a9bbf126bf65325))
-- *(docs)* Keep Analytics and below-fold home JS off the critical path ([b0bfd8b](https://github.com/jakubwarkusz/themes/commit/b0bfd8b0d305c9c5f53f91d9dd484de4a05fc9f9))
-- *(provider)* Apply theme once per toggle and keep context identity stable ([c7e5dd2](https://github.com/jakubwarkusz/themes/commit/c7e5dd206cf630735a17285a2e3598657c6e7ded))
-- Omit cookie-parser bytecode from the default inline bootstrap ([0ef37d2](https://github.com/jakubwarkusz/themes/commit/0ef37d258275f549fc33c58e57fef22f19913055))
+- *(themes)* Reclaim bundle budget headroom without raising limits by [@martijn00](https://github.com/martijn00) ([a653226](https://github.com/jakubwarkusz/themes/commit/a6532261c6d4f1eb9bf2ef2e2a9bbf126bf65325))
+- *(docs)* Keep Analytics and below-fold home JS off the critical path by [@martijn00](https://github.com/martijn00) ([b0bfd8b](https://github.com/jakubwarkusz/themes/commit/b0bfd8b0d305c9c5f53f91d9dd484de4a05fc9f9))
+- *(provider)* Apply theme once per toggle and keep context identity stable by [@martijn00](https://github.com/martijn00) ([c7e5dd2](https://github.com/jakubwarkusz/themes/commit/c7e5dd206cf630735a17285a2e3598657c6e7ded))
+- Omit cookie-parser bytecode from the default inline bootstrap by [@martijn00](https://github.com/martijn00) ([0ef37d2](https://github.com/jakubwarkusz/themes/commit/0ef37d258275f549fc33c58e57fef22f19913055))
 
 ### Changed
 
@@ -184,77 +185,77 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- *(themes)* Add upgrading-from-1.x layout example ([c676a82](https://github.com/jakubwarkusz/themes/commit/c676a825c82e85c2c1e74b22b4855b7074e11b11))
-- *(themes)* Call out TypeScript 5.9 peer requirement ([db9c980](https://github.com/jakubwarkusz/themes/commit/db9c980bf5b3b2c62aa727a810a82408026c091a))
-- *(themes)* Document upstream compatibility features ([cc8731a](https://github.com/jakubwarkusz/themes/commit/cc8731a1f702214adfca873d5bbfa10d90348833))
-- *(themes)* Dogfood package in documentation app ([157907c](https://github.com/jakubwarkusz/themes/commit/157907cac49343d1b3191fdd2ed01d167b24c3ce))
-- Add contributor and agent guidance ([f661027](https://github.com/jakubwarkusz/themes/commit/f661027b9080a5f6286cebdf199983590843faa3))
-- Preserve React 18 support metadata ([92ae3ea](https://github.com/jakubwarkusz/themes/commit/92ae3eaf66330aabf217df784a5ce4760e7e6eb5))
+- *(themes)* Add upgrading-from-1.x layout example by [@martijn00](https://github.com/martijn00) ([c676a82](https://github.com/jakubwarkusz/themes/commit/c676a825c82e85c2c1e74b22b4855b7074e11b11))
+- *(themes)* Call out TypeScript 5.9 peer requirement by [@martijn00](https://github.com/martijn00) ([db9c980](https://github.com/jakubwarkusz/themes/commit/db9c980bf5b3b2c62aa727a810a82408026c091a))
+- *(themes)* Document upstream compatibility features by [@martijn00](https://github.com/martijn00) ([cc8731a](https://github.com/jakubwarkusz/themes/commit/cc8731a1f702214adfca873d5bbfa10d90348833))
+- *(themes)* Dogfood package in documentation app by [@martijn00](https://github.com/martijn00) ([157907c](https://github.com/jakubwarkusz/themes/commit/157907cac49343d1b3191fdd2ed01d167b24c3ce))
+- Add contributor and agent guidance by [@martijn00](https://github.com/martijn00) ([f661027](https://github.com/jakubwarkusz/themes/commit/f661027b9080a5f6286cebdf199983590843faa3))
+- Preserve React 18 support metadata by [@martijn00](https://github.com/martijn00) ([92ae3ea](https://github.com/jakubwarkusz/themes/commit/92ae3eaf66330aabf217df784a5ce4760e7e6eb5))
 - Update README and migration guides for `2.0.0-beta.1` release, highlighting breaking changes and installation instructions with `@beta` tag ([1908f3a](https://github.com/jakubwarkusz/themes/commit/1908f3aff057f1e7699fbb1a2804743e901a7a61))
 - Update migration guides and API documentation for `2.0.0-beta.1`, clarifying breaking changes and enhancing MDX component integration ([6f1e6ad](https://github.com/jakubwarkusz/themes/commit/6f1e6adedc392045d13883bc64e6ab34ec6106bb))
-- Normalize README spacing ([099f2a6](https://github.com/jakubwarkusz/themes/commit/099f2a6cece1cc388b3c2dc9c6353f188ad11264))
-- Document Shadow DOM themeRoot and align 2.0 public API copy ([7de64de](https://github.com/jakubwarkusz/themes/commit/7de64dee09d2c43da216d98bdd9fb539eaa9f323))
+- Normalize README spacing by [@martijn00](https://github.com/martijn00) ([099f2a6](https://github.com/jakubwarkusz/themes/commit/099f2a6cece1cc388b3c2dc9c6353f188ad11264))
+- Document Shadow DOM themeRoot and align 2.0 public API copy by [@martijn00](https://github.com/martijn00) ([7de64de](https://github.com/jakubwarkusz/themes/commit/7de64dee09d2c43da216d98bdd9fb539eaa9f323))
 
 ### Miscellaneous
 
-- Add project agent skills for React and Next work ([d5d3bd2](https://github.com/jakubwarkusz/themes/commit/d5d3bd27ac6e4b0f00c6b4e5a7ea488b6d6c6fa0))
-- *(themes)* Test TypeScript 5.9 through 7 ([0269eaf](https://github.com/jakubwarkusz/themes/commit/0269eafb118d774f46b299510b81f8decbad12fe))
-- Verify library and docs independently ([26fb7d4](https://github.com/jakubwarkusz/themes/commit/26fb7d4c65810b09d242c54c66629d0df0a9a4a2))
-- Align release and support gates ([e7fb022](https://github.com/jakubwarkusz/themes/commit/e7fb022dc090b2cfad96e9f4a5fb16120d162557))
-- Align final stack tooling state ([3f2a709](https://github.com/jakubwarkusz/themes/commit/3f2a70977b5e0e2aff9422814efa1f5dd30f82bb))
-- Refresh split train lockfile ([187d488](https://github.com/jakubwarkusz/themes/commit/187d48863ca37187bb8dd7fbe2c5b89737af429b))
+- Add project agent skills for React and Next work by [@martijn00](https://github.com/martijn00) ([d5d3bd2](https://github.com/jakubwarkusz/themes/commit/d5d3bd27ac6e4b0f00c6b4e5a7ea488b6d6c6fa0))
+- *(themes)* Test TypeScript 5.9 through 7 by [@martijn00](https://github.com/martijn00) ([0269eaf](https://github.com/jakubwarkusz/themes/commit/0269eafb118d774f46b299510b81f8decbad12fe))
+- Verify library and docs independently by [@martijn00](https://github.com/martijn00) ([26fb7d4](https://github.com/jakubwarkusz/themes/commit/26fb7d4c65810b09d242c54c66629d0df0a9a4a2))
+- Align release and support gates by [@martijn00](https://github.com/martijn00) ([e7fb022](https://github.com/jakubwarkusz/themes/commit/e7fb022dc090b2cfad96e9f4a5fb16120d162557))
+- Align final stack tooling state by [@martijn00](https://github.com/martijn00) ([3f2a709](https://github.com/jakubwarkusz/themes/commit/3f2a70977b5e0e2aff9422814efa1f5dd30f82bb))
+- Refresh split train lockfile by [@martijn00](https://github.com/martijn00) ([187d488](https://github.com/jakubwarkusz/themes/commit/187d48863ca37187bb8dd7fbe2c5b89737af429b))
 - Exclude .agents dir from Linguist ([44350d8](https://github.com/jakubwarkusz/themes/commit/44350d8c0ca17851324313e941bea43ca8001299))
 - Update package manager to bun@1.3.9 and add install command in vercel.json ([3e21a2c](https://github.com/jakubwarkusz/themes/commit/3e21a2c1c0d339bded5d539dc633bde6ccb8dbb0))
 - Update build command in vercel.json to use bunx for consistency ([4c937bc](https://github.com/jakubwarkusz/themes/commit/4c937bcdd3fb170170533fbe18e5d25890b22e55))
-- *(tooling)* Replace Biome with Oxc lint and format ([2f8e155](https://github.com/jakubwarkusz/themes/commit/2f8e1553fc9cdbdc4d4e9c76816ec259299ebc39))
-- *(tooling)* Bump oxfmt and oxlint to latest ([421083b](https://github.com/jakubwarkusz/themes/commit/421083b7f8ab0e4fdde391a6083e2ea45f8b7ce7))
-- *(tooling)* Switch package management from Bun to pnpm ([df09e3f](https://github.com/jakubwarkusz/themes/commit/df09e3fc6d03c0f6d92f13939612049c7e5b80dd))
-- *(ci)* Group Dependabot updates into fewer PRs ([6211d02](https://github.com/jakubwarkusz/themes/commit/6211d021f7fe91f05cd7e2ca20532ee319c20516))
-- *(themes)* Generate extended bootstrap source ([1ecb992](https://github.com/jakubwarkusz/themes/commit/1ecb9929c5567dc6ecfd44e387660d522c48e37f))
-- *(ci)* Stop triple-building the library and finish pnpm leftover drift ([deee334](https://github.com/jakubwarkusz/themes/commit/deee334cdf39e99c09ffa38b5db0bd0dcc27ee49))
+- *(tooling)* Replace Biome with Oxc lint and format by [@martijn00](https://github.com/martijn00) ([2f8e155](https://github.com/jakubwarkusz/themes/commit/2f8e1553fc9cdbdc4d4e9c76816ec259299ebc39))
+- *(tooling)* Bump oxfmt and oxlint to latest by [@martijn00](https://github.com/martijn00) ([421083b](https://github.com/jakubwarkusz/themes/commit/421083b7f8ab0e4fdde391a6083e2ea45f8b7ce7))
+- *(tooling)* Switch package management from Bun to pnpm by [@martijn00](https://github.com/martijn00) ([df09e3f](https://github.com/jakubwarkusz/themes/commit/df09e3fc6d03c0f6d92f13939612049c7e5b80dd))
+- *(ci)* Group Dependabot updates into fewer PRs by [@martijn00](https://github.com/martijn00) ([6211d02](https://github.com/jakubwarkusz/themes/commit/6211d021f7fe91f05cd7e2ca20532ee319c20516))
+- *(themes)* Generate extended bootstrap source by [@pttydou](https://github.com/pttydou) ([1ecb992](https://github.com/jakubwarkusz/themes/commit/1ecb9929c5567dc6ecfd44e387660d522c48e37f))
+- *(ci)* Stop triple-building the library and finish pnpm leftover drift by [@martijn00](https://github.com/martijn00) ([deee334](https://github.com/jakubwarkusz/themes/commit/deee334cdf39e99c09ffa38b5db0bd0dcc27ee49))
 
 ### Other
 
-- Address PR review feedback (#37) ([9adf140](https://github.com/jakubwarkusz/themes/commit/9adf140328eebc23a210db5a0740ebd9c10556a1))
-- Address PR review feedback (#38) ([bab55c3](https://github.com/jakubwarkusz/themes/commit/bab55c347628dacbf33b1185753a1a23e570f3ba))
+- Address PR review feedback (#37) by [@martijn00](https://github.com/martijn00) ([9adf140](https://github.com/jakubwarkusz/themes/commit/9adf140328eebc23a210db5a0740ebd9c10556a1))
+- Address PR review feedback (#38) by [@martijn00](https://github.com/martijn00) ([bab55c3](https://github.com/jakubwarkusz/themes/commit/bab55c347628dacbf33b1185753a1a23e570f3ba))
 
 ## [1.2.0] - 2026-08-10
 
 ### Added
 
-- *(themes)* Isolate typed factory contexts ([739b02a](https://github.com/jakubwarkusz/themes/commit/739b02a7cdbb14a028785c8d0773a8b73a07df2c))
-- *(themes)* Tighten public TypeScript contracts ([88738ad](https://github.com/jakubwarkusz/themes/commit/88738ad6882326d3e90a600028420144ad862a01))
-- *(themes)* Adopt useEffectEvent with React 18 fallback ([28efd5c](https://github.com/jakubwarkusz/themes/commit/28efd5c4ec6b7bb10cda9b5adc4d6476d6d51908))
+- *(themes)* Isolate typed factory contexts by [@martijn00](https://github.com/martijn00) ([739b02a](https://github.com/jakubwarkusz/themes/commit/739b02a7cdbb14a028785c8d0773a8b73a07df2c))
+- *(themes)* Tighten public TypeScript contracts by [@martijn00](https://github.com/martijn00) ([88738ad](https://github.com/jakubwarkusz/themes/commit/88738ad6882326d3e90a600028420144ad862a01))
+- *(themes)* Adopt useEffectEvent with React 18 fallback by [@martijn00](https://github.com/martijn00) ([28efd5c](https://github.com/jakubwarkusz/themes/commit/28efd5c4ec6b7bb10cda9b5adc4d6476d6d51908))
 
 ## [1.1.0] - 2026-08-03
 
 ### Added
 
-- *(themes)* Add a stable framework-neutral bootstrap ([58b9664](https://github.com/jakubwarkusz/themes/commit/58b9664d4cf725d29502dcd82449bc03d77ac6ef))
-- *(themes)* Expose portable client APIs ([39282e5](https://github.com/jakubwarkusz/themes/commit/39282e5118c4fd1aadfe4b3d19edf8574445240b))
+- *(themes)* Add a stable framework-neutral bootstrap by [@martijn00](https://github.com/martijn00) ([58b9664](https://github.com/jakubwarkusz/themes/commit/58b9664d4cf725d29502dcd82449bc03d77ac6ef))
+- *(themes)* Expose portable client APIs by [@martijn00](https://github.com/martijn00) ([39282e5](https://github.com/jakubwarkusz/themes/commit/39282e5118c4fd1aadfe4b3d19edf8574445240b))
 
 ### Fixed
 
-- *(themes)* Harden runtime theme synchronization ([2a97fb6](https://github.com/jakubwarkusz/themes/commit/2a97fb6e74a2e8bf415ac3f5a532a78095b98710))
-- *(themes)* Validate stored selections consistently ([4722c9b](https://github.com/jakubwarkusz/themes/commit/4722c9bed83c6c9d654917e1bc1f4f0d40083bf0))
-- *(themes)* Keep default provider lightweight ([a15ad09](https://github.com/jakubwarkusz/themes/commit/a15ad09b2ee43e412df054e01dbee1449e400f5c))
-- *(themes)* Forward storage errors in Next provider ([3c192c5](https://github.com/jakubwarkusz/themes/commit/3c192c5ef582b279142b19b9e4de5f62f7f2dc0f))
-- *(themes)* Resolve package imports during type-check ([80c316c](https://github.com/jakubwarkusz/themes/commit/80c316c05a3a07ea91864a73ebb0e65414065fd8))
-- *(themes)* Keep next-provider bootstrap within size budget ([6aa95fb](https://github.com/jakubwarkusz/themes/commit/6aa95fb33cc4e868d02fc394dde26379ba07e499))
-- *(themes)* Address portable SSR review feedback ([5d60a44](https://github.com/jakubwarkusz/themes/commit/5d60a446e01522c2fab1e6ab55531a7f3ddec042))
-- *(themes)* Honor enableSystem when resolving system theme ([851e953](https://github.com/jakubwarkusz/themes/commit/851e953a263d6d263495b5a246d6aa3cb9c9abdc))
+- *(themes)* Harden runtime theme synchronization by [@martijn00](https://github.com/martijn00) ([2a97fb6](https://github.com/jakubwarkusz/themes/commit/2a97fb6e74a2e8bf415ac3f5a532a78095b98710))
+- *(themes)* Validate stored selections consistently by [@martijn00](https://github.com/martijn00) ([4722c9b](https://github.com/jakubwarkusz/themes/commit/4722c9bed83c6c9d654917e1bc1f4f0d40083bf0))
+- *(themes)* Keep default provider lightweight by [@martijn00](https://github.com/martijn00) ([a15ad09](https://github.com/jakubwarkusz/themes/commit/a15ad09b2ee43e412df054e01dbee1449e400f5c))
+- *(themes)* Forward storage errors in Next provider by [@martijn00](https://github.com/martijn00) ([3c192c5](https://github.com/jakubwarkusz/themes/commit/3c192c5ef582b279142b19b9e4de5f62f7f2dc0f))
+- *(themes)* Resolve package imports during type-check by [@martijn00](https://github.com/martijn00) ([80c316c](https://github.com/jakubwarkusz/themes/commit/80c316c05a3a07ea91864a73ebb0e65414065fd8))
+- *(themes)* Keep next-provider bootstrap within size budget by [@martijn00](https://github.com/martijn00) ([6aa95fb](https://github.com/jakubwarkusz/themes/commit/6aa95fb33cc4e868d02fc394dde26379ba07e499))
+- *(themes)* Address portable SSR review feedback by [@martijn00](https://github.com/martijn00) ([5d60a44](https://github.com/jakubwarkusz/themes/commit/5d60a446e01522c2fab1e6ab55531a7f3ddec042))
+- *(themes)* Honor enableSystem when resolving system theme by [@martijn00](https://github.com/martijn00) ([851e953](https://github.com/jakubwarkusz/themes/commit/851e953a263d6d263495b5a246d6aa3cb9c9abdc))
 
 ### Performance
 
-- *(themes)* Use set lookups and register benchmark fixtures ([bfa524a](https://github.com/jakubwarkusz/themes/commit/bfa524a81f03d5de4f98a0b4feb1bb0fe2c389ca))
+- *(themes)* Use set lookups and register benchmark fixtures by [@martijn00](https://github.com/martijn00) ([bfa524a](https://github.com/jakubwarkusz/themes/commit/bfa524a81f03d5de4f98a0b4feb1bb0fe2c389ca))
 
 ### Documentation
 
-- *(themes)* Document portable APIs ([3cfd6b1](https://github.com/jakubwarkusz/themes/commit/3cfd6b11c7fe311d23de6e28b3a16f7b97bc0645))
+- *(themes)* Document portable APIs by [@martijn00](https://github.com/martijn00) ([3cfd6b1](https://github.com/jakubwarkusz/themes/commit/3cfd6b11c7fe311d23de6e28b3a16f7b97bc0645))
 
 ### Miscellaneous
 
-- Drop unused @biomejs/cli-linux-x64 dev dependency ([92b60f2](https://github.com/jakubwarkusz/themes/commit/92b60f2cf7e50f65ac10720fb5c819eac128076e))
+- Drop unused @biomejs/cli-linux-x64 dev dependency by [@martijn00](https://github.com/martijn00) ([92b60f2](https://github.com/jakubwarkusz/themes/commit/92b60f2cf7e50f65ac10720fb5c819eac128076e))
 
 ## [1.0.0] - 2026-07-04
 
@@ -331,7 +332,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- *(readme->docs)* Fixed fields values in API reference ([e0772af](https://github.com/jakubwarkusz/themes/commit/e0772af7494a164c6a8f0d1658881c8574543af6))
+- *(readme->docs)* Fixed fields values in API reference by [@oliverperzyk](https://github.com/oliverperzyk) ([e0772af](https://github.com/jakubwarkusz/themes/commit/e0772af7494a164c6a8f0d1658881c8574543af6))
 
 ### Changed
 
@@ -347,9 +348,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- *(github->dx)* Added configuration of Dependabot ([a9358d6](https://github.com/jakubwarkusz/themes/commit/a9358d68a8c4e60f59911bbc89a367fa35621510))
-- *(github->funding)* Added funding file ([e403faa](https://github.com/jakubwarkusz/themes/commit/e403faa3ed28c32736fc61bf6849f58aed996f8e))
-- *(themes)* Add bundle size benchmarks ([7096486](https://github.com/jakubwarkusz/themes/commit/70964864d4f1960e5fbc23b059d8131d6fd6a76d))
+- *(github->dx)* Added configuration of Dependabot by [@oliverperzyk](https://github.com/oliverperzyk) ([a9358d6](https://github.com/jakubwarkusz/themes/commit/a9358d68a8c4e60f59911bbc89a367fa35621510))
+- *(github->funding)* Added funding file by [@oliverperzyk](https://github.com/oliverperzyk) ([e403faa](https://github.com/jakubwarkusz/themes/commit/e403faa3ed28c32736fc61bf6849f58aed996f8e))
+- *(themes)* Add bundle size benchmarks by [@salasebas](https://github.com/salasebas) ([7096486](https://github.com/jakubwarkusz/themes/commit/70964864d4f1960e5fbc23b059d8131d6fd6a76d))
 - *(themes)* Add followSystem option to theme configuration and update related tests ([b64cb66](https://github.com/jakubwarkusz/themes/commit/b64cb66794df08ac17226eb311e8c1fb2c529e2a))
 - *(themes)* Enhance cookie serialization with validation for names, paths, and domains ([7b14a06](https://github.com/jakubwarkusz/themes/commit/7b14a06f18b096cfe73f8f902ebe6f15d4835b35))
 
@@ -403,7 +404,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Forward cookieOptions through ThemeProvider wrappers ([aaf7876](https://github.com/jakubwarkusz/themes/commit/aaf787602cfea10957e83d442b48b0f5eb58dabf))
+- Forward cookieOptions through ThemeProvider wrappers by Cihat Karli ([aaf7876](https://github.com/jakubwarkusz/themes/commit/aaf787602cfea10957e83d442b48b0f5eb58dabf))
 
 ### Changed
 

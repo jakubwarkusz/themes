@@ -7,6 +7,7 @@ export type ChangelogItem = {
 	breaking: boolean;
 	text: string;
 	commit?: { hash: string; url: string };
+	author?: { login: string; url: string; first: boolean };
 };
 export type ChangelogGroup = { name: string; items: ChangelogItem[] };
 export type Release = {
@@ -83,8 +84,21 @@ export const getReleases = cache(async (): Promise<Release[]> => {
 				if (!commit) continue;
 				entry.commit = { hash: commit[1], url: commit[2] };
 				entry.text = entry.text.slice(0, commit.index).trim();
+				const author = entry.text.match(/\s+by \[@([\w-]+)\]\((\S+?)\)$/);
+				if (!author) continue;
+				entry.author = { login: author[1], url: author[2], first: false };
+				entry.text = entry.text.slice(0, author.index).trim();
 			}
 	}
+
+	const seen = new Set<string>();
+	for (const release of releases.toReversed())
+		for (const group of release.groups)
+			for (const entry of group.items) {
+				if (!entry.author || seen.has(entry.author.login)) continue;
+				seen.add(entry.author.login);
+				entry.author.first = true;
+			}
 	return releases.filter((release) => release.groups.some((group) => group.items.length));
 });
 
@@ -103,7 +117,7 @@ export async function getChangelogMarkdown() {
 						"",
 						...group.items.map(
 							(item) =>
-								`- ${item.breaking ? "**Breaking:** " : ""}${item.scope ? `**${item.scope}:** ` : ""}${item.text}`,
+								`- ${item.breaking ? "**Breaking:** " : ""}${item.scope ? `**${item.scope}:** ` : ""}${item.text}${item.author ? ` by [@${item.author.login}](${item.author.url})${item.author.first ? " (first contribution)" : ""}` : ""}`,
 						),
 					].join("\n"),
 				);
