@@ -6,6 +6,7 @@ import {
 	SidebarFolderContent,
 	SidebarFolderLink,
 	SidebarFolderTrigger,
+	useFolderDepth,
 } from "fumadocs-ui/components/sidebar/base";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -13,7 +14,12 @@ import { sidebarActiveClass, sidebarBaseClass, sidebarMutedClass } from "./sideb
 
 export function SidebarFolderComponent({ item, children }: { item: Folder; children: ReactNode }) {
 	const pathname = usePathname();
+	const depth = useFolderDepth();
 	const isActive = item.index ? pathname === item.index.url : false;
+
+	if (depth === 0 && !item.index) {
+		return <div className="flex flex-col">{children}</div>;
+	}
 
 	const triggerCls = `${sidebarBaseClass} ${isActive ? sidebarActiveClass : sidebarMutedClass} [&_svg[data-icon]]:ms-auto [&_svg[data-icon]]:size-3 [&_svg[data-icon]]:opacity-40 w-full`;
 

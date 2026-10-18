@@ -1,8 +1,8 @@
 export const sidebarBaseClass =
-	"flex w-full items-center rounded-md px-3 py-1.5 text-sm transition-colors duration-100 hover:text-fd-foreground";
+	"flex items-center py-1 ps-6 pe-2 text-sm leading-5 transition-colors duration-150 ease-out";
 
-export const sidebarMutedClass = "text-fd-muted-foreground";
-export const sidebarActiveClass = "text-fd-foreground font-medium";
+export const sidebarMutedClass = "text-fd-muted-foreground hover:text-fd-foreground";
+export const sidebarActiveClass = "font-medium text-fd-foreground";
 
 export function sidebarIndent(depth: number) {
 	return depth > 0 ? { paddingInlineStart: `${depth * 12 + 12}px` } : undefined;

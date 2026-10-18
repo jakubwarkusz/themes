@@ -1,14 +1,14 @@
 {
   "title": "@wrksz/themes",
   "pages": [
+    "---Guides---",
     "index",
     "agents",
+    "migration",
+    "why-not-next-themes",
     "---API---",
     "api",
     "---Examples---",
-    "examples",
-    "---More---",
-    "migration",
-    "why-not-next-themes"
+    "examples"
   ]
 }

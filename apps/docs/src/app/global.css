@@ -50,6 +50,37 @@ kbd {
 	border-inline-end: 1px solid var(--color-fd-border) !important;
 }
 
+@layer utilities {
+	#nd-sidebar [data-radix-scroll-area-viewport] > div {
+		gap: 0 !important;
+	}
+}
+
+#nd-sidebar button[data-search-full] {
+	border: 0;
+	border-radius: 10px;
+	background: var(--color-fd-card);
+	padding: 6px 6px 6px 10px;
+	transition: background-color 150ms ease-out;
+
+	&:hover {
+		background: var(--color-fd-secondary);
+	}
+}
+
+#nd-sidebar div:has(> [data-theme-toggle]) {
+	border: 0;
+	background: transparent;
+	padding: 0;
+}
+
+#nd-sidebar [data-theme-toggle] {
+	border: 0;
+	border-radius: 9999px;
+	background: var(--color-fd-card);
+	padding: 2px;
+}
+
 #toc-title {
 	display: none;
 }
