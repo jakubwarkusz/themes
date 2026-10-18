@@ -21,6 +21,7 @@ yarn-error.log*
 .next
 .worktrees/
 packages/themes/benchmarks/.bundle-size/
+packages/themes/.publish/
 
 .pnpm-store/
 .worktrees/

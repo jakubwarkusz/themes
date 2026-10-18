@@ -11,6 +11,7 @@ import {
 import {
 	applyThemeToDom,
 	getDomWindow,
+	getTargetEl,
 	readStoredTheme,
 	writeStoredTheme,
 } from "../core/client-dom.js";
@@ -201,10 +202,14 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		initializeEvent();
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
-		return subscribeHistoryReapply(domWindow, () => {
-			const last = lastAppliedRef.current;
-			if (last) applyThemeToDom(last);
-		});
+		return subscribeHistoryReapply(
+			domWindow,
+			() => {
+				const last = lastAppliedRef.current;
+				if (last) applyThemeToDom(last);
+			},
+			() => getTargetEl(lastAppliedRef.current?.target ?? "html"),
+		);
 	}, []);
 
 	// setTheme / system / storage already write the DOM. Re-apply only when

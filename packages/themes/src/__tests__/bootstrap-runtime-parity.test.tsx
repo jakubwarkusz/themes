@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { cleanup, render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { applyThemeToDom } from "../core/client-dom.js";
+import { applyExtendedThemeToDom, type AppliedThemeState } from "../core/extended-client-dom.js";
 import { getScript } from "../core/script.js";
 import { resolveDefaultTheme } from "../core/theme-validation.js";
 import type { Attribute, ThemeProviderProps } from "../core/types.js";
@@ -183,8 +184,18 @@ const cases: ParityCase[] = [
 	},
 ];
 
+let frames: FrameRequestCallback[] = [];
+
+function flushFrame(): void {
+	const pending = frames;
+	frames = [];
+	for (const callback of pending) callback(0);
+}
+
 function resetDom(parityCase?: ParityCase): void {
 	cleanup();
+	flushFrame();
+	flushFrame();
 	localStorage.clear();
 	sessionStorage.clear();
 	clearCookies();
@@ -288,19 +299,15 @@ function getProviderProps(parityCase: ParityCase): Omit<ThemeProviderProps<strin
 }
 
 beforeEach(() => {
-	// Flush transition-disable style cleanup synchronously so later suites are not
-	// hit by happy-dom removeChild errors from pending requestAnimationFrame work.
-	const flushFrame = ((callback: FrameRequestCallback) => {
-		callback(0);
-		return 0;
-	}) as typeof requestAnimationFrame;
-	globalThis.requestAnimationFrame = flushFrame;
-	window.requestAnimationFrame = flushFrame;
+	vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) =>
+		frames.push(callback),
+	);
 	resetDom();
 });
 
 afterEach(() => {
 	resetDom();
+	vi.unstubAllGlobals();
 });
 
 describe("bootstrap/runtime/provider parity", () => {
@@ -398,6 +405,38 @@ describe("bootstrap/runtime/provider parity", () => {
 });
 
 describe("bootstrap/runtime sequential apply", () => {
+	test("cached runtime tokens match bootstrap after DOM restoration and remapping", () => {
+		const value = { dark: "dark palette-dark" };
+		let previous: AppliedThemeState | undefined;
+		for (const mapped of ["dark palette-dark", "dark palette-dark", "night palette-night"]) {
+			value.dark = mapped;
+			resetDom();
+			localStorage.setItem("theme", "dark");
+			const bootstrap = captureDom(() =>
+				runGeneratedScript({
+					...scriptBase,
+					value,
+					disableTransitionOnChange: "color 0s",
+				}),
+			);
+			for (const extended of [false, true]) {
+				resetDom();
+				const options = {
+					...applyOptions,
+					resolved: "dark",
+					valueMap: value,
+					themeColor: scriptBase.themeColors,
+					disableTransitionOnChange: "color 0s",
+				};
+				const runtime = captureDom(() => {
+					if (extended) previous = applyExtendedThemeToDom({ ...options, previous });
+					else applyThemeToDom(options);
+				});
+				expect(runtime).toEqual(bootstrap);
+			}
+		}
+	});
+
 	const scriptBase = {
 		storageKey: "theme",
 		attribute: "class" as const,

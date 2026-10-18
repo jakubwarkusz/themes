@@ -104,7 +104,8 @@
 	},
 	"scripts": {
 		"generate:script-source": "tsx scripts/generate-script-source.ts",
-		"build": "pnpm generate:script-source && tsdown",
+		"build": "pnpm generate:script-source && tsdown --no-dts && tsdown --config tsdown.types.config.ts && pnpm prepare:package",
+		"prepare:package": "tsx scripts/prepare-package.ts",
 		"dev": "pnpm generate:script-source && tsdown --watch",
 		"type-check": "tsc --noEmit",
 		"type-check:compat:5.9": "pnpm build && pnpm --package typescript@5.9.3 dlx tsc --noEmit && pnpm --package typescript@5.9.3 dlx tsc -p tsconfig.compat.json && tsx --tsconfig tsconfig.compat.json scripts/smoke-exports.ts",

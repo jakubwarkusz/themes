@@ -13,6 +13,7 @@ import {
 	type AppliedThemeState,
 	applyExtendedThemeToDom,
 	getDomWindow,
+	getTargetElement,
 	readStoredTheme,
 	writeStoredTheme,
 } from "../core/extended-client-dom.js";
@@ -248,10 +249,17 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		initializeEvent();
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
-		return subscribeHistoryReapply(domWindow, () => {
-			const last = lastAppliedRef.current;
-			if (last) applyToDomEvent(last.resolved);
-		});
+		return subscribeHistoryReapply(
+			domWindow,
+			() => {
+				const last = lastAppliedRef.current;
+				if (last) applyToDomEvent(last.resolved);
+			},
+			() => {
+				const last = lastAppliedRef.current;
+				return getTargetElement(last?.target ?? "html", last?.themeRoot);
+			},
+		);
 	}, []);
 
 	// setTheme / system / storage already write the DOM. Re-apply only when

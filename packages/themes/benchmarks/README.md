@@ -1,5 +1,24 @@
 # Bundle Size Benchmarks
 
+## Published package
+
+`pnpm --filter @wrksz/themes build` preserves the runtime modules and client boundaries,
+then bundles declarations into public entrypoints backed by a shared declaration file.
+JSDoc is retained. Development watch builds keep their module-preserving declarations.
+
+The build also prepares `packages/themes/.publish/` with `dist`, README, agent guidance,
+and a manifest derived from the source package.json without `scripts` or `devDependencies`.
+Exports, peer requirements, version, license metadata, and other consumer fields are preserved.
+The source manifest is never rewritten by this step; release tags are applied before building.
+
+`pnpm --filter @wrksz/themes size:package` refreshes that staging directory, measures its npm
+pack contents, checks declaration imports and export paths, and smoke-imports the staged
+package. The release workflow publishes **that directory**, not the workspace package root.
+For a local tarball, build first and run `npm pack ./packages/themes/.publish --ignore-scripts`
+from the repository root. Do not publish the workspace root package directly.
+
+## Client bundles
+
 These fixtures measure small, realistic `@wrksz/themes` consumption cases:
 
 - `use-theme`: imports `useTheme` from `@wrksz/themes/client`
@@ -83,3 +102,22 @@ deltas for every fixture.
 - `maxBytes` / `maxGzipBytes`: hard per-fixture size limits, always checked.
 - `maxDeltaBytes` / `maxDeltaGzipBytes`: allowed growth versus a baseline, checked only when
   `--compare` is used.
+
+## Runtime workloads
+
+Run the runtime microbenchmarks separately from correctness tests:
+
+```bash
+pnpm --filter @wrksz/themes exec vitest bench --run benchmarks/runtime.bench.ts
+```
+
+The three workloads measure batches of 1,000 unchanged DOM applications, unrelated class
+mutations with a frame flush after each delivery, and rapid theme changes followed by two
+animation frames. Use the same benchmark file, dependencies, and runtime for both revisions.
+JSON results can be saved with `--reporter=json --outputFile=/tmp/themes-runtime.json`.
+
+These are synthetic happy-dom measurements with controlled observer delivery and animation
+frames, not browser frame times or end-user navigation latency. The rapid-change workload
+is a stress case, not typical usage. Correctness tests separately cover selective observer
+dispatch, bounded token reuse, transition-style reuse, and bootstrap/runtime parity. Real
+Next.js navigation and Activity restoration remain covered by `pnpm verify:fixture`.

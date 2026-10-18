@@ -2,16 +2,19 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { preparePackage } from "./prepare-package.js";
+import { preProcessFile } from "typescript";
 
 const root = resolve(import.meta.dirname, "..");
 const { maxUnpackedBytes } = JSON.parse(
 	await readFile(resolve(root, "benchmarks/package-size-thresholds.json"), "utf8"),
 ) as { maxUnpackedBytes: number };
 assert.ok(Number.isSafeInteger(maxUnpackedBytes) && maxUnpackedBytes > 0);
+const publishRoot = await preparePackage(root);
 
 const reports = JSON.parse(
 	execFileSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], {
-		cwd: root,
+		cwd: publishRoot,
 		encoding: "utf8",
 	}),
 ) as Array<{
@@ -39,6 +42,27 @@ for (const entry of Object.values(manifest.exports)) {
 		assert.ok(paths.has(path), `Published export missing: ${path}. Run pnpm build first.`);
 	}
 }
+
+for (const file of report.files) {
+	if (!file.path.endsWith(".d.ts")) continue;
+	const path = resolve(publishRoot, file.path);
+	const source = await readFile(path, "utf8");
+	for (const imported of preProcessFile(source).importedFiles) {
+		if (!imported.fileName.startsWith(".")) continue;
+		await readFile(resolve(path, "..", imported.fileName.replace(/\.js$/, ".d.ts")));
+	}
+}
+
+const importChecks = Object.keys(manifest.exports)
+	.filter((subpath) => subpath !== "./package.json")
+	.map((subpath) => {
+		const specifier = `@wrksz/themes${subpath === "." ? "" : subpath.slice(1)}`;
+		return `import ${JSON.stringify(specifier)}; if (!import.meta.resolve(${JSON.stringify(specifier)}).includes('/.publish/dist/')) throw new Error('Unexpected package resolution');`;
+	});
+execFileSync(process.execPath, ["--input-type=module", "-e", importChecks.join("\n")], {
+	cwd: publishRoot,
+	stdio: "inherit",
+});
 
 console.table({
 	package: {

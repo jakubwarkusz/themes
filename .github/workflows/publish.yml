@@ -63,10 +63,10 @@ jobs:
           if [ "$VERSION" != "$PRERELEASE" ]; then
             NPM_TAG="${PRERELEASE%%.*}"
             echo "Publishing prerelease ${VERSION} with dist-tag ${NPM_TAG}"
-            npm publish --provenance --access public --tag "${NPM_TAG}"
+            npm publish ./.publish --provenance --access public --tag "${NPM_TAG}"
           else
             echo "Publishing stable release ${VERSION} to latest"
-            npm publish --provenance --access public
+            npm publish ./.publish --provenance --access public
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

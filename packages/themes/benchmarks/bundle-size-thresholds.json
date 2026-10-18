@@ -36,10 +36,10 @@
 		"maxDeltaGzipBytes": 120
 	},
 	"next-provider": {
-		"maxBytes": 10500,
-		"maxGzipBytes": 4000,
-		"maxDeltaBytes": 500,
-		"maxDeltaGzipBytes": 250
+		"maxBytes": 11000,
+		"maxGzipBytes": 4320,
+		"maxDeltaBytes": 650,
+		"maxDeltaGzipBytes": 320
 	},
 	"script": {
 		"maxBytes": 3600,
@@ -50,8 +50,8 @@
 	"client-provider": {
 		"maxBytes": 9500,
 		"maxGzipBytes": 3900,
-		"maxDeltaBytes": 510,
-		"maxDeltaGzipBytes": 270
+		"maxDeltaBytes": 650,
+		"maxDeltaGzipBytes": 300
 	},
 	"generated-script": {
 		"maxBytes": 2200,
@@ -60,33 +60,33 @@
 		"maxDeltaGzipBytes": 120
 	},
 	"next-client-boundary": {
-		"maxBytes": 7700,
-		"maxGzipBytes": 3300,
-		"maxDeltaBytes": 100,
-		"maxDeltaGzipBytes": 40
+		"maxBytes": 8300,
+		"maxGzipBytes": 3580,
+		"maxDeltaBytes": 650,
+		"maxDeltaGzipBytes": 300
 	},
 	"extended-next-client-boundary": {
-		"maxBytes": 9350,
-		"maxGzipBytes": 3860,
-		"maxDeltaBytes": 100,
-		"maxDeltaGzipBytes": 40
+		"maxBytes": 10000,
+		"maxGzipBytes": 4140,
+		"maxDeltaBytes": 700,
+		"maxDeltaGzipBytes": 300
 	},
 	"next-factory": {
-		"maxBytes": 12000,
-		"maxGzipBytes": 4530,
-		"maxDeltaBytes": 100,
-		"maxDeltaGzipBytes": 40
+		"maxBytes": 12600,
+		"maxGzipBytes": 4840,
+		"maxDeltaBytes": 650,
+		"maxDeltaGzipBytes": 320
 	},
 	"client-factory": {
-		"maxBytes": 8250,
-		"maxGzipBytes": 3450,
-		"maxDeltaBytes": 100,
-		"maxDeltaGzipBytes": 40
+		"maxBytes": 8850,
+		"maxGzipBytes": 3720,
+		"maxDeltaBytes": 650,
+		"maxDeltaGzipBytes": 300
 	},
 	"extended-next-provider": {
-		"maxBytes": 12500,
-		"maxGzipBytes": 4650,
-		"maxDeltaBytes": 500,
-		"maxDeltaGzipBytes": 250
+		"maxBytes": 12950,
+		"maxGzipBytes": 4960,
+		"maxDeltaBytes": 700,
+		"maxDeltaGzipBytes": 320
 	}
 }

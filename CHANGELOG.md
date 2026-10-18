@@ -57,26 +57,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- _(themes)_ Add opt-in extended providers ([859c670](https://github.com/jakubwarkusz/themes/commit/859c670f8b6444aa600b60cd6eb149196c3eb8bc))
-- _(themes)_ Pair createThemes with NextThemeProvider and ThemeScript ([48684af](https://github.com/jakubwarkusz/themes/commit/48684af9e1f8d70e4f575e3b4f4d948418a3b072))
+- *(themes)* Add opt-in extended providers ([859c670](https://github.com/jakubwarkusz/themes/commit/859c670f8b6444aa600b60cd6eb149196c3eb8bc))
+- *(themes)* Pair createThemes with NextThemeProvider and ThemeScript ([48684af](https://github.com/jakubwarkusz/themes/commit/48684af9e1f8d70e4f575e3b4f4d948418a3b072))
 
 ### Fixed
 
-- _(next)_ Keep theme provider in app shells ([555cfe6](https://github.com/jakubwarkusz/themes/commit/555cfe67b94d1e740fc83cf2ec91d311d94ff5a2))
-- _(next)_ Add metadata for tenant pages ([b83b62e](https://github.com/jakubwarkusz/themes/commit/b83b62e7e3811a99133a62318c21ad47df58edcf))
-- _(themes)_ Stabilize provider initialization and bootstrap parity ([623a1c7](https://github.com/jakubwarkusz/themes/commit/623a1c7516f89d5f6730f5eda191b5400b63267d))
-- _(docs)_ Trim unused theme exports and use dvh height ([89af1ca](https://github.com/jakubwarkusz/themes/commit/89af1cae06001949cf3bceb4625644647cb07aaf))
-- _(ci)_ Clear audit advisories and build library before docs tests ([d6a9232](https://github.com/jakubwarkusz/themes/commit/d6a923269a8859c2e1aea795422dfa4ad24093b8))
-- _(tooling)_ Keep generated script-source out of oxfmt ([4eaf966](https://github.com/jakubwarkusz/themes/commit/4eaf9662a365b602732653329025ca4ddbf27870))
-- _(tooling)_ Restore library build before docs tests in verify ([c1a8995](https://github.com/jakubwarkusz/themes/commit/c1a8995ee601133aa9841257d2179a434c1f7d1c))
-- _(themes)_ Keep setTheme off useEffectEvent for oxlint ([4f2845b](https://github.com/jakubwarkusz/themes/commit/4f2845bbf2d41a2e826c57428b3d10ad189e4c1d))
-- _(themes)_ Satisfy exactOptionalPropertyTypes in extended providers ([a74d5ac](https://github.com/jakubwarkusz/themes/commit/a74d5ac4842ade0bfe9f1e2751035075fdd3b435))
-- _(themes)_ Adapt extended provider tests after rebase onto main ([303b8e1](https://github.com/jakubwarkusz/themes/commit/303b8e172b1361d7f52c26d3543891c7c565d562))
-- _(themes)_ Satisfy oxfmt and oxlint after rebase onto main ([cdb8fef](https://github.com/jakubwarkusz/themes/commit/cdb8fef44be4197132b1cba45adef58c0a5bcb00))
-- _(themes)_ Carry merged-PR review feedback into extended providers ([df166d0](https://github.com/jakubwarkusz/themes/commit/df166d03476d3d096eb100d087f7133ba0962122))
-- _(tooling)_ Sync pnpm lockfile with oxfmt/oxlint bumps ([3f952fd](https://github.com/jakubwarkusz/themes/commit/3f952fd9d6290ed1b06b8968abd845ebd9148cfc))
-- _(docs)_ Keep Vercel on pinned Bun and use pnpm --filter ([895a406](https://github.com/jakubwarkusz/themes/commit/895a4060b00bac1cf3c76030a0b0c2f73c2523bb))
-- _(provider)_ Keep the skip/memo pattern inside bundle budgets ([6b3060a](https://github.com/jakubwarkusz/themes/commit/6b3060a400771392f14454d36fdc6d34f70eb014))
+- *(next)* Keep theme provider in app shells ([555cfe6](https://github.com/jakubwarkusz/themes/commit/555cfe67b94d1e740fc83cf2ec91d311d94ff5a2))
+- *(next)* Add metadata for tenant pages ([b83b62e](https://github.com/jakubwarkusz/themes/commit/b83b62e7e3811a99133a62318c21ad47df58edcf))
+- *(themes)* Stabilize provider initialization and bootstrap parity ([623a1c7](https://github.com/jakubwarkusz/themes/commit/623a1c7516f89d5f6730f5eda191b5400b63267d))
+- *(docs)* Trim unused theme exports and use dvh height ([89af1ca](https://github.com/jakubwarkusz/themes/commit/89af1cae06001949cf3bceb4625644647cb07aaf))
+- *(ci)* Clear audit advisories and build library before docs tests ([d6a9232](https://github.com/jakubwarkusz/themes/commit/d6a923269a8859c2e1aea795422dfa4ad24093b8))
+- *(tooling)* Keep generated script-source out of oxfmt ([4eaf966](https://github.com/jakubwarkusz/themes/commit/4eaf9662a365b602732653329025ca4ddbf27870))
+- *(tooling)* Restore library build before docs tests in verify ([c1a8995](https://github.com/jakubwarkusz/themes/commit/c1a8995ee601133aa9841257d2179a434c1f7d1c))
+- *(themes)* Keep setTheme off useEffectEvent for oxlint ([4f2845b](https://github.com/jakubwarkusz/themes/commit/4f2845bbf2d41a2e826c57428b3d10ad189e4c1d))
+- *(themes)* Satisfy exactOptionalPropertyTypes in extended providers ([a74d5ac](https://github.com/jakubwarkusz/themes/commit/a74d5ac4842ade0bfe9f1e2751035075fdd3b435))
+- *(themes)* Adapt extended provider tests after rebase onto main ([303b8e1](https://github.com/jakubwarkusz/themes/commit/303b8e172b1361d7f52c26d3543891c7c565d562))
+- *(themes)* Satisfy oxfmt and oxlint after rebase onto main ([cdb8fef](https://github.com/jakubwarkusz/themes/commit/cdb8fef44be4197132b1cba45adef58c0a5bcb00))
+- *(themes)* Carry merged-PR review feedback into extended providers ([df166d0](https://github.com/jakubwarkusz/themes/commit/df166d03476d3d096eb100d087f7133ba0962122))
+- *(tooling)* Sync pnpm lockfile with oxfmt/oxlint bumps ([3f952fd](https://github.com/jakubwarkusz/themes/commit/3f952fd9d6290ed1b06b8968abd845ebd9148cfc))
+- *(docs)* Keep Vercel on pinned Bun and use pnpm --filter ([895a406](https://github.com/jakubwarkusz/themes/commit/895a4060b00bac1cf3c76030a0b0c2f73c2523bb))
+- *(provider)* Keep the skip/memo pattern inside bundle budgets ([6b3060a](https://github.com/jakubwarkusz/themes/commit/6b3060a400771392f14454d36fdc6d34f70eb014))
 - Unify bootstrap and runtime theme DOM apply ([b5345d8](https://github.com/jakubwarkusz/themes/commit/b5345d855cab7abc57153449365b412a62c74343))
 - Re-apply theme after Instant Navigation restores the DOM ([84b3b1f](https://github.com/jakubwarkusz/themes/commit/84b3b1ff830c790b2a769d6a7fc3d9fd691db6b1))
 - Restore theme when Instant Navigation clears html class ([67f6f5f](https://github.com/jakubwarkusz/themes/commit/67f6f5fbed7e4d2e7c121a4e82380ca15ffe76cb))
@@ -87,13 +87,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reclaim next-provider gzip under the 3.91 KiB ceiling ([3e0a53a](https://github.com/jakubwarkusz/themes/commit/3e0a53afa481f9a42b8bdbd4643c960a8f9ecf4a))
 - Update documentation for clarity and consistency ([16a6211](https://github.com/jakubwarkusz/themes/commit/16a6211e64a8e2974bb62f45a4e0c85a8da2b55b))
 - Keep a single React/Next copy after the workspace bump ([53d6c48](https://github.com/jakubwarkusz/themes/commit/53d6c48f915c6dc042cb763fbf8cbd19e8370702))
-- _(docs)_ Await fumadocs llms index in the llms.txt route ([850fac3](https://github.com/jakubwarkusz/themes/commit/850fac3d68b47ae593f785621eab08ecc217dfcf))
+- *(docs)* Await fumadocs llms index in the llms.txt route ([850fac3](https://github.com/jakubwarkusz/themes/commit/850fac3d68b47ae593f785621eab08ecc217dfcf))
 
 ### Performance
 
-- _(themes)_ Reclaim bundle budget headroom without raising limits ([a653226](https://github.com/jakubwarkusz/themes/commit/a6532261c6d4f1eb9bf2ef2e2a9bbf126bf65325))
-- _(docs)_ Keep Analytics and below-fold home JS off the critical path ([b0bfd8b](https://github.com/jakubwarkusz/themes/commit/b0bfd8b0d305c9c5f53f91d9dd484de4a05fc9f9))
-- _(provider)_ Apply theme once per toggle and keep context identity stable ([c7e5dd2](https://github.com/jakubwarkusz/themes/commit/c7e5dd206cf630735a17285a2e3598657c6e7ded))
+- *(themes)* Reclaim bundle budget headroom without raising limits ([a653226](https://github.com/jakubwarkusz/themes/commit/a6532261c6d4f1eb9bf2ef2e2a9bbf126bf65325))
+- *(docs)* Keep Analytics and below-fold home JS off the critical path ([b0bfd8b](https://github.com/jakubwarkusz/themes/commit/b0bfd8b0d305c9c5f53f91d9dd484de4a05fc9f9))
+- *(provider)* Apply theme once per toggle and keep context identity stable ([c7e5dd2](https://github.com/jakubwarkusz/themes/commit/c7e5dd206cf630735a17285a2e3598657c6e7ded))
 - Omit cookie-parser bytecode from the default inline bootstrap ([0ef37d2](https://github.com/jakubwarkusz/themes/commit/0ef37d258275f549fc33c58e57fef22f19913055))
 
 ### Changed
@@ -102,10 +102,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- _(themes)_ Add upgrading-from-1.x layout example ([c676a82](https://github.com/jakubwarkusz/themes/commit/c676a825c82e85c2c1e74b22b4855b7074e11b11))
-- _(themes)_ Call out TypeScript 5.9 peer requirement ([db9c980](https://github.com/jakubwarkusz/themes/commit/db9c980bf5b3b2c62aa727a810a82408026c091a))
-- _(themes)_ Document upstream compatibility features ([cc8731a](https://github.com/jakubwarkusz/themes/commit/cc8731a1f702214adfca873d5bbfa10d90348833))
-- _(themes)_ Dogfood package in documentation app ([157907c](https://github.com/jakubwarkusz/themes/commit/157907cac49343d1b3191fdd2ed01d167b24c3ce))
+- *(themes)* Add upgrading-from-1.x layout example ([c676a82](https://github.com/jakubwarkusz/themes/commit/c676a825c82e85c2c1e74b22b4855b7074e11b11))
+- *(themes)* Call out TypeScript 5.9 peer requirement ([db9c980](https://github.com/jakubwarkusz/themes/commit/db9c980bf5b3b2c62aa727a810a82408026c091a))
+- *(themes)* Document upstream compatibility features ([cc8731a](https://github.com/jakubwarkusz/themes/commit/cc8731a1f702214adfca873d5bbfa10d90348833))
+- *(themes)* Dogfood package in documentation app ([157907c](https://github.com/jakubwarkusz/themes/commit/157907cac49343d1b3191fdd2ed01d167b24c3ce))
 - Add contributor and agent guidance ([f661027](https://github.com/jakubwarkusz/themes/commit/f661027b9080a5f6286cebdf199983590843faa3))
 - Preserve React 18 support metadata ([92ae3ea](https://github.com/jakubwarkusz/themes/commit/92ae3eaf66330aabf217df784a5ce4760e7e6eb5))
 - Update README and migration guides for `2.0.0-beta.1` release, highlighting breaking changes and installation instructions with `@beta` tag ([1908f3a](https://github.com/jakubwarkusz/themes/commit/1908f3aff057f1e7699fbb1a2804743e901a7a61))
@@ -116,7 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Miscellaneous
 
 - Add project agent skills for React and Next work ([d5d3bd2](https://github.com/jakubwarkusz/themes/commit/d5d3bd27ac6e4b0f00c6b4e5a7ea488b6d6c6fa0))
-- _(themes)_ Test TypeScript 5.9 through 7 ([0269eaf](https://github.com/jakubwarkusz/themes/commit/0269eafb118d774f46b299510b81f8decbad12fe))
+- *(themes)* Test TypeScript 5.9 through 7 ([0269eaf](https://github.com/jakubwarkusz/themes/commit/0269eafb118d774f46b299510b81f8decbad12fe))
 - Verify library and docs independently ([26fb7d4](https://github.com/jakubwarkusz/themes/commit/26fb7d4c65810b09d242c54c66629d0df0a9a4a2))
 - Align release and support gates ([e7fb022](https://github.com/jakubwarkusz/themes/commit/e7fb022dc090b2cfad96e9f4a5fb16120d162557))
 - Align final stack tooling state ([3f2a709](https://github.com/jakubwarkusz/themes/commit/3f2a70977b5e0e2aff9422814efa1f5dd30f82bb))
@@ -124,12 +124,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Exclude .agents dir from Linguist ([44350d8](https://github.com/jakubwarkusz/themes/commit/44350d8c0ca17851324313e941bea43ca8001299))
 - Update package manager to bun@1.3.9 and add install command in vercel.json ([3e21a2c](https://github.com/jakubwarkusz/themes/commit/3e21a2c1c0d339bded5d539dc633bde6ccb8dbb0))
 - Update build command in vercel.json to use bunx for consistency ([4c937bc](https://github.com/jakubwarkusz/themes/commit/4c937bcdd3fb170170533fbe18e5d25890b22e55))
-- _(tooling)_ Replace Biome with Oxc lint and format ([2f8e155](https://github.com/jakubwarkusz/themes/commit/2f8e1553fc9cdbdc4d4e9c76816ec259299ebc39))
-- _(tooling)_ Bump oxfmt and oxlint to latest ([421083b](https://github.com/jakubwarkusz/themes/commit/421083b7f8ab0e4fdde391a6083e2ea45f8b7ce7))
-- _(tooling)_ Switch package management from Bun to pnpm ([df09e3f](https://github.com/jakubwarkusz/themes/commit/df09e3fc6d03c0f6d92f13939612049c7e5b80dd))
-- _(ci)_ Group Dependabot updates into fewer PRs ([6211d02](https://github.com/jakubwarkusz/themes/commit/6211d021f7fe91f05cd7e2ca20532ee319c20516))
-- _(themes)_ Generate extended bootstrap source ([1ecb992](https://github.com/jakubwarkusz/themes/commit/1ecb9929c5567dc6ecfd44e387660d522c48e37f))
-- _(ci)_ Stop triple-building the library and finish pnpm leftover drift ([deee334](https://github.com/jakubwarkusz/themes/commit/deee334cdf39e99c09ffa38b5db0bd0dcc27ee49))
+- *(tooling)* Replace Biome with Oxc lint and format ([2f8e155](https://github.com/jakubwarkusz/themes/commit/2f8e1553fc9cdbdc4d4e9c76816ec259299ebc39))
+- *(tooling)* Bump oxfmt and oxlint to latest ([421083b](https://github.com/jakubwarkusz/themes/commit/421083b7f8ab0e4fdde391a6083e2ea45f8b7ce7))
+- *(tooling)* Switch package management from Bun to pnpm ([df09e3f](https://github.com/jakubwarkusz/themes/commit/df09e3fc6d03c0f6d92f13939612049c7e5b80dd))
+- *(ci)* Group Dependabot updates into fewer PRs ([6211d02](https://github.com/jakubwarkusz/themes/commit/6211d021f7fe91f05cd7e2ca20532ee319c20516))
+- *(themes)* Generate extended bootstrap source ([1ecb992](https://github.com/jakubwarkusz/themes/commit/1ecb9929c5567dc6ecfd44e387660d522c48e37f))
+- *(ci)* Stop triple-building the library and finish pnpm leftover drift ([deee334](https://github.com/jakubwarkusz/themes/commit/deee334cdf39e99c09ffa38b5db0bd0dcc27ee49))
 
 ### Other
 
@@ -140,35 +140,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- _(themes)_ Isolate typed factory contexts ([739b02a](https://github.com/jakubwarkusz/themes/commit/739b02a7cdbb14a028785c8d0773a8b73a07df2c))
-- _(themes)_ Tighten public TypeScript contracts ([88738ad](https://github.com/jakubwarkusz/themes/commit/88738ad6882326d3e90a600028420144ad862a01))
-- _(themes)_ Adopt useEffectEvent with React 18 fallback ([28efd5c](https://github.com/jakubwarkusz/themes/commit/28efd5c4ec6b7bb10cda9b5adc4d6476d6d51908))
+- *(themes)* Isolate typed factory contexts ([739b02a](https://github.com/jakubwarkusz/themes/commit/739b02a7cdbb14a028785c8d0773a8b73a07df2c))
+- *(themes)* Tighten public TypeScript contracts ([88738ad](https://github.com/jakubwarkusz/themes/commit/88738ad6882326d3e90a600028420144ad862a01))
+- *(themes)* Adopt useEffectEvent with React 18 fallback ([28efd5c](https://github.com/jakubwarkusz/themes/commit/28efd5c4ec6b7bb10cda9b5adc4d6476d6d51908))
 
 ## [1.1.0] - 2026-08-03
 
 ### Added
 
-- _(themes)_ Add a stable framework-neutral bootstrap ([58b9664](https://github.com/jakubwarkusz/themes/commit/58b9664d4cf725d29502dcd82449bc03d77ac6ef))
-- _(themes)_ Expose portable client APIs ([39282e5](https://github.com/jakubwarkusz/themes/commit/39282e5118c4fd1aadfe4b3d19edf8574445240b))
+- *(themes)* Add a stable framework-neutral bootstrap ([58b9664](https://github.com/jakubwarkusz/themes/commit/58b9664d4cf725d29502dcd82449bc03d77ac6ef))
+- *(themes)* Expose portable client APIs ([39282e5](https://github.com/jakubwarkusz/themes/commit/39282e5118c4fd1aadfe4b3d19edf8574445240b))
 
 ### Fixed
 
-- _(themes)_ Harden runtime theme synchronization ([2a97fb6](https://github.com/jakubwarkusz/themes/commit/2a97fb6e74a2e8bf415ac3f5a532a78095b98710))
-- _(themes)_ Validate stored selections consistently ([4722c9b](https://github.com/jakubwarkusz/themes/commit/4722c9bed83c6c9d654917e1bc1f4f0d40083bf0))
-- _(themes)_ Keep default provider lightweight ([a15ad09](https://github.com/jakubwarkusz/themes/commit/a15ad09b2ee43e412df054e01dbee1449e400f5c))
-- _(themes)_ Forward storage errors in Next provider ([3c192c5](https://github.com/jakubwarkusz/themes/commit/3c192c5ef582b279142b19b9e4de5f62f7f2dc0f))
-- _(themes)_ Resolve package imports during type-check ([80c316c](https://github.com/jakubwarkusz/themes/commit/80c316c05a3a07ea91864a73ebb0e65414065fd8))
-- _(themes)_ Keep next-provider bootstrap within size budget ([6aa95fb](https://github.com/jakubwarkusz/themes/commit/6aa95fb33cc4e868d02fc394dde26379ba07e499))
-- _(themes)_ Address portable SSR review feedback ([5d60a44](https://github.com/jakubwarkusz/themes/commit/5d60a446e01522c2fab1e6ab55531a7f3ddec042))
-- _(themes)_ Honor enableSystem when resolving system theme ([851e953](https://github.com/jakubwarkusz/themes/commit/851e953a263d6d263495b5a246d6aa3cb9c9abdc))
+- *(themes)* Harden runtime theme synchronization ([2a97fb6](https://github.com/jakubwarkusz/themes/commit/2a97fb6e74a2e8bf415ac3f5a532a78095b98710))
+- *(themes)* Validate stored selections consistently ([4722c9b](https://github.com/jakubwarkusz/themes/commit/4722c9bed83c6c9d654917e1bc1f4f0d40083bf0))
+- *(themes)* Keep default provider lightweight ([a15ad09](https://github.com/jakubwarkusz/themes/commit/a15ad09b2ee43e412df054e01dbee1449e400f5c))
+- *(themes)* Forward storage errors in Next provider ([3c192c5](https://github.com/jakubwarkusz/themes/commit/3c192c5ef582b279142b19b9e4de5f62f7f2dc0f))
+- *(themes)* Resolve package imports during type-check ([80c316c](https://github.com/jakubwarkusz/themes/commit/80c316c05a3a07ea91864a73ebb0e65414065fd8))
+- *(themes)* Keep next-provider bootstrap within size budget ([6aa95fb](https://github.com/jakubwarkusz/themes/commit/6aa95fb33cc4e868d02fc394dde26379ba07e499))
+- *(themes)* Address portable SSR review feedback ([5d60a44](https://github.com/jakubwarkusz/themes/commit/5d60a446e01522c2fab1e6ab55531a7f3ddec042))
+- *(themes)* Honor enableSystem when resolving system theme ([851e953](https://github.com/jakubwarkusz/themes/commit/851e953a263d6d263495b5a246d6aa3cb9c9abdc))
 
 ### Performance
 
-- _(themes)_ Use set lookups and register benchmark fixtures ([bfa524a](https://github.com/jakubwarkusz/themes/commit/bfa524a81f03d5de4f98a0b4feb1bb0fe2c389ca))
+- *(themes)* Use set lookups and register benchmark fixtures ([bfa524a](https://github.com/jakubwarkusz/themes/commit/bfa524a81f03d5de4f98a0b4feb1bb0fe2c389ca))
 
 ### Documentation
 
-- _(themes)_ Document portable APIs ([3cfd6b1](https://github.com/jakubwarkusz/themes/commit/3cfd6b11c7fe311d23de6e28b3a16f7b97bc0645))
+- *(themes)* Document portable APIs ([3cfd6b1](https://github.com/jakubwarkusz/themes/commit/3cfd6b11c7fe311d23de6e28b3a16f7b97bc0645))
 
 ### Miscellaneous
 
@@ -178,19 +178,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- _(publish)_ Enhance NPM publishing logic for prereleases and stable releases ([fd98c4f](https://github.com/jakubwarkusz/themes/commit/fd98c4f2b3914e8658ef28718128af6d1ce587d3))
+- *(publish)* Enhance NPM publishing logic for prereleases and stable releases ([fd98c4f](https://github.com/jakubwarkusz/themes/commit/fd98c4f2b3914e8658ef28718128af6d1ce587d3))
 
 ### Fixed
 
-- _(theme)_ Enable TypeScript declaration file splitting in bunup.config.ts ([9422947](https://github.com/jakubwarkusz/themes/commit/942294754d4c25c3922a71c03aa20be1a006358a))
-- _(theme)_ Update size comparison script to use baseline benchmarks ([00b5d81](https://github.com/jakubwarkusz/themes/commit/00b5d8168c417d58f0f43856127444a59a673b63))
-- _(theme)_ Enhance cookie handling and class attribute management ([a40fe04](https://github.com/jakubwarkusz/themes/commit/a40fe045579545ef852684467d5811a0e050c56e))
-- _(theme)_ Add entry points for TypeScript declaration file generation in bunup.config.ts ([fd028f8](https://github.com/jakubwarkusz/themes/commit/fd028f874f6e5d5f6ce272a53e948cbd4b84fd64))
+- *(theme)* Enable TypeScript declaration file splitting in bunup.config.ts ([9422947](https://github.com/jakubwarkusz/themes/commit/942294754d4c25c3922a71c03aa20be1a006358a))
+- *(theme)* Update size comparison script to use baseline benchmarks ([00b5d81](https://github.com/jakubwarkusz/themes/commit/00b5d8168c417d58f0f43856127444a59a673b63))
+- *(theme)* Enhance cookie handling and class attribute management ([a40fe04](https://github.com/jakubwarkusz/themes/commit/a40fe045579545ef852684467d5811a0e050c56e))
+- *(theme)* Add entry points for TypeScript declaration file generation in bunup.config.ts ([fd028f8](https://github.com/jakubwarkusz/themes/commit/fd028f874f6e5d5f6ce272a53e948cbd4b84fd64))
 
 ### Changed
 
 - Split client provider DOM helpers ([0003149](https://github.com/jakubwarkusz/themes/commit/0003149d06d6dd14c3f6b1413fea638e567459b1))
-- _(themes)_ Make root entry client-only and remove duplicate provider ([7e48344](https://github.com/jakubwarkusz/themes/commit/7e48344f98b22e0fdda084b713e94c2e86e528d4))
+- *(themes)* Make root entry client-only and remove duplicate provider ([7e48344](https://github.com/jakubwarkusz/themes/commit/7e48344f98b22e0fdda084b713e94c2e86e528d4))
 
 ### Miscellaneous
 
@@ -200,33 +200,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- _(theme)_ Enhance bundle size management and comparison ([ff3c65f](https://github.com/jakubwarkusz/themes/commit/ff3c65f64da33889e27ea6965065756e72f19178))
-- _(animation)_ Improve motion handling with reduced motion support ([c9d6f08](https://github.com/jakubwarkusz/themes/commit/c9d6f08841fdd432c7623ed004a05b52a8b102db))
-- _(config)_ Add support for next-themes compatibility and enhance webpack configuration ([8eb49de](https://github.com/jakubwarkusz/themes/commit/8eb49de20ddf46e4bb5b17e4f4bdff3c3a18c4c8))
-- _(layout)_ Integrate ThemeProvider for enhanced theme management and update metadata ([650c1ac](https://github.com/jakubwarkusz/themes/commit/650c1ac33d632ed56f56dab6452eaccbb372ee88))
-- _(docs)_ Add Vercel configuration and update build script for documentation ([008ca99](https://github.com/jakubwarkusz/themes/commit/008ca99e8347a7e840d224adb2c833dbe786c685))
+- *(theme)* Enhance bundle size management and comparison ([ff3c65f](https://github.com/jakubwarkusz/themes/commit/ff3c65f64da33889e27ea6965065756e72f19178))
+- *(animation)* Improve motion handling with reduced motion support ([c9d6f08](https://github.com/jakubwarkusz/themes/commit/c9d6f08841fdd432c7623ed004a05b52a8b102db))
+- *(config)* Add support for next-themes compatibility and enhance webpack configuration ([8eb49de](https://github.com/jakubwarkusz/themes/commit/8eb49de20ddf46e4bb5b17e4f4bdff3c3a18c4c8))
+- *(layout)* Integrate ThemeProvider for enhanced theme management and update metadata ([650c1ac](https://github.com/jakubwarkusz/themes/commit/650c1ac33d632ed56f56dab6452eaccbb372ee88))
+- *(docs)* Add Vercel configuration and update build script for documentation ([008ca99](https://github.com/jakubwarkusz/themes/commit/008ca99e8347a7e840d224adb2c833dbe786c685))
 
 ### Fixed
 
-- _(hero-content)_ Adjust layout and typography for improved responsiveness and visual consistency ([00ba071](https://github.com/jakubwarkusz/themes/commit/00ba071af1d79dc369bcb36c8a51502d5c6b1020))
-- _(docs)_ Resolve react-doctor warnings ([869e3f1](https://github.com/jakubwarkusz/themes/commit/869e3f12deee9ad40d8bac5c2c0cae47657bdd61))
-- _(layout)_ Update ThemeProvider import path for compatibility with next.js ([e791e85](https://github.com/jakubwarkusz/themes/commit/e791e858a162f59606fff0eea1d60dfa58d5d89b))
-- _(build)_ Add next-provider as explicit bunup entry to prevent 'use client' chunk contamination ([47d4e02](https://github.com/jakubwarkusz/themes/commit/47d4e02b65fefcfdbc162c95a4c9cb47f7205952))
-- _(docs)_ Remove next-themes alias causing SSR prerender crash on Vercel ([48aff7b](https://github.com/jakubwarkusz/themes/commit/48aff7b7e4b868f9c802ae5ae9d7d43fd97d69e3))
-- _(theme)_ Improve cookie handling and validation, enhance script safety ([cdc8b49](https://github.com/jakubwarkusz/themes/commit/cdc8b49e826d5022dfc51701d1066810c5c4b335))
-- _(theme)_ Update baseline sizes and improve cookie handling logic ([a8446a6](https://github.com/jakubwarkusz/themes/commit/a8446a6c27dae4d677bd5a194994f1c3030a6f62))
-- _(theme)_ Remove unused client-next-provider entry and update baseline sizes ([394bf8d](https://github.com/jakubwarkusz/themes/commit/394bf8d8a7cdac3a017668b6c1d7dc2c9d7f8ae6))
-- _(theme)_ Preserve Next server entrypoint boundary ([40984a1](https://github.com/jakubwarkusz/themes/commit/40984a17d145642c37d874659fb670307e4f2757))
+- *(hero-content)* Adjust layout and typography for improved responsiveness and visual consistency ([00ba071](https://github.com/jakubwarkusz/themes/commit/00ba071af1d79dc369bcb36c8a51502d5c6b1020))
+- *(docs)* Resolve react-doctor warnings ([869e3f1](https://github.com/jakubwarkusz/themes/commit/869e3f12deee9ad40d8bac5c2c0cae47657bdd61))
+- *(layout)* Update ThemeProvider import path for compatibility with next.js ([e791e85](https://github.com/jakubwarkusz/themes/commit/e791e858a162f59606fff0eea1d60dfa58d5d89b))
+- *(build)* Add next-provider as explicit bunup entry to prevent 'use client' chunk contamination ([47d4e02](https://github.com/jakubwarkusz/themes/commit/47d4e02b65fefcfdbc162c95a4c9cb47f7205952))
+- *(docs)* Remove next-themes alias causing SSR prerender crash on Vercel ([48aff7b](https://github.com/jakubwarkusz/themes/commit/48aff7b7e4b868f9c802ae5ae9d7d43fd97d69e3))
+- *(theme)* Improve cookie handling and validation, enhance script safety ([cdc8b49](https://github.com/jakubwarkusz/themes/commit/cdc8b49e826d5022dfc51701d1066810c5c4b335))
+- *(theme)* Update baseline sizes and improve cookie handling logic ([a8446a6](https://github.com/jakubwarkusz/themes/commit/a8446a6c27dae4d677bd5a194994f1c3030a6f62))
+- *(theme)* Remove unused client-next-provider entry and update baseline sizes ([394bf8d](https://github.com/jakubwarkusz/themes/commit/394bf8d8a7cdac3a017668b6c1d7dc2c9d7f8ae6))
+- *(theme)* Preserve Next server entrypoint boundary ([40984a1](https://github.com/jakubwarkusz/themes/commit/40984a17d145642c37d874659fb670307e4f2757))
 
 ### Changed
 
-- _(docs)_ Remove old Vercel configuration and add new build script for documentation ([078d298](https://github.com/jakubwarkusz/themes/commit/078d298383b8d13e611649bb7d19d76afc8185e4))
-- _(layout)_ Remove ThemeProvider ([603480e](https://github.com/jakubwarkusz/themes/commit/603480e38720f55e50dfd5cfc3076302d0b408db))
+- *(docs)* Remove old Vercel configuration and add new build script for documentation ([078d298](https://github.com/jakubwarkusz/themes/commit/078d298383b8d13e611649bb7d19d76afc8185e4))
+- *(layout)* Remove ThemeProvider ([603480e](https://github.com/jakubwarkusz/themes/commit/603480e38720f55e50dfd5cfc3076302d0b408db))
 
 ### Documentation
 
 - Update comparison and features sections for clarity and accuracy ([87e9f47](https://github.com/jakubwarkusz/themes/commit/87e9f47f29fe5f545eb185ff30055909c367eb2c))
-- _(theme)_ Add security notes and model to ThemeProvider documentation ([b7a5c79](https://github.com/jakubwarkusz/themes/commit/b7a5c79964011f226a3983dff88a1037a7a08a7f))
+- *(theme)* Add security notes and model to ThemeProvider documentation ([b7a5c79](https://github.com/jakubwarkusz/themes/commit/b7a5c79964011f226a3983dff88a1037a7a08a7f))
 
 ### Other
 
@@ -236,40 +236,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- _(theme)_ Enhance theme type definitions and improve theme selection logic ([f4f4220](https://github.com/jakubwarkusz/themes/commit/f4f42204ab2f4aa1c3fffeba4bbf7613516bb448))
-- _(theme)_ Enhance theme management with typed themes and improved documentation ([fc00e37](https://github.com/jakubwarkusz/themes/commit/fc00e37da6340deb607e63a886e976633812f4b0))
-- _(theme)_ Add new types for theme configuration and value mapping ([b675a84](https://github.com/jakubwarkusz/themes/commit/b675a8445daeb3b746eaaaf63735095323db5081))
+- *(theme)* Enhance theme type definitions and improve theme selection logic ([f4f4220](https://github.com/jakubwarkusz/themes/commit/f4f42204ab2f4aa1c3fffeba4bbf7613516bb448))
+- *(theme)* Enhance theme management with typed themes and improved documentation ([fc00e37](https://github.com/jakubwarkusz/themes/commit/fc00e37da6340deb607e63a886e976633812f4b0))
+- *(theme)* Add new types for theme configuration and value mapping ([b675a84](https://github.com/jakubwarkusz/themes/commit/b675a8445daeb3b746eaaaf63735095323db5081))
 
 ### Documentation
 
-- _(theme)_ Update README with new badge styles ([bee08a1](https://github.com/jakubwarkusz/themes/commit/bee08a18db838ac53c3e94cee4ab8fc258d73103))
-- _(theme)_ Update documentation for typed themes and hybrid storage ([e97e33b](https://github.com/jakubwarkusz/themes/commit/e97e33b5e057dcfd295843fa595639f4b8ccbc55))
+- *(theme)* Update README with new badge styles ([bee08a1](https://github.com/jakubwarkusz/themes/commit/bee08a18db838ac53c3e94cee4ab8fc258d73103))
+- *(theme)* Update documentation for typed themes and hybrid storage ([e97e33b](https://github.com/jakubwarkusz/themes/commit/e97e33b5e057dcfd295843fa595639f4b8ccbc55))
 
 ## [0.9.4] - 2026-05-21
 
 ### Fixed
 
-- _(readme->docs)_ Fixed fields values in API reference ([e0772af](https://github.com/jakubwarkusz/themes/commit/e0772af7494a164c6a8f0d1658881c8574543af6))
+- *(readme->docs)* Fixed fields values in API reference ([e0772af](https://github.com/jakubwarkusz/themes/commit/e0772af7494a164c6a8f0d1658881c8574543af6))
 
 ### Changed
 
-- _(theme)_ Improve transition suppression logic and update documentation ([c6e90b0](https://github.com/jakubwarkusz/themes/commit/c6e90b0e015068ac2e9f12711f6985444e51445c))
+- *(theme)* Improve transition suppression logic and update documentation ([c6e90b0](https://github.com/jakubwarkusz/themes/commit/c6e90b0e015068ac2e9f12711f6985444e51445c))
 
 ## [0.9.2] - 2026-05-07
 
 ### Added
 
-- _(themes)_ Introduce fine-grained client subpath exports and update documentation ([ecd21c7](https://github.com/jakubwarkusz/themes/commit/ecd21c7e43560c1d6b891b46adda64a91a40ab20))
+- *(themes)* Introduce fine-grained client subpath exports and update documentation ([ecd21c7](https://github.com/jakubwarkusz/themes/commit/ecd21c7e43560c1d6b891b46adda64a91a40ab20))
 
 ## [0.9.1] - 2026-05-07
 
 ### Added
 
-- _(github->dx)_ Added configuration of Dependabot ([a9358d6](https://github.com/jakubwarkusz/themes/commit/a9358d68a8c4e60f59911bbc89a367fa35621510))
-- _(github->funding)_ Added funding file ([e403faa](https://github.com/jakubwarkusz/themes/commit/e403faa3ed28c32736fc61bf6849f58aed996f8e))
-- _(themes)_ Add bundle size benchmarks ([7096486](https://github.com/jakubwarkusz/themes/commit/70964864d4f1960e5fbc23b059d8131d6fd6a76d))
-- _(themes)_ Add followSystem option to theme configuration and update related tests ([b64cb66](https://github.com/jakubwarkusz/themes/commit/b64cb66794df08ac17226eb311e8c1fb2c529e2a))
-- _(themes)_ Enhance cookie serialization with validation for names, paths, and domains ([7b14a06](https://github.com/jakubwarkusz/themes/commit/7b14a06f18b096cfe73f8f902ebe6f15d4835b35))
+- *(github->dx)* Added configuration of Dependabot ([a9358d6](https://github.com/jakubwarkusz/themes/commit/a9358d68a8c4e60f59911bbc89a367fa35621510))
+- *(github->funding)* Added funding file ([e403faa](https://github.com/jakubwarkusz/themes/commit/e403faa3ed28c32736fc61bf6849f58aed996f8e))
+- *(themes)* Add bundle size benchmarks ([7096486](https://github.com/jakubwarkusz/themes/commit/70964864d4f1960e5fbc23b059d8131d6fd6a76d))
+- *(themes)* Add followSystem option to theme configuration and update related tests ([b64cb66](https://github.com/jakubwarkusz/themes/commit/b64cb66794df08ac17226eb311e8c1fb2c529e2a))
+- *(themes)* Enhance cookie serialization with validation for names, paths, and domains ([7b14a06](https://github.com/jakubwarkusz/themes/commit/7b14a06f18b096cfe73f8f902ebe6f15d4835b35))
 
 ### Documentation
 
@@ -279,16 +279,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- _(themes)_ Add hybrid storage runtime support ([b84c297](https://github.com/jakubwarkusz/themes/commit/b84c29778d1fa7842153746b9079e6df187a52ad))
-- _(themes)_ Introduce createThemes factory and useThemeEffect hook, along with corresponding tests ([c95278f](https://github.com/jakubwarkusz/themes/commit/c95278fa5c194962e3d7498a963bedfcc87ad2d6))
+- *(themes)* Add hybrid storage runtime support ([b84c297](https://github.com/jakubwarkusz/themes/commit/b84c29778d1fa7842153746b9079e6df187a52ad))
+- *(themes)* Introduce createThemes factory and useThemeEffect hook, along with corresponding tests ([c95278f](https://github.com/jakubwarkusz/themes/commit/c95278fa5c194962e3d7498a963bedfcc87ad2d6))
 
 ### Fixed
 
-- _(themes)_ Rely on document.defaultView for DOM listeners ([2bf7920](https://github.com/jakubwarkusz/themes/commit/2bf79206b5b3d9cfb3c4eae0eb34aeea335c4401))
+- *(themes)* Rely on document.defaultView for DOM listeners ([2bf7920](https://github.com/jakubwarkusz/themes/commit/2bf79206b5b3d9cfb3c4eae0eb34aeea335c4401))
 
 ### Changed
 
-- _(themes)_ Improve regex usage in cookie handling and add lint ignore comments for test helpers and image component ([3313df4](https://github.com/jakubwarkusz/themes/commit/3313df48c5f99b5a9c30fbdf816c956b870c2cde))
+- *(themes)* Improve regex usage in cookie handling and add lint ignore comments for test helpers and image component ([3313df4](https://github.com/jakubwarkusz/themes/commit/3313df48c5f99b5a9c30fbdf816c956b870c2cde))
 
 ### Documentation
 
@@ -296,8 +296,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Miscellaneous
 
-- _(ci)_ Update bun version to 1.3.9 in CI workflow ([20e92da](https://github.com/jakubwarkusz/themes/commit/20e92daf4ea6a81ef777855559d0efcf1b413ba1))
-- _(ci)_ Update lint command in CI workflow to use biome check ([70c8ca8](https://github.com/jakubwarkusz/themes/commit/70c8ca871026097e4eecf78c33dec47e900753c5))
+- *(ci)* Update bun version to 1.3.9 in CI workflow ([20e92da](https://github.com/jakubwarkusz/themes/commit/20e92daf4ea6a81ef777855559d0efcf1b413ba1))
+- *(ci)* Update lint command in CI workflow to use biome check ([70c8ca8](https://github.com/jakubwarkusz/themes/commit/70c8ca871026097e4eecf78c33dec47e900753c5))
 
 ## [0.8.3] - 2026-04-10
 
