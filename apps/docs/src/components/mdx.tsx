@@ -1,11 +1,13 @@
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
+import { Callout } from "./callout";
 import { Beta, Breaking, Bug, Fixed, No, Since, Yes } from "./mdx-badges";
 
 export function getMDXComponents(components?: MDXComponents) {
 	return {
 		...defaultMdxComponents,
+		Callout,
 		Tab,
 		Tabs,
 		Since,

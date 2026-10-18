@@ -108,6 +108,88 @@ figure.shiki pre {
 	background-color: var(--color-fd-secondary);
 }
 
+.callout {
+	--callout-tone: var(--tone-info);
+	--callout-bg-mix: 6%;
+	--callout-border-mix: 20%;
+
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	column-gap: 10px;
+	align-items: start;
+	margin-block: 1.25rem;
+	padding: 12px 14px;
+	border-radius: 12px;
+	box-shadow: inset 0 0 0 1px
+		color-mix(in oklab, var(--callout-tone) var(--callout-border-mix), transparent);
+	background: color-mix(in oklab, var(--callout-tone) var(--callout-bg-mix), transparent);
+	font-size: 0.875rem;
+	line-height: 1.5;
+}
+
+.dark .callout {
+	--callout-bg-mix: 9%;
+	--callout-border-mix: 26%;
+}
+
+.callout[data-tone="success"] {
+	--callout-tone: var(--tone-success);
+}
+
+.callout[data-tone="warning"] {
+	--callout-tone: var(--tone-warning);
+}
+
+.callout[data-tone="danger"] {
+	--callout-tone: var(--tone-danger);
+}
+
+.callout-icon {
+	display: flex;
+	align-items: center;
+	height: 1lh;
+	color: var(--callout-tone);
+}
+
+.callout-body {
+	min-width: 0;
+	color: var(--color-fd-foreground);
+	text-wrap: pretty;
+
+	& > * {
+		margin-block: 0;
+	}
+
+	& > * + * {
+		margin-top: 0.5em;
+	}
+
+	& :where(a) {
+		color: var(--color-fd-foreground);
+		font-weight: 500;
+		text-decoration: underline;
+		text-decoration-color: color-mix(in oklab, var(--callout-tone) 50%, transparent);
+		text-underline-offset: 0.2em;
+	}
+
+	& :where(a):hover {
+		text-decoration-color: var(--callout-tone);
+	}
+}
+
+.callout-title {
+	font-weight: 500;
+}
+
+.badge-tone {
+	background: color-mix(in oklab, var(--badge-tone) 12%, transparent);
+	color: var(--badge-tone);
+}
+
+.dark .badge-tone {
+	background: color-mix(in oklab, var(--badge-tone) 16%, transparent);
+}
+
 @keyframes sky-in {
 	from {
 		opacity: 0;
@@ -125,11 +207,19 @@ figure.shiki pre {
 }
 
 :root {
+	--tone-info: oklch(0.52 0.13 250);
+	--tone-success: oklch(0.5 0.13 150);
+	--tone-warning: oklch(0.51 0.12 70);
+	--tone-danger: oklch(0.54 0.19 25);
 	--paint-rust: #a9533f;
 	--paint-sage: #4f7a4c;
 }
 
 .dark {
+	--tone-info: oklch(0.75 0.11 250);
+	--tone-success: oklch(0.76 0.13 150);
+	--tone-warning: oklch(0.8 0.13 80);
+	--tone-danger: oklch(0.71 0.16 25);
 	--paint-rust: #d98a72;
 	--paint-sage: #9cc797;
 }
