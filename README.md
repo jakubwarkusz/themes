@@ -1,9 +1,12 @@
-![@wrksz/themes: light, dark and any theme you name, for React 18 and 19 and Next.js 16+](./.github/images/banner.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./.github/images/banner-dark.webp">
+  <img alt="A painted sky with a sun and moon sticker: day in light mode, night in dark mode" src="./.github/images/banner-light.webp">
+</picture>
 
 # @wrksz/themes
 
 [![npm](https://shieldcn.dev/badge/npm-%40wrksz%2Fthemes-CB3837.png?logo=npm&variant=secondary&size=sm)](https://www.npmjs.com/package/@wrksz/themes)
-[![docs](https://shieldcn.dev/badge/docs-themes.wrksz.dev-7C3AED.png?logo=readthedocs&variant=secondary&size=sm)](https://themes.wrksz.dev)
+[![docs](https://shieldcn.dev/badge/docs-themes.wrksz.dev-18181B.png?logo=readthedocs&variant=secondary&size=sm)](https://themes.wrksz.dev)
 [![changelog](https://shieldcn.dev/badge/changelog-Keep%20a%20Changelog-E05735.png?variant=secondary&size=sm)](./CHANGELOG.md)
 ![Next.js](https://shieldcn.dev/badge/Next.js-16-000000.png?logo=nextdotjs&variant=secondary&size=sm)
 ![React](https://shieldcn.dev/badge/React-18%20%2F%2019-087EA4.png?logo=react&variant=secondary&size=sm)
@@ -25,27 +28,27 @@ npm install @wrksz/themes
 
 ## Why not `next-themes`?
 
-|                                                 | next-themes | @wrksz/themes              |
-| ----------------------------------------------- | ----------- | -------------------------- |
-| React 19 script warning                         | ❌          | ✅ `useServerInsertedHTML` |
-| `__name` minification bug                       | ❌          | ✅                         |
-| Stale theme with React 19 `cacheComponents`     | ❌          | ✅ `useSyncExternalStore`  |
-| Multi-class theme removal leaving stale classes | ❌          | ✅                         |
-| Nested providers                                | ❌          | ✅ per-instance store      |
-| `sessionStorage` support                        | ❌          | ✅                         |
-| `cookie` storage (zero-flash SSR)               | ❌          | ✅                         |
-| `hybrid` storage (SSR + cross-tab sync)         | ❌          | ✅                         |
-| Disable storage                                 | ❌          | ✅ `storage="none"`        |
-| `meta theme-color` support                      | ❌          | ✅ `themeColor` prop       |
-| Server-provided theme                           | ❌          | ✅ `initialTheme` prop     |
-| `disableTransitionOnChange` per property        | ❌          | ✅ pass a CSS string       |
-| Read theme outside React                        | ❌          | ✅ `getTheme()` helper     |
-| Generic types                                   | ❌          | ✅ `useTheme<AppTheme>()`  |
-| Typed factory                                   | ❌          | ✅ `createThemes(...)`     |
-| Theme-change effect hook                        | ❌          | ✅ `useThemeEffect(...)`   |
-| Hydration state without mount effects           | ❌          | ✅ `useHydrated()`         |
-| Framework-neutral SSR bootstrap                 | ❌          | ✅ `@wrksz/themes/script`  |
-| Zero runtime dependencies                       | ✅          | ✅                         |
+|                                                 | next-themes | @wrksz/themes                   |
+| ----------------------------------------------- | ----------- | ------------------------------- |
+| React 19 script warning                         | Bug         | Fixed (`useServerInsertedHTML`) |
+| `__name` minification bug                       | Bug         | Fixed                           |
+| Stale theme with React 19 `cacheComponents`     | Bug         | Fixed (`useSyncExternalStore`)  |
+| Multi-class theme removal leaving stale classes | Bug         | Fixed                           |
+| Nested providers                                | No          | Yes (per-instance store)        |
+| `sessionStorage` support                        | No          | Yes                             |
+| `cookie` storage (zero-flash SSR)               | No          | Yes                             |
+| `hybrid` storage (SSR + cross-tab sync)         | No          | Yes                             |
+| Disable storage                                 | No          | Yes (`storage="none"`)          |
+| `meta theme-color` support                      | No          | Yes (`themeColor` prop)         |
+| Server-provided theme                           | No          | Yes (`initialTheme` prop)       |
+| `disableTransitionOnChange` per property        | No          | Yes (pass a CSS string)         |
+| Read theme outside React                        | No          | Yes (`getTheme()` helper)       |
+| Generic types                                   | No          | Yes (`useTheme<AppTheme>()`)    |
+| Typed factory                                   | No          | Yes (`createThemes(...)`)       |
+| Theme-change effect hook                        | No          | Yes (`useThemeEffect(...)`)     |
+| Hydration state without mount effects           | No          | Yes (`useHydrated()`)           |
+| Framework-neutral SSR bootstrap                 | No          | Yes (`@wrksz/themes/script`)    |
+| Zero runtime dependencies                       | Yes         | Yes                             |
 
 ## Table of Contents
 
@@ -133,17 +136,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-For apps using CSS media queries (`@media (prefers-color-scheme: dark)`) alongside CSS class variables, avoid the media query fallback - the library sets the correct class before the first paint:
+For apps using CSS media queries (`@media (prefers-color-scheme: dark)`) alongside CSS class variables, avoid the media query fallback - the library sets the correct class before the first paint. A media query fallback flashes when the system preference differs from the stored theme:
 
 ```css
-/* ❌ causes flash when system pref differs from stored theme */
 @media (prefers-color-scheme: dark) {
 	:root:not(.light) {
 		--bg: #09090b;
 	}
 }
+```
 
-/* ✅ */
+Use class-based selectors instead:
+
+```css
 :root {
 	--bg: #ffffff;
 }
