@@ -20,6 +20,7 @@ import { HeroSky } from "./hero-sky";
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
 const PKG_MANAGERS = [
+	{ label: "bun", command: "bun add @wrksz/themes" },
 	{ label: "npm", command: "npm install @wrksz/themes" },
 	{ label: "pnpm", command: "pnpm add @wrksz/themes" },
 	{ label: "yarn", command: "yarn add @wrksz/themes" },
@@ -41,11 +42,11 @@ function InstallSnippet() {
 	}
 
 	return (
-		<div className="flex w-md max-w-full flex-col overflow-hidden rounded-xl border border-fd-border bg-fd-card sm:h-12 sm:flex-row sm:items-stretch">
-			<div className="relative grid h-11 shrink-0 grid-cols-3 items-center self-start border-fd-border p-1.5 max-sm:w-full max-sm:border-b sm:h-auto sm:self-stretch sm:border-r">
+		<div className="flex w-lg max-w-full flex-col overflow-hidden rounded-xl border border-fd-border bg-fd-card sm:h-12 sm:flex-row sm:items-stretch">
+			<div className="relative grid h-11 shrink-0 grid-cols-4 items-center self-start border-fd-border p-1.5 max-sm:w-full max-sm:border-b sm:h-auto sm:self-stretch sm:border-r">
 				<span
 					aria-hidden
-					className="absolute top-1.5 bottom-1.5 left-1.5 w-[calc((100%-0.75rem)/3)] rounded-md bg-fd-muted ring-1 ring-fd-border transition-transform duration-200 ease-out motion-reduce:transition-none"
+					className="absolute top-1.5 bottom-1.5 left-1.5 w-[calc((100%-0.75rem)/4)] rounded-md bg-fd-muted ring-1 ring-fd-border transition-transform duration-200 ease-out motion-reduce:transition-none"
 					style={{
 						transform: `translateX(${PKG_MANAGERS.findIndex((mgr) => mgr.label === pm) * 100}%)`,
 					}}
@@ -57,7 +58,7 @@ function InstallSnippet() {
 						aria-pressed={pm === mgr.label}
 						onClick={() => setPm(mgr.label)}
 						className={cn(
-							"relative h-full w-full cursor-pointer rounded-md sm:w-14 text-xs font-medium transition-[transform,color] duration-150 active:scale-[0.96]",
+							"relative h-full w-full cursor-pointer rounded-md sm:w-12 text-xs font-medium transition-[transform,color] duration-150 active:scale-[0.96]",
 							pm === mgr.label
 								? "text-fd-foreground"
 								: "text-fd-muted-foreground/60 hover:text-fd-muted-foreground",
@@ -146,7 +147,7 @@ export function HeroContent({ stars }: { stars: number | null }) {
 				/>
 				<Image src={sticker} alt="" priority className="relative size-20 sm:size-24" />
 				<h1
-					className="relative mt-3 text-5xl font-semibold tracking-tight text-[#F4F2EC] [text-shadow:0_2px_18px_rgb(26_23_16/0.35)] sm:text-7xl"
+					className="relative mt-3 text-[clamp(1.75rem,9.5vw,3rem)] font-semibold tracking-tight text-[#F4F2EC] [text-shadow:0_2px_18px_rgb(26_23_16/0.35)] sm:text-7xl"
 					style={{ textWrap: "balance", lineHeight: 1.05 } as React.CSSProperties}
 				>
 					@wrksz/themes
@@ -158,10 +159,10 @@ export function HeroContent({ stars }: { stars: number | null }) {
 					Drop-in replacement for next-themes. React 19 hydration fixed, full TypeScript
 					types, zero dependencies.
 				</p>
-				<div className="relative mt-7 flex flex-wrap items-center justify-center gap-3">
+				<div className="relative mt-7 flex w-full max-w-64 flex-col items-stretch gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center">
 					<Link
 						href="/docs"
-						className="inline-flex items-center gap-2 rounded-lg bg-[#F4F2EC] px-5 py-2.5 text-sm font-semibold text-[#1B1A17] shadow-[0_1px_2px_rgb(26_23_16/0.2)] transition-[transform,opacity] duration-150 hover:opacity-90 active:scale-[0.97]"
+						className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#F4F2EC] px-5 py-2.5 text-sm font-semibold text-[#1B1A17] shadow-[0_1px_2px_rgb(26_23_16/0.2)] transition-[transform,opacity] duration-150 hover:opacity-90 active:scale-[0.97]"
 					>
 						Get started
 					</Link>
@@ -169,7 +170,7 @@ export function HeroContent({ stars }: { stars: number | null }) {
 						href={`https://github.com/${gitConfig.user}/${gitConfig.repo}`}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="inline-flex items-center gap-2 rounded-lg border border-white/35 bg-white/15 px-5 py-2.5 text-sm font-medium text-[#F4F2EC] backdrop-blur-md transition-[transform,background-color] duration-150 hover:bg-white/25 active:scale-[0.97]"
+						className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/35 bg-white/15 px-5 py-2.5 text-sm font-medium text-[#F4F2EC] backdrop-blur-md transition-[transform,background-color] duration-150 hover:bg-white/25 active:scale-[0.97]"
 					>
 						<HugeiconsIcon
 							icon={GithubIcon}
