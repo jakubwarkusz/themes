@@ -11,6 +11,35 @@ const SHOWN = "scale-100 opacity-100 blur-0 duration-200";
 const HIDDEN =
 	"scale-50 opacity-0 blur-[4px] duration-[120ms] motion-reduce:scale-100 motion-reduce:blur-0";
 
+export function useCopied(copyValue: () => Promise<void>) {
+	const [copied, setCopied] = useState(false);
+	const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+	async function copy() {
+		try {
+			await copyValue();
+			setCopied(true);
+			clearTimeout(timer.current);
+			timer.current = setTimeout(() => setCopied(false), 2000);
+		} catch {}
+	}
+
+	return [copied, copy] as const;
+}
+
+export function CopyIcons({ copied, className }: { copied: boolean; className?: string }) {
+	return (
+		<span aria-hidden className={cn("relative size-3.5 shrink-0", className)}>
+			<span className={cn(SWAP, copied ? HIDDEN : SHOWN)}>
+				<HugeiconsIcon icon={Copy01Icon} size={14} color="currentColor" strokeWidth={1.5} />
+			</span>
+			<span className={cn(SWAP, "text-emerald-500", copied ? SHOWN : HIDDEN)}>
+				<HugeiconsIcon icon={Tick02Icon} size={14} color="currentColor" strokeWidth={2} />
+			</span>
+		</span>
+	);
+}
+
 export function CopyButton({
 	getValue,
 	label = "Copy",
@@ -20,17 +49,7 @@ export function CopyButton({
 	label?: string;
 	className?: string;
 }) {
-	const [copied, setCopied] = useState(false);
-	const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-	async function copy() {
-		try {
-			await navigator.clipboard.writeText(getValue());
-			setCopied(true);
-			clearTimeout(timer.current);
-			timer.current = setTimeout(() => setCopied(false), 2000);
-		} catch {}
-	}
+	const [copied, copy] = useCopied(() => navigator.clipboard.writeText(getValue()));
 
 	return (
 		<button
@@ -42,12 +61,7 @@ export function CopyButton({
 				className,
 			)}
 		>
-			<span aria-hidden className={cn(SWAP, copied ? HIDDEN : SHOWN)}>
-				<HugeiconsIcon icon={Copy01Icon} size={14} color="currentColor" strokeWidth={1.5} />
-			</span>
-			<span aria-hidden className={cn(SWAP, "text-emerald-500", copied ? SHOWN : HIDDEN)}>
-				<HugeiconsIcon icon={Tick02Icon} size={14} color="currentColor" strokeWidth={2} />
-			</span>
+			<CopyIcons copied={copied} />
 		</button>
 	);
 }

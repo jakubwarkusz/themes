@@ -11,6 +11,7 @@ import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx";
+import { PageActions } from "@/components/page-actions";
 import { gitConfig } from "@/lib/layout.shared";
 import { getPageImage, source } from "@/lib/source";
 
@@ -31,7 +32,11 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 		>
 			<DocsTitle>{page.data.title}</DocsTitle>
 			<DocsDescription className="mb-0">{page.data.description}</DocsDescription>
-			<div className="flex items-center gap-3 border-b pb-6">
+			<div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b pb-6">
+				<PageActions
+					markdownUrl={`${page.url}.mdx`}
+					pageUrl={`https://themes.wrksz.dev${page.url}.mdx`}
+				/>
 				<a
 					href={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
 					rel="noreferrer noopener"

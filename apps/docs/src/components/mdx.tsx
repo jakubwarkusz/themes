@@ -9,12 +9,14 @@ import { InstallCommand } from "./install-command";
 import { Beta, Breaking, Bug, Fixed, No, Since, Yes } from "./mdx-badges";
 import { Do, Dont } from "./practice";
 import { ScrollFade } from "./scroll-fade";
+import { ThemeDemo } from "./theme-demo";
 
 export function getMDXComponents(components?: MDXComponents) {
 	return {
 		...defaultMdxComponents,
 		Callout,
 		InstallCommand,
+		ThemeDemo,
 		pre: ({
 			ref: _ref,
 			title,
