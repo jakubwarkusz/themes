@@ -5,6 +5,27 @@ description: Force a specific theme on a page or section, ignoring user preferen
 
 Use `forcedTheme` to lock the theme for a page or section. `setTheme` calls are ignored while a theme is forced.
 
+
+## Try it
+
+Pick a theme, then force one. While `forcedTheme` is set it wins over the selection; clear it and the selection comes back.
+
+<ForcedDemo>
+
+```tsx title="page.tsx"
+import { ThemeProvider } from "@wrksz/themes/next";
+
+export default function Page({ children }: { children: React.ReactNode }) {
+  return (
+    <ThemeProvider forcedTheme="dark" target="#page" storage="none">
+      <div id="page">{children}</div>
+    </ThemeProvider>
+  );
+}
+```
+
+</ForcedDemo>
+
 ## Per-page forced theme
 
 ```tsx title="app/dashboard/layout.tsx"

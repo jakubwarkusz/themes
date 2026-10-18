@@ -9,6 +9,24 @@ The `themeColor` prop keeps `<meta name="theme-color">` in sync with the current
   `themeColor` always writes to `document.head`, including when [`themeRoot`](/docs/examples/shadow-dom) is a shadow root. That is document chrome, not per-widget browser chrome.
 </Callout>
 
+
+## Try it
+
+Switch the theme and watch `<meta name="theme-color">` follow. On Safari and installed PWAs the browser chrome changes with it.
+
+<MetaThemeColorDemo>
+
+```tsx title="app/layout.tsx"
+<ThemeProvider
+  themes={["light", "dark", "sepia", "forest"]}
+  themeColor={{ light: "#fcfcfc", dark: "#141414", sepia: "#f4ecd8", forest: "#1d2620" }}
+>
+  {children}
+</ThemeProvider>
+```
+
+</MetaThemeColorDemo>
+
 ## Per-theme colors
 
 ```tsx

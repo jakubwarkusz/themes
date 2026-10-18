@@ -349,16 +349,6 @@ kbd {
 
 	background: var(--demo-bg);
 	color: var(--demo-fg);
-	transition:
-		background-color 200ms ease,
-		color 200ms ease;
-
-	& * {
-		transition:
-			background-color 200ms ease,
-			border-color 200ms ease,
-			color 200ms ease;
-	}
 }
 
 .theme-demo[data-theme="dark"] {
@@ -400,13 +390,6 @@ kbd {
 		--demo-accent: #f2f2f2;
 		--demo-accent-fg: #141414;
 		--demo-surface: #1c1c1c;
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.theme-demo,
-	.theme-demo * {
-		transition: none;
 	}
 }
 

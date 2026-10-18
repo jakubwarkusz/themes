@@ -10,6 +10,14 @@ import { InstallCommand } from "./install-command";
 import { Beta, Breaking, Bug, Fixed, No, Since, Yes } from "./mdx-badges";
 import { Do, Dont } from "./practice";
 import { ScrollFade } from "./scroll-fade";
+import {
+	DataAttributeDemo,
+	ForcedDemo,
+	HybridDemo,
+	MetaThemeColorDemo,
+	ScopedDemo,
+	TailwindDemo,
+} from "./example-demos";
 import { ThemeDemo } from "./theme-demo";
 
 function countLines(children: ReactNode) {
@@ -33,6 +41,12 @@ export function getMDXComponents(components?: MDXComponents) {
 		h5: (props) => <Heading as="h5" {...props} />,
 		h6: (props) => <Heading as="h6" {...props} />,
 		ThemeDemo,
+		ScopedDemo,
+		ForcedDemo,
+		TailwindDemo,
+		DataAttributeDemo,
+		HybridDemo,
+		MetaThemeColorDemo,
 		pre: ({
 			ref: _ref,
 			title,

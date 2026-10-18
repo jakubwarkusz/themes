@@ -5,6 +5,28 @@ description: Applying themes via data attributes instead of CSS classes.
 
 Instead of adding a class to `<html>`, you can set a `data-*` attribute. This is useful when you want to avoid conflicts with existing class-based styling.
 
+
+## Try it
+
+The provider writes the theme into `data-theme`; plain CSS selectors pick it up. The value on the right is read from the DOM.
+
+<DataAttributeDemo>
+
+```tsx title="app/layout.tsx"
+<ThemeProvider attribute="data-theme" themes={["light", "dark", "sepia", "forest"]}>
+  {children}
+</ThemeProvider>
+```
+
+```css title="app/globals.css"
+[data-theme="light"]  { --bg: #fcfcfc; --fg: #1f1f1f; }
+[data-theme="dark"]   { --bg: #141414; --fg: #f2f2f2; }
+[data-theme="sepia"]  { --bg: #f4ecd8; --fg: #433422; }
+[data-theme="forest"] { --bg: #1d2620; --fg: #e3ead9; }
+```
+
+</DataAttributeDemo>
+
 ## Setup
 
 ```tsx

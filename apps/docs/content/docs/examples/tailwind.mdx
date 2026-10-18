@@ -5,6 +5,33 @@ description: Using @wrksz/themes with Tailwind CSS v4 dark mode.
 
 `@wrksz/themes` applies a `dark` class to `<html>` by default. In Tailwind v4, you need to tell Tailwind to use that class for `dark:` variants instead of the default `prefers-color-scheme` media query.
 
+
+## Try it
+
+A card styled only with Tailwind classes and their `dark:` variants. The provider sets the class; Tailwind does the rest.
+
+<TailwindDemo>
+
+```css title="app/globals.css"
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+```
+
+```tsx title="usage-card.tsx"
+export function UsageCard() {
+  return (
+    <div className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
+      <p className="text-zinc-500 dark:text-zinc-400">Usage this month</p>
+      <div className="bg-zinc-100 dark:bg-zinc-800">
+        <div className="bg-sky-500 dark:bg-sky-400" />
+      </div>
+    </div>
+  );
+}
+```
+
+</TailwindDemo>
+
 ## Setup
 
 Add `@custom-variant` to your CSS:
