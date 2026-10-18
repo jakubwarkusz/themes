@@ -9,12 +9,14 @@
 }
 
 @theme inline {
+	--font-weight-normal: 450;
 	--font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 	--font-mono:
 		var(--font-ioskeley-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 body {
+	font-weight: 450;
 	font-feature-settings: "cv01", "ss03";
 }
 

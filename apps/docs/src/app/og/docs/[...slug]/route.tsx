@@ -1,6 +1,5 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { googleFonts } from "takumi-js/helpers";
 import { ImageResponse } from "takumi-js/response";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
@@ -14,7 +13,9 @@ const images = [
 	{ src: "sticker", data: () => readFile(join(ASSETS, "sticker.png")) },
 ];
 
-const fonts = googleFonts([{ name: "Inter", weight: [400, 500, 700] }]);
+const fonts = readFile(join(process.cwd(), "src/app/fonts/Inter.woff2")).then((data) => [
+	{ name: "Inter", data },
+]);
 
 const CREAM = "#F4F2EC";
 
