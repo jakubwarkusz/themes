@@ -1,6 +1,8 @@
 "use client";
 
 import type { ReactElement } from "react";
+import { getScriptConfig } from "../core/script-config.js";
+import { getScript } from "../core/script.js";
 import type { ThemeContextInstance } from "../core/context.js";
 import type { ThemeProviderProps } from "../core/types.js";
 import { ClientNextThemeProvider } from "../providers/client-next-provider.js";
@@ -61,7 +63,9 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 			themes: config.themes,
 			themeContext: bindings.themeContext,
 		} satisfies NextProviderProps<ThemeName>;
-		return <ClientNextThemeProvider {...merged} />;
+		return (
+			<ClientNextThemeProvider {...merged} bootstrap={getScript(getScriptConfig(merged))} />
+		);
 	}
 
 	function TypedThemeScript(

@@ -5,6 +5,11 @@ description: API reference for the ThemeProvider component.
 
 `ThemeProvider` wraps your app, injects an anti-flash script before hydration, and manages theme state via `ClientThemeProvider`.
 
+When rendered from a Server Component, the Next providers generate the bootstrap string on the
+server and pass it to the client boundary. The generator stays out of that client bundle; the
+script string is included in the HTML and the RSC payload. The typed Next factory remains a client-side path
+and still includes the generator. See [`createThemes`](/docs/api/create-themes).
+
 <Callout type="warn">
   <Breaking /> In 1.x, `ThemeProvider` from `@wrksz/themes/next` was an **async** Server Component that called `cookies()` for cookie/hybrid storage. From **`2.0.0`** it is synchronous and never reads cookies on the server. See [Upgrading from 1.x](/docs/migration#upgrading-from-1x).
 </Callout>

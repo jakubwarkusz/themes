@@ -3,6 +3,7 @@ import "./setup.js";
 import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { isValidElement, type ReactElement, type ReactNode } from "react";
 import { clearCookies } from "./setup.js";
+import { ThemeProvider as ServerThemeProvider } from "../providers/next-provider.js";
 
 const insertedHtmlCallbacks: Array<() => ReactNode> = [];
 
@@ -63,6 +64,32 @@ afterEach(() => {
 });
 
 describe("createThemes Next pairing", () => {
+	test("matches server bootstrap generation after applying factory prop overrides", () => {
+		const overrides = {
+			initialTheme: "sepia" as const,
+			value: { sepia: "warm" },
+			nonce: "factory-nonce",
+		};
+		const view = render(
+			<NextThemeProvider {...overrides}>
+				<ThemeReader />
+			</NextThemeProvider>,
+		);
+		const client = ServerThemeProvider({
+			children: null,
+			themes: ["light", "dark", "sepia"],
+			defaultTheme: "light",
+			attribute: "class",
+			storage: "none",
+			...overrides,
+		}) as ReactElement<{ bootstrap: string }>;
+		const script = insertedHtmlCallbacks[0]?.() as ScriptElement;
+		expect(script.props.dangerouslySetInnerHTML?.__html).toBe(client.props.bootstrap);
+		expect(script.props.nonce).toBe("factory-nonce");
+		expect(view.getByTestId("theme").textContent).toBe("sepia");
+		expect(document.documentElement.classList.contains("warm")).toBe(true);
+	});
+
 	test("NextThemeProvider injects a bootstrap that includes the factory theme tuple", () => {
 		render(
 			<NextThemeProvider>

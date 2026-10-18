@@ -11,6 +11,22 @@ These fixtures measure small, realistic `@wrksz/themes` consumption cases:
 - `next-provider`: imports `ThemeProvider` from `@wrksz/themes/next`
 - `extended-next-provider`: imports the opt-in `ThemeProvider` from
   `@wrksz/themes/next/extended` with system mapping and same-document synchronization enabled
+- `next-client-boundary`: bundles the built internal `ClientNextThemeProvider` and its imports
+- `extended-next-client-boundary`: bundles the built internal `ExtendedClientNextThemeProvider` and its imports
+- `next-factory`: exports a provider and matching hook from a typed Next factory
+- `client-factory`: exports a provider and matching hook from a typed client-only factory
+
+The client-boundary fixtures import internal `dist` modules deliberately; they are not new
+public package exports. They measure the library code reachable from the client boundary,
+without including the server wrapper. This captures improvements such as moving script
+generation to the server, which the full `next-provider` fixtures cannot distinguish.
+Factory fixtures use the public entrypoints and remain separate because their configuration
+and provider are created in a client module. The client-only factory does not provide a bootstrap.
+
+These measurements exclude React/Next runtime code, HTML, and RSC payloads. They are not the
+total JavaScript transferred by an application. Before shipping a server/client split, also
+compare a production Next build's client chunks and HTML/RSC. Embedded RSC in the initial HTML
+must not be counted again as a separate response. Compression and a warm JS cache affect the balance.
 
 Run the benchmark from the repository root:
 
@@ -25,8 +41,8 @@ runtime), prints raw and gzip sizes, and fails when a fixture exceeds
 
 Changing the bundler or minifier can change these measurements independently of runtime source changes.
 
-When an intentional change increases size, update only the affected threshold and mention the
-measured before/after values in the pull request.
+Existing budgets must not be raised to accommodate a change. Lower them after verified
+reductions, and report measured before/after values in the pull request.
 
 ## Compare against a baseline
 
@@ -36,13 +52,16 @@ CI compares every run against the committed baseline:
 pnpm --filter @wrksz/themes size:compare benchmarks/baseline.json
 ```
 
-When an intentional change changes bundle size, update `baseline.json` with the new report:
+To deliberately refresh the complete baseline, use:
 
 ```bash
 pnpm --filter @wrksz/themes size:update-baseline
 ```
 
 Then review the `benchmarks/baseline.json` diff before committing it.
+When adding a fixture, append only its measured baseline and budget; preserve existing entries
+so their accumulated regressions are not reset. The client-boundary and factory entries record
+the starting point before server-side bootstrap optimization.
 
 For one-off local comparisons, save a temporary baseline before making a change:
 

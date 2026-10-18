@@ -1,58 +1,24 @@
 import type { ReactElement } from "react";
 import { getScript } from "./core/script.js";
-import { resolveDefaultTheme } from "./core/theme-validation.js";
+import { getScriptConfig } from "./core/script-config.js";
 import type { DefaultTheme, ThemeProviderProps } from "./core/types.js";
-
-const DEFAULT_THEMES: string[] = ["light", "dark"];
 
 export type ThemeScriptProps<Themes extends string = DefaultTheme> = Omit<
 	ThemeProviderProps<Themes>,
 	"children" | "onThemeChange" | "onStorageError" | "cookieOptions"
 >;
 
-export function ThemeScript<Themes extends string = DefaultTheme>({
-	themes = DEFAULT_THEMES as Themes[],
-	forcedTheme,
-	enableSystem = true,
-	defaultTheme,
-	attribute = "class",
-	value,
-	target = "html",
-	disableTransitionOnChange = false,
-	storage = "localStorage",
-	storageKey = "theme",
-	enableColorScheme = true,
-	nonce,
-	scriptProps,
-	themeColor,
-	followSystem = false,
-	initialTheme,
-}: ThemeScriptProps<Themes>): ReactElement {
-	const resolvedDefault = resolveDefaultTheme(themes, enableSystem, defaultTheme);
+export function ThemeScript<Themes extends string = DefaultTheme>(
+	props: ThemeScriptProps<Themes>,
+): ReactElement {
+	const { nonce, scriptProps } = props;
 
 	return (
 		<script
 			{...scriptProps}
 			suppressHydrationWarning
 			// escaped inline bootstrap prevents a flash before hydration
-			dangerouslySetInnerHTML={{
-				__html: getScript({
-					storageKey,
-					attribute,
-					defaultTheme: resolvedDefault,
-					enableSystem,
-					enableColorScheme,
-					forcedTheme,
-					themes,
-					value,
-					target,
-					storage,
-					themeColors: themeColor,
-					initialTheme,
-					disableTransitionOnChange,
-					followSystem,
-				}),
-			}}
+			dangerouslySetInnerHTML={{ __html: getScript(getScriptConfig(props)) }}
 			{...(nonce !== undefined ? { nonce } : null)}
 		/>
 	);
