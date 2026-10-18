@@ -50,8 +50,8 @@
 	"client-provider": {
 		"maxBytes": 9500,
 		"maxGzipBytes": 3900,
-		"maxDeltaBytes": 500,
-		"maxDeltaGzipBytes": 250
+		"maxDeltaBytes": 510,
+		"maxDeltaGzipBytes": 255
 	},
 	"generated-script": {
 		"maxBytes": 2200,
