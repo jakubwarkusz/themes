@@ -15,7 +15,10 @@ export function subscribeHistoryReapply(
 	w: Window,
 	apply: () => void,
 	getTarget: () => Element | null,
+	attribute: string | readonly string[] = "class",
 ): () => void {
+	// Root layout swaps clear every theme attribute, not just class.
+	options.attributeFilter = [...new Set(options.attributeFilter.concat(attribute))];
 	listeners.set(apply, { target: getTarget, element: getTarget() });
 	if (listeners.size === 1) {
 		const Observer = (w as unknown as { MutationObserver?: typeof MutationObserver })
