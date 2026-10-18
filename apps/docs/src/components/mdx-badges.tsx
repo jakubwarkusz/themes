@@ -13,7 +13,7 @@ const TONES: Record<Tone, string> = {
 	danger: "badge-tone [--badge-tone:var(--tone-danger)]",
 };
 
-function Badge({
+export function Badge({
 	tone,
 	icon,
 	dot,
