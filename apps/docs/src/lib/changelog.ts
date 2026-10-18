@@ -62,7 +62,9 @@ export const getReleases = cache(async (): Promise<Release[]> => {
 			continue;
 		}
 
-		const entry = line.match(/^- (?:\*\((.+?)\)\*\s+)?(\[\*\*breaking\*\*\]\s+)?(.+)/);
+		const entry = line.match(
+			/^- (?:[*_]\((.+?)\)[*_]\s+)?(\[[*_]{2}breaking[*_]{2}\]\s+)?(.+)/,
+		);
 		if (entry) {
 			item = { scope: entry[1], breaking: Boolean(entry[2]), text: entry[3].trim() };
 			current.groups.at(-1)?.items.push(item);
