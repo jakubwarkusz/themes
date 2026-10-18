@@ -7,11 +7,13 @@ import {
 	DocsTitle,
 	PageLastUpdate,
 } from "fumadocs-ui/layouts/docs/page";
+import { TOCPopover, TOCProvider } from "fumadocs-ui/layouts/docs/page/slots/toc";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx";
 import { PageActions } from "@/components/page-actions";
+import { Toc } from "@/components/toc";
 import { gitConfig } from "@/lib/layout.shared";
 import { getPageImage, source } from "@/lib/source";
 
@@ -29,13 +31,14 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 			tableOfContent={{
 				container: { className: "pt-8" },
 			}}
+			slots={{ toc: { provider: TOCProvider, main: Toc, popover: TOCPopover } }}
 		>
 			<DocsTitle>{page.data.title}</DocsTitle>
 			<DocsDescription className="mb-0">{page.data.description}</DocsDescription>
 			<div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b pb-6">
 				<PageActions
 					markdownUrl={`${page.url}.mdx`}
-					pageUrl={`https://themes.wrksz.dev${page.url}.mdx`}
+					pageUrl={`https://themes.wrksz.dev${page.url}`}
 				/>
 				<a
 					href={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
