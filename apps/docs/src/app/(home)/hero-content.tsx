@@ -1,6 +1,12 @@
 "use client";
 
-import { Download01Icon, Github01Icon, NpmIcon, StarIcon } from "@hugeicons/core-free-icons";
+import {
+	ArrowDown02Icon,
+	Download01Icon,
+	Github01Icon,
+	NpmIcon,
+	StarIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useReducedMotion } from "motion/react";
 import * as m from "motion/react-m";
@@ -125,6 +131,22 @@ export function HeroContent({
 				</Link>
 				<HeroInstall />
 			</m.div>
+
+			<m.p className="mt-4 text-sm text-fd-muted-foreground" {...fadeUp(0.18)}>
+				Using an AI agent?{" "}
+				<a
+					href="#agents"
+					className="group inline-flex items-center gap-1 text-fd-foreground outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-fd-ring"
+				>
+					<span className="link-underline-center">Set it up with one prompt</span>
+					<HugeiconsIcon
+						icon={ArrowDown02Icon}
+						size={13}
+						color="currentColor"
+						strokeWidth={1.8}
+					/>
+				</a>
+			</m.p>
 		</>
 	);
 }

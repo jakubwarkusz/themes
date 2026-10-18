@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import { MotionProvider } from "@/components/motion-provider";
+import { Agents } from "./agents";
 import { Contributors } from "./contributors";
 import { Footer } from "./footer";
 import { Hero } from "./hero";
@@ -17,6 +18,7 @@ export default function HomePage() {
 			</MotionProvider>
 			<MotionProvider>
 				<FeaturesGrid />
+				<Agents />
 				<Comparison />
 				<Roadmap />
 				<Contributors />

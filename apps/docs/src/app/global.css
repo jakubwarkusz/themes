@@ -8,6 +8,16 @@
 	--fd-nav-height: 56px !important;
 }
 
+html {
+	scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+}
+
 @theme inline {
 	--font-weight-normal: 450;
 	--font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
