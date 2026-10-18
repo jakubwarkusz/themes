@@ -58,7 +58,7 @@ export function HeroContent({ stars }: { stars: number | null }) {
 					href={`https://github.com/${gitConfig.user}/${gitConfig.repo}`}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="inline-flex h-8 cursor-default items-center gap-1.5 rounded-md bg-fd-card px-3 text-sm text-fd-foreground outline-none transition-[background-color,scale] duration-150 ease-out hover:bg-fd-secondary focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.97]"
+					className="group inline-flex h-8 cursor-default items-center gap-1.5 rounded-md bg-fd-card px-3 text-sm text-fd-foreground outline-none transition-[background-color,scale] duration-150 ease-out hover:bg-fd-secondary focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.97]"
 				>
 					<HugeiconsIcon
 						icon={GithubIcon}
@@ -69,15 +69,17 @@ export function HeroContent({ stars }: { stars: number | null }) {
 					GitHub
 					{stars != null && (
 						<>
-							<span className="text-fd-muted-foreground">·</span>
-							<HugeiconsIcon
-								icon={StarIcon}
-								size={12}
-								color="#f59e0b"
-								fill="#f59e0b"
-								strokeWidth={0}
-							/>
-							<span className="tabular-nums">{formatStars(stars)}</span>
+							<span aria-hidden className="mx-1 h-3.5 w-px bg-fd-border" />
+							<span className="flex items-center gap-1 text-fd-muted-foreground transition-colors duration-150 group-hover:text-fd-foreground">
+								<HugeiconsIcon
+									icon={StarIcon}
+									size={12}
+									color="#f59e0b"
+									fill="#f59e0b"
+									strokeWidth={0}
+								/>
+								<span className="tabular-nums">{formatStars(stars)}</span>
+							</span>
 						</>
 					)}
 				</Link>
