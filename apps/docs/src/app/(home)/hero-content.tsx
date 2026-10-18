@@ -55,7 +55,7 @@ export function HeroContent({ stars }: { stars: number | null }) {
 				<div className="relative mt-7 flex w-full max-w-64 flex-col items-stretch gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center">
 					<Link
 						href="/docs"
-						className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#F4F2EC] px-5 py-2.5 text-sm font-semibold text-[#1B1A17] shadow-[0_1px_2px_rgb(26_23_16/0.2)] transition-[scale,opacity] duration-150 hover:opacity-90 active:scale-[0.97]"
+						className="inline-flex cursor-default items-center justify-center gap-2 rounded-lg bg-[#F4F2EC] px-5 py-2.5 text-sm font-semibold text-[#1B1A17] shadow-[0_1px_2px_rgb(26_23_16/0.2)] transition-[scale,opacity] duration-150 hover:opacity-90 active:scale-[0.97]"
 					>
 						Get started
 					</Link>
@@ -63,7 +63,7 @@ export function HeroContent({ stars }: { stars: number | null }) {
 						href={`https://github.com/${gitConfig.user}/${gitConfig.repo}`}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/35 bg-white/15 px-5 py-2.5 text-sm font-medium text-[#F4F2EC] backdrop-blur-md transition-[scale,background-color] duration-150 hover:bg-white/25 active:scale-[0.97]"
+						className="inline-flex cursor-default items-center justify-center gap-2 rounded-lg border border-white/35 bg-white/15 px-5 py-2.5 text-sm font-medium text-[#F4F2EC] backdrop-blur-md transition-[scale,background-color] duration-150 hover:bg-white/25 active:scale-[0.97]"
 					>
 						<HugeiconsIcon
 							icon={GithubIcon}

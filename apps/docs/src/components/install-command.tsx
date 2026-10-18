@@ -86,7 +86,7 @@ export function InstallCommand({ className }: { className?: string }) {
 							writePm(mgr.label);
 						}}
 						className={cn(
-							"relative cursor-pointer rounded-md text-xs font-medium outline-none transition-[color,scale] duration-150 focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.96]",
+							"relative rounded-md text-xs font-medium outline-none transition-[color,scale] duration-150 focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.96]",
 							pm === mgr.label
 								? "text-fd-foreground"
 								: "text-fd-muted-foreground hover:text-fd-foreground",
