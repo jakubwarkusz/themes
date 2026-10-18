@@ -87,3 +87,32 @@ export const getReleases = cache(async (): Promise<Release[]> => {
 	}
 	return releases.filter((release) => release.groups.some((group) => group.items.length));
 });
+
+export async function getChangelogMarkdown() {
+	const releases = await getReleases();
+	return releases
+		.map((release) => {
+			const meta = [release.date, release.url && `[Compare](${release.url})`]
+				.filter(Boolean)
+				.join(" · ");
+			const groups = release.groups
+				.filter((group) => group.items.length)
+				.map((group) =>
+					[
+						`### ${group.name}`,
+						"",
+						...group.items.map(
+							(item) =>
+								`- ${item.breaking ? "**Breaking:** " : ""}${item.scope ? `**${item.scope}:** ` : ""}${item.text}`,
+						),
+					].join("\n"),
+				);
+			return [
+				`## ${release.version}`,
+				...(meta ? ["", meta] : []),
+				"",
+				groups.join("\n\n"),
+			].join("\n");
+		})
+		.join("\n\n");
+}
