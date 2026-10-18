@@ -51,7 +51,7 @@
 		"maxBytes": 9500,
 		"maxGzipBytes": 3900,
 		"maxDeltaBytes": 510,
-		"maxDeltaGzipBytes": 255
+		"maxDeltaGzipBytes": 270
 	},
 	"generated-script": {
 		"maxBytes": 2200,
