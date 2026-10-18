@@ -860,7 +860,7 @@ function Highlighted({ file }: { file: GeneratedFile }) {
 					<pre
 						className={cn(
 							className,
-							"w-full py-3.5 text-[0.875rem] leading-relaxed whitespace-pre-wrap outline-none [overflow-wrap:anywhere] [tab-size:2] *:flex *:flex-col",
+							"w-full py-3.5 text-[0.875rem] leading-relaxed whitespace-pre-wrap outline-none wrap-anywhere tab-2 *:flex *:flex-col",
 						)}
 						{...props}
 					/>
@@ -873,7 +873,7 @@ function Highlighted({ file }: { file: GeneratedFile }) {
 function Plain({ file }: { file: GeneratedFile }) {
 	return (
 		<CodeBlock title={file.path} copyValue={file.code}>
-			<pre className="w-full px-4 py-3.5 text-[0.875rem] leading-relaxed whitespace-pre-wrap text-fd-muted-foreground [overflow-wrap:anywhere] [tab-size:2]">
+			<pre className="w-full px-4 py-3.5 text-[0.875rem] leading-relaxed whitespace-pre-wrap text-fd-muted-foreground wrap-anywhere tab-2">
 				{file.code}
 			</pre>
 		</CodeBlock>
@@ -903,7 +903,7 @@ export function Configurator() {
 		setConfig((current) => normalize({ ...current, ...patch }));
 
 	return (
-		<div className="not-prose my-6 grid gap-6 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
+		<div className="not-prose my-6 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
 			<Controls config={config} update={update} />
 			<div className="flex min-w-0 flex-col gap-3 lg:sticky lg:top-[calc(var(--fd-docs-row-1,0px)+1.5rem)] lg:max-h-[calc(100dvh-var(--fd-docs-row-1,0px)-3rem)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:scrollbar-none">
 				<div className="flex flex-col gap-1.5 rounded-xl bg-fd-card p-1.5">
