@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { googleFonts } from "takumi-js/helpers";
 import { ImageResponse } from "takumi-js/response";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
@@ -12,6 +13,8 @@ const images = [
 	{ src: "sky", data: () => readFile(join(ASSETS, "sky-night.webp")) },
 	{ src: "sticker", data: () => readFile(join(ASSETS, "sticker.png")) },
 ];
+
+const fonts = googleFonts([{ name: "Inter", weight: [400, 500, 700] }]);
 
 const CREAM = "#F4F2EC";
 
@@ -120,6 +123,7 @@ export async function GET(_req: Request, { params }: RouteContext<"/og/docs/[...
 			height: 630,
 			format: "webp",
 			images,
+			fonts,
 		},
 	);
 }
