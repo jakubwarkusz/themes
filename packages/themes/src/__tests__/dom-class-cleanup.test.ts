@@ -43,6 +43,18 @@ for (const { name, createApply } of [
 	},
 ]) {
 	describe(`${name} DOM class cleanup`, () => {
+		test("cached tokens still repair cleared classes and follow changed mappings", () => {
+			const apply = createApply();
+			const valueMap = { dark: "dark palette-dark" };
+			apply({ ...options, valueMap });
+			target.className = "layout";
+			apply({ ...options, valueMap });
+			expect(target.className).toBe("layout dark palette-dark");
+			valueMap.dark = "night palette-night";
+			apply({ ...options, valueMap });
+			expect(target.className).toBe("layout night palette-night");
+		});
+
 		test("does not scan theme mappings for data-only application or repeated class application", () => {
 			const apply = createApply();
 			const readLight = vi.fn(() => "light");

@@ -1,4 +1,5 @@
 import type { Attribute, ThemeColor } from "./types.js";
+import { disableTransitions, splitClassTokens } from "./dom-runtime.js";
 
 export { getDomWindow, readStoredTheme, writeStoredTheme } from "./storage.js";
 
@@ -24,10 +25,6 @@ function resolveThemeColor(themeColor: ThemeColor, resolved: string): string | u
 	return themeColor[resolved];
 }
 
-function splitClassTokens(value: string): string[] {
-	return value.split(" ").filter((t) => t);
-}
-
 function updateMetaThemeColor(color: string | undefined): void {
 	let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
 	if (!color) {
@@ -45,7 +42,7 @@ function updateMetaThemeColor(color: string | undefined): void {
 	if (meta.content !== color) meta.content = color;
 }
 
-function getTargetEl(target: string): Element | null {
+export function getTargetEl(target: string): Element | null {
 	if (target === "html") return document.documentElement;
 	if (target === "body") return document.body;
 	return document.querySelector(target);
@@ -89,12 +86,7 @@ export function applyThemeToDom({
 	}
 
 	if (needsUpdate && disableTransitionOnChange) {
-		const transitionValue =
-			typeof disableTransitionOnChange === "string" ? disableTransitionOnChange : "none";
-		const style = document.createElement("style");
-		style.textContent = `*,*::before,*::after{transition:${transitionValue}!important}`;
-		document.head.appendChild(style);
-		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
+		disableTransitions(disableTransitionOnChange);
 	}
 
 	if (staleClasses) {

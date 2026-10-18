@@ -83,3 +83,22 @@ deltas for every fixture.
 - `maxBytes` / `maxGzipBytes`: hard per-fixture size limits, always checked.
 - `maxDeltaBytes` / `maxDeltaGzipBytes`: allowed growth versus a baseline, checked only when
   `--compare` is used.
+
+## Runtime workloads
+
+Run the runtime microbenchmarks separately from correctness tests:
+
+```bash
+pnpm --filter @wrksz/themes exec vitest bench --run benchmarks/runtime.bench.ts
+```
+
+The three workloads measure batches of 1,000 unchanged DOM applications, unrelated class
+mutations with a frame flush after each delivery, and rapid theme changes followed by two
+animation frames. Use the same benchmark file, dependencies, and runtime for both revisions.
+JSON results can be saved with `--reporter=json --outputFile=/tmp/themes-runtime.json`.
+
+These are synthetic happy-dom measurements with controlled observer delivery and animation
+frames, not browser frame times or end-user navigation latency. The rapid-change workload
+is a stress case, not typical usage. Correctness tests separately cover selective observer
+dispatch, bounded token reuse, transition-style reuse, and bootstrap/runtime parity. Real
+Next.js navigation and Activity restoration remain covered by `pnpm verify:fixture`.

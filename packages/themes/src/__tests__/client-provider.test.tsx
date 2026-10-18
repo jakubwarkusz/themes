@@ -841,20 +841,11 @@ describe("ClientThemeProvider - disableTransitionOnChange", () => {
 	test("injected style contains 'none' for boolean true", () => {
 		wrap(<ThemeConsumer />, { disableTransitionOnChange: true, defaultTheme: "dark" });
 
-		const captured = { content: null as string | null };
-		const origAppend = document.head.appendChild.bind(document.head);
-		document.head.appendChild = <T extends Node>(node: T): T => {
-			if ((node as unknown as Element).tagName === "STYLE")
-				captured.content = (node as unknown as Element).textContent;
-			return origAppend(node) as T;
-		};
-
 		act(() => {
 			fireEvent.click(screen.getByTestId("btn-light"));
 		});
 
-		document.head.appendChild = origAppend;
-		expect(captured.content).toContain("transition:none");
+		expect(document.head.querySelector("style")?.textContent).toContain("transition:none");
 	});
 
 	test("injected style uses custom CSS string", () => {
@@ -863,20 +854,15 @@ describe("ClientThemeProvider - disableTransitionOnChange", () => {
 			defaultTheme: "dark",
 		});
 
-		const captured = { content: null as string | null };
-		const origAppend = document.head.appendChild.bind(document.head);
-		document.head.appendChild = <T extends Node>(node: T): T => {
-			if ((node as unknown as Element).tagName === "STYLE")
-				captured.content = (node as unknown as Element).textContent;
-			return origAppend(node) as T;
-		};
-
 		act(() => {
 			fireEvent.click(screen.getByTestId("btn-light"));
 		});
 
-		document.head.appendChild = origAppend;
-		expect(captured.content).toContain("background-color 0s, color 0s");
+		expect(
+			Array.from(document.head.querySelectorAll("style"), (style) => style.textContent).some(
+				(content) => content.includes("background-color 0s, color 0s"),
+			),
+		).toBe(true);
 	});
 });
 

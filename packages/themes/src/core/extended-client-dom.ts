@@ -1,4 +1,5 @@
 import type { Attribute, ThemeColor } from "./types.js";
+import { disableTransitions, splitClassTokens } from "./dom-runtime.js";
 
 export { getDomWindow, readStoredTheme, writeStoredTheme } from "./storage.js";
 
@@ -64,11 +65,7 @@ function restoreMetaThemeColor(state: AppliedThemeState["themeColorMeta"]): void
 	else state.element.setAttribute("content", state.previousContent);
 }
 
-function splitClassTokens(value: string): string[] {
-	return value.split(" ").filter((t) => t);
-}
-
-function getTargetElement(target: string, themeRoot?: Element | ShadowRoot): Element | null {
+export function getTargetElement(target: string, themeRoot?: Element | ShadowRoot): Element | null {
 	if (themeRoot) {
 		if ("host" in themeRoot) return themeRoot.host;
 		if ("tagName" in themeRoot) return themeRoot;
@@ -136,13 +133,8 @@ export function applyExtendedThemeToDom({
 	}
 
 	if (needsUpdate && disableTransitionOnChange) {
-		const transitionValue =
-			typeof disableTransitionOnChange === "string" ? disableTransitionOnChange : "none";
-		const style = document.createElement("style");
-		style.textContent = `*,*::before,*::after{transition:${transitionValue}!important}`;
 		const styleRoot = themeRoot && "host" in themeRoot ? themeRoot : document.head;
-		styleRoot.append(style);
-		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
+		disableTransitions(disableTransitionOnChange, styleRoot);
 	}
 
 	if (staleClasses.length) element.classList.remove(...staleClasses);
