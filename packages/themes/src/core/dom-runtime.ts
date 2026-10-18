@@ -26,18 +26,16 @@ export function disableTransitions(
 	if (!state) {
 		const style = document.createElement("style");
 		style.textContent = `*,*::before,*::after{transition:${transition}!important}`;
-		state = { style, remaining: 2 };
+		state = { style, remaining: 0 };
 		active.set(transition, state);
-		root.append(style);
 		const current = state;
 		requestAnimationFrame(function release() {
 			if (--current.remaining) requestAnimationFrame(release);
 			else {
-				current.style.remove();
+				style.remove();
 				active.delete(transition);
 			}
 		});
-		return;
 	}
 	state.remaining = 2;
 	if (root.lastChild !== state.style) root.append(state.style);

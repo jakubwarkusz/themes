@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { cleanup, render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { applyThemeToDom } from "../core/client-dom.js";
@@ -184,8 +184,18 @@ const cases: ParityCase[] = [
 	},
 ];
 
+let frames: FrameRequestCallback[] = [];
+
+function flushFrame(): void {
+	const pending = frames;
+	frames = [];
+	for (const callback of pending) callback(0);
+}
+
 function resetDom(parityCase?: ParityCase): void {
 	cleanup();
+	flushFrame();
+	flushFrame();
 	localStorage.clear();
 	sessionStorage.clear();
 	clearCookies();
@@ -289,19 +299,15 @@ function getProviderProps(parityCase: ParityCase): Omit<ThemeProviderProps<strin
 }
 
 beforeEach(() => {
-	// Flush transition-disable style cleanup synchronously so later suites are not
-	// hit by happy-dom removeChild errors from pending requestAnimationFrame work.
-	const flushFrame = ((callback: FrameRequestCallback) => {
-		callback(0);
-		return 0;
-	}) as typeof requestAnimationFrame;
-	globalThis.requestAnimationFrame = flushFrame;
-	window.requestAnimationFrame = flushFrame;
+	vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) =>
+		frames.push(callback),
+	);
 	resetDom();
 });
 
 afterEach(() => {
 	resetDom();
+	vi.unstubAllGlobals();
 });
 
 describe("bootstrap/runtime/provider parity", () => {

@@ -27,8 +27,17 @@ relative to ordinary user-driven theme toggles.
 
 ## Remaining size tradeoff
 
-The full runtime variant is intentionally retained for further optimization. Relative to
-the unchanged bundle baseline, the default client boundary grows by 640 B raw / 282 B gzip,
-and the extended boundary by 687 B raw / 283 B gzip. These exceed the existing budgets.
-Neither the budgets nor the baseline have been raised or refreshed to hide that growth.
-The branch is not yet ready to merge under the current size policy.
+The full runtime variant is retained. A follow-up simplification shares transition-style
+attachment and countdown reset between new and reused styles, saving 22 B raw per provider
+fixture. The parity suite queues animation frames instead of invoking callbacks synchronously,
+so cleanup is tested after DOM application, as in a browser.
+
+After rebuilding, the default client boundary measures 8,239 B raw / 3,537 B gzip
+(+618 B / +274 B against the unchanged baseline). The extended boundary measures
+9,932 B raw / 4,094 B gzip (+665 B / +275 B). Gzip results can vary with build output.
+
+These savings do not offset the added runtime behavior. The user explicitly approved
+accepting the remaining size cost if optimization alone did not meet the old limits.
+Only exceeded provider/factory budgets are increased, with small margins for build variation;
+hook, script, image, and package-install budgets are unchanged. The baseline is not refreshed,
+so reports continue to expose the cost rather than resetting the deltas to zero.
