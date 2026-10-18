@@ -7,8 +7,8 @@ import * as m from "motion/react-m";
 import Image from "next/image";
 import Link from "next/link";
 import sticker from "@/assets/home/sticker.png";
-import { InstallCommand } from "@/components/install-command";
 import { formatStars, gitConfig } from "@/lib/layout.shared";
+import { HeroInstall } from "./hero-install";
 import { HeroSky } from "./hero-sky";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
@@ -81,10 +81,7 @@ export function HeroContent({ stars }: { stars: number | null }) {
 						</>
 					)}
 				</Link>
-			</m.div>
-
-			<m.div className="mt-4" {...fadeUp(0.18)}>
-				<InstallCommand className="w-lg max-w-full" />
+				<HeroInstall />
 			</m.div>
 		</>
 	);

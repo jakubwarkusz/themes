@@ -4,14 +4,14 @@ import { useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/cn";
 import { CopyButton } from "./copy-button";
 
-const PKG_MANAGERS = [
+export const PKG_MANAGERS = [
 	{ label: "bun", command: "bun add @wrksz/themes" },
 	{ label: "npm", command: "npm install @wrksz/themes" },
 	{ label: "pnpm", command: "pnpm add @wrksz/themes" },
 	{ label: "yarn", command: "yarn add @wrksz/themes" },
 ] as const;
 
-type PkgManager = (typeof PKG_MANAGERS)[number]["label"];
+export type PkgManager = (typeof PKG_MANAGERS)[number]["label"];
 
 const STORAGE_KEY = "wrksz-themes:package-manager";
 const DEFAULT_PM: PkgManager = "pnpm";
@@ -31,7 +31,7 @@ function readPm(): PkgManager {
 	}
 }
 
-function writePm(pm: PkgManager) {
+export function writePm(pm: PkgManager) {
 	memory = pm;
 	try {
 		localStorage.setItem(STORAGE_KEY, pm);
@@ -51,8 +51,12 @@ function subscribe(listener: () => void) {
 	};
 }
 
+export function usePackageManager() {
+	return useSyncExternalStore(subscribe, readPm, () => DEFAULT_PM);
+}
+
 export function InstallCommand({ className }: { className?: string }) {
-	const pm = useSyncExternalStore(subscribe, readPm, () => DEFAULT_PM);
+	const pm = usePackageManager();
 	const [picked, setPicked] = useState(false);
 	const command = PKG_MANAGERS.find((mgr) => mgr.label === pm)?.command ?? "";
 	const active = PKG_MANAGERS.findIndex((mgr) => mgr.label === pm);
