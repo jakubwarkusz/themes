@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import { Activity } from "react";
 import { useTheme } from "../core/context.js";
 import { getExtendedScript } from "../core/extended-script.js";
 import { getScript, type ScriptConfig } from "../core/script.js";
@@ -57,6 +58,46 @@ for (const { name, Provider, bootstrap } of [
 	},
 ]) {
 	describe(`${name} provider regressions`, () => {
+		test.each(["class", "data-theme"] as const)(
+			"restores %s and color scheme when an Activity becomes visible again",
+			(attribute) => {
+				mockMedia();
+				localStorage.setItem("theme", "dark");
+				const onThemeChange = vi.fn();
+				const content = (mode: "visible" | "hidden") => (
+					<Activity mode={mode}>
+						<Provider
+							attribute={attribute}
+							target="#theme-regression"
+							onThemeChange={onThemeChange}
+						>
+							<ThemeReader />
+						</Provider>
+					</Activity>
+				);
+				const view = render(content("visible"));
+				for (const cycle of [1, 2]) {
+					view.rerender(content("hidden"));
+					target.className = "layout";
+					target.removeAttribute("data-theme");
+					target.style.colorScheme = "";
+					view.rerender(content("visible"));
+					expect(target.getAttribute(attribute), `reveal ${cycle}`).toBe(
+						attribute === "class" ? "layout dark" : "dark",
+					);
+					expect(target.style.colorScheme).toBe("dark");
+					expect(
+						JSON.parse(screen.getByTestId("state").textContent ?? "{}"),
+					).toMatchObject({
+						theme: "dark",
+						resolvedTheme: "dark",
+					});
+				}
+				expect(onThemeChange).not.toHaveBeenCalled();
+				expect(localStorage.getItem("theme")).toBe("dark");
+			},
+		);
+
 		test("keeps the bootstrap's forced theme while tracking system changes", () => {
 			const changeSystem = mockMedia();
 			const onThemeChange = vi.fn();

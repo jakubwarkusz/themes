@@ -244,6 +244,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 
 	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
+		lastAppliedRef.current = null;
 		initializeEvent();
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
