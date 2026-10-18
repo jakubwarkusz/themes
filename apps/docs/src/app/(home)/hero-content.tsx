@@ -1,11 +1,6 @@
 "use client";
 
-import {
-	CheckmarkCircle01Icon,
-	Copy01Icon,
-	GithubIcon,
-	StarIcon,
-} from "@hugeicons/core-free-icons";
+import { Copy01Icon, GithubIcon, StarIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useReducedMotion } from "motion/react";
 import * as m from "motion/react-m";
@@ -41,15 +36,18 @@ function InstallSnippet() {
 		} catch {}
 	}
 
+	const active = PKG_MANAGERS.findIndex((mgr) => mgr.label === pm);
+
 	return (
-		<div className="flex w-lg max-w-full flex-col overflow-hidden rounded-xl border border-fd-border bg-fd-card sm:h-12 sm:flex-row sm:items-stretch">
-			<div className="relative grid h-11 shrink-0 grid-cols-4 items-center self-start border-fd-border p-1.5 max-sm:w-full max-sm:border-b sm:h-auto sm:self-stretch sm:border-r">
+		<div className="flex w-lg max-w-full flex-col gap-1 rounded-xl bg-fd-card p-1.5 sm:flex-row sm:items-center">
+			<fieldset
+				aria-label="Package manager"
+				className="relative grid h-8 min-w-0 shrink-0 grid-cols-4 sm:w-48"
+			>
 				<span
 					aria-hidden
-					className="absolute top-1.5 bottom-1.5 left-1.5 w-[calc((100%-0.75rem)/4)] rounded-md bg-fd-muted ring-1 ring-fd-border transition-transform duration-200 ease-out motion-reduce:transition-none"
-					style={{
-						transform: `translateX(${PKG_MANAGERS.findIndex((mgr) => mgr.label === pm) * 100}%)`,
-					}}
+					className="absolute inset-y-0 left-0 w-1/4 rounded-md bg-fd-background shadow-[0_1px_2px_rgb(0_0_0/0.08)] transition-transform duration-200 ease-out motion-reduce:transition-none dark:bg-fd-secondary"
+					style={{ transform: `translateX(${active * 100}%)` }}
 				/>
 				{PKG_MANAGERS.map((mgr) => (
 					<button
@@ -58,30 +56,32 @@ function InstallSnippet() {
 						aria-pressed={pm === mgr.label}
 						onClick={() => setPm(mgr.label)}
 						className={cn(
-							"relative h-full w-full cursor-pointer rounded-md sm:w-12 text-xs font-medium transition-[transform,color] duration-150 active:scale-[0.96]",
+							"relative cursor-pointer rounded-md text-xs font-medium outline-none transition-[color,transform] duration-150 focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.96]",
 							pm === mgr.label
 								? "text-fd-foreground"
-								: "text-fd-muted-foreground/60 hover:text-fd-muted-foreground",
+								: "text-fd-muted-foreground hover:text-fd-foreground",
 						)}
 					>
 						{mgr.label}
 					</button>
 				))}
-			</div>
-			<button
-				type="button"
-				onClick={copy}
-				className="group flex min-w-0 flex-1 cursor-pointer items-center gap-2.5 px-4 py-3 transition-[background-color] duration-150 hover:bg-fd-muted sm:py-0"
-			>
-				<span className="select-none font-mono text-[13px] text-fd-muted-foreground/40">
+			</fieldset>
+			<div className="flex h-8 min-w-0 flex-1 items-center gap-2 pl-2.5 sm:pl-3">
+				<span className="select-none font-mono text-[13px] text-fd-muted-foreground">
 					$
 				</span>
-				<span className="flex-1 truncate text-left font-mono text-[13px] text-fd-foreground">
+				<code className="flex-1 truncate text-left font-mono text-[13px] text-fd-foreground">
 					{command}
-				</span>
-				<span className="relative size-3.25 shrink-0">
+				</code>
+				<button
+					type="button"
+					onClick={copy}
+					aria-label={copied ? "Copied" : "Copy command"}
+					className="relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-fd-muted-foreground outline-none transition-[color,background-color,transform] duration-150 hover:bg-fd-accent hover:text-fd-foreground focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.96]"
+				>
 					<span
-						className="absolute inset-0 flex items-center justify-center text-fd-muted-foreground/30 transition-[opacity,transform,filter] duration-150 group-hover:text-fd-muted-foreground/70"
+						aria-hidden
+						className="absolute inset-0 flex items-center justify-center transition-[opacity,transform,filter] duration-150"
 						style={{
 							opacity: copied ? 0 : 1,
 							transform: copied ? "scale(0.6)" : "scale(1)",
@@ -91,12 +91,13 @@ function InstallSnippet() {
 					>
 						<HugeiconsIcon
 							icon={Copy01Icon}
-							size={13}
+							size={14}
 							color="currentColor"
 							strokeWidth={1.5}
 						/>
 					</span>
 					<span
+						aria-hidden
 						className="absolute inset-0 flex items-center justify-center text-emerald-500 transition-[opacity,transform,filter] duration-150"
 						style={{
 							opacity: copied ? 1 : 0,
@@ -106,14 +107,14 @@ function InstallSnippet() {
 						}}
 					>
 						<HugeiconsIcon
-							icon={CheckmarkCircle01Icon}
-							size={13}
+							icon={Tick02Icon}
+							size={14}
 							color="currentColor"
-							strokeWidth={1.5}
+							strokeWidth={2}
 						/>
 					</span>
-				</span>
-			</button>
+				</button>
+			</div>
 		</div>
 	);
 }
@@ -134,8 +135,6 @@ export function HeroContent({ stars }: { stars: number | null }) {
 
 	return (
 		<>
-			{/* The painted sky: by day in the light theme, by night in the dark
-			    one, repainted on the switch (hero-sky.tsx). */}
 			<m.div
 				className="relative flex min-h-90 w-full flex-col items-center justify-center overflow-hidden rounded-2xl px-6 py-12 sm:aspect-5/2 sm:min-h-0"
 				{...fadeUp(0)}
