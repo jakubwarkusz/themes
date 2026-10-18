@@ -1,18 +1,12 @@
-import { Edit01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import {
-	DocsBody,
-	DocsDescription,
-	DocsPage,
-	DocsTitle,
-	PageLastUpdate,
-} from "fumadocs-ui/layouts/docs/page";
+import { findNeighbour } from "fumadocs-core/page-tree";
+import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/layouts/docs/page";
 import { TOCPopover, TOCProvider } from "fumadocs-ui/layouts/docs/page/slots/toc";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx";
 import { PageActions } from "@/components/page-actions";
+import { PageFooter } from "@/components/page-footer";
 import { Toc } from "@/components/toc";
 import { gitConfig } from "@/lib/layout.shared";
 import { getPageImage, source } from "@/lib/source";
@@ -23,6 +17,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 	if (!page) notFound();
 
 	const MDX = page.data.body;
+	const neighbours = findNeighbour(source.getPageTree(), page.url);
 
 	return (
 		<DocsPage
@@ -31,6 +26,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 			tableOfContent={{
 				container: { className: "pt-8" },
 			}}
+			footer={{ enabled: false }}
 			slots={{ toc: { provider: TOCProvider, main: Toc, popover: TOCPopover } }}
 		>
 			<DocsTitle>{page.data.title}</DocsTitle>
@@ -40,26 +36,6 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 					markdownUrl={`${page.url}.mdx`}
 					pageUrl={`https://themes.wrksz.dev${page.url}`}
 				/>
-				<a
-					href={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
-					rel="noreferrer noopener"
-					target="_blank"
-					className="inline-flex items-center gap-1.5 text-xs text-fd-muted-foreground transition-colors hover:text-fd-foreground"
-				>
-					<HugeiconsIcon
-						icon={Edit01Icon}
-						size={12}
-						color="currentColor"
-						strokeWidth={1.5}
-					/>
-					Edit on GitHub
-				</a>
-				{page.data.lastModified && (
-					<PageLastUpdate
-						className="ms-auto text-xs text-fd-muted-foreground"
-						date={page.data.lastModified}
-					/>
-				)}
 			</div>
 			<DocsBody>
 				<MDX
@@ -68,6 +44,12 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 					})}
 				/>
 			</DocsBody>
+			<PageFooter
+				editUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
+				lastModified={page.data.lastModified}
+				previous={neighbours.previous}
+				next={neighbours.next}
+			/>
 		</DocsPage>
 	);
 }
