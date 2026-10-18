@@ -15,7 +15,7 @@ const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
 function C({ children }: { children: string }) {
 	return (
-		<code className="rounded bg-fd-muted px-1 py-0.5 font-mono text-[0.72rem] text-fd-foreground/80">
+		<code className="rounded bg-fd-muted px-[0.35em] py-[0.15em] font-mono text-[0.9em] text-fd-foreground [box-decoration-break:clone]">
 			{children}
 		</code>
 	);
@@ -83,81 +83,65 @@ const features: Feature[] = [
 export function FeaturesGrid() {
 	const shouldReduceMotion = useReducedMotion();
 
-	const headingVariants = {
+	const listVariants = {
+		hidden: {},
+		show: { transition: { staggerChildren: shouldReduceMotion ? 0 : 0.04 } },
+	};
+
+	const itemVariants = {
 		hidden: {
 			opacity: 0,
-			transform: shouldReduceMotion ? "translateY(0px)" : "translateY(20px)",
+			transform: shouldReduceMotion ? "translateY(0px)" : "translateY(8px)",
 		},
 		show: {
 			opacity: 1,
 			transform: "translateY(0px)",
-			transition: { duration: 0.5, ease: EASE_OUT },
-		},
-	};
-
-	const gridVariants = {
-		hidden: { opacity: 0 },
-		show: {
-			opacity: 1,
-			transition: {
-				duration: 0.4,
-				ease: EASE_OUT,
-				delay: 0.08,
-				staggerChildren: shouldReduceMotion ? 0 : 0.05,
-				delayChildren: 0.1,
-			},
-		},
-	};
-
-	const cardVariants = {
-		hidden: {
-			transform: shouldReduceMotion ? "translateY(0px)" : "translateY(12px)",
-		},
-		show: {
-			transform: "translateY(0px)",
-			transition: { duration: 0.45, ease: EASE_OUT },
+			transition: { duration: 0.4, ease: EASE_OUT },
 		},
 	};
 
 	return (
-		<section className="w-full max-w-4xl pb-16 sm:pb-24">
-			<m.div
-				className="mb-10 text-center"
-				variants={headingVariants}
+		<section className="w-full max-w-4xl pb-16 sm:pb-20">
+			<m.h2
+				className="text-base font-medium text-fd-muted-foreground"
+				variants={itemVariants}
 				initial="hidden"
 				whileInView="show"
 				viewport={{ once: true, margin: "-80px" }}
 			>
-				<p className="mb-2 text-xs font-semibold text-fd-muted-foreground/40">Features</p>
-				<h2 className="text-xl font-semibold tracking-tight text-fd-foreground sm:text-2xl">
-					What you&apos;re getting.
-				</h2>
-			</m.div>
+				Features
+			</m.h2>
 
-			<m.div
-				className="grid grid-cols-1 overflow-hidden rounded-xl border border-fd-border bg-fd-border sm:grid-cols-2 lg:grid-cols-3"
-				style={{ gap: "1px" }}
-				variants={gridVariants}
+			<m.ul
+				className="mt-4 grid grid-cols-1 gap-x-12 gap-y-6 sm:grid-cols-2"
+				variants={listVariants}
 				initial="hidden"
 				whileInView="show"
 				viewport={{ once: true, margin: "-80px" }}
 			>
 				{features.map((feature) => (
-					<m.div
+					<m.li
 						key={feature.title}
-						className="bg-fd-background p-6 transition-colors hover:bg-fd-card"
-						variants={cardVariants}
+						className="flex flex-col gap-1"
+						variants={itemVariants}
 					>
-						<Image src={feature.icon} alt="" sizes="48px" className="mb-4 size-12" />
-						<h3 className="mb-1.5 text-sm font-semibold text-fd-foreground">
-							{feature.title}
-						</h3>
-						<p className="text-xs leading-relaxed text-fd-muted-foreground">
+						<div className="flex items-center gap-2">
+							<Image
+								src={feature.icon}
+								alt=""
+								sizes="28px"
+								className="size-7 shrink-0"
+							/>
+							<h3 className="text-sm font-medium text-fd-foreground">
+								{feature.title}
+							</h3>
+						</div>
+						<p className="max-w-md text-sm leading-relaxed text-fd-muted-foreground">
 							{feature.description}
 						</p>
-					</m.div>
+					</m.li>
 				))}
-			</m.div>
+			</m.ul>
 		</section>
 	);
 }
