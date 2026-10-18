@@ -43,8 +43,9 @@ Now use `dark:` variants anywhere:
 
 If you manage CSS variables yourself (e.g. for custom themes), avoid using `@media (prefers-color-scheme: dark)` as a fallback:
 
+<Dont caption="The media query applies before the theme class does, so it flashes">
+
 ```css
-/* ❌ causes flash - CSS fires before the theme class is applied */
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
     --bg: #09090b;
@@ -52,15 +53,18 @@ If you manage CSS variables yourself (e.g. for custom themes), avoid using `@med
 }
 ```
 
+</Dont>
+
 The library reads `prefers-color-scheme` in the inline script and sets the correct class on `<html>` before the first paint. A CSS media query fallback is redundant and causes a flash for users whose system preference differs from their stored theme.
 
-Use class-based selectors only:
+<Do caption="Class-based selectors only">
 
 ```css
-/* ✅ */
 :root       { --bg: #ffffff; }
 :root.dark  { --bg: #09090b; }
 ```
+
+</Do>
 
 ## Data attribute
 

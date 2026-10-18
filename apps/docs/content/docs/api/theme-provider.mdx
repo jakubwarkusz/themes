@@ -35,30 +35,38 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 <Callout type="warn">
   Use `ThemeProvider` from `@wrksz/themes/next` directly in a server layout. The `next` entry also exports the server-only `getTheme` helper, so it is not a client-module entry. For nested providers inside Client Components, use [`ClientThemeProvider`](/docs/api/client-theme-provider).
-
-  ```tsx
-  // ❌ do not import the Next server entry from a client module
-  "use client";
-  import { ThemeProvider } from "@wrksz/themes/next";
-  export function Providers({ children }) {
-    return <ThemeProvider>{children}</ThemeProvider>;
-  }
-  ```
-
-  ```tsx
-  // ✅ use directly in layout.tsx
-  import { ThemeProvider } from "@wrksz/themes/next";
-  export default function RootLayout({ children }) {
-    return (
-      <html suppressHydrationWarning>
-        <body>
-          <ThemeProvider>{children}</ThemeProvider>
-        </body>
-      </html>
-    );
-  }
-  ```
 </Callout>
+
+<Dont caption="Importing the Next entry from a client module">
+
+```tsx title="app/providers.tsx"
+"use client";
+import { ThemeProvider } from "@wrksz/themes/next";
+
+export function Providers({ children }) {
+  return <ThemeProvider>{children}</ThemeProvider>;
+}
+```
+
+</Dont>
+
+<Do caption="Rendering it in the root layout">
+
+```tsx title="app/layout.tsx"
+import { ThemeProvider } from "@wrksz/themes/next";
+
+export default function RootLayout({ children }) {
+  return (
+    <html suppressHydrationWarning>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+</Do>
 
 ## Props
 

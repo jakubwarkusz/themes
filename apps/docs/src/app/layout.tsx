@@ -1,13 +1,29 @@
 import { ThemeProvider } from "@wrksz/themes/next";
 import { RootProvider } from "fumadocs-ui/provider/next";
+import DocsSearchDialog from "@/components/search-dialog";
 import type { Metadata } from "next";
 import "./global.css";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { Analytics } from "@/components/deferred-analytics";
 import { appThemes, themeProviderDefaults } from "@/lib/theme-config";
 
-const inter = Inter({
-	subsets: ["latin"],
+const inter = localFont({
+	src: [
+		{ path: "./fonts/Inter.woff2", weight: "100 900", style: "normal" },
+		{ path: "./fonts/Inter-Italic.woff2", weight: "100 900", style: "italic" },
+	],
+	variable: "--font-inter",
+	display: "swap",
+});
+
+const ioskeleyMono = localFont({
+	src: [
+		{ path: "./fonts/IoskeleyMono-Regular.woff2", weight: "400", style: "normal" },
+		{ path: "./fonts/IoskeleyMono-Bold.woff2", weight: "700", style: "normal" },
+		{ path: "./fonts/IoskeleyMono-Italic.woff2", weight: "400", style: "italic" },
+	],
+	variable: "--font-ioskeley-mono",
+	display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -34,10 +50,19 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: LayoutProps<"/">) {
 	return (
-		<html lang="en" className={inter.className} suppressHydrationWarning>
+		<html
+			lang="en"
+			className={`${inter.variable} ${ioskeleyMono.variable}`}
+			suppressHydrationWarning
+		>
 			<body className="flex flex-col min-h-dvh antialiased">
 				<ThemeProvider {...themeProviderDefaults} themes={appThemes}>
-					<RootProvider>{children}</RootProvider>
+					<RootProvider
+						theme={{ enabled: false }}
+						search={{ SearchDialog: DocsSearchDialog }}
+					>
+						{children}
+					</RootProvider>
 				</ThemeProvider>
 				<Analytics />
 			</body>

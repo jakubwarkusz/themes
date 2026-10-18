@@ -1,6 +1,7 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { unstable_cache } from "next/cache";
 import Image from "next/image";
+import { ThemeSwitch } from "@/components/theme-switch";
 
 export const gitConfig = {
 	user: "jakubwarkusz",
@@ -48,29 +49,32 @@ export function formatStars(count: number): string {
 	return String(count);
 }
 
+export function NavTitle({ version }: { version?: string }) {
+	return (
+		<span className="flex items-center gap-1.5">
+			<Image
+				src="/wrksz.svg"
+				alt="@wrksz"
+				width={28}
+				height={16}
+				className="invert dark:invert-0"
+			/>
+			<span className="text-fd-muted-foreground">/</span>
+			<span className="font-medium">themes</span>
+			{version && (
+				<span className="ms-0.5 font-mono text-xs text-fd-muted-foreground">
+					v{version}
+					{version.includes("beta") ? " · beta" : null}
+				</span>
+			)}
+		</span>
+	);
+}
+
 export function baseOptions(version?: string): BaseLayoutProps {
 	return {
-		nav: {
-			title: (
-				<span className="flex items-center gap-1.5">
-					<Image
-						src="/wrksz.svg"
-						alt="@wrksz"
-						width={28}
-						height={16}
-						className="invert dark:invert-0"
-					/>
-					<span className="text-fd-muted-foreground">/</span>
-					<span className="font-medium">themes</span>
-					{version && (
-						<span className="rounded-md border border-fd-border bg-fd-muted px-1.5 py-0.5 text-xs font-medium text-fd-muted-foreground">
-							v{version}
-							{version.includes("beta") ? " · beta" : null}
-						</span>
-					)}
-				</span>
-			),
-		},
+		nav: { title: <NavTitle version={version} /> },
 		githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
+		slots: { themeSwitch: ThemeSwitch },
 	};
 }

@@ -13,6 +13,10 @@ const images = [
 	{ src: "sticker", data: () => readFile(join(ASSETS, "sticker.png")) },
 ];
 
+const fonts = readFile(join(process.cwd(), "src/app/fonts/Inter.woff2")).then((data) => [
+	{ name: "Inter", data },
+]);
+
 const CREAM = "#F4F2EC";
 
 const ogRootStyle: CSSProperties = {
@@ -120,6 +124,7 @@ export async function GET(_req: Request, { params }: RouteContext<"/og/docs/[...
 			height: 630,
 			format: "webp",
 			images,
+			fonts,
 		},
 	);
 }

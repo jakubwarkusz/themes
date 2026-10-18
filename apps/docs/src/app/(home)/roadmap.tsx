@@ -36,57 +36,59 @@ const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 export function Roadmap() {
 	const shouldReduceMotion = useReducedMotion();
 
-	const container = {
+	const list = {
 		hidden: {},
-		show: {
-			transition: { staggerChildren: shouldReduceMotion ? 0 : 0.07 },
-		},
+		show: { transition: { staggerChildren: shouldReduceMotion ? 0 : 0.04 } },
 	};
 
 	const item = {
 		hidden: {
 			opacity: 0,
-			transform: shouldReduceMotion ? "translateY(0px)" : "translateY(20px)",
+			transform: shouldReduceMotion ? "translateY(0px)" : "translateY(8px)",
 		},
 		show: {
 			opacity: 1,
 			transform: "translateY(0px)",
-			transition: { duration: 0.5, ease: EASE_OUT },
+			transition: { duration: 0.4, ease: EASE_OUT },
 		},
 	};
 
 	return (
-		<section className="w-full max-w-4xl pb-16 sm:pb-24">
-			<m.div
-				className="mb-10 text-center"
+		<section className="w-full max-w-4xl pb-16 sm:pb-20">
+			<m.h2
+				className="text-base font-medium text-fd-muted-foreground"
 				variants={item}
 				initial="hidden"
 				whileInView="show"
 				viewport={{ once: true, margin: "-80px" }}
 			>
-				<p className="mb-2 text-xs font-semibold text-fd-muted-foreground/40">Roadmap</p>
-				<h2 className="text-xl font-semibold tracking-tight text-fd-foreground sm:text-2xl">
-					What&apos;s next.
-				</h2>
-			</m.div>
+				Roadmap
+			</m.h2>
 
-			<m.div
-				className="grid grid-cols-1 gap-8 sm:grid-cols-3"
-				variants={container}
+			<m.ul
+				className="mt-4 grid grid-cols-1 gap-x-12 gap-y-6 sm:grid-cols-3"
+				variants={list}
 				initial="hidden"
 				whileInView="show"
 				viewport={{ once: true, margin: "-80px" }}
 			>
 				{plans.map((plan) => (
-					<m.div key={plan.label} className="flex flex-col gap-3" variants={item}>
-						<Image src={plan.icon} alt="" sizes="48px" className="size-12" />
-						<p className="text-sm font-semibold text-fd-foreground">{plan.label}</p>
-						<p className="text-xs leading-relaxed text-fd-muted-foreground">
+					<m.li key={plan.label} className="flex flex-col gap-1" variants={item}>
+						<div className="flex items-center gap-2">
+							<Image
+								src={plan.icon}
+								alt=""
+								sizes="28px"
+								className="size-7 shrink-0"
+							/>
+							<h3 className="text-sm font-medium text-fd-foreground">{plan.label}</h3>
+						</div>
+						<p className="text-sm leading-relaxed text-fd-muted-foreground">
 							{plan.description}
 						</p>
-					</m.div>
+					</m.li>
 				))}
-			</m.div>
+			</m.ul>
 		</section>
 	);
 }

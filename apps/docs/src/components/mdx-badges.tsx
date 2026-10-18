@@ -1,64 +1,96 @@
 import { Bug01Icon, Cancel01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
+import type { IconSvgElement } from "@hugeicons/react";
 import { HugeiconsIcon } from "@hugeicons/react";
+import type { ReactNode } from "react";
+import { cn } from "@/lib/cn";
 
-export function Since({ version }: { version: string }) {
+type Tone = "neutral" | "success" | "warning" | "danger";
+
+const TONES: Record<Tone, string> = {
+	neutral: "bg-fd-secondary text-fd-muted-foreground",
+	success: "badge-tone [--badge-tone:var(--tone-success)]",
+	warning: "badge-tone [--badge-tone:var(--tone-warning)]",
+	danger: "badge-tone [--badge-tone:var(--tone-danger)]",
+};
+
+export function Badge({
+	tone,
+	icon,
+	dot,
+	children,
+}: {
+	tone: Tone;
+	icon?: IconSvgElement;
+	dot?: boolean;
+	children: ReactNode;
+}) {
 	return (
-		<span className="inline-flex items-center rounded-md border border-fd-border bg-fd-muted px-1.5 py-0.5 text-xs font-medium text-fd-muted-foreground">
-			Since v{version}
+		<span
+			className={cn(
+				"not-prose relative -top-px inline-flex h-5 items-center gap-1 rounded-sm px-1.5 align-middle text-[11px] font-medium whitespace-nowrap",
+				TONES[tone],
+			)}
+		>
+			{dot ? <span aria-hidden className="size-1.5 rounded-full bg-current" /> : null}
+			{icon ? (
+				<HugeiconsIcon icon={icon} size={11} color="currentColor" strokeWidth={2.2} />
+			) : null}
+			{children}
 		</span>
 	);
 }
 
+export function Since({ version }: { version: string }) {
+	return <Badge tone="neutral">Since v{version}</Badge>;
+}
+
 export function Beta({ version }: { version: string }) {
 	return (
-		<span className="inline-flex items-center rounded-md border border-[oklch(0.75_0.17_55/35%)] bg-[oklch(0.75_0.17_55/12%)] px-1.5 py-0.5 text-xs font-medium text-[oklch(0.62_0.15_55)]">
-			v{version}
-		</span>
+		<Badge tone="warning" dot>
+			Beta v{version}
+		</Badge>
 	);
 }
 
 export function Breaking({ version = "2.0.0" }: { version?: string }) {
 	return (
-		<span className="inline-flex items-center rounded-md border border-[oklch(0.65_0.22_25/35%)] bg-[oklch(0.65_0.22_25/10%)] px-1.5 py-0.5 text-xs font-medium text-[oklch(0.58_0.18_25)]">
-			Breaking · v{version}
-		</span>
+		<Badge tone="danger" dot>
+			Breaking
+			<span className="opacity-70">v{version}</span>
+		</Badge>
 	);
 }
 
 export function Yes({ note }: { note?: string }) {
 	return (
-		<span className="inline-flex items-center gap-1 rounded-full bg-[oklch(0.72_0.18_145/12%)] px-2 py-0.5 text-xs font-medium text-[oklch(0.62_0.18_145)]">
-			<HugeiconsIcon icon={Tick02Icon} size={11} color="currentColor" strokeWidth={2} />
+		<Badge tone="success" icon={Tick02Icon}>
 			<span className="hidden sm:inline">{note ?? "Yes"}</span>
 			<span className="sm:hidden">Yes</span>
-		</span>
+		</Badge>
 	);
 }
 
 export function No() {
 	return (
-		<span className="inline-flex items-center gap-1 rounded-full bg-[oklch(0.65_0.22_25/10%)] px-2 py-0.5 text-xs font-medium text-[oklch(0.58_0.18_25)]">
-			<HugeiconsIcon icon={Cancel01Icon} size={11} color="currentColor" strokeWidth={2} />
-			<span className="hidden sm:inline">No</span>
-		</span>
+		<Badge tone="neutral" icon={Cancel01Icon}>
+			No
+		</Badge>
 	);
 }
 
 export function Fixed({ note }: { note?: string }) {
 	return (
-		<span className="inline-flex items-center gap-1 rounded-full bg-[oklch(0.541_0.247_293/12%)] px-2 py-0.5 text-xs font-medium text-[oklch(0.65_0.2_293)]">
-			<HugeiconsIcon icon={Tick02Icon} size={11} color="currentColor" strokeWidth={2} />
+		<Badge tone="success" icon={Tick02Icon}>
 			<span className="hidden sm:inline">{note ? `Fixed (${note})` : "Fixed"}</span>
 			<span className="sm:hidden">Fixed</span>
-		</span>
+		</Badge>
 	);
 }
 
 export function Bug() {
 	return (
-		<span className="inline-flex items-center gap-1 rounded-full bg-[oklch(0.75_0.17_55/12%)] px-2 py-0.5 text-xs font-medium text-[oklch(0.62_0.15_55)]">
-			<HugeiconsIcon icon={Bug01Icon} size={11} color="currentColor" strokeWidth={2} />
-			<span className="hidden sm:inline">Bug</span>
-		</span>
+		<Badge tone="warning" icon={Bug01Icon}>
+			Bug
+		</Badge>
 	);
 }
