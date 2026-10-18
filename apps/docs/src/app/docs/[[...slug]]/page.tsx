@@ -8,6 +8,7 @@ import { getMDXComponents } from "@/components/mdx";
 import { PageActions } from "@/components/page-actions";
 import { PageFooter } from "@/components/page-footer";
 import { Toc } from "@/components/toc";
+import { getReleases, isLegacy } from "@/lib/changelog";
 import { gitConfig } from "@/lib/layout.shared";
 import { getPageImage, source } from "@/lib/source";
 
@@ -18,10 +19,25 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 
 	const MDX = page.data.body;
 	const neighbours = findNeighbour(source.getPageTree(), page.url);
+	const releases = page.path === "changelog.mdx" ? await getReleases() : undefined;
+	const toc = releases
+		? [
+				...releases
+					.filter((release) => !isLegacy(release))
+					.map((release) => ({
+						title: release.version,
+						url: `#${release.id}`,
+						depth: 2,
+					})),
+				...(releases.some(isLegacy)
+					? [{ title: "Older releases", url: "#older-releases", depth: 2 }]
+					: []),
+			]
+		: page.data.toc;
 
 	return (
 		<DocsPage
-			toc={page.data.toc}
+			toc={toc}
 			full={page.data.full}
 			tableOfContent={{
 				container: { className: "pt-8" },

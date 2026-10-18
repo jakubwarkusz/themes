@@ -4,7 +4,10 @@ import { useTOCItems } from "fumadocs-ui/components/toc";
 import type { TOCProps } from "fumadocs-ui/layouts/docs/page/slots/toc";
 import { m } from "motion/react";
 import {
+	Children,
 	type CSSProperties,
+	cloneElement,
+	isValidElement,
 	type ReactNode,
 	useEffect,
 	useLayoutEffect,
@@ -14,6 +17,7 @@ import {
 } from "react";
 import { cn } from "@/lib/cn";
 import { MotionProvider } from "./motion-provider";
+import { ScrollFade } from "./scroll-fade";
 import {
 	headingTreeDepths,
 	RAIL_OFFSET,
@@ -37,6 +41,16 @@ const titleHidden =
 	"opacity-0 blur-[4px] group-hover:opacity-100 group-hover:blur-none group-hover:delay-[60ms] group-hover:duration-200 group-focus-within:opacity-100 group-focus-within:blur-none group-focus-within:delay-[60ms] group-focus-within:duration-200";
 
 type Heading = { id: string; level: number; text: ReactNode };
+
+function stripLinks(node: ReactNode): ReactNode {
+	return Children.map(node, (child) => {
+		if (!isValidElement<{ href?: string; children?: ReactNode }>(child)) return child;
+		if (child.type === "a" || child.props.href !== undefined)
+			return stripLinks(child.props.children);
+		if (child.props.children === undefined) return child;
+		return cloneElement(child, undefined, stripLinks(child.props.children));
+	});
+}
 
 function TocGuides({
 	depths,
@@ -190,6 +204,11 @@ function TocRail({ headings }: { headings: Heading[] }) {
 	);
 }
 
+function rewind(el: HTMLElement) {
+	const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+	el.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+}
+
 export function Toc({ container }: TOCProps) {
 	const items = useTOCItems();
 	const headings = useMemo(
@@ -197,7 +216,7 @@ export function Toc({ container }: TOCProps) {
 			items.map((item) => ({
 				id: item.url.slice(1),
 				level: item.depth,
-				text: item.title,
+				text: stripLinks(item.title),
 			})),
 		[items],
 	);
@@ -215,9 +234,21 @@ export function Toc({ container }: TOCProps) {
 				container?.className,
 			)}
 		>
-			<MotionProvider>
-				<TocRail headings={headings} />
-			</MotionProvider>
+			<ScrollFade
+				className="-ms-1 min-h-0 flex-1 overflow-y-auto overscroll-contain ps-1 pb-4 scrollbar-none"
+				onPointerLeave={(event) => {
+					const el = event.currentTarget;
+					if (!el.contains(document.activeElement)) rewind(el);
+				}}
+				onBlur={(event) => {
+					const el = event.currentTarget;
+					if (!el.contains(event.relatedTarget) && !el.matches(":hover")) rewind(el);
+				}}
+			>
+				<MotionProvider>
+					<TocRail headings={headings} />
+				</MotionProvider>
+			</ScrollFade>
 		</div>
 	);
 }

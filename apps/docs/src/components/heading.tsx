@@ -1,11 +1,19 @@
 "use client";
 
 import { Link04Icon } from "@hugeicons/core-free-icons";
-import type { ComponentProps } from "react";
+import { Children, type ComponentProps, isValidElement, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { CopyIcons, useCopied } from "./copy-button";
 
 type HeadingTag = "h2" | "h3" | "h4" | "h5" | "h6";
+
+function hasLink(children: ReactNode): boolean {
+	return Children.toArray(children).some(
+		(child) =>
+			isValidElement<{ href?: string; children?: ReactNode }>(child) &&
+			(child.props.href !== undefined || hasLink(child.props.children)),
+	);
+}
 
 export function Heading({
 	as: As,
@@ -34,9 +42,13 @@ export function Heading({
 			className={cn("group/heading flex scroll-m-28 items-center gap-1.5", className)}
 			{...props}
 		>
-			<a data-card="" href={`#${id}`}>
-				{children}
-			</a>
+			{hasLink(children) ? (
+				<span>{children}</span>
+			) : (
+				<a data-card="" href={`#${id}`}>
+					{children}
+				</a>
+			)}
 			<button
 				type="button"
 				onClick={copy}

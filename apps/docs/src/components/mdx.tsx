@@ -4,6 +4,7 @@ import type { MDXComponents } from "mdx/types";
 import { Children, type ComponentProps, isValidElement, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { Callout } from "./callout";
+import { Changelog } from "./changelog";
 import { CodeBlock } from "./code-block";
 import { Heading } from "./heading";
 import { InstallCommand } from "./install-command";
@@ -34,6 +35,7 @@ export function getMDXComponents(components?: MDXComponents) {
 	return {
 		...defaultMdxComponents,
 		Callout,
+		Changelog,
 		InstallCommand,
 		h2: (props) => <Heading as="h2" {...props} />,
 		h3: (props) => <Heading as="h3" {...props} />,
