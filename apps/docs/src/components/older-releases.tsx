@@ -15,6 +15,7 @@ export function OlderReleases({
 	children: ReactNode;
 }) {
 	const [open, setOpen] = useState(false);
+	const [settled, setSettled] = useState(false);
 	const [target, setTarget] = useState<string | null>(null);
 	const id = useId();
 	const root = useRef<HTMLDivElement>(null);
@@ -25,6 +26,7 @@ export function OlderReleases({
 			const panel = root.current?.querySelector(`[id="${CSS.escape(id)}"]`);
 			if (!hash || !panel?.contains(document.getElementById(hash))) return;
 			setTarget(hash);
+			setSettled(true);
 			setOpen(true);
 		};
 		const onNavigate = (event: Event) => {
@@ -62,7 +64,12 @@ export function OlderReleases({
 					type="button"
 					aria-expanded={open}
 					aria-controls={id}
-					onClick={() => setOpen(!open)}
+					onClick={() => {
+						setSettled(
+							!open && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+						);
+						setOpen(!open);
+					}}
 					className="flex h-8 w-fit items-center gap-1.5 rounded-md bg-fd-card px-3 text-sm font-medium text-fd-muted-foreground outline-none transition-[color,scale] duration-150 ease-out hover:text-fd-foreground focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.96]"
 				>
 					{open ? "Hide older releases" : `Show ${count} older releases`}
@@ -81,13 +88,16 @@ export function OlderReleases({
 			<div
 				id={id}
 				inert={!open}
+				onTransitionEnd={(event) => {
+					if (event.target === event.currentTarget && open) setSettled(true);
+				}}
 				className={cn(
 					"grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
 					target && "transition-none",
 					open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
 				)}
 			>
-				<div className="min-h-0 overflow-clip">{children}</div>
+				<div className={cn("min-h-0", !settled && "overflow-clip")}>{children}</div>
 			</div>
 		</div>
 	);

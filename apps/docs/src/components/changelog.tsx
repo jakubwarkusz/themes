@@ -12,6 +12,8 @@ import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import Link from "next/link";
 import { gitConfig } from "@/lib/layout.shared";
 import { getReleases, isLegacy, isMajor, type Release } from "@/lib/changelog";
+import { getGitHubUser, getReleaseReactions, type ReleaseReactions } from "@/lib/github-releases";
+import { AuthorCard, type Person } from "./author-card";
 import { Heading } from "./heading";
 import { Badge } from "./mdx-badges";
 import { OlderReleases } from "./older-releases";
@@ -64,12 +66,55 @@ function Inline({ text }: { text: string }) {
 	});
 }
 
-function ReleaseEntry({ release, latest }: { release: Release; latest: boolean }) {
+function contributorsOf(release: Release) {
+	const counts = new Map<string, number>();
+	for (const group of release.groups)
+		for (const item of group.items) {
+			const login = item.author?.login ?? gitConfig.user;
+			counts.set(login, (counts.get(login) ?? 0) + 1);
+		}
+	return [...counts].toSorted(([a, x], [b, y]) =>
+		a === gitConfig.user ? -1 : b === gitConfig.user ? 1 : y - x,
+	);
+}
+
+async function getPeople(releases: Release[]) {
+	const totals = new Map<string, number>();
+	const first = new Map<string, string>();
+	for (const release of releases.toReversed())
+		for (const group of release.groups)
+			for (const item of group.items) {
+				const login = item.author?.login ?? gitConfig.user;
+				totals.set(login, (totals.get(login) ?? 0) + 1);
+				if (!first.has(login)) first.set(login, release.version);
+			}
+	const people = await Promise.all(
+		[...totals].map(async ([login, total]): Promise<[string, Person]> => [
+			login,
+			{ login, user: await getGitHubUser(login), total, first: first.get(login) ?? "" },
+		]),
+	);
+	return Object.fromEntries(people);
+}
+
+function ReleaseEntry({
+	release,
+	latest,
+	reactions,
+	people,
+}: {
+	release: Release;
+	latest: boolean;
+	reactions?: ReleaseReactions;
+	people: Record<string, Person>;
+}) {
 	const migration = MIGRATION[release.version];
+	const contributors = contributorsOf(release);
+	const counts = Object.fromEntries(contributors);
 
 	return (
 		<section className="grid gap-x-10 gap-y-4 border-t py-8 sm:grid-cols-[8.5rem_minmax(0,1fr)]">
-			<div className="flex flex-col gap-1 sm:sticky sm:top-[calc(var(--fd-docs-row-1,0px)+1.5rem)] sm:self-start">
+			<div className="flex flex-col gap-1 sm:sticky sm:top-[calc(var(--fd-docs-row-1,0px)+1.5rem)] sm:z-10 sm:self-start sm:focus-within:z-20 sm:hover:z-20">
 				<Heading
 					as="h2"
 					id={release.id}
@@ -110,6 +155,54 @@ function ReleaseEntry({ release, latest }: { release: Release; latest: boolean }
 						className={quiet}
 					>
 						npm
+					</a>
+				) : null}
+				{contributors.length ? (
+					<div className="mt-2 flex -space-x-1.5">
+						{contributors.map(([login, count]) => (
+							<AuthorCard
+								key={login}
+								person={people[login]}
+								release={release.version}
+								inRelease={count}
+							>
+								<a
+									href={`https://github.com/${login}`}
+									target="_blank"
+									rel="noreferrer"
+									aria-label={`@${login}`}
+									className="rounded-full outline-none ring-2 ring-fd-background focus-visible:ring-fd-ring"
+								>
+									<img
+										src={`https://github.com/${login}.png?size=40`}
+										alt=""
+										width={20}
+										height={20}
+										loading="lazy"
+										className="size-5 rounded-full bg-fd-secondary"
+									/>
+								</a>
+							</AuthorCard>
+						))}
+					</div>
+				) : null}
+				{reactions?.reactions.length ? (
+					<a
+						href={reactions.url}
+						target="_blank"
+						rel="noreferrer"
+						aria-label="Reactions on the GitHub release"
+						className="group mt-1 flex w-fit flex-wrap gap-1 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+					>
+						{reactions.reactions.map((reaction) => (
+							<span
+								key={reaction.emoji}
+								className="inline-flex h-6 items-center gap-1 rounded-full bg-fd-card px-2 text-xs text-fd-muted-foreground tabular-nums transition-colors duration-150 group-hover:text-fd-foreground"
+							>
+								<span aria-hidden>{reaction.emoji}</span>
+								{reaction.count}
+							</span>
+						))}
 					</a>
 				) : null}
 			</div>
@@ -154,22 +247,28 @@ function ReleaseEntry({ release, latest }: { release: Release; latest: boolean }
 											<Inline text={item.text} />
 											{item.author ? (
 												<span className="ms-2 inline-flex items-center gap-1.5 align-middle">
-													<a
-														href={item.author.url}
-														target="_blank"
-														rel="noreferrer"
-														className="inline-flex items-center gap-1 text-xs text-fd-muted-foreground transition-colors duration-150 hover:text-fd-foreground"
+													<AuthorCard
+														person={people[item.author.login]}
+														release={release.version}
+														inRelease={counts[item.author.login] ?? 1}
 													>
-														<img
-															src={`https://github.com/${item.author.login}.png?size=32`}
-															alt=""
-															width={16}
-															height={16}
-															loading="lazy"
-															className="size-4 rounded-full bg-fd-secondary"
-														/>
-														@{item.author.login}
-													</a>
+														<a
+															href={item.author.url}
+															target="_blank"
+															rel="noreferrer"
+															className="inline-flex items-center gap-1 text-xs text-fd-muted-foreground transition-colors duration-150 hover:text-fd-foreground"
+														>
+															<img
+																src={`https://github.com/${item.author.login}.png?size=32`}
+																alt=""
+																width={16}
+																height={16}
+																loading="lazy"
+																className="size-4 rounded-full bg-fd-secondary"
+															/>
+															@{item.author.login}
+														</a>
+													</AuthorCard>
 													{item.author.first ? (
 														<Badge tone="success" dot>
 															First contribution
@@ -205,11 +304,19 @@ export async function Changelog() {
 	const current = releases.filter((release) => !isLegacy(release));
 	const legacy = releases.filter(isLegacy);
 	const latest = releases.find((release) => release.date)?.id;
+	const reactions = await getReleaseReactions();
+	const people = await getPeople(releases);
 
 	return (
 		<div className="not-prose mt-2 flex flex-col [&>section:first-child]:border-t-0 [&>section:first-child]:pt-0">
 			{current.map((release) => (
-				<ReleaseEntry key={release.id} release={release} latest={release.id === latest} />
+				<ReleaseEntry
+					key={release.id}
+					release={release}
+					latest={release.id === latest}
+					reactions={reactions[release.version]}
+					people={people}
+				/>
 			))}
 			{legacy.length ? (
 				<OlderReleases
@@ -217,7 +324,13 @@ export async function Changelog() {
 					range={`${legacy.at(-1)?.version} - ${legacy[0].version}`}
 				>
 					{legacy.map((release) => (
-						<ReleaseEntry key={release.id} release={release} latest={false} />
+						<ReleaseEntry
+							key={release.id}
+							release={release}
+							latest={false}
+							reactions={reactions[release.version]}
+							people={people}
+						/>
 					))}
 				</OlderReleases>
 			) : null}

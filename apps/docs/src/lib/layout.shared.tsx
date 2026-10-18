@@ -26,12 +26,20 @@ export const getLibraryVersion = unstable_cache(
 	{ revalidate: 3600 },
 );
 
+export function githubHeaders() {
+	const token = process.env.GITHUB_TOKEN;
+	return {
+		Accept: "application/vnd.github+json",
+		...(token ? { Authorization: `Bearer ${token}` } : {}),
+	};
+}
+
 export const getGitHubStars = unstable_cache(
 	async (): Promise<number | null> => {
 		try {
 			const res = await fetch(
 				`https://api.github.com/repos/${gitConfig.user}/${gitConfig.repo}`,
-				{ headers: { Accept: "application/vnd.github+json" } },
+				{ headers: githubHeaders() },
 			);
 			if (!res.ok) return null;
 			const data = (await res.json()) as { stargazers_count: number };
