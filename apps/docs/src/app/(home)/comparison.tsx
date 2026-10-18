@@ -161,7 +161,7 @@ export function Comparison() {
 											src={sticker}
 											alt=""
 											sizes="16px"
-											className="size-4 translate-y-0.5"
+											className="size-4"
 										/>
 										@wrksz/themes
 									</span>

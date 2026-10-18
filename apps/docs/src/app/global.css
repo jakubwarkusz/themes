@@ -75,25 +75,6 @@ samp,
 	--color-fd-overlay: oklch(0 0 0 / 60%);
 }
 
-figure.shiki:not(.not-fumadocs-codeblock *) {
-	border-color: transparent;
-	box-shadow: none;
-}
-
-figure.shiki pre {
-	font-size: 0.875rem;
-	line-height: 1.625;
-}
-
-.prose div[data-orientation]:has(> [role="tablist"]) {
-	border-color: transparent;
-	background-color: var(--color-fd-card);
-
-	& figure.shiki {
-		background-color: var(--color-fd-card);
-	}
-}
-
 .prose :where(code):not(:where(pre *, .not-prose *)) {
 	border: 0;
 	border-radius: 4px;
