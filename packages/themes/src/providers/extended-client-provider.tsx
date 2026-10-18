@@ -4,6 +4,7 @@ import {
 	type ReactElement,
 	useCallback,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useRef,
 	useSyncExternalStore,
@@ -26,6 +27,7 @@ import type { Attribute, DefaultTheme, ThemeContextValue } from "../core/types.j
 import { useEffectEvent } from "../core/use-effect-event.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
+const useIsomorphicLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect;
 
 type LastAppliedTheme = {
 	resolved: string;
@@ -259,7 +261,18 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 				const last = lastAppliedRef.current;
 				return getTargetElement(last?.target ?? "html", last?.themeRoot);
 			},
+			attribute,
 		);
+		// oxlint-disable-next-line react-hooks/exhaustive-deps -- attribute is captured per subscription; Activity reveals resubscribe.
+	}, []);
+
+	useIsomorphicLayoutEffect(() => {
+		const last = lastAppliedRef.current;
+		if (last)
+			appliedThemeRef.current = applyExtendedThemeToDom({
+				...last,
+				previous: appliedThemeRef.current,
+			});
 	}, []);
 
 	// setTheme / system / storage already write the DOM. Re-apply only when

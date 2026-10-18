@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
-import type { ReactNode } from "react";
+import { Activity, type ReactNode, useLayoutEffect } from "react";
 import { useTheme } from "../core/context.js";
 import { serializeCookie, writeCookie } from "../core/cookie.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
@@ -924,6 +924,52 @@ describe("ClientThemeProvider - history re-apply", () => {
 			await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
 		});
 		expect(document.documentElement.classList.contains("dark")).toBe(true);
+	});
+
+	test("restores attributes cleared while hidden before an Activity reveal paints", () => {
+		const seen: (string | null)[] = [];
+		function HtmlProbe({ mode }: { mode: string }) {
+			useLayoutEffect(() => {
+				if (mode === "visible")
+					seen.push(document.documentElement.getAttribute("data-theme"));
+			}, [mode]);
+			return null;
+		}
+		const tree = (mode: "hidden" | "visible") => (
+			<>
+				<Activity mode={mode}>
+					<ClientThemeProvider
+						attribute="data-theme"
+						defaultTheme="dark"
+						enableSystem={false}
+						storage="none"
+					>
+						<ThemeConsumer />
+					</ClientThemeProvider>
+				</Activity>
+				<HtmlProbe mode={mode} />
+			</>
+		);
+		const view = render(tree("visible"));
+		expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+		view.rerender(tree("hidden"));
+		document.documentElement.removeAttribute("data-theme");
+		view.rerender(tree("visible"));
+		expect(seen.at(-1)).toBe("dark");
+	});
+
+	test("re-applies when a data attribute is cleared without a history event", async () => {
+		wrap(<ThemeConsumer />, { attribute: "data-theme" });
+		act(() => {
+			fireEvent.click(screen.getByTestId("btn-dark"));
+		});
+		document.documentElement.removeAttribute("data-theme");
+		document.documentElement.style.colorScheme = "";
+		await act(async () => {
+			await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+		});
+		expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+		expect(document.documentElement.style.colorScheme).toBe("dark");
 	});
 
 	test("re-applies html when a later provider targets another element", async () => {
