@@ -20,13 +20,26 @@ export const docs = defineDocs({
 	},
 });
 
+function withJsxText(theme: ThemeRegistration): ThemeRegistration {
+	return {
+		...theme,
+		tokenColors: [
+			...(theme.tokenColors ?? []),
+			{
+				scope: ["meta.jsx.children"],
+				settings: { foreground: theme.colors?.["editor.foreground"] },
+			},
+		],
+	};
+}
+
 export default defineConfig({
 	mdxOptions: {
 		providerImportSource: "@/components/mdx",
 		rehypeCodeOptions: {
 			themes: {
-				light: pierreLight as ThemeRegistration,
-				dark: pierreDark as ThemeRegistration,
+				light: withJsxText(pierreLight as ThemeRegistration),
+				dark: withJsxText(pierreDark as ThemeRegistration),
 			},
 		},
 	},

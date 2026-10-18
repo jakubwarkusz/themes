@@ -3,11 +3,17 @@ import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
 import { Callout } from "./callout";
 import { Beta, Breaking, Bug, Fixed, No, Since, Yes } from "./mdx-badges";
+import { ScrollFade } from "./scroll-fade";
 
 export function getMDXComponents(components?: MDXComponents) {
 	return {
 		...defaultMdxComponents,
 		Callout,
+		table: (props) => (
+			<ScrollFade className="prose-no-margin my-6 overflow-x-auto">
+				<table {...props} />
+			</ScrollFade>
+		),
 		Tab,
 		Tabs,
 		Since,

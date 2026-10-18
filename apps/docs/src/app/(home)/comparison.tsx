@@ -1,52 +1,14 @@
 "use client";
 
-import { Bug01Icon, Cancel01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import sticker from "@/assets/home/sticker.png";
 import { useReducedMotion } from "motion/react";
 import * as m from "motion/react-m";
 import Link from "next/link";
+import { Bug, Fixed, No, Yes } from "@/components/mdx-badges";
+import { ScrollFade } from "@/components/scroll-fade";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
-
-function Bug() {
-	return (
-		<span className="inline-flex items-center gap-1 rounded-md border border-[color-mix(in_oklab,var(--paint-rust)_25%,transparent)] bg-[color-mix(in_oklab,var(--paint-rust)_10%,transparent)] px-2 py-0.5 text-xs font-medium text-(--paint-rust)">
-			<HugeiconsIcon icon={Bug01Icon} size={10} color="currentColor" strokeWidth={2} />
-			<span className="hidden sm:inline">Bug</span>
-		</span>
-	);
-}
-
-function No() {
-	return (
-		<span className="inline-flex items-center gap-1 rounded-md border border-fd-border bg-fd-muted px-2 py-0.5 text-xs font-medium text-fd-muted-foreground">
-			<HugeiconsIcon icon={Cancel01Icon} size={10} color="currentColor" strokeWidth={2} />
-			<span className="hidden sm:inline">No</span>
-		</span>
-	);
-}
-
-function Fixed({ note }: { note?: string }) {
-	return (
-		<span className="inline-flex items-center gap-1 rounded-md border border-[color-mix(in_oklab,var(--paint-sage)_25%,transparent)] bg-[color-mix(in_oklab,var(--paint-sage)_10%,transparent)] px-2 py-0.5 text-xs font-medium text-(--paint-sage)">
-			<HugeiconsIcon icon={Tick02Icon} size={10} color="currentColor" strokeWidth={2} />
-			<span className="hidden sm:inline">{note ? `Fixed (${note})` : "Fixed"}</span>
-			<span className="sm:hidden">Fixed</span>
-		</span>
-	);
-}
-
-function Yes({ note }: { note?: string }) {
-	return (
-		<span className="inline-flex items-center gap-1 rounded-md border border-[color-mix(in_oklab,var(--paint-sage)_25%,transparent)] bg-[color-mix(in_oklab,var(--paint-sage)_10%,transparent)] px-2 py-0.5 text-xs font-medium text-(--paint-sage)">
-			<HugeiconsIcon icon={Tick02Icon} size={10} color="currentColor" strokeWidth={2} />
-			<span className="hidden sm:inline">{note ?? "Yes"}</span>
-			<span className="sm:hidden">Yes</span>
-		</span>
-	);
-}
 
 const rows = [
 	{
@@ -148,7 +110,7 @@ export function Comparison() {
 			</m.div>
 
 			<m.div
-				className="overflow-hidden rounded-xl border border-fd-border sm:hidden"
+				className="sm:hidden"
 				variants={fadeUp}
 				initial="hidden"
 				whileInView="show"
@@ -158,57 +120,74 @@ export function Comparison() {
 				{rows.map((row, i) => (
 					<div
 						key={row.label}
-						className={`flex items-center justify-between gap-4 px-4 py-3 ${i < rows.length - 1 ? "border-b border-fd-border" : ""}`}
+						className={`flex items-center justify-between gap-4 py-2.5 ${i < rows.length - 1 ? "border-b border-fd-border/60" : ""}`}
 					>
-						<span className="text-xs text-fd-muted-foreground">{row.label}</span>
+						<span className="text-sm text-fd-foreground/80">{row.label}</span>
 						{row.wrksz}
 					</div>
 				))}
 			</m.div>
 
 			<m.div
-				className="hidden overflow-hidden rounded-xl border border-fd-border sm:block"
+				className="hidden sm:block"
 				variants={fadeUp}
 				initial="hidden"
 				whileInView="show"
 				viewport={{ once: true, margin: "-80px" }}
 				transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.08 }}
 			>
-				<table className="w-full text-sm">
-					<thead>
-						<tr className="border-b border-fd-border">
-							<th
-								scope="col"
-								className="px-4 py-2.5 text-left text-xs font-medium text-fd-muted-foreground/50"
-							>
-								<span className="sr-only">Feature</span>
-							</th>
-							<th className="px-4 py-2.5 text-center text-xs font-medium text-fd-muted-foreground/50">
-								next-themes
-							</th>
-							<th className="px-4 py-2.5 text-center text-xs font-medium text-fd-foreground">
-								<span className="inline-flex items-center gap-1.5">
-									<Image src={sticker} alt="" sizes="20px" className="size-5" />
-									@wrksz/themes
-								</span>
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{rows.map((row, i) => (
-							<tr
-								key={row.label}
-								className={`transition-colors hover:bg-fd-muted/30 ${i < rows.length - 1 ? "border-b border-fd-border" : ""}`}
-							>
-								<td className="px-4 py-3 text-xs text-fd-muted-foreground">
-									{row.label}
-								</td>
-								<td className="px-4 py-3 text-center">{row.next}</td>
-								<td className="px-4 py-3 text-center">{row.wrksz}</td>
+				<ScrollFade className="overflow-x-auto">
+					<table className="w-full border-collapse text-left text-sm tabular-nums">
+						<thead>
+							<tr className="border-b border-fd-border">
+								<th
+									scope="col"
+									className="py-2 pr-6 align-bottom font-medium text-fd-foreground"
+								>
+									Feature
+								</th>
+								<th
+									scope="col"
+									className="py-2 pr-6 align-bottom font-medium whitespace-nowrap text-fd-muted-foreground"
+								>
+									next-themes
+								</th>
+								<th
+									scope="col"
+									className="py-2 align-bottom font-medium whitespace-nowrap text-fd-foreground"
+								>
+									<span className="flex items-center gap-1.5">
+										<Image
+											src={sticker}
+											alt=""
+											sizes="16px"
+											className="size-4 translate-y-0.5"
+										/>
+										@wrksz/themes
+									</span>
+								</th>
 							</tr>
-						))}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							{rows.map((row, i) => (
+								<tr
+									key={row.label}
+									className={
+										i < rows.length - 1
+											? "border-b border-fd-border/60"
+											: undefined
+									}
+								>
+									<td className="py-2.5 pr-6 align-top text-fd-foreground/80">
+										{row.label}
+									</td>
+									<td className="py-2.5 pr-6 align-top">{row.next}</td>
+									<td className="py-2.5 align-top">{row.wrksz}</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</ScrollFade>
 			</m.div>
 
 			<m.div

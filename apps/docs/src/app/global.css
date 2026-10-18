@@ -104,8 +104,106 @@ figure.shiki pre {
 	-webkit-box-decoration-break: clone;
 }
 
-.prose :where(table) :where(code):not(:where(pre *, .not-prose *)) {
-	background-color: var(--color-fd-secondary);
+.prose table {
+	width: 100%;
+	border: 0;
+	border-radius: 0;
+	border-collapse: collapse;
+	background: none;
+	font-size: 0.875rem;
+	font-variant-numeric: tabular-nums;
+}
+
+.prose th,
+.prose td {
+	padding: 0.5rem 1.5rem 0.5rem 0;
+	border-inline: 0;
+	text-align: left;
+	background: none;
+
+	&:last-child {
+		padding-right: 0;
+	}
+}
+
+.prose th {
+	vertical-align: bottom;
+	font-weight: 500;
+	color: var(--color-fd-foreground);
+	border-bottom: 1px solid var(--color-fd-border);
+}
+
+.prose td {
+	vertical-align: top;
+	color: color-mix(in oklab, var(--color-fd-foreground) 80%, transparent);
+	border-bottom: 1px solid color-mix(in oklab, var(--color-fd-border) 60%, transparent);
+}
+
+.prose tbody tr:last-child td {
+	border-bottom: 0;
+}
+
+@property --scroll-fade-top {
+	syntax: "<length>";
+	inherits: false;
+	initial-value: 0px;
+}
+
+@property --scroll-fade-bottom {
+	syntax: "<length>";
+	inherits: false;
+	initial-value: 0px;
+}
+
+@property --scroll-fade-left {
+	syntax: "<length>";
+	inherits: false;
+	initial-value: 0px;
+}
+
+@property --scroll-fade-right {
+	syntax: "<length>";
+	inherits: false;
+	initial-value: 0px;
+}
+
+.scroll-fade {
+	mask-image:
+		linear-gradient(
+			to bottom,
+			transparent,
+			#000 var(--scroll-fade-top),
+			#000 calc(100% - var(--scroll-fade-bottom)),
+			transparent
+		),
+		linear-gradient(
+			to right,
+			transparent,
+			#000 var(--scroll-fade-left),
+			#000 calc(100% - var(--scroll-fade-right)),
+			transparent
+		);
+	mask-composite: intersect;
+	transition-property:
+		--scroll-fade-top, --scroll-fade-bottom, --scroll-fade-left, --scroll-fade-right;
+	transition-duration: 200ms;
+	transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.scroll-fade[data-scroll-top] {
+	--scroll-fade-top: 24px;
+}
+
+.scroll-fade[data-scroll-bottom] {
+	--scroll-fade-bottom: 24px;
+}
+
+.scroll-fade[data-scroll-left] {
+	--scroll-fade-left: 32px;
+}
+
+.scroll-fade[data-scroll-right] {
+	--scroll-fade-right: 32px;
 }
 
 .callout {
@@ -211,8 +309,6 @@ figure.shiki pre {
 	--tone-success: oklch(0.5 0.13 150);
 	--tone-warning: oklch(0.51 0.12 70);
 	--tone-danger: oklch(0.54 0.19 25);
-	--paint-rust: #a9533f;
-	--paint-sage: #4f7a4c;
 }
 
 .dark {
@@ -220,6 +316,4 @@ figure.shiki pre {
 	--tone-success: oklch(0.76 0.13 150);
 	--tone-warning: oklch(0.8 0.13 80);
 	--tone-danger: oklch(0.71 0.16 25);
-	--paint-rust: #d98a72;
-	--paint-sage: #9cc797;
 }
