@@ -1,5 +1,6 @@
 import { ThemeProvider } from "@wrksz/themes/next";
 import { RootProvider } from "fumadocs-ui/provider/next";
+import DocsSearchDialog from "@/components/search-dialog";
 import type { Metadata } from "next";
 import "./global.css";
 import localFont from "next/font/local";
@@ -56,7 +57,12 @@ export default function Layout({ children }: LayoutProps<"/">) {
 		>
 			<body className="flex flex-col min-h-dvh antialiased">
 				<ThemeProvider {...themeProviderDefaults} themes={appThemes}>
-					<RootProvider theme={{ enabled: false }}>{children}</RootProvider>
+					<RootProvider
+						theme={{ enabled: false }}
+						search={{ SearchDialog: DocsSearchDialog }}
+					>
+						{children}
+					</RootProvider>
 				</ThemeProvider>
 				<Analytics />
 			</body>

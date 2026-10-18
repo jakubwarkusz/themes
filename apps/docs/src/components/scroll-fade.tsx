@@ -3,7 +3,7 @@
 import type { ComponentPropsWithoutRef } from "react";
 import { cn } from "@/lib/cn";
 
-function scrollFade(el: HTMLElement | null) {
+export function scrollFade(el: HTMLElement | null) {
 	if (!el) return;
 	const update = () => {
 		const { scrollTop, scrollLeft, scrollHeight, scrollWidth, clientHeight, clientWidth } = el;
@@ -21,10 +21,13 @@ function scrollFade(el: HTMLElement | null) {
 	const resize = new ResizeObserver(update);
 	resize.observe(el);
 	for (const child of el.children) resize.observe(child);
+	const mutation = new MutationObserver(update);
+	mutation.observe(el, { childList: true, subtree: true });
 	el.addEventListener("scroll", update, { passive: true });
 	update();
 	return () => {
 		resize.disconnect();
+		mutation.disconnect();
 		el.removeEventListener("scroll", update);
 	};
 }
