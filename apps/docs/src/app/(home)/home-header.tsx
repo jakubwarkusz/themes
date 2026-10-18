@@ -54,7 +54,7 @@ export function HomeHeader({ title }: { title: ReactNode }) {
 					target="_blank"
 					rel="noreferrer noopener"
 					aria-label="GitHub"
-					className={`${ICON_BUTTON} -me-2`}
+					className={ICON_BUTTON}
 				>
 					<HugeiconsIcon
 						icon={GithubIcon}
