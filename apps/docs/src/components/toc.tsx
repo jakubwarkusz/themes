@@ -77,7 +77,7 @@ function TocGuides({
 					? "border-fd-muted-foreground"
 					: "border-fd-border/60",
 			)}
-			style={(next > level ? undefined : { marginBottom: endGap }) as CSSProperties}
+			style={{ marginBottom: next > level ? "0.1875rem" : endGap } as CSSProperties}
 		/>
 	));
 }
