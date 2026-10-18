@@ -30,12 +30,14 @@ export function Segmented<T extends string>({
 	value,
 	onChange,
 	disabled = false,
+	format,
 }: {
 	label: string;
 	options: readonly T[];
 	value: T;
 	onChange: (value: T) => void;
 	disabled?: boolean;
+	format?: (value: T) => string;
 }) {
 	const group = useRef<HTMLFieldSetElement>(null);
 	const [pill, setPill] = useState<{ left: number; width: number } | null>(null);
@@ -84,13 +86,14 @@ export function Segmented<T extends string>({
 						onChange(option);
 					}}
 					className={cn(
-						"relative rounded-md px-3 text-xs font-medium capitalize outline-none transition-[color,scale] duration-150 focus-visible:ring-2 focus-visible:ring-fd-ring enabled:active:scale-[0.96]",
+						"relative shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap outline-none transition-[color,scale] duration-150 focus-visible:ring-2 focus-visible:ring-fd-ring enabled:active:scale-[0.96]",
+						!format && "capitalize",
 						value === option
 							? "text-fd-foreground"
 							: "text-fd-muted-foreground enabled:hover:text-fd-foreground",
 					)}
 				>
-					{option}
+					{format ? format(option) : option}
 				</button>
 			))}
 		</fieldset>

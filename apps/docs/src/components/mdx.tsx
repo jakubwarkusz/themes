@@ -1,6 +1,7 @@
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
+import dynamic from "next/dynamic";
 import { Children, type ComponentProps, isValidElement, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { Callout } from "./callout";
@@ -21,6 +22,8 @@ import {
 } from "./example-demos";
 import { ThemeDemo } from "./theme-demo";
 
+const Configurator = dynamic(() => import("./configurator").then((mod) => mod.Configurator));
+
 function countLines(children: ReactNode) {
 	const code = Children.toArray(children).find(isValidElement) as
 		| { props: { children?: ReactNode } }
@@ -36,6 +39,7 @@ export function getMDXComponents(components?: MDXComponents) {
 		...defaultMdxComponents,
 		Callout,
 		Changelog,
+		Configurator: () => <Configurator />,
 		InstallCommand,
 		h2: (props) => <Heading as="h2" {...props} />,
 		h3: (props) => <Heading as="h3" {...props} />,

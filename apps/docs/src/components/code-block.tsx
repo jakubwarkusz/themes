@@ -13,10 +13,12 @@ export const CodeCollapse = createContext(true);
 export function CodeBlock({
 	title,
 	lines = 0,
+	copyValue,
 	children,
 }: {
 	title?: string;
 	lines?: number;
+	copyValue?: string;
 	children: ReactNode;
 }) {
 	const viewport = useRef<HTMLDivElement>(null);
@@ -70,7 +72,9 @@ export function CodeBlock({
 			)}
 
 			<CopyButton
-				getValue={() => viewport.current?.querySelector("pre")?.textContent ?? ""}
+				getValue={() =>
+					copyValue ?? viewport.current?.querySelector("pre")?.textContent ?? ""
+				}
 				label="Copy code"
 				className="absolute top-2 right-2"
 			/>

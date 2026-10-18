@@ -3,6 +3,7 @@
   "pages": [
     "---Guides---",
     "index",
+    "configurator",
     "agents",
     "migration",
     "why-not-next-themes",
