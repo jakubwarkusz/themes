@@ -1,30 +1,31 @@
 "use client";
 
-import { Globe02Icon, PlugIcon, SparklesIcon } from "@hugeicons/core-free-icons";
-import type { IconSvgElement } from "@hugeicons/react";
-import { HugeiconsIcon } from "@hugeicons/react";
+import Image, { type StaticImageData } from "next/image";
 import { useReducedMotion } from "motion/react";
 import * as m from "motion/react-m";
+import contributions from "@/assets/home/roadmap-contributions.png";
+import moreFeatures from "@/assets/home/roadmap-features.png";
+import frameworks from "@/assets/home/roadmap-frameworks.png";
 
 type Plan = {
-	icon: IconSvgElement;
+	icon: StaticImageData;
 	label: string;
 	description: string;
 };
 
 const plans: Plan[] = [
 	{
-		icon: Globe02Icon,
+		icon: frameworks,
 		label: "Framework agnostic",
 		description: "Remix, Vite, SvelteKit, and other React-based frameworks.",
 	},
 	{
-		icon: SparklesIcon,
+		icon: moreFeatures,
 		label: "More features",
 		description: "More storage adapters and finer-grained resolution options.",
 	},
 	{
-		icon: PlugIcon,
+		icon: contributions,
 		label: "Open to contributions",
 		description: "Bug reports, feature requests, and PRs are welcome on GitHub.",
 	},
@@ -78,14 +79,7 @@ export function Roadmap() {
 			>
 				{plans.map((plan) => (
 					<m.div key={plan.label} className="flex flex-col gap-3" variants={item}>
-						<div className="inline-flex size-8 items-center justify-center rounded-lg bg-fd-muted text-fd-muted-foreground ring-1 ring-fd-border">
-							<HugeiconsIcon
-								icon={plan.icon}
-								size={15}
-								color="currentColor"
-								strokeWidth={1.5}
-							/>
-						</div>
+						<Image src={plan.icon} alt="" sizes="48px" className="size-12" />
 						<p className="text-sm font-semibold text-fd-foreground">{plan.label}</p>
 						<p className="text-xs leading-relaxed text-fd-muted-foreground">
 							{plan.description}

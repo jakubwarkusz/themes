@@ -5,7 +5,7 @@ export async function Hero() {
 	const stars = await getGitHubStars();
 
 	return (
-		<section className="relative flex flex-col items-center text-center pt-20 pb-16 sm:pt-28 sm:pb-20 max-w-2xl w-full">
+		<section className="relative flex flex-col items-center text-center pt-8 pb-16 sm:pt-12 sm:pb-20 max-w-4xl w-full">
 			<HeroContent stars={stars} />
 		</section>
 	);

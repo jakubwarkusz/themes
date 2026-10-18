@@ -2,6 +2,8 @@
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
 	--fd-nav-height: 56px !important;
 }
@@ -59,4 +61,30 @@
 	--color-fd-accent-foreground: oklch(0.93 0.005 265);
 	--color-fd-ring: oklch(0.55 0.006 265);
 	--color-fd-overlay: oklch(0.1 0.006 265 / 80%);
+}
+
+@keyframes sky-in {
+	from {
+		opacity: 0;
+	}
+}
+
+.sky-in {
+	animation: sky-in 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sky-in {
+		animation-duration: 0.2s;
+	}
+}
+
+:root {
+	--paint-rust: #a9533f;
+	--paint-sage: #4f7a4c;
+}
+
+.dark {
+	--paint-rust: #d98a72;
+	--paint-sage: #9cc797;
 }

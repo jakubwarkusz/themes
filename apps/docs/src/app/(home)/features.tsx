@@ -1,18 +1,15 @@
 "use client";
 
-import {
-	ArrowReloadHorizontalIcon,
-	CheckmarkBadge01Icon,
-	CookieIcon,
-	Layers01Icon,
-	ReactIcon,
-	Typescript01Icon,
-} from "@hugeicons/core-free-icons";
-import type { IconSvgElement } from "@hugeicons/react";
-import { HugeiconsIcon } from "@hugeicons/react";
+import Image, { type StaticImageData } from "next/image";
 import { useReducedMotion } from "motion/react";
 import * as m from "motion/react-m";
 import type { ReactNode } from "react";
+import dropIn from "@/assets/home/feature-drop-in.png";
+import nested from "@/assets/home/feature-nested.png";
+import react from "@/assets/home/feature-react.png";
+import storage from "@/assets/home/feature-storage.png";
+import types from "@/assets/home/feature-types.png";
+import zeroDeps from "@/assets/home/feature-zero-deps.png";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
@@ -25,14 +22,14 @@ function C({ children }: { children: string }) {
 }
 
 type Feature = {
-	icon: IconSvgElement;
+	icon: StaticImageData;
 	title: string;
 	description: ReactNode;
 };
 
 const features: Feature[] = [
 	{
-		icon: ReactIcon,
+		icon: react,
 		title: "React 19 ready",
 		description: (
 			<>
@@ -42,7 +39,7 @@ const features: Feature[] = [
 		),
 	},
 	{
-		icon: ArrowReloadHorizontalIcon,
+		icon: dropIn,
 		title: "Drop-in replacement",
 		description: (
 			<>
@@ -51,7 +48,7 @@ const features: Feature[] = [
 		),
 	},
 	{
-		icon: CookieIcon,
+		icon: storage,
 		title: "Hybrid storage",
 		description: (
 			<>
@@ -61,12 +58,12 @@ const features: Feature[] = [
 		),
 	},
 	{
-		icon: Layers01Icon,
+		icon: nested,
 		title: "Nested providers",
 		description: "Independent theme instances per section. No shared state between them.",
 	},
 	{
-		icon: Typescript01Icon,
+		icon: types,
 		title: "Full type safety",
 		description: (
 			<>
@@ -76,7 +73,7 @@ const features: Feature[] = [
 		),
 	},
 	{
-		icon: CheckmarkBadge01Icon,
+		icon: zeroDeps,
 		title: "Zero runtime deps",
 		description:
 			"No runtime dependencies. A tiny inline script plus React hooks, nothing more.",
@@ -151,14 +148,7 @@ export function FeaturesGrid() {
 						className="bg-fd-background p-6 transition-colors hover:bg-fd-card"
 						variants={cardVariants}
 					>
-						<div className="mb-3 inline-flex size-8 items-center justify-center rounded-lg bg-fd-muted text-fd-muted-foreground ring-1 ring-fd-border">
-							<HugeiconsIcon
-								icon={feature.icon}
-								size={16}
-								color="currentColor"
-								strokeWidth={1.5}
-							/>
-						</div>
+						<Image src={feature.icon} alt="" sizes="48px" className="mb-4 size-12" />
 						<h3 className="mb-1.5 text-sm font-semibold text-fd-foreground">
 							{feature.title}
 						</h3>

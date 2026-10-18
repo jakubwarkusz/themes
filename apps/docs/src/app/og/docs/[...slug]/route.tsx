@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "takumi-js/response";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
@@ -5,23 +7,38 @@ import { getPageImage, source } from "@/lib/source";
 
 export const revalidate = false;
 
+const ASSETS = join(process.cwd(), "src/assets/home");
+const images = [
+	{ src: "sky", data: () => readFile(join(ASSETS, "sky-night.webp")) },
+	{ src: "sticker", data: () => readFile(join(ASSETS, "sticker.png")) },
+];
+
+const CREAM = "#F4F2EC";
+
 const ogRootStyle: CSSProperties = {
 	display: "flex",
 	width: "100%",
 	height: "100%",
-	backgroundColor: "#0a0a0a",
+	backgroundColor: "#1B1A17",
 	position: "relative",
 	overflow: "hidden",
 	fontFamily: "Inter, sans-serif",
 };
 
-const ogGridStyle: CSSProperties = {
+const ogSkyStyle: CSSProperties = {
 	position: "absolute",
 	inset: 0,
-	backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
-	backgroundSize: "28px 28px",
+	backgroundImage: "url(sky)",
+	backgroundSize: "cover",
+	backgroundPosition: "center",
 	display: "flex",
-	WebkitMaskImage: "linear-gradient(to bottom, black 40%, transparent 100%)",
+};
+
+const ogShadeStyle: CSSProperties = {
+	position: "absolute",
+	inset: 0,
+	backgroundImage: "linear-gradient(180deg, rgba(26,23,16,0.05) 0%, rgba(26,23,16,0.7) 100%)",
+	display: "flex",
 };
 
 const ogContentStyle: CSSProperties = {
@@ -36,36 +53,26 @@ const ogContentStyle: CSSProperties = {
 
 const ogBrandStyle: CSSProperties = {
 	display: "flex",
-	fontSize: "20px",
+	fontSize: "24px",
 	fontWeight: 500,
-	color: "rgba(255,255,255,0.4)",
+	color: "rgba(244,242,236,0.8)",
 	letterSpacing: "-0.01em",
 };
 
 const ogBrandRowStyle: CSSProperties = {
 	display: "flex",
 	alignItems: "center",
-	gap: "8px",
-	marginBottom: "24px",
+	gap: "14px",
+	marginBottom: "28px",
 };
 
 const ogDescriptionStyle: CSSProperties = {
 	display: "flex",
 	fontSize: "28px",
-	color: "rgba(255,255,255,0.5)",
+	color: "rgba(244,242,236,0.75)",
 	lineHeight: 1.4,
 	maxWidth: "820px",
 	fontWeight: 400,
-};
-
-const ogAccentStyle: CSSProperties = {
-	position: "absolute",
-	bottom: 0,
-	left: 0,
-	right: 0,
-	height: "2px",
-	background: "linear-gradient(to right, transparent, rgba(139, 92, 246, 0.6), transparent)",
-	display: "flex",
 };
 
 function ogTitleStyle(title: string, hasDescription: boolean): CSSProperties {
@@ -73,7 +80,7 @@ function ogTitleStyle(title: string, hasDescription: boolean): CSSProperties {
 		display: "flex",
 		fontSize: title.length > 30 ? "64px" : "76px",
 		fontWeight: 700,
-		color: "#ffffff",
+		color: CREAM,
 		lineHeight: 1.1,
 		letterSpacing: "-0.03em",
 		marginBottom: hasDescription ? "20px" : "0",
@@ -84,10 +91,12 @@ function ogTitleStyle(title: string, hasDescription: boolean): CSSProperties {
 function OGImage({ title, description }: { title: string; description?: string }) {
 	return (
 		<div style={ogRootStyle}>
-			<div style={ogGridStyle} />
+			<div style={ogSkyStyle} />
+			<div style={ogShadeStyle} />
 
 			<div style={ogContentStyle}>
 				<div style={ogBrandRowStyle}>
+					<img src="sticker" alt="" width={52} height={52} />
 					<div style={ogBrandStyle}>@wrksz/themes</div>
 				</div>
 
@@ -95,8 +104,6 @@ function OGImage({ title, description }: { title: string; description?: string }
 
 				{description && <div style={ogDescriptionStyle}>{description}</div>}
 			</div>
-
-			<div style={ogAccentStyle} />
 		</div>
 	);
 }
@@ -112,6 +119,7 @@ export async function GET(_req: Request, { params }: RouteContext<"/og/docs/[...
 			width: 1200,
 			height: 630,
 			format: "webp",
+			images,
 		},
 	);
 }

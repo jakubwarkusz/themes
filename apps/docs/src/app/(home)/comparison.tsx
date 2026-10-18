@@ -2,6 +2,8 @@
 
 import { Bug01Icon, Cancel01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import Image from "next/image";
+import sticker from "@/assets/home/sticker.png";
 import { useReducedMotion } from "motion/react";
 import * as m from "motion/react-m";
 import Link from "next/link";
@@ -10,7 +12,7 @@ const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
 function Bug() {
 	return (
-		<span className="inline-flex items-center gap-1 rounded-md border border-red-500/15 bg-red-500/8 px-2 py-0.5 text-xs font-medium text-red-400">
+		<span className="inline-flex items-center gap-1 rounded-md border border-[color-mix(in_oklab,var(--paint-rust)_25%,transparent)] bg-[color-mix(in_oklab,var(--paint-rust)_10%,transparent)] px-2 py-0.5 text-xs font-medium text-(--paint-rust)">
 			<HugeiconsIcon icon={Bug01Icon} size={10} color="currentColor" strokeWidth={2} />
 			<span className="hidden sm:inline">Bug</span>
 		</span>
@@ -28,7 +30,7 @@ function No() {
 
 function Fixed({ note }: { note?: string }) {
 	return (
-		<span className="inline-flex items-center gap-1 rounded-md border border-fd-primary/20 bg-fd-primary/8 px-2 py-0.5 text-xs font-medium text-fd-primary">
+		<span className="inline-flex items-center gap-1 rounded-md border border-[color-mix(in_oklab,var(--paint-sage)_25%,transparent)] bg-[color-mix(in_oklab,var(--paint-sage)_10%,transparent)] px-2 py-0.5 text-xs font-medium text-(--paint-sage)">
 			<HugeiconsIcon icon={Tick02Icon} size={10} color="currentColor" strokeWidth={2} />
 			<span className="hidden sm:inline">{note ? `Fixed (${note})` : "Fixed"}</span>
 			<span className="sm:hidden">Fixed</span>
@@ -38,7 +40,7 @@ function Fixed({ note }: { note?: string }) {
 
 function Yes({ note }: { note?: string }) {
 	return (
-		<span className="inline-flex items-center gap-1 rounded-md border border-green-500/15 bg-green-500/8 px-2 py-0.5 text-xs font-medium text-green-400">
+		<span className="inline-flex items-center gap-1 rounded-md border border-[color-mix(in_oklab,var(--paint-sage)_25%,transparent)] bg-[color-mix(in_oklab,var(--paint-sage)_10%,transparent)] px-2 py-0.5 text-xs font-medium text-(--paint-sage)">
 			<HugeiconsIcon icon={Tick02Icon} size={10} color="currentColor" strokeWidth={2} />
 			<span className="hidden sm:inline">{note ?? "Yes"}</span>
 			<span className="sm:hidden">Yes</span>
@@ -184,8 +186,11 @@ export function Comparison() {
 							<th className="px-4 py-2.5 text-center text-xs font-medium text-fd-muted-foreground/50">
 								next-themes
 							</th>
-							<th className="px-4 py-2.5 text-center text-xs font-medium text-fd-muted-foreground/50">
-								@wrksz/themes
+							<th className="px-4 py-2.5 text-center text-xs font-medium text-fd-foreground">
+								<span className="inline-flex items-center gap-1.5">
+									<Image src={sticker} alt="" sizes="20px" className="size-5" />
+									@wrksz/themes
+								</span>
 							</th>
 						</tr>
 					</thead>
