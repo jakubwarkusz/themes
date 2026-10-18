@@ -168,7 +168,7 @@ function TocRail({ headings }: { headings: Heading[] }) {
 										scrollToHeading(heading.id, RAIL_OFFSET);
 									}}
 									className={cn(
-										"block min-w-0 flex-1 pb-3 text-sm leading-4.5 text-pretty",
+										"block min-w-0 flex-1 pb-3 text-sm leading-4.5 text-pretty wrap-anywhere [&_code]:text-[0.9em]",
 										titleSwap,
 										depth > 0 && "pl-2",
 										current
