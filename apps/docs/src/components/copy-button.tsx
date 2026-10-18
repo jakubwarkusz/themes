@@ -1,6 +1,7 @@
 "use client";
 
 import { Copy01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
+import type { IconSvgElement } from "@hugeicons/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useRef, useState } from "react";
 import { cn } from "@/lib/cn";
@@ -27,11 +28,19 @@ export function useCopied(copyValue: () => Promise<void>) {
 	return [copied, copy] as const;
 }
 
-export function CopyIcons({ copied, className }: { copied: boolean; className?: string }) {
+export function CopyIcons({
+	copied,
+	icon = Copy01Icon,
+	className,
+}: {
+	copied: boolean;
+	icon?: IconSvgElement;
+	className?: string;
+}) {
 	return (
 		<span aria-hidden className={cn("relative size-3.5 shrink-0", className)}>
 			<span className={cn(SWAP, copied ? HIDDEN : SHOWN)}>
-				<HugeiconsIcon icon={Copy01Icon} size={14} color="currentColor" strokeWidth={1.5} />
+				<HugeiconsIcon icon={icon} size={14} color="currentColor" strokeWidth={1.5} />
 			</span>
 			<span className={cn(SWAP, "text-emerald-500", copied ? SHOWN : HIDDEN)}>
 				<HugeiconsIcon icon={Tick02Icon} size={14} color="currentColor" strokeWidth={2} />
