@@ -766,3 +766,11 @@ kbd {
 	--tone-warning: oklch(0.8 0.13 80);
 	--tone-danger: oklch(0.71 0.16 25);
 }
+
+@keyframes feedback-in {
+	from {
+		opacity: 0;
+		filter: blur(2px);
+		translate: 0 2px;
+	}
+}

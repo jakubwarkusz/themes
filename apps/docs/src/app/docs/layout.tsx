@@ -6,6 +6,7 @@ import {
 } from "@/components/sidebar-components";
 import { VersionProvider } from "@/components/nav-title";
 import { baseOptions, getLibraryVersion } from "@/lib/layout.shared";
+import { SidebarSponsor } from "@/components/sidebar-sponsor";
 import { source } from "@/lib/source";
 
 export default async function Layout({ children }: LayoutProps<"/docs">) {
@@ -16,6 +17,7 @@ export default async function Layout({ children }: LayoutProps<"/docs">) {
 				tree={source.getPageTree()}
 				{...baseOptions()}
 				sidebar={{
+					footer: <SidebarSponsor />,
 					components: {
 						Item: SidebarItemComponent,
 						Folder: SidebarFolderComponent,
