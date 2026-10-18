@@ -254,6 +254,53 @@ samp,
 	}
 }
 
+.demo-avatar {
+	--l: 74%;
+	--c: 0.14;
+
+	position: relative;
+	flex: none;
+	border-radius: 9999px;
+	background:
+		radial-gradient(
+			circle at var(--avatar-x1) var(--avatar-y1),
+			oklch(calc(var(--l) + 10%) var(--c) var(--avatar-hue-2)),
+			transparent 60%
+		),
+		radial-gradient(
+			circle at var(--avatar-x2) var(--avatar-y2),
+			oklch(var(--l) var(--c) var(--avatar-hue-3)),
+			transparent 55%
+		),
+		radial-gradient(
+			circle at var(--avatar-x3) var(--avatar-y3),
+			oklch(calc(var(--l) - 8%) var(--c) var(--avatar-hue)),
+			transparent 65%
+		),
+		linear-gradient(
+			var(--avatar-angle),
+			oklch(calc(var(--l) - 4%) var(--c) var(--avatar-hue)),
+			oklch(calc(var(--l) + 4%) var(--c) var(--avatar-hue-2))
+		);
+
+	&::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		box-shadow: inset 0 0 0 1px oklch(0% 0 0 / 10%);
+	}
+}
+
+.theme-demo:is([data-theme="dark"], [data-theme="forest"]) .demo-avatar {
+	--l: 64%;
+	--c: 0.13;
+
+	&::after {
+		box-shadow: inset 0 0 0 1px oklch(100% 0 0 / 10%);
+	}
+}
+
 .callout {
 	--callout-tone: var(--tone-info);
 	--callout-bg-mix: 6%;

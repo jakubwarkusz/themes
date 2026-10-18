@@ -1,13 +1,54 @@
 "use client";
 
 import { ClientThemeProvider, useTheme } from "@wrksz/themes/client";
-import { useSyncExternalStore } from "react";
+import { type CSSProperties, useSyncExternalStore } from "react";
 import { cn } from "@/lib/cn";
 
 const THEMES = ["light", "dark", "sepia", "forest"] as const;
 const OPTIONS = [...THEMES, "system"] as const;
 
 const subscribe = () => () => {};
+
+function hash(text: string) {
+	let h = 0x811c9dc5;
+	for (const char of text) {
+		h ^= char.codePointAt(0) ?? 0;
+		h = Math.imul(h, 0x01000193);
+	}
+	return h >>> 0;
+}
+
+function random(seed: number) {
+	let state = seed;
+	return () => {
+		state = (state + 0x6d2b79f5) | 0;
+		let t = state;
+		t = Math.imul(t ^ (t >>> 15), t | 1);
+		t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+	};
+}
+
+function avatarVars(seed: string): CSSProperties {
+	const next = random(hash(seed.trim().toLowerCase()));
+	const hue = Math.floor(next() * 360);
+	const spread = 25 + next() * 45;
+	const point = () => `${Math.round(next() * 100)}%`;
+	return {
+		"--avatar-hue": hue,
+		"--avatar-hue-2": Math.round(hue + spread),
+		"--avatar-hue-3": Math.round(hue - spread * 0.8),
+		"--avatar-x1": point(),
+		"--avatar-y1": point(),
+		"--avatar-x2": point(),
+		"--avatar-y2": point(),
+		"--avatar-x3": point(),
+		"--avatar-y3": point(),
+		"--avatar-angle": `${Math.round(next() * 360)}deg`,
+	} as CSSProperties;
+}
+
+const AVATAR = avatarVars("Ada Lovelace");
 
 function Controls() {
 	const { theme, resolvedTheme, setTheme } = useTheme<(typeof THEMES)[number]>();
@@ -48,14 +89,9 @@ function Controls() {
 				))}
 			</fieldset>
 
-			<div id="theme-demo" className="theme-demo rounded-lg p-5 sm:p-6">
+			<div id="theme-demo" className="theme-demo rounded-lg p-5 select-none sm:p-6">
 				<div className="flex items-center gap-3">
-					<span
-						aria-hidden
-						className="flex size-8 items-center justify-center rounded-full bg-(--demo-accent) text-xs font-semibold text-(--demo-accent-fg)"
-					>
-						AL
-					</span>
+					<span aria-hidden className="demo-avatar size-8" style={AVATAR} />
 					<div className="min-w-0 flex-1">
 						<p className="text-sm font-medium">Ada Lovelace</p>
 						<p className="text-xs text-(--demo-muted)">Commented on your theme</p>
