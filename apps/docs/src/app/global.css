@@ -91,10 +91,65 @@ kbd {
 }
 
 #nd-sidebar [data-theme-toggle] {
-	border: 0;
-	border-radius: 9999px;
-	background: var(--color-fd-card);
-	padding: 2px;
+	margin-inline-start: auto;
+}
+
+#nd-sidebar div:has(> [data-theme-toggle]) > a {
+	display: flex;
+	width: 32px;
+	height: 32px;
+	align-items: center;
+	justify-content: center;
+	border-radius: 6px;
+	color: var(--color-fd-muted-foreground);
+	transition:
+		background-color 150ms ease-out,
+		color 150ms ease-out;
+
+	&:hover {
+		background: var(--color-fd-card);
+		color: var(--color-fd-foreground);
+	}
+
+	& svg {
+		width: 16px;
+		height: 16px;
+	}
+}
+
+@keyframes icon-in {
+	from {
+		opacity: 0;
+		scale: 0.25;
+		filter: blur(4px);
+	}
+}
+
+@keyframes icon-out {
+	from {
+		opacity: 1;
+		scale: 1;
+		filter: blur(0);
+	}
+	to {
+		opacity: 0;
+		scale: 0.25;
+		filter: blur(4px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	@keyframes icon-in {
+		from {
+			opacity: 0;
+		}
+	}
+
+	@keyframes icon-out {
+		to {
+			opacity: 0;
+		}
+	}
 }
 
 #toc-title {

@@ -1,90 +1,49 @@
 "use client";
 
-import { ComputerIcon, Moon02Icon, Sun03Icon } from "@hugeicons/core-free-icons";
-import type { IconSvgElement } from "@hugeicons/react";
+import { Moon02Icon, Sun03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useTheme } from "@wrksz/themes/client";
-import type { ThemeSwitchProps } from "fumadocs-ui/layouts/shared/slots/theme-switch";
-import { useSyncExternalStore } from "react";
-import { flushSync } from "react-dom";
+import { useState } from "react";
 import { cn } from "@/lib/cn";
 
-const ITEMS = [
-	["light", "Light", Sun03Icon],
-	["dark", "Dark", Moon02Icon],
-	["system", "System", ComputerIcon],
-] as const satisfies readonly (readonly [string, string, IconSvgElement])[];
+const sunAtRest = "scale-[0.25] opacity-0 blur-xs dark:scale-100 dark:opacity-100 dark:blur-none";
+const moonAtRest = "dark:scale-[0.25] dark:opacity-0 dark:blur-xs";
+const enter = "animate-[icon-in_300ms_cubic-bezier(0.2,0,0,1)_both]";
+const leave = "animate-[icon-out_300ms_cubic-bezier(0.2,0,0,1)_both]";
 
-type Selection = (typeof ITEMS)[number][0];
+export function ThemeSwitch() {
+	const { resolvedTheme, setTheme } = useTheme();
+	const [switched, setSwitched] = useState(false);
+	const dark = resolvedTheme === "dark";
+	const light = resolvedTheme === "light";
+	const label = dark ? "Switch to light theme" : "Switch to dark theme";
 
-const subscribe = () => () => {};
-
-function item(active: boolean) {
-	return cn(
-		"flex size-6.5 items-center justify-center p-1.5",
-		active ? "bg-fd-accent text-fd-accent-foreground" : "text-fd-muted-foreground",
-	);
-}
-
-export function ThemeSwitch({ className, mode = "light-dark", ...props }: ThemeSwitchProps) {
-	const { theme, resolvedTheme, setTheme } = useTheme();
-	const mounted = useSyncExternalStore(
-		subscribe,
-		() => true,
-		() => false,
-	);
-
-	function change(next: Selection) {
-		if (document.startViewTransition) {
-			document.startViewTransition(() => flushSync(() => setTheme(next)));
-		} else {
-			setTheme(next);
-		}
-	}
-
-	const container = cn(
-		"inline-flex items-center overflow-hidden rounded-full border p-1 *:rounded-full",
-		className,
-	);
-
-	if (mode === "light-dark") {
-		const value = mounted ? resolvedTheme : null;
-		return (
-			<button
-				type="button"
-				className={container}
-				aria-label="Toggle Theme"
-				data-theme-toggle=""
-				onClick={() => change(value === "light" ? "dark" : "light")}
-			>
-				{ITEMS.slice(0, 2).map(([key, , icon]) => (
-					<span key={key} className={item(value === key)}>
-						<HugeiconsIcon
-							icon={icon}
-							size={14}
-							color="currentColor"
-							strokeWidth={1.8}
-						/>
-					</span>
-				))}
-			</button>
-		);
-	}
-
-	const value = mounted ? theme : null;
 	return (
-		<div className={container} data-theme-toggle="" {...props}>
-			{ITEMS.map(([key, label, icon]) => (
-				<button
-					key={key}
-					type="button"
-					aria-label={label}
-					className={item(value === key)}
-					onClick={() => change(key)}
-				>
-					<HugeiconsIcon icon={icon} size={14} color="currentColor" strokeWidth={1.8} />
-				</button>
-			))}
-		</div>
+		<button
+			type="button"
+			data-theme-toggle=""
+			onClick={() => {
+				setSwitched(true);
+				setTheme(dark ? "light" : "dark");
+			}}
+			aria-label={label}
+			title={label}
+			className="relative flex size-8 shrink-0 items-center justify-center rounded-md text-fd-muted-foreground outline-none transition-[color,background-color,scale] duration-150 ease-out hover:bg-fd-card hover:text-fd-foreground focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.96]"
+		>
+			<HugeiconsIcon
+				icon={Sun03Icon}
+				size={16}
+				color="currentColor"
+				strokeWidth={1.8}
+				className={cn("absolute", switched ? (dark ? enter : leave) : sunAtRest)}
+			/>
+			<HugeiconsIcon
+				icon={Moon02Icon}
+				size={16}
+				color="currentColor"
+				strokeWidth={1.8}
+				className={cn("absolute", switched ? (light ? enter : leave) : moonAtRest)}
+			/>
+		</button>
 	);
 }
