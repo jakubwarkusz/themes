@@ -315,6 +315,7 @@ kbd {
 	--demo-border: #e2e2e2;
 	--demo-accent: #1f1f1f;
 	--demo-accent-fg: #fcfcfc;
+	--demo-surface: #f3f3f3;
 
 	background: var(--demo-bg);
 	color: var(--demo-fg);
@@ -337,6 +338,7 @@ kbd {
 	--demo-border: #2e2e2e;
 	--demo-accent: #f2f2f2;
 	--demo-accent-fg: #141414;
+	--demo-surface: #1c1c1c;
 }
 
 .theme-demo[data-theme="sepia"] {
@@ -346,6 +348,7 @@ kbd {
 	--demo-border: #dccfb0;
 	--demo-accent: #8a5a2b;
 	--demo-accent-fg: #fbf6ea;
+	--demo-surface: #efe5cc;
 }
 
 .theme-demo[data-theme="forest"] {
@@ -355,6 +358,7 @@ kbd {
 	--demo-border: #34443a;
 	--demo-accent: #9cc797;
 	--demo-accent-fg: #1d2620;
+	--demo-surface: #222c25;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -365,6 +369,7 @@ kbd {
 		--demo-border: #2e2e2e;
 		--demo-accent: #f2f2f2;
 		--demo-accent-fg: #141414;
+		--demo-surface: #1c1c1c;
 	}
 }
 
