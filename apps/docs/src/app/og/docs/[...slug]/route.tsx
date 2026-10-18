@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { ImageResponse } from "takumi-js/response";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
+import { getReleases } from "@/lib/changelog";
 import { getPageImage, source } from "@/lib/source";
 
 export const revalidate = false;
@@ -92,7 +93,27 @@ function ogTitleStyle(title: string, hasDescription: boolean): CSSProperties {
 	};
 }
 
-function OGImage({ title, description }: { title: string; description?: string }) {
+const ogBadgeStyle: CSSProperties = {
+	display: "flex",
+	alignSelf: "flex-start",
+	padding: "8px 18px",
+	marginBottom: "24px",
+	borderRadius: "999px",
+	backgroundColor: "rgba(244,242,236,0.14)",
+	color: CREAM,
+	fontSize: "24px",
+	fontWeight: 500,
+};
+
+function OGImage({
+	title,
+	description,
+	badge,
+}: {
+	title: string;
+	description?: string;
+	badge?: string;
+}) {
 	return (
 		<div style={ogRootStyle}>
 			<div style={ogSkyStyle} />
@@ -103,6 +124,8 @@ function OGImage({ title, description }: { title: string; description?: string }
 					<img src="sticker" alt="" width={52} height={52} />
 					<div style={ogBrandStyle}>@wrksz/themes</div>
 				</div>
+
+				{badge && <div style={ogBadgeStyle}>{badge}</div>}
 
 				<div style={ogTitleStyle(title, Boolean(description))}>{title}</div>
 
@@ -117,8 +140,14 @@ export async function GET(_req: Request, { params }: RouteContext<"/og/docs/[...
 	const page = source.getPage(slug.slice(0, -1));
 	if (!page) notFound();
 
+	const latest = page.path === "changelog.mdx" ? (await getReleases())[0] : undefined;
+
 	return new ImageResponse(
-		<OGImage title={page.data.title} description={page.data.description} />,
+		<OGImage
+			title={page.data.title}
+			description={page.data.description}
+			badge={latest ? `Latest: v${latest.version}` : undefined}
+		/>,
 		{
 			width: 1200,
 			height: 630,

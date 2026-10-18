@@ -4,25 +4,28 @@ import { GithubIcon, Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useSearchContext } from "fumadocs-ui/contexts/search";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Brand, VersionLink } from "@/components/nav-title";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { gitConfig } from "@/lib/layout.shared";
 
 const ICON_BUTTON =
 	"flex size-8 shrink-0 items-center justify-center rounded-md text-fd-muted-foreground outline-none transition-[color,background-color,scale] duration-150 ease-out hover:bg-fd-card hover:text-fd-foreground focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.96]";
 
-export function HomeHeader({ title }: { title: ReactNode }) {
+export function HomeHeader({ version }: { version?: string }) {
 	const { setOpenSearch } = useSearchContext();
 
 	return (
 		<header className="sticky top-0 z-40 w-full bg-fd-background/80 px-4 backdrop-blur-md">
 			<div className="mx-auto flex h-14 w-full max-w-4xl items-center gap-1">
-				<Link
-					href="/"
-					className="me-auto rounded-md outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
-				>
-					{title}
-				</Link>
+				<span className="me-auto flex items-center gap-2">
+					<Link
+						href="/"
+						className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+					>
+						<Brand />
+					</Link>
+					<VersionLink version={version} />
+				</span>
 				<Link
 					href="/docs"
 					className="rounded-md px-2 py-1.5 text-sm text-fd-muted-foreground outline-none transition-colors duration-150 hover:text-fd-foreground focus-visible:ring-2 focus-visible:ring-fd-ring"

@@ -2,7 +2,12 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { cache } from "react";
 
-export type ChangelogItem = { scope?: string; breaking: boolean; text: string };
+export type ChangelogItem = {
+	scope?: string;
+	breaking: boolean;
+	text: string;
+	commit?: { hash: string; url: string };
+};
 export type ChangelogGroup = { name: string; items: ChangelogItem[] };
 export type Release = {
 	id: string;
@@ -15,6 +20,8 @@ export type Release = {
 const PATH = join(process.cwd(), "../../CHANGELOG.md");
 
 export const readChangelog = cache(() => readFile(PATH, "utf8"));
+
+const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
 export const isLegacy = (release: Release) => release.version.startsWith("0.");
 
@@ -36,7 +43,7 @@ export const getReleases = cache(async (): Promise<Release[]> => {
 		const release = line.match(/^## \[(.+?)\](?:\s*-\s*(\S+))?/);
 		if (release) {
 			releases.push({
-				id: `v${release[1].toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+				id: `v${slugify(release[1])}`,
 				version: release[1],
 				date: release[2],
 				groups: [],
@@ -66,6 +73,15 @@ export const getReleases = cache(async (): Promise<Release[]> => {
 		else if (!line.trim()) item = undefined;
 	}
 
-	for (const release of releases) release.url = links.get(release.version);
+	for (const release of releases) {
+		release.url = links.get(release.version);
+		for (const group of release.groups)
+			for (const entry of group.items) {
+				const commit = entry.text.match(/\s*\(\[([0-9a-f]{7,40})\]\((\S+?)\)\)$/);
+				if (!commit) continue;
+				entry.commit = { hash: commit[1], url: commit[2] };
+				entry.text = entry.text.slice(0, commit.index).trim();
+			}
+	}
 	return releases.filter((release) => release.groups.some((group) => group.items.length));
 });

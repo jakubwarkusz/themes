@@ -25,7 +25,7 @@ export function resolveActiveIndex(headings: Pick<TocHeading, "id">[], offset: n
 	let active = 0;
 	headings.forEach(({ id }, index) => {
 		const el = document.getElementById(id);
-		if (el && el.getBoundingClientRect().top <= line) active = index;
+		if (el?.getClientRects().length && el.getBoundingClientRect().top <= line) active = index;
 	});
 	return active;
 }

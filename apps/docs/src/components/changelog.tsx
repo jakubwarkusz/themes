@@ -102,6 +102,16 @@ function ReleaseEntry({ release, latest }: { release: Release; latest: boolean }
 						Compare
 					</a>
 				) : null}
+				{release.date ? (
+					<a
+						href={`https://www.npmjs.com/package/@wrksz/themes/v/${release.version}`}
+						target="_blank"
+						rel="noreferrer"
+						className={quiet}
+					>
+						npm
+					</a>
+				) : null}
 			</div>
 			<div className="flex flex-col gap-6 sm:pt-0.5">
 				{release.groups.map((group) =>
@@ -118,7 +128,10 @@ function ReleaseEntry({ release, latest }: { release: Release; latest: boolean }
 							</h3>
 							<ul className="mt-2.5 flex flex-col gap-2 text-sm leading-relaxed text-fd-foreground [&_code]:rounded-sm [&_code]:bg-fd-secondary [&_code]:px-[0.35em] [&_code]:py-[0.15em] [&_code]:font-mono [&_code]:text-[0.9em]">
 								{group.items.map((item) => (
-									<li key={`${item.scope}${item.text}`} className="flex gap-2">
+									<li
+										key={item.commit?.hash ?? `${item.scope ?? ""}${item.text}`}
+										className="flex gap-2"
+									>
 										<span
 											aria-hidden
 											className="flex h-[1.625em] w-3.5 shrink-0 items-center justify-center"
@@ -139,6 +152,17 @@ function ReleaseEntry({ release, latest }: { release: Release; latest: boolean }
 												</span>
 											) : null}
 											<Inline text={item.text} />
+											{item.commit ? (
+												<a
+													href={item.commit.url}
+													target="_blank"
+													rel="noreferrer"
+													aria-label={`Commit ${item.commit.hash}`}
+													className="ms-2 font-mono text-xs text-fd-muted-foreground transition-colors duration-150 hover:text-fd-foreground"
+												>
+													{item.commit.hash}
+												</a>
+											) : null}
 										</span>
 									</li>
 								))}
