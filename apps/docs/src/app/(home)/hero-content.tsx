@@ -1,6 +1,6 @@
 "use client";
 
-import { Download01Icon, GithubIcon, NpmIcon, StarIcon } from "@hugeicons/core-free-icons";
+import { Download01Icon, Github01Icon, NpmIcon, StarIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useReducedMotion } from "motion/react";
 import * as m from "motion/react-m";
@@ -73,7 +73,7 @@ export function HeroContent({
 					className={CHIP}
 				>
 					<HugeiconsIcon
-						icon={GithubIcon}
+						icon={Github01Icon}
 						size={14}
 						color="currentColor"
 						strokeWidth={1.8}
