@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/cn";
 import { CopyButton } from "./copy-button";
 
@@ -13,8 +13,47 @@ const PKG_MANAGERS = [
 
 type PkgManager = (typeof PKG_MANAGERS)[number]["label"];
 
+const STORAGE_KEY = "wrksz-themes:package-manager";
+const DEFAULT_PM: PkgManager = "pnpm";
+const listeners = new Set<() => void>();
+let memory: PkgManager = DEFAULT_PM;
+
+function isPkgManager(value: string | null): value is PkgManager {
+	return PKG_MANAGERS.some((mgr) => mgr.label === value);
+}
+
+function readPm(): PkgManager {
+	try {
+		const stored = localStorage.getItem(STORAGE_KEY);
+		return isPkgManager(stored) ? stored : memory;
+	} catch {
+		return memory;
+	}
+}
+
+function writePm(pm: PkgManager) {
+	memory = pm;
+	try {
+		localStorage.setItem(STORAGE_KEY, pm);
+	} catch {}
+	for (const listener of listeners) listener();
+}
+
+function subscribe(listener: () => void) {
+	const onStorage = (event: StorageEvent) => {
+		if (event.key === STORAGE_KEY) listener();
+	};
+	listeners.add(listener);
+	window.addEventListener("storage", onStorage);
+	return () => {
+		listeners.delete(listener);
+		window.removeEventListener("storage", onStorage);
+	};
+}
+
 export function InstallCommand({ className }: { className?: string }) {
-	const [pm, setPm] = useState<PkgManager>("pnpm");
+	const pm = useSyncExternalStore(subscribe, readPm, () => DEFAULT_PM);
+	const [picked, setPicked] = useState(false);
 	const command = PKG_MANAGERS.find((mgr) => mgr.label === pm)?.command ?? "";
 	const active = PKG_MANAGERS.findIndex((mgr) => mgr.label === pm);
 
@@ -31,7 +70,10 @@ export function InstallCommand({ className }: { className?: string }) {
 			>
 				<span
 					aria-hidden
-					className="absolute inset-y-0 left-0 w-1/4 rounded-md bg-fd-background shadow-[0_1px_2px_rgb(0_0_0/0.08)] transition-transform duration-200 ease-out motion-reduce:transition-none dark:bg-fd-secondary"
+					className={cn(
+						"absolute inset-y-0 left-0 w-1/4 rounded-md bg-fd-background shadow-[0_1px_2px_rgb(0_0_0/0.08)] motion-reduce:transition-none dark:bg-fd-secondary",
+						picked && "transition-transform duration-200 ease-out",
+					)}
 					style={{ transform: `translateX(${active * 100}%)` }}
 				/>
 				{PKG_MANAGERS.map((mgr) => (
@@ -39,7 +81,10 @@ export function InstallCommand({ className }: { className?: string }) {
 						key={mgr.label}
 						type="button"
 						aria-pressed={pm === mgr.label}
-						onClick={() => setPm(mgr.label)}
+						onClick={() => {
+							setPicked(true);
+							writePm(mgr.label);
+						}}
 						className={cn(
 							"relative cursor-pointer rounded-md text-xs font-medium outline-none transition-[color,scale] duration-150 focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.96]",
 							pm === mgr.label
