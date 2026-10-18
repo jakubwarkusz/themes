@@ -9,9 +9,9 @@ type ButtonProps = ComponentProps<typeof Link> & {
 
 const variants: Record<ButtonVariant, string> = {
 	primary:
-		"inline-flex cursor-default items-center justify-center gap-2 rounded-lg bg-fd-primary px-5 py-2.5 text-sm font-semibold text-fd-primary-foreground transition-[scale,opacity] duration-150 hover:opacity-90 active:scale-[0.96]",
+		"inline-flex h-8 cursor-default items-center gap-1.5 rounded-md bg-fd-primary px-3 text-sm font-medium text-fd-primary-foreground outline-none transition-[opacity,scale] duration-150 ease-out hover:opacity-90 focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:ring-offset-2 focus-visible:ring-offset-fd-background active:scale-[0.97]",
 	secondary:
-		"inline-flex cursor-default items-center justify-center gap-2 rounded-lg border border-fd-border bg-fd-card px-5 py-2.5 text-sm font-medium text-fd-foreground transition-[scale,background-color] duration-150 hover:bg-fd-accent active:scale-[0.96]",
+		"inline-flex h-8 cursor-default items-center gap-1.5 rounded-md bg-fd-card px-3 text-sm text-fd-foreground outline-none transition-[background-color,scale] duration-150 ease-out hover:bg-fd-secondary focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.97]",
 };
 
 export function Button({ variant = "primary", className, ...props }: ButtonProps) {
