@@ -9,13 +9,12 @@
 }
 
 html {
-	scroll-behavior: smooth;
+	background-color: var(--color-fd-background);
 }
 
-@media (prefers-reduced-motion: reduce) {
-	html {
-		scroll-behavior: auto;
-	}
+html,
+body {
+	overscroll-behavior: none;
 }
 
 @theme inline {

@@ -9,6 +9,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useReducedMotion } from "motion/react";
+import type { MouseEvent } from "react";
 import * as m from "motion/react-m";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,6 +25,15 @@ const CHIP =
 
 const STAT =
 	"flex items-center gap-1 text-fd-muted-foreground transition-colors duration-150 group-hover:text-fd-foreground";
+
+function scrollToAgents(event: MouseEvent<HTMLAnchorElement>) {
+	const target = document.getElementById("agents");
+	if (!target) return;
+	event.preventDefault();
+	const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+	target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+	window.history.pushState(null, "", "#agents");
+}
 
 export function HeroContent({
 	stars,
@@ -136,6 +146,7 @@ export function HeroContent({
 				Using an AI agent?{" "}
 				<a
 					href="#agents"
+					onClick={scrollToAgents}
 					className="group inline-flex items-center gap-1 text-fd-foreground outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-fd-ring"
 				>
 					<span className="link-underline-center">Set it up with one prompt</span>
