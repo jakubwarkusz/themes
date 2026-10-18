@@ -1,3 +1,14 @@
+import {
+	Alert02Icon,
+	BookOpen01Icon,
+	Exchange01Icon,
+	FlashIcon,
+	MoreHorizontalIcon,
+	PlusSignIcon,
+	Settings02Icon,
+	Wrench01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import Link from "next/link";
 import { gitConfig } from "@/lib/layout.shared";
 import { getReleases, isLegacy, isMajor, type Release } from "@/lib/changelog";
@@ -9,6 +20,16 @@ const REPO = `https://github.com/${gitConfig.user}/${gitConfig.repo}`;
 
 const MIGRATION: Record<string, string> = {
 	"2.0.0": "/docs/migration#upgrading-from-1x",
+};
+
+const GROUP_ICONS: Record<string, IconSvgElement> = {
+	"Breaking Changes": Alert02Icon,
+	Added: PlusSignIcon,
+	Fixed: Wrench01Icon,
+	Performance: FlashIcon,
+	Changed: Exchange01Icon,
+	Documentation: BookOpen01Icon,
+	Miscellaneous: Settings02Icon,
 };
 
 const DATE = new Intl.DateTimeFormat("en-US", {
@@ -86,16 +107,24 @@ function ReleaseEntry({ release, latest }: { release: Release; latest: boolean }
 				{release.groups.map((group) =>
 					group.items.length ? (
 						<div key={group.name}>
-							<h3 className="text-sm font-medium text-fd-muted-foreground">
+							<h3 className="flex items-center gap-2 text-sm font-medium text-fd-muted-foreground">
+								<HugeiconsIcon
+									icon={GROUP_ICONS[group.name] ?? MoreHorizontalIcon}
+									size={14}
+									color="currentColor"
+									strokeWidth={1.8}
+								/>
 								{group.name}
 							</h3>
 							<ul className="mt-2.5 flex flex-col gap-2 text-sm leading-relaxed text-fd-foreground [&_code]:rounded-sm [&_code]:bg-fd-secondary [&_code]:px-[0.35em] [&_code]:py-[0.15em] [&_code]:font-mono [&_code]:text-[0.9em]">
 								{group.items.map((item) => (
-									<li key={`${item.scope}${item.text}`} className="flex gap-3">
+									<li key={`${item.scope}${item.text}`} className="flex gap-2">
 										<span
 											aria-hidden
-											className="mt-[0.7em] size-1 shrink-0 rounded-full bg-fd-muted-foreground/60"
-										/>
+											className="flex h-[1.625em] w-3.5 shrink-0 items-center justify-center"
+										>
+											<span className="size-1 rounded-full bg-fd-muted-foreground/60" />
+										</span>
 										<span className="min-w-0">
 											{item.breaking ? (
 												<span className="me-2">
