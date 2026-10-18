@@ -45,6 +45,36 @@ kbd {
 	vertical-align: 0.1em;
 }
 
+.link-underline-center {
+	position: relative;
+	display: inline-block;
+
+	&::after {
+		content: "";
+		position: absolute;
+		right: 0;
+		bottom: -0.06em;
+		left: 0;
+		height: 1.5px;
+		background-color: currentColor;
+		transform: scaleX(0);
+		transition: transform 150ms cubic-bezier(0.23, 1, 0.32, 1);
+	}
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.group:hover .link-underline-center::after,
+	.link-underline-center:hover::after {
+		transform: scaleX(1);
+		transition-duration: 200ms;
+	}
+}
+
+.group:focus-visible .link-underline-center::after {
+	transform: scaleX(1);
+	transition: none;
+}
+
 #nd-sidebar {
 	background-color: var(--color-fd-background) !important;
 	border-inline-end: 1px solid var(--color-fd-border) !important;
