@@ -1,4 +1,4 @@
-import { ThemeProvider } from "@wrksz/themes";
+import { ClientThemeProvider } from "@wrksz/themes/client";
 import { ThemeScript } from "@wrksz/themes/script";
 import type { ReactNode } from "react";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
@@ -25,9 +25,9 @@ export function Layout({ children }: { children: ReactNode }) {
 				<Links />
 			</head>
 			<body>
-				<ThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
+				<ClientThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
 					{children}
-				</ThemeProvider>
+				</ClientThemeProvider>
 				<ScrollRestoration />
 				<Scripts />
 			</body>

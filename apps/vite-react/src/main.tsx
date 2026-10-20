@@ -1,4 +1,4 @@
-import { ThemeProvider } from "@wrksz/themes";
+import { ClientThemeProvider } from "@wrksz/themes/client";
 import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { ThemeControls } from "./theme-controls";
@@ -55,8 +55,8 @@ if (!root) {
 
 createRoot(root).render(
 	<StrictMode>
-		<ThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
+		<ClientThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
 			<App />
-		</ThemeProvider>
+		</ClientThemeProvider>
 	</StrictMode>,
 );

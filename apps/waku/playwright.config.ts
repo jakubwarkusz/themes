@@ -8,7 +8,7 @@ export default defineConfig({
 		baseURL: "http://127.0.0.1:3142",
 	},
 	webServer: {
-		command: "bun run start",
+		command: "pnpm start",
 		port: 3142,
 		reuseExistingServer: !process.env.CI,
 		timeout: 120_000,

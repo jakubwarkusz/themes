@@ -1,9 +1,9 @@
-import { ThemeProvider } from "@wrksz/themes";
+import { ClientThemeProvider } from "@wrksz/themes/client";
 import { ThemeControls } from "./theme-controls";
 
 export function ThemeApp({ title }: { title: string }) {
 	return (
-		<ThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
+		<ClientThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
 			<main>
 				<h1>{title}</h1>
 				<ThemeControls />
@@ -12,6 +12,6 @@ export function ThemeApp({ title }: { title: string }) {
 					<a href="/about">About</a>
 				</nav>
 			</main>
-		</ThemeProvider>
+		</ClientThemeProvider>
 	);
 }

@@ -1,6 +1,35 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-test("keeps the current theme across client navigation", async ({ context, page, request }) => {
+const origin = "http://127.0.0.1:3138";
+
+async function blockApplicationScripts(page: Page) {
+	await page.route("**/*", (route) => {
+		if (route.request().resourceType() === "script") return route.abort();
+		return route.continue();
+	});
+}
+
+test("applies the stored theme before hydration", async ({ context, page, request }) => {
+	await context.addCookies([{ name: "theme", value: "dark", url: origin }]);
+
+	const documentHtml = await (
+		await request.get("/", { headers: { cookie: "theme=dark" } })
+	).text();
+	const bootstrapAt = documentHtml.indexOf("data-theme-bootstrap");
+	const bodyAt = documentHtml.indexOf("<body");
+	expect(bootstrapAt).toBeGreaterThanOrEqual(0);
+	expect(bodyAt).toBeGreaterThan(bootstrapAt);
+
+	await blockApplicationScripts(page);
+	await page.goto("/", { waitUntil: "domcontentloaded" });
+
+	const root = page.locator("html");
+	await expect(root).toHaveClass(/\bdark\b/);
+	await expect(root).toHaveCSS("color-scheme", "dark");
+	await expect(page.locator("script[data-theme-bootstrap]")).not.toHaveCount(0);
+});
+
+test("keeps the current theme across client navigation", async ({ context, page }) => {
 	const consoleErrors: string[] = [];
 	page.on("console", (message) => {
 		if (message.type() === "error") consoleErrors.push(message.text());
@@ -10,16 +39,9 @@ test("keeps the current theme across client navigation", async ({ context, page,
 		{
 			name: "theme",
 			value: "dark",
-			url: "http://127.0.0.1:3138",
+			url: origin,
 		},
 	]);
-	const documentResponse = await request.get("/", {
-		headers: { cookie: "theme=dark" },
-	});
-	const documentHtml = await documentResponse.text();
-	expect(documentHtml.indexOf("data-theme-bootstrap")).toBeLessThan(
-		documentHtml.indexOf("<body"),
-	);
 
 	await page.goto("/");
 	await expect(page.locator("html")).toHaveClass(/dark/);

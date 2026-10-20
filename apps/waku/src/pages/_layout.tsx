@@ -1,12 +1,12 @@
-import { ThemeProvider } from "@wrksz/themes";
+import { ClientThemeProvider } from "@wrksz/themes/client";
 import type { ReactNode } from "react";
 import "../styles.css";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
 	return (
-		<ThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
+		<ClientThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
 			{children}
-		</ThemeProvider>
+		</ClientThemeProvider>
 	);
 }
 

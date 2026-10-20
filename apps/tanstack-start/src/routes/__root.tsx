@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
-import { ThemeProvider } from "@wrksz/themes";
+import { ClientThemeProvider } from "@wrksz/themes/client";
 import { ThemeScript } from "@wrksz/themes/script";
 import type { ReactNode } from "react";
 import appCss from "../styles.css?url";
@@ -39,9 +39,9 @@ function RootDocument({ children }: { children: ReactNode }) {
 				/>
 			</head>
 			<body>
-				<ThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
+				<ClientThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
 					{children}
-				</ThemeProvider>
+				</ClientThemeProvider>
 				<Scripts />
 			</body>
 		</html>
