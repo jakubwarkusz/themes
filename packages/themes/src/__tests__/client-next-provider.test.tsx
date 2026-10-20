@@ -17,6 +17,9 @@ vi.mock("next/navigation.js", () => ({
 
 const { ThemeProvider } = await import("../providers/next-provider.js");
 const { ExtendedThemeProvider } = await import("../providers/extended-next-provider.js");
+const { ClientNextThemeProvider } = await import("../providers/client-next-provider.js");
+const { ExtendedClientNextThemeProvider } =
+	await import("../providers/extended-client-next-provider.js");
 
 type ScriptElement = ReactElement<{
 	dangerouslySetInnerHTML?: { __html?: string };
@@ -212,7 +215,7 @@ describe("ExtendedThemeProvider", () => {
 describe("ClientNextThemeProvider - SSR snapshots", () => {
 	test("seeds theme and resolvedTheme from initialTheme", () => {
 		const html = renderToStaticMarkup(
-			<ClientNextThemeProvider storage="none" initialTheme="dark">
+			<ClientNextThemeProvider bootstrap="" storage="none" initialTheme="dark">
 				<ThemeConsumer />
 			</ClientNextThemeProvider>,
 		);
@@ -222,7 +225,7 @@ describe("ClientNextThemeProvider - SSR snapshots", () => {
 
 	test("leaves theme unknown when neither initialTheme nor forcedTheme is set", () => {
 		const html = renderToStaticMarkup(
-			<ClientNextThemeProvider storage="none">
+			<ClientNextThemeProvider bootstrap="" storage="none">
 				<ThemeConsumer />
 			</ClientNextThemeProvider>,
 		);
@@ -232,7 +235,7 @@ describe("ClientNextThemeProvider - SSR snapshots", () => {
 
 	test("seeds theme and resolvedTheme from forcedTheme", () => {
 		const html = renderToStaticMarkup(
-			<ClientNextThemeProvider storage="none" forcedTheme="dark">
+			<ClientNextThemeProvider bootstrap="" storage="none" forcedTheme="dark">
 				<ThemeConsumer />
 			</ClientNextThemeProvider>,
 		);
@@ -242,7 +245,12 @@ describe("ClientNextThemeProvider - SSR snapshots", () => {
 
 	test("forcedTheme wins over initialTheme", () => {
 		const html = renderToStaticMarkup(
-			<ClientNextThemeProvider storage="none" forcedTheme="dark" initialTheme="light">
+			<ClientNextThemeProvider
+				bootstrap=""
+				storage="none"
+				forcedTheme="dark"
+				initialTheme="light"
+			>
 				<ThemeConsumer />
 			</ClientNextThemeProvider>,
 		);
@@ -252,7 +260,7 @@ describe("ClientNextThemeProvider - SSR snapshots", () => {
 
 	test("initialTheme=system reports theme but not resolvedTheme", () => {
 		const html = renderToStaticMarkup(
-			<ClientNextThemeProvider storage="none" initialTheme="system">
+			<ClientNextThemeProvider bootstrap="" storage="none" initialTheme="system">
 				<ThemeConsumer />
 			</ClientNextThemeProvider>,
 		);
@@ -262,7 +270,11 @@ describe("ClientNextThemeProvider - SSR snapshots", () => {
 
 	test("ignores initialTheme that is not in the themes list", () => {
 		const html = renderToStaticMarkup(
-			<ClientNextThemeProvider storage="none" initialTheme={"invalid" as "light"}>
+			<ClientNextThemeProvider
+				bootstrap=""
+				storage="none"
+				initialTheme={"invalid" as "light"}
+			>
 				<ThemeConsumer />
 			</ClientNextThemeProvider>,
 		);
@@ -272,7 +284,7 @@ describe("ClientNextThemeProvider - SSR snapshots", () => {
 
 	test("ThemedImage uses the seeded theme source", () => {
 		const html = renderToStaticMarkup(
-			<ClientNextThemeProvider storage="none" initialTheme="dark">
+			<ClientNextThemeProvider bootstrap="" storage="none" initialTheme="dark">
 				<ThemedImage src={{ light: "/light.png", dark: "/dark.png" }} alt="Theme preview" />
 			</ClientNextThemeProvider>,
 		);
@@ -282,7 +294,7 @@ describe("ClientNextThemeProvider - SSR snapshots", () => {
 
 	test("ThemedImage keeps the placeholder when initialTheme is system", () => {
 		const html = renderToStaticMarkup(
-			<ClientNextThemeProvider storage="none" initialTheme="system">
+			<ClientNextThemeProvider bootstrap="" storage="none" initialTheme="system">
 				<ThemedImage src={{ light: "/light.png", dark: "/dark.png" }} alt="Theme preview" />
 			</ClientNextThemeProvider>,
 		);
@@ -293,7 +305,7 @@ describe("ClientNextThemeProvider - SSR snapshots", () => {
 
 	test("useThemeValue returns the seeded resolved value", () => {
 		const html = renderToStaticMarkup(
-			<ClientNextThemeProvider storage="none" initialTheme="dark">
+			<ClientNextThemeProvider bootstrap="" storage="none" initialTheme="dark">
 				<ValueReader values={{ light: "Light", dark: "Dark" }} />
 			</ClientNextThemeProvider>,
 		);
@@ -304,7 +316,7 @@ describe("ClientNextThemeProvider - SSR snapshots", () => {
 describe("ExtendedClientNextThemeProvider - SSR snapshots", () => {
 	test("seeds theme and resolvedTheme from initialTheme", () => {
 		const html = renderToStaticMarkup(
-			<ExtendedClientNextThemeProvider storage="none" initialTheme="dark">
+			<ExtendedClientNextThemeProvider bootstrap="" storage="none" initialTheme="dark">
 				<ThemeConsumer />
 			</ExtendedClientNextThemeProvider>,
 		);
@@ -314,7 +326,12 @@ describe("ExtendedClientNextThemeProvider - SSR snapshots", () => {
 
 	test("forcedTheme wins over initialTheme", () => {
 		const html = renderToStaticMarkup(
-			<ExtendedClientNextThemeProvider storage="none" forcedTheme="dark" initialTheme="light">
+			<ExtendedClientNextThemeProvider
+				bootstrap=""
+				storage="none"
+				forcedTheme="dark"
+				initialTheme="light"
+			>
 				<ThemeConsumer />
 			</ExtendedClientNextThemeProvider>,
 		);
