@@ -1,54 +1,294 @@
 ---
 title: Other React frameworks
-description: First-paint theming in TanStack Start, Remix, and other SSR frameworks.
+description: First-paint theming in Vite, React Router, TanStack Start, Astro, Waku, and other SSR frameworks.
 ---
 
-Use the client provider for state and render `ThemeScript` in your framework's server-controlled document head.
+Use [`ClientThemeProvider`](/docs/api/client-theme-provider) from `@wrksz/themes/client` for theme state, and render [`ThemeScript`](/docs/api/theme-script) in the document head your framework controls. The client provider does not emit the inline script.
 
-```tsx
+```tsx title="document.tsx"
+import { ClientThemeProvider } from "@wrksz/themes/client";
 import { ThemeScript } from "@wrksz/themes/script";
-import { ThemeProvider } from "@wrksz/themes";
 
 export function Document({ children }: { children: React.ReactNode }) {
   return (
-    <html suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
-        <ThemeScript />
+        <ThemeScript storage="hybrid" defaultTheme="light" enableSystem={false} />
       </head>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ClientThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
+          {children}
+        </ClientThemeProvider>
       </body>
     </html>
   );
 }
 ```
 
-`ThemeScript` and `getScript` use a build-generated deterministic bootstrap so bundlers cannot rewrite behavior through `Function#toString()`. Keep script configuration equal to the provider configuration. `ThemeScript` / `getScript` cannot take `themeRoot`: Shadow widgets stay on `@wrksz/themes/client/extended-provider` after mount. See [Shadow DOM](/docs/examples/shadow-dom).
+<Callout type="warn">
+  Do not import `@wrksz/themes/next` outside Next.js. That entry uses `useServerInsertedHTML`.
+</Callout>
 
-```tsx
-import { getScript, ThemeScript } from "@wrksz/themes/script";
+<Callout type="info">
+  Pass the same `storage`, `defaultTheme`, and `enableSystem` to the script and the provider. The provider defaults `enableSystem` to `true`. A bootstrap that sets `enableSystem: false` will disagree with hydration when storage contains `"system"`.
+</Callout>
+
+`ThemeScript` and `getScript` use a build-generated deterministic bootstrap so bundlers cannot rewrite behavior through `Function#toString()`. `ThemeScript` / `getScript` cannot take `themeRoot`. Shadow widgets stay on `@wrksz/themes/client/extended-provider` after mount. See [Shadow DOM](/docs/examples/shadow-dom).
+
+Preview fixtures live in the repo:
+
+- [`apps/vite-react`](https://github.com/jakubwarkusz/themes/tree/main/apps/vite-react) — Vite SPA with `getScript()` injected into `index.html`
+- [`apps/react-router`](https://github.com/jakubwarkusz/themes/tree/main/apps/react-router) — React Router 7 framework mode
+- [`apps/tanstack-start`](https://github.com/jakubwarkusz/themes/tree/main/apps/tanstack-start) — TanStack Start document shell
+- [`apps/astro`](https://github.com/jakubwarkusz/themes/tree/main/apps/astro) — Astro `ThemeScript` with no `client:*` directive, plus one React island
+- [`apps/waku`](https://github.com/jakubwarkusz/themes/tree/main/apps/waku) — Waku `_root.tsx` document shell
+
+## Vite SPA
+
+There is no server document to render `ThemeScript`. Inject `getScript()` into `index.html` before the app bundle:
+
+```ts title="vite.config.ts"
+import react from "@vitejs/plugin-react";
+import { getScript } from "@wrksz/themes/script";
+import { defineConfig, type Plugin } from "vite";
+
+const themeBootstrap = getScript({
+  storageKey: "theme",
+  attribute: "class",
+  defaultTheme: "light",
+  enableSystem: false,
+  enableColorScheme: true,
+  forcedTheme: undefined,
+  themes: ["light", "dark"],
+  value: undefined,
+  target: "html",
+  storage: "hybrid",
+  themeColors: undefined,
+  initialTheme: undefined,
+  disableTransitionOnChange: false,
+  followSystem: false,
+});
+
+function themeScriptPlugin(): Plugin {
+  return {
+    name: "theme-script",
+    transformIndexHtml(html) {
+      return html.replace(
+        "<head>",
+        `<head>\n    <script data-theme-bootstrap="true">${themeBootstrap}</script>`,
+      );
+    },
+  };
+}
+
+export default defineConfig({
+  plugins: [themeScriptPlugin(), react()],
+});
+```
+
+Wrap the React tree with the same storage, default, and system settings:
+
+```tsx title="src/main.tsx"
+import { ClientThemeProvider } from "@wrksz/themes/client";
+
+<ClientThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
+  <App />
+</ClientThemeProvider>
+```
+
+## React Router 7
+
+Put `ThemeScript` in the root `Layout` `<head>`:
+
+```tsx title="src/root.tsx"
+import { ClientThemeProvider } from "@wrksz/themes/client";
+import { ThemeScript } from "@wrksz/themes/script";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript
+          storage="hybrid"
+          defaultTheme="light"
+          enableSystem={false}
+          scriptProps={{ "data-theme-bootstrap": "true" }}
+        />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <ClientThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
+          {children}
+        </ClientThemeProvider>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+export default function App() {
+  return <Outlet />;
+}
+```
+
+## TanStack Start
+
+Render `ThemeScript` next to `HeadContent` on the root document:
+
+```tsx title="src/routes/__root.tsx"
+import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
+import { ClientThemeProvider } from "@wrksz/themes/client";
+import { ThemeScript } from "@wrksz/themes/script";
+
+export const Route = createRootRoute({
+  component: RootComponent,
+});
+
+function RootComponent() {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <HeadContent />
+        <ThemeScript
+          storage="hybrid"
+          defaultTheme="light"
+          enableSystem={false}
+          scriptProps={{ "data-theme-bootstrap": "true" }}
+        />
+      </head>
+      <body>
+        <ClientThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
+          <Outlet />
+        </ClientThemeProvider>
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+```
+
+## Astro
+
+Server-render `ThemeScript` with no `client:*` directive. Astro renders children passed from an `.astro` template outside the hydrated React tree, so controls that call `useTheme` have to live inside the island.
+
+<Dont caption="Astro children are not React descendants of the hydrated provider">
+
+```astro title="src/pages/index.astro"
+<ThemeApp client:load>
+  <button>Use dark</button>
+</ThemeApp>
+```
+
+</Dont>
+
+<Do caption="Import the controls inside the same React component as the provider">
+
+```tsx title="src/components/ThemeApp.tsx"
+import { ClientThemeProvider } from "@wrksz/themes/client";
+import { ThemeControls } from "./theme-controls";
+
+export function ThemeApp({ title }: { title: string }) {
+  return (
+    <ClientThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
+      <h1>{title}</h1>
+      <ThemeControls />
+    </ClientThemeProvider>
+  );
+}
+```
+
+```astro title="src/pages/index.astro"
+---
+import { ThemeApp } from "../components/ThemeApp";
+import Layout from "../layouts/Layout.astro";
+---
+<Layout title="Home">
+  <ThemeApp client:load title="home" />
+</Layout>
+```
+
+</Do>
+
+```astro title="src/layouts/Layout.astro"
+---
+import { ThemeScript } from "@wrksz/themes/script";
+---
+<html lang="en">
+  <head>
+    <ThemeScript
+      storage="hybrid"
+      defaultTheme="light"
+      enableSystem={false}
+      scriptProps={{ "data-theme-bootstrap": "true" }}
+    />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+```
+
+## Waku
+
+Customize the document with `_root.tsx` and wrap pages with the client provider in `_layout.tsx`:
+
+```tsx title="src/pages/_root.tsx"
+import { ThemeScript } from "@wrksz/themes/script";
+import type { ReactNode } from "react";
+
+export default async function RootElement({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript
+          storage="hybrid"
+          defaultTheme="light"
+          enableSystem={false}
+          scriptProps={{ "data-theme-bootstrap": "true" }}
+        />
+      </head>
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+```tsx title="src/pages/_layout.tsx"
+import { ClientThemeProvider } from "@wrksz/themes/client";
+import type { ReactNode } from "react";
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <ClientThemeProvider storage="hybrid" defaultTheme="light" enableSystem={false}>
+      {children}
+    </ClientThemeProvider>
+  );
+}
 ```
 
 ## Cloudflare
 
-If Rocket Loader is enabled, exclude the bootstrap script from deferral:
+<Callout type="warn">
+  If Rocket Loader is enabled, exclude the bootstrap script from deferral. A flash without Rocket Loader generally means the script was emitted after blocking styles or outside the initial server response. Inspect the generated HTML and keep the script in `<head>` before application CSS.
+</Callout>
 
-```tsx
+```tsx title="document.tsx"
 <ThemeScript scriptProps={{ "data-cfasync": "false" }} />
 ```
 
-A flash without Rocket Loader generally means the script was emitted after blocking styles or outside the initial server response. Inspect the generated HTML and ensure the script is in `<head>` before application CSS.
-
 ## Base paths
 
-The bootstrap has no route or asset dependency, so a Next.js `basePath` does not require configuration. A base-path-only flash points to document caching, delayed CSS, or a layout that omitted the root provider/script.
+The bootstrap has no route or asset dependency, so a Next.js `basePath` does not require configuration. A base-path-only flash points to document caching, delayed CSS, or a layout that omitted the root provider or script.
 
 ## Content Security Policy
 
-Pass the same request-scoped nonce used by your `script-src` policy:
+<Callout type="info">
+  Pass the same request-scoped nonce used by your `script-src` policy. The script requires inline-script authorization and does not require `unsafe-eval`.
+</Callout>
 
-```tsx
+```tsx title="document.tsx"
 <ThemeScript nonce={nonce} />
 ```
-
-The script requires inline-script authorization but never requires `unsafe-eval`.

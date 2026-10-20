@@ -1,263 +1,321 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "packages/themes/**"
-      - "apps/docs/**"
-      - "apps/next-16-3/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "pnpm-workspace.yaml"
-      - "oxlint.config.ts"
-      - "oxfmt.config.ts"
-      - "README.md"
-      - "CONTRIBUTING.md"
-      - "AGENTS.md"
-      - "lefthook.yml"
-      - ".github/workflows/ci.yml"
-  pull_request:
-    branches: [main]
-    paths:
-      - "packages/themes/**"
-      - "apps/docs/**"
-      - "apps/next-16-3/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "pnpm-workspace.yaml"
-      - "oxlint.config.ts"
-      - "oxfmt.config.ts"
-      - "README.md"
-      - "CONTRIBUTING.md"
-      - "AGENTS.md"
-      - "lefthook.yml"
-      - ".github/workflows/ci.yml"
+    push:
+        branches: [main]
+        paths:
+            - "packages/themes/**"
+            - "apps/**"
+            - "package.json"
+            - "pnpm-lock.yaml"
+            - "pnpm-workspace.yaml"
+            - "oxlint.config.ts"
+            - "oxfmt.config.ts"
+            - "README.md"
+            - "CONTRIBUTING.md"
+            - "AGENTS.md"
+            - "lefthook.yml"
+            - ".github/workflows/ci.yml"
+    pull_request:
+        branches: [main]
+        paths:
+            - "packages/themes/**"
+            - "apps/**"
+            - "package.json"
+            - "pnpm-lock.yaml"
+            - "pnpm-workspace.yaml"
+            - "oxlint.config.ts"
+            - "oxfmt.config.ts"
+            - "README.md"
+            - "CONTRIBUTING.md"
+            - "AGENTS.md"
+            - "lefthook.yml"
+            - ".github/workflows/ci.yml"
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+    group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
 jobs:
-  quality:
-    name: Repository quality
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
+    quality:
+        name: Repository quality
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+            - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: pnpm
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 24
+                  cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
 
-      - name: Format check
-        run: pnpm format:check
+            - name: Format check
+              run: pnpm format:check
 
-      - name: Lint
-        run: pnpm lint
+            - name: Lint
+              run: pnpm lint
 
-      - name: Audit high severity dependencies
-        run: pnpm audit:high
+            - name: Audit high severity dependencies
+              run: pnpm audit:high
 
-  library:
-    name: Library
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
+    library:
+        name: Library
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+            - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: pnpm
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 24
+                  cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
 
-      - name: Type check
-        run: pnpm --filter @wrksz/themes type-check
+            - name: Type check
+              run: pnpm --filter @wrksz/themes type-check
 
-      - name: Test
-        run: pnpm --filter @wrksz/themes test
+            - name: Test
+              run: pnpm --filter @wrksz/themes test
 
-      - name: Build
-        run: pnpm --filter @wrksz/themes build
+            - name: Build
+              run: pnpm --filter @wrksz/themes build
 
-      - name: Smoke test published exports and client boundaries
-        run: pnpm --filter @wrksz/themes smoke:exports
+            - name: Smoke test published exports and client boundaries
+              run: pnpm --filter @wrksz/themes smoke:exports
 
-      - name: Bundle size
-        working-directory: packages/themes
-        run: pnpm exec tsx scripts/bundle-size.ts --compare benchmarks/baseline.json
+            - name: Bundle size
+              working-directory: packages/themes
+              run: pnpm exec tsx scripts/bundle-size.ts --compare benchmarks/baseline.json
 
-      - name: Installed package size
-        run: pnpm --filter @wrksz/themes size:package
+            - name: Installed package size
+              run: pnpm --filter @wrksz/themes size:package
 
-  react-compatibility:
-    name: React ${{ matrix.react }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - react: "18.3.1"
-            react-types: "18.3.23"
-            react-dom-types: "18.3.7"
-          - react: "19.3.0"
-            react-types: "19.3.0"
-            react-dom-types: "19.3.0"
-    steps:
-      - uses: actions/checkout@v7
+    react-compatibility:
+        name: React ${{ matrix.react }}
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - react: "18.3.1"
+                      react-types: "18.3.23"
+                      react-dom-types: "18.3.7"
+                    - react: "19.3.0"
+                      react-types: "19.3.0"
+                      react-dom-types: "19.3.0"
+        steps:
+            - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+            - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: pnpm
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 24
+                  cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
 
-      - name: Select React version
-        env:
-          REACT: ${{ matrix.react }}
-          REACT_TYPES: ${{ matrix.react-types }}
-          REACT_DOM_TYPES: ${{ matrix.react-dom-types }}
-        run: |
-          # Force one React version across the workspace (apps pin their own range),
-          # then reinstall so peer links under packages/* are rewritten.
-          printf '\n  react: %s\n  react-dom: %s\n' "${REACT}" "${REACT}" >> pnpm-workspace.yaml
-          pnpm add --workspace-root --save-dev \
-            "react@${REACT}" \
-            "react-dom@${REACT}" \
-            "@types/react@${REACT_TYPES}" \
-            "@types/react-dom@${REACT_DOM_TYPES}"
-          pnpm --filter theme-docs --filter next-16-3-compat add \
-            "react@${REACT}" \
-            "react-dom@${REACT}"
-          pnpm --filter theme-docs --filter next-16-3-compat add --save-dev \
-            "@types/react@${REACT_TYPES}" \
-            "@types/react-dom@${REACT_DOM_TYPES}"
-          pnpm install
+            - name: Select React version
+              env:
+                  REACT: ${{ matrix.react }}
+                  REACT_TYPES: ${{ matrix.react-types }}
+                  REACT_DOM_TYPES: ${{ matrix.react-dom-types }}
+              run: |
+                  # Force one React version across the workspace (apps pin their own range),
+                  # then reinstall so peer links under packages/* are rewritten.
+                  printf '\n  react: %s\n  react-dom: %s\n' "${REACT}" "${REACT}" >> pnpm-workspace.yaml
+                  pnpm add --workspace-root --save-dev \
+                    "react@${REACT}" \
+                    "react-dom@${REACT}" \
+                    "@types/react@${REACT_TYPES}" \
+                    "@types/react-dom@${REACT_DOM_TYPES}"
+                  pnpm --filter theme-docs --filter next-16-3-compat add \
+                    "react@${REACT}" \
+                    "react-dom@${REACT}"
+                  pnpm --filter theme-docs --filter next-16-3-compat add --save-dev \
+                    "@types/react@${REACT_TYPES}" \
+                    "@types/react-dom@${REACT_DOM_TYPES}"
+                  pnpm install
 
-      - name: Test effect event compatibility
-        run: pnpm --filter @wrksz/themes test src/__tests__/use-effect-event-compat.test.tsx
+            - name: Test effect event compatibility
+              run: pnpm --filter @wrksz/themes test src/__tests__/use-effect-event-compat.test.tsx
 
-      - name: Build
-        run: pnpm --filter @wrksz/themes build
+            - name: Build
+              run: pnpm --filter @wrksz/themes build
 
-  typescript-compatibility:
-    name: TypeScript ${{ matrix.version }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - version: "5.9.3"
-            script: "type-check:compat:5.9"
-          - version: "6.0.2"
-            script: "type-check:compat:6"
-          - version: "7.0.2"
-            script: "type-check:compat:7"
-    steps:
-      - uses: actions/checkout@v7
+    typescript-compatibility:
+        name: TypeScript ${{ matrix.version }}
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - version: "5.9.3"
+                      script: "type-check:compat:5.9"
+                    - version: "6.0.2"
+                      script: "type-check:compat:6"
+                    - version: "7.0.2"
+                      script: "type-check:compat:7"
+        steps:
+            - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+            - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: pnpm
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 24
+                  cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
 
-      - name: Check source and published package
-        run: pnpm --filter @wrksz/themes ${{ matrix.script }}
+            - name: Check source and published package
+              run: pnpm --filter @wrksz/themes ${{ matrix.script }}
 
-  docs:
-    name: Documentation
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
+    docs:
+        name: Documentation
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+            - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: pnpm
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 24
+                  cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
 
-      - name: Build library
-        run: pnpm --filter @wrksz/themes build
+            - name: Build library
+              run: pnpm --filter @wrksz/themes build
 
-      - name: Test
-        run: pnpm --filter theme-docs test
+            - name: Test
+              run: pnpm --filter theme-docs test
 
-      - name: Type check
-        run: pnpm --filter theme-docs types:check
+            - name: Type check
+              run: pnpm --filter theme-docs types:check
 
-      - name: Build
-        run: pnpm build:docs
+            - name: Build
+              run: pnpm build:docs
 
-  next-16-3:
-    name: Next.js 16.3 Instant Navigations
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v7
+    next-16-3:
+        name: Next.js 16.3 Instant Navigations
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        steps:
+            - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+            - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: pnpm
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 24
+                  cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
 
-      - name: Build library
-        run: pnpm --filter @wrksz/themes build
+            - name: Build library
+              run: pnpm --filter @wrksz/themes build
 
-      - name: Type check
-        run: pnpm --filter next-16-3-compat type-check
+            - name: Type check
+              run: pnpm --filter next-16-3-compat type-check
 
-      - name: Build fixture
-        run: pnpm --filter next-16-3-compat build
+            - name: Build fixture
+              run: pnpm --filter next-16-3-compat build
 
-      # Local verify:full needs the same browser:
-      # pnpm --filter next-16-3-compat exec playwright install chromium
-      - name: Cache Playwright Chromium
-        uses: actions/cache@v6
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            playwright-chromium-${{ runner.os }}-
+            # Local verify:full needs the same browser:
+            # pnpm --filter next-16-3-compat exec playwright install chromium
+            - name: Cache Playwright Chromium
+              uses: actions/cache@v6
+              id: playwright-cache
+              with:
+                  path: ~/.cache/ms-playwright
+                  key: playwright-chromium-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+                  restore-keys: |
+                      playwright-chromium-${{ runner.os }}-
 
-      - name: Install Chromium
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm --filter next-16-3-compat exec playwright install --with-deps chromium
+            - name: Install Chromium
+              if: steps.playwright-cache.outputs.cache-hit != 'true'
+              run: pnpm --filter next-16-3-compat exec playwright install --with-deps chromium
 
-      - name: Install Chromium OS dependencies
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm --filter next-16-3-compat exec playwright install-deps chromium
+            - name: Install Chromium OS dependencies
+              if: steps.playwright-cache.outputs.cache-hit == 'true'
+              run: pnpm --filter next-16-3-compat exec playwright install-deps chromium
 
-      - name: Test Instant Navigations
-        run: pnpm --filter next-16-3-compat test:e2e
+            - name: Test Instant Navigations
+              run: pnpm --filter next-16-3-compat test:e2e
+
+    framework-fixtures:
+        name: ${{ matrix.name }}
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - name: Vite React
+                      filter: vite-react
+                    - name: React Router
+                      filter: react-router-compat
+                    - name: TanStack Start
+                      filter: tanstack-start
+                    - name: Astro
+                      filter: astro-react
+                    - name: Waku
+                      filter: waku-compat
+        steps:
+            - uses: actions/checkout@v7
+
+            - uses: pnpm/action-setup@v6
+
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 24
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build library
+              run: pnpm --filter @wrksz/themes build
+
+            - name: Type check
+              run: pnpm --filter ${{ matrix.filter }} type-check
+
+            - name: Build fixture
+              run: pnpm --filter ${{ matrix.filter }} build
+
+            - name: Cache Playwright Chromium
+              uses: actions/cache@v4
+              id: playwright-cache
+              with:
+                  path: ~/.cache/ms-playwright
+                  key: playwright-chromium-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+                  restore-keys: |
+                      playwright-chromium-${{ runner.os }}-
+
+            - name: Install Chromium
+              if: steps.playwright-cache.outputs.cache-hit != 'true'
+              run: pnpm --filter ${{ matrix.filter }} exec playwright install --with-deps chromium
+
+            - name: Install Chromium OS dependencies
+              if: steps.playwright-cache.outputs.cache-hit == 'true'
+              run: pnpm --filter ${{ matrix.filter }} exec playwright install-deps chromium
+
+            - name: Test first-paint theming
+              run: pnpm --filter ${{ matrix.filter }} test:e2e
