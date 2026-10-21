@@ -1,5 +1,4 @@
-export const sidebarBaseClass =
-	"flex items-center py-1 ps-6 pe-2 text-sm leading-5 transition-colors duration-150 ease-out";
+export const sidebarBaseClass = "flex items-center py-1 ps-6 pe-2 text-sm leading-5";
 
 export const sidebarMutedClass = "text-fd-muted-foreground hover:text-fd-foreground";
 export const sidebarActiveClass = "font-medium text-fd-foreground";
