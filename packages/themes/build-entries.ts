@@ -13,6 +13,7 @@ export const PUBLIC_BUILD_ENTRIES: readonly string[] = [
 	"src/next/extended.ts",
 	"src/next/create-themes.ts",
 	"src/script.ts",
+	"src/server.ts",
 ];
 
 export const INTERNAL_RUNTIME_BUILD_ENTRIES: readonly string[] = [
