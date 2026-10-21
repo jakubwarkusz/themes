@@ -63,7 +63,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 			</DocsBody>
 			<PageFooter
 				page={page.url}
-				editUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
+				editUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/apps/docs/content/docs/${page.path}`}
 				lastModified={page.data.lastModified}
 				previous={neighbours.previous}
 				next={neighbours.next}
