@@ -4,7 +4,11 @@ import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useTOCItems } from "fumadocs-ui/components/toc";
 import { useTreePath } from "fumadocs-ui/contexts/tree";
-import type { TOCProps } from "fumadocs-ui/layouts/docs/page/slots/toc";
+import {
+	TOCProvider,
+	type TOCProps,
+	type TOCProviderProps,
+} from "fumadocs-ui/layouts/docs/page/slots/toc";
 import { m, useMotionValueEvent, useTransform } from "motion/react";
 import {
 	Children,
@@ -12,6 +16,7 @@ import {
 	cloneElement,
 	isValidElement,
 	type ReactNode,
+	use,
 	useEffect,
 	useId,
 	useLayoutEffect,
@@ -21,6 +26,7 @@ import {
 } from "react";
 import { cn } from "@/lib/cn";
 import { MotionProvider } from "./motion-provider";
+import { OlderReleasesContext } from "./older-releases";
 import { ScrollFade } from "./scroll-fade";
 import {
 	headingTreeDepths,
@@ -371,6 +377,19 @@ function TocPopoverPanel({ headings }: { headings: Heading[] }) {
 			</div>
 		</div>
 	);
+}
+
+export function TocProvider({ toc, ...props }: TOCProviderProps) {
+	const older = use(OlderReleasesContext);
+	const items = useMemo(
+		() =>
+			older?.open
+				? toc.flatMap((item) => (item.url === "#older-releases" ? older.toc : [item]))
+				: toc,
+		[toc, older],
+	);
+
+	return <TOCProvider toc={items} {...props} />;
 }
 
 export function TocPopover() {

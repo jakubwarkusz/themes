@@ -2,8 +2,35 @@
 
 import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import type { TOCItemType } from "fumadocs-core/toc";
+import {
+	createContext,
+	type ReactNode,
+	use,
+	useEffect,
+	useId,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
 import { cn } from "@/lib/cn";
+
+export const OlderReleasesContext = createContext<{
+	open: boolean;
+	setOpen: (open: boolean) => void;
+	toc: TOCItemType[];
+} | null>(null);
+
+export function OlderReleasesProvider({
+	toc,
+	children,
+}: {
+	toc: TOCItemType[];
+	children: ReactNode;
+}) {
+	const [open, setOpen] = useState(false);
+	return <OlderReleasesContext value={{ open, setOpen, toc }}>{children}</OlderReleasesContext>;
+}
 
 export function OlderReleases({
 	range,
@@ -14,7 +41,10 @@ export function OlderReleases({
 	count: number;
 	children: ReactNode;
 }) {
-	const [open, setOpen] = useState(false);
+	const shared = use(OlderReleasesContext);
+	const [local, setLocal] = useState(false);
+	const open = shared?.open ?? local;
+	const setOpen = shared?.setOpen ?? setLocal;
 	const [settled, setSettled] = useState(false);
 	const [target, setTarget] = useState<string | null>(null);
 	const id = useId();
@@ -43,7 +73,7 @@ export function OlderReleases({
 			navigation?.removeEventListener("navigate", onNavigate);
 			window.removeEventListener("hashchange", onHash);
 		};
-	}, [id]);
+	}, [id, setOpen]);
 
 	useLayoutEffect(() => {
 		if (!target) return;

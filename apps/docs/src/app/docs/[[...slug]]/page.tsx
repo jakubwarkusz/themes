@@ -1,16 +1,22 @@
 import { findNeighbour } from "fumadocs-core/page-tree";
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/layouts/docs/page";
-import { TOCProvider } from "fumadocs-ui/layouts/docs/page/slots/toc";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx";
+import { OlderReleasesProvider } from "@/components/older-releases";
 import { PageActions } from "@/components/page-actions";
 import { PageFooter } from "@/components/page-footer";
-import { Toc, TocPopover } from "@/components/toc";
-import { getReleases, isLegacy } from "@/lib/changelog";
+import { Toc, TocPopover, TocProvider } from "@/components/toc";
+import { getReleases, isLegacy, type Release } from "@/lib/changelog";
 import { gitConfig } from "@/lib/layout.shared";
 import { getPageImage, source } from "@/lib/source";
+
+const toTocItem = (release: Release) => ({
+	title: release.version,
+	url: `#${release.id}`,
+	depth: 2,
+});
 
 export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 	const params = await props.params;
@@ -20,22 +26,17 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 	const MDX = page.data.body;
 	const neighbours = findNeighbour(source.getPageTree(), page.url);
 	const releases = page.path === "changelog.mdx" ? await getReleases() : undefined;
+	const legacyToc = releases?.filter(isLegacy).map(toTocItem) ?? [];
 	const toc = releases
 		? [
-				...releases
-					.filter((release) => !isLegacy(release))
-					.map((release) => ({
-						title: release.version,
-						url: `#${release.id}`,
-						depth: 2,
-					})),
-				...(releases.some(isLegacy)
+				...releases.filter((release) => !isLegacy(release)).map(toTocItem),
+				...(legacyToc.length
 					? [{ title: "Older releases", url: "#older-releases", depth: 2 }]
 					: []),
 			]
 		: page.data.toc;
 
-	return (
+	const content = (
 		<DocsPage
 			toc={toc}
 			full={page.data.full}
@@ -43,7 +44,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 				container: { className: "pt-8" },
 			}}
 			footer={{ enabled: false }}
-			slots={{ toc: { provider: TOCProvider, main: Toc, popover: TocPopover } }}
+			slots={{ toc: { provider: TocProvider, main: Toc, popover: TocPopover } }}
 		>
 			<DocsTitle>{page.data.title}</DocsTitle>
 			<DocsDescription className="mb-0">{page.data.description}</DocsDescription>
@@ -68,6 +69,12 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 				next={neighbours.next}
 			/>
 		</DocsPage>
+	);
+
+	return legacyToc.length ? (
+		<OlderReleasesProvider toc={legacyToc}>{content}</OlderReleasesProvider>
+	) : (
+		content
 	);
 }
 
