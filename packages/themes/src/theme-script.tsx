@@ -5,7 +5,7 @@ import type { DefaultTheme, ThemeProviderProps } from "./core/types.js";
 
 export type ThemeScriptProps<Themes extends string = DefaultTheme> = Omit<
 	ThemeProviderProps<Themes>,
-	"children" | "onThemeChange" | "onStorageError" | "cookieOptions"
+	"children" | "onThemeChange" | "onStorageError" | "cookieOptions" | "enableViewTransition"
 >;
 
 export function ThemeScript<Themes extends string = DefaultTheme>(
