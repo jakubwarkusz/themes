@@ -34,8 +34,8 @@ These defaults are documented in the [next-themes API](https://github.com/pacoco
 
 ## Upgrading from 1.x
 
-<Callout type="warn">
-  <Breaking /> These changes apply when upgrading from **1.x to 2.x**. Skip this section if you already use 2.x.
+<Callout type="breaking">
+  These changes apply when upgrading from **1.x to 2.x**. Skip this section if you already use 2.x.
 </Callout>
 
 ### What broke vs 1.2.0
@@ -77,8 +77,8 @@ export default async function RootLayout({ children }) {
 
 `@wrksz/themes/next` is the server-layout entry and also exports the server-only `getTheme` helper. Move the root theme provider out of a client wrapper. Keep unrelated auth, query or UI providers in that wrapper and render it inside the new root theme provider.
 
-<Callout type="info">
-  <Breaking /> In 1.x this entry was an **async** Server Component. From `2.0.0` it is synchronous, but it still must not be imported from a `"use client"` module because it re-exports `getTheme`.
+<Callout type="breaking">
+  In 1.x this entry was an **async** Server Component. From `2.0.0` it is synchronous, but it still must not be imported from a `"use client"` module because it re-exports `getTheme`.
 </Callout>
 
 ```diff

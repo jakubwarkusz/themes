@@ -1,13 +1,6 @@
-import {
-	Alert02Icon,
-	AlertCircleIcon,
-	CheckmarkCircle02Icon,
-	InformationCircleIcon,
-} from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import type { ReactNode } from "react";
 
-type Tone = "info" | "success" | "warning" | "danger";
+type Tone = "info" | "success" | "warning" | "danger" | "breaking";
 
 const TONES: Record<string, Tone> = {
 	info: "info",
@@ -16,40 +9,37 @@ const TONES: Record<string, Tone> = {
 	warn: "warning",
 	warning: "warning",
 	error: "danger",
+	breaking: "breaking",
 };
 
-const ICONS = {
-	info: InformationCircleIcon,
-	success: CheckmarkCircle02Icon,
-	warning: Alert02Icon,
-	danger: AlertCircleIcon,
-} satisfies Record<Tone, unknown>;
+const LABELS: Record<Tone, string> = {
+	info: "Note",
+	success: "Tip",
+	warning: "Warning",
+	danger: "Danger",
+	breaking: "Breaking",
+};
 
 export function Callout({
 	type = "info",
 	title,
+	version = "2.0.0",
 	children,
 }: {
 	type?: string;
 	title?: ReactNode;
+	version?: string;
 	children?: ReactNode;
 }) {
 	const tone = TONES[type] ?? "info";
 
 	return (
 		<div role="note" data-tone={tone} className="callout">
-			<span className="callout-icon">
-				<HugeiconsIcon
-					icon={ICONS[tone]}
-					size={16}
-					color="currentColor"
-					strokeWidth={1.8}
-				/>
+			<span className="callout-label">
+				{title ?? LABELS[tone]}
+				{tone === "breaking" ? <span className="callout-version">v{version}</span> : null}
 			</span>
-			<div className="callout-body">
-				{title != null ? <p className="callout-title">{title}</p> : null}
-				{children}
-			</div>
+			{children}
 		</div>
 	);
 }

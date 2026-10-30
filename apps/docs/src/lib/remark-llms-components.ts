@@ -97,7 +97,13 @@ function replacement(node: JsxNode): Parameters<typeof replaceSource>[2] | undef
 			return "```bash\nnpm install @wrksz/themes\n```";
 		case "Callout":
 			return (s) => {
-				const label = attr(node, "type") === "warn" ? "Warning" : "Note";
+				const type = attr(node, "type");
+				const label =
+					type === "breaking"
+						? `Breaking (v${attr(node, "version") ?? "2.0.0"})`
+						: type === "warn"
+							? "Warning"
+							: "Note";
 				const body = s.inner(node as Node).trim();
 				return `> **${label}:** ${body.replaceAll("\n", "\n> ")}`;
 			};
