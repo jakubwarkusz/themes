@@ -100,7 +100,7 @@ export function Comparison() {
 				variants={fadeUp}
 				initial="hidden"
 				whileInView="show"
-				viewport={{ once: true, margin: "-80px" }}
+				viewport={{ once: true }}
 			>
 				<h2 className="text-base font-medium text-fd-muted-foreground">Comparison</h2>
 				<p className="mt-1 text-sm text-fd-foreground/80">
@@ -113,7 +113,7 @@ export function Comparison() {
 				variants={fadeUp}
 				initial="hidden"
 				whileInView="show"
-				viewport={{ once: true, margin: "-80px" }}
+				viewport={{ once: true }}
 				transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.08 }}
 			>
 				{rows.map((row, i) => (
@@ -132,7 +132,7 @@ export function Comparison() {
 				variants={fadeUp}
 				initial="hidden"
 				whileInView="show"
-				viewport={{ once: true, margin: "-80px" }}
+				viewport={{ once: true }}
 				transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.08 }}
 			>
 				<ScrollFade className="overflow-x-auto">
@@ -194,7 +194,7 @@ export function Comparison() {
 				variants={fadeUp}
 				initial="hidden"
 				whileInView="show"
-				viewport={{ once: true, margin: "-80px" }}
+				viewport={{ once: true }}
 				transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.12 }}
 			>
 				<Link

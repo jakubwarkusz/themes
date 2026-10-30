@@ -60,7 +60,7 @@ export function Roadmap() {
 				variants={item}
 				initial="hidden"
 				whileInView="show"
-				viewport={{ once: true, margin: "-80px" }}
+				viewport={{ once: true }}
 			>
 				Roadmap
 			</m.h2>
@@ -70,7 +70,7 @@ export function Roadmap() {
 				variants={list}
 				initial="hidden"
 				whileInView="show"
-				viewport={{ once: true, margin: "-80px" }}
+				viewport={{ once: true }}
 			>
 				{plans.map((plan) => (
 					<m.li key={plan.label} className="flex flex-col gap-1" variants={item}>

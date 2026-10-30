@@ -107,7 +107,7 @@ export function FeaturesGrid() {
 				variants={itemVariants}
 				initial="hidden"
 				whileInView="show"
-				viewport={{ once: true, margin: "-80px" }}
+				viewport={{ once: true }}
 			>
 				Features
 			</m.h2>
@@ -117,7 +117,7 @@ export function FeaturesGrid() {
 				variants={listVariants}
 				initial="hidden"
 				whileInView="show"
-				viewport={{ once: true, margin: "-80px" }}
+				viewport={{ once: true }}
 			>
 				{features.map((feature) => (
 					<m.li

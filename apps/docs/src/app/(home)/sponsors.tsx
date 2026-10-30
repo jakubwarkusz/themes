@@ -28,7 +28,7 @@ export function Sponsors() {
 			className="w-full max-w-4xl pb-16 sm:pb-20"
 			initial="hidden"
 			whileInView="show"
-			viewport={{ once: true, margin: "-80px" }}
+			viewport={{ once: true }}
 			transition={{ staggerChildren: shouldReduceMotion ? 0 : 0.04 }}
 		>
 			<m.h2 className="text-base font-medium text-fd-muted-foreground" variants={item}>
