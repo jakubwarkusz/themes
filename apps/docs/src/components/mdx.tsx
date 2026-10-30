@@ -5,7 +5,9 @@ import dynamic from "next/dynamic";
 import { Children, type ComponentProps, isValidElement, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { Callout } from "./callout";
+import { After, Before, Change, Changes, Entries, Entry, Pair, Pairs } from "./changes";
 import { Changelog } from "./changelog";
+import { Check, Choice, Choices } from "./choices";
 import { CodeBlock } from "./code-block";
 import { Heading } from "./heading";
 import { InstallCommand } from "./install-command";
@@ -40,7 +42,18 @@ export function getMDXComponents(components?: MDXComponents) {
 	return {
 		...defaultMdxComponents,
 		Callout,
+		After,
+		Before,
+		Change,
+		Changes,
 		Changelog,
+		Entries,
+		Entry,
+		Pair,
+		Pairs,
+		Check,
+		Choice,
+		Choices,
 		Configurator: () => <Configurator />,
 		InstallCommand,
 		MigrateWithAI,

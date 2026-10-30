@@ -40,13 +40,28 @@ These defaults are documented in the [next-themes API](https://github.com/pacoco
 
 ### What broke vs 1.2.0
 
-| Change | 1.x | 2.0.0 |
-|--------|-----|--------------|
-| Next `ThemeProvider` | `async`, called `cookies()` for `storage="cookie"\|"hybrid"` and set `initialTheme` for you | Synchronous; does not read cookies on the server. |
-| Server cookie read | Provider called `cookies()` for cookie/hybrid storage | Call [`getTheme`](/docs/api/get-theme) explicitly when server content needs the selection; pass `initialTheme` to seed the provider |
-| TypeScript peer | `>=4.5.0` | `>=5.9` (5.0–5.8 unsupported) |
-| `forcedTheme` | Could write the forced value into storage on init | Does **not** persist to storage |
-| `initialTheme` / `storageKey` | Prop changes could re-run mount init | Initializes at mount; later prop changes do not re-initialize |
+<Changes>
+  <Change name="Next `ThemeProvider`">
+    <Before>`async`, called `cookies()` for `storage="cookie"` / `"hybrid"` and set `initialTheme` for you</Before>
+    <After>Synchronous; does not read cookies on the server</After>
+  </Change>
+  <Change name="Server cookie read">
+    <Before>Provider called `cookies()` for cookie/hybrid storage</Before>
+    <After>Call [`getTheme`](/docs/api/get-theme) explicitly when server content needs the selection; pass `initialTheme` to seed the provider</After>
+  </Change>
+  <Change name="TypeScript peer">
+    <Before>`>=4.5.0`</Before>
+    <After>`>=5.9` (5.0–5.8 unsupported)</After>
+  </Change>
+  <Change name="`forcedTheme`">
+    <Before>Could write the forced value into storage on init</Before>
+    <After>Does **not** persist to storage</After>
+  </Change>
+  <Change name="`initialTheme` / `storageKey`">
+    <Before>Prop changes could re-run mount init</Before>
+    <After>Initializes at mount; later prop changes do not re-initialize</After>
+  </Change>
+</Changes>
 
 ### Migration path
 

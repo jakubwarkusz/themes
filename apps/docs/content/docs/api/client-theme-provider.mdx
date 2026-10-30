@@ -23,13 +23,29 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
 ## ThemeProvider vs ClientThemeProvider
 
-| | `ThemeProvider` (`@wrksz/themes/next`) | `ClientThemeProvider` (`@wrksz/themes/client`) | Extended (`@wrksz/themes/client/extended-provider`) |
-|---|---|---|---|
-| Renders inline script | Yes - prevents flash on load | No | No |
-| Use in Server Components | Yes | No | No |
-| Use in Client Components | No | Yes | Yes |
-| Default props | Yes | Yes (`nonce` unused) | Yes, plus `themeRoot`, `systemThemeMap`, `enableSameDocumentSync` |
-| `themeRoot` | No | No | Yes. Omitted from `@wrksz/themes/next/extended` |
+<Choices>
+  <Choice name="ThemeProvider" from="@wrksz/themes/next" use="Root layout">
+    <Check>Inline script, no flash on load</Check>
+    <Check>Server Components</Check>
+    <Check no>Client Components</Check>
+    <Check>All default props</Check>
+    <Check no>`themeRoot`</Check>
+  </Choice>
+  <Choice name="ClientThemeProvider" from="@wrksz/themes/client" use="Nested providers">
+    <Check no>Inline script</Check>
+    <Check no>Server Components</Check>
+    <Check>Client Components</Check>
+    <Check>All default props, `nonce` unused</Check>
+    <Check no>`themeRoot`</Check>
+  </Choice>
+  <Choice name="ClientThemeProvider" from="@wrksz/themes/client/extended-provider" use="Shadow DOM, custom roots, same-document sync">
+    <Check no>Inline script</Check>
+    <Check no>Server Components</Check>
+    <Check>Client Components</Check>
+    <Check>Default props, plus `systemThemeMap` and `enableSameDocumentSync`</Check>
+    <Check>`themeRoot`, not on `@wrksz/themes/next/extended`</Check>
+  </Choice>
+</Choices>
 
 For your root layout, always use `ThemeProvider`. Use `ClientThemeProvider` only for nested providers deeper in the tree.
 

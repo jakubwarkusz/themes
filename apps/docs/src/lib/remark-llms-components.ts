@@ -34,12 +34,12 @@ function walk(node: unknown, visit: (node: JsxNode) => void) {
 	for (const child of (node as { children?: unknown[] }).children ?? []) walk(child, visit);
 }
 
-function collectProps(node: JsxNode): JsxNode[] {
-	const props: JsxNode[] = [];
+function collect(node: JsxNode, name: string): JsxNode[] {
+	const found: JsxNode[] = [];
 	walk(node, (child) => {
-		if (child.name === "Prop") props.push(child);
+		if (child.name === name) found.push(child);
 	});
-	return props;
+	return found;
 }
 
 function cell(markdown: string) {
@@ -57,7 +57,7 @@ function breakingLabel(node: JsxNode) {
 }
 
 function propsTable(s: Stringifier, node: JsxNode) {
-	const props = collectProps(node);
+	const props = collect(node, "Prop");
 	const hasDefault = props.some((prop) => attr(prop, "default") || attr(prop, "required"));
 	const header = hasDefault
 		? ["Name", "Type", "Default", "Description"]
@@ -93,6 +93,50 @@ function replacement(node: JsxNode): Parameters<typeof replaceSource>[2] | undef
 			return (s) => propsTable(s, node);
 		case "BreakingNote":
 			return (s) => `${breakingLabel(node)}: ${cell(s.inner(node as Node))}`;
+		case "Changes":
+			return (s) =>
+				markdownTable([
+					["Change", "1.x", "2.0.0"],
+					...collect(node, "Change").map((change) => [
+						cell(String(attr(change, "name"))),
+						cell(s.inner(collect(change, "Before")[0] as Node)),
+						cell(s.inner(collect(change, "After")[0] as Node)),
+					]),
+				]);
+		case "Entries":
+			return (s) =>
+				collect(node, "Entry")
+					.map((entry) => {
+						const use = attr(entry, "use");
+						const details = cell(s.inner(entry as Node));
+						return `- \`${attr(entry, "name")}\`${typeof use === "string" ? `: ${use}` : ""}${details ? `. ${details}` : ""}`;
+					})
+					.join("\n");
+		case "Pairs":
+			return (s) =>
+				markdownTable([
+					[String(attr(node, "left")), String(attr(node, "right"))],
+					...collect(node, "Pair").map((pair) => [
+						cell(String(attr(pair, "label"))),
+						cell(s.inner(pair as Node)),
+					]),
+				]);
+		case "Choices":
+			return (s) =>
+				collect(node, "Choice")
+					.map((choice) => {
+						const use = attr(choice, "use");
+						const checks = collect(choice, "Check").map(
+							(check) =>
+								`- ${attr(check, "no") ? "No" : "Yes"}: ${cell(s.inner(check as Node))}`,
+						);
+						return [
+							`**${attr(choice, "name")}** (\`${attr(choice, "from")}\`)${typeof use === "string" ? ` - ${use}` : ""}`,
+							"",
+							...checks,
+						].join("\n");
+					})
+					.join("\n\n");
 		case "InstallCommand":
 			return "```bash\nnpm install @wrksz/themes\n```";
 		case "Callout":

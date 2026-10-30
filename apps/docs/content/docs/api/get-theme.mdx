@@ -11,10 +11,14 @@ description: Read the current theme from a cookie outside React - in proxy, layo
 
 Two variants depending on context:
 
-| Call | Returns | Use when |
-|------|---------|----------|
-| `getTheme(request)` | `string` or inferred theme union | `proxy.ts`, edge functions |
-| `await getTheme()` | `Promise<string>` or inferred theme union | Server Components, layouts |
+<Entries>
+  <Entry name="getTheme(request)" use="`proxy.ts`, edge functions">
+    Returns `string` or the inferred theme union
+  </Entry>
+  <Entry name="await getTheme()" use="Server Components, layouts">
+    Returns `Promise<string>` or the inferred theme union
+  </Entry>
+</Entries>
 
 ## Proxy
 

@@ -108,20 +108,20 @@ export function ThemeToggle() {
 ## Import paths
 
 
-| Import | Use for |
-|--------|---------|
-| `@wrksz/themes/next` | `ThemeProvider` in Next.js (recommended) |
-| `@wrksz/themes/client` | `useTheme`, `useThemeValue`, `useThemeEffect`, `ThemedImage`, `ClientThemeProvider`, `createThemes` |
-| `@wrksz/themes/client/use-theme` | Direct `useTheme` import |
-| `@wrksz/themes/client/use-theme-value` | Direct `useThemeValue` import |
-| `@wrksz/themes/client/use-theme-effect` | Direct `useThemeEffect` import |
-| `@wrksz/themes/client/themed-image` | Direct `ThemedImage` import |
-| `@wrksz/themes/client/provider` | Direct `ClientThemeProvider` import |
-| `@wrksz/themes/client/create-themes` | Direct `createThemes` import |
-| `@wrksz/themes/next/create-themes` | Typed `createThemes` with `NextThemeProvider` and `ThemeScript` |
-| `@wrksz/themes/next/extended` | Opt-in Next.js `ThemeProvider` with `systemThemeMap` and same-document sync |
-| `@wrksz/themes/client/extended-provider` | Opt-in `ClientThemeProvider` with `themeRoot`, `systemThemeMap`, and same-document sync |
-| `@wrksz/themes` | Client-safe `ThemeProvider` alias and `createThemes` for framework-neutral React usage |
+<Entries>
+  <Entry name="@wrksz/themes/next" use="`ThemeProvider` in Next.js (recommended)" />
+  <Entry name="@wrksz/themes/client" use="`useTheme`, `useThemeValue`, `useThemeEffect`, `ThemedImage`, `ClientThemeProvider`, `createThemes`" />
+  <Entry name="@wrksz/themes/client/use-theme" use="Direct `useTheme` import" />
+  <Entry name="@wrksz/themes/client/use-theme-value" use="Direct `useThemeValue` import" />
+  <Entry name="@wrksz/themes/client/use-theme-effect" use="Direct `useThemeEffect` import" />
+  <Entry name="@wrksz/themes/client/themed-image" use="Direct `ThemedImage` import" />
+  <Entry name="@wrksz/themes/client/provider" use="Direct `ClientThemeProvider` import" />
+  <Entry name="@wrksz/themes/client/create-themes" use="Direct `createThemes` import" />
+  <Entry name="@wrksz/themes/next/create-themes" use="Typed `createThemes` with `NextThemeProvider` and `ThemeScript`" />
+  <Entry name="@wrksz/themes/next/extended" use="Opt-in Next.js `ThemeProvider` with `systemThemeMap` and same-document sync" />
+  <Entry name="@wrksz/themes/client/extended-provider" use="Opt-in `ClientThemeProvider` with `themeRoot`, `systemThemeMap`, and same-document sync" />
+  <Entry name="@wrksz/themes" use="Client-safe `ThemeProvider` alias and `createThemes` for framework-neutral React usage" />
+</Entries>
 
 <Callout type="info">
   The API is identical to `next-themes`. Migrating requires changing one import line: `@wrksz/themes/next` instead of `next-themes`. See [Why not next-themes?](/docs/why-not-next-themes) for a full comparison.
