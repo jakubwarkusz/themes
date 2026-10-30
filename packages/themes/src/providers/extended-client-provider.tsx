@@ -9,6 +9,7 @@ import {
 	useRef,
 	useSyncExternalStore,
 } from "react";
+import { holdIfEqual, sameStringList, sameStringRecord } from "../core/config-equal.js";
 import { ThemeContext } from "../core/context.js";
 import {
 	type AppliedThemeState,
@@ -98,6 +99,15 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	const store = storeRef.current;
 	const appliedThemeRef = useRef<AppliedThemeState | undefined>(undefined);
 	const lastAppliedRef = useRef<LastAppliedTheme | null>(null);
+	const themesRef = useRef(themes);
+	themesRef.current = holdIfEqual(themesRef.current, themes, sameStringList);
+	const stableThemes = themesRef.current;
+	const valueMapRef = useRef(valueMap);
+	valueMapRef.current = holdIfEqual(valueMapRef.current, valueMap, sameStringRecord);
+	const stableValueMap = valueMapRef.current;
+	const themeColorRef = useRef(themeColor);
+	themeColorRef.current = holdIfEqual(themeColorRef.current, themeColor, sameStringRecord);
+	const stableThemeColor = themeColorRef.current;
 	const {
 		getSnapshot,
 		setState: setStoreState,
@@ -111,7 +121,8 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		store.getServerSnapshot,
 	);
 
-	const validForcedTheme = forcedTheme && themes.includes(forcedTheme) ? forcedTheme : undefined;
+	const validForcedTheme =
+		forcedTheme && stableThemes.includes(forcedTheme) ? forcedTheme : undefined;
 	const selectedTheme = validForcedTheme ?? theme;
 	const resolvedTheme = selectedTheme
 		? (resolveSelection(
@@ -130,12 +141,12 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		const last: LastAppliedTheme = {
 			resolved,
 			attribute,
-			themes,
-			valueMap,
+			themes: stableThemes,
+			valueMap: stableValueMap,
 			target,
 			disableTransitionOnChange,
 			enableColorScheme,
-			themeColor,
+			themeColor: stableThemeColor,
 			themeRoot,
 		};
 		appliedThemeRef.current = applyExtendedThemeToDom({
@@ -213,7 +224,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 
 			const current = getSnapshot().theme as Themes | "system" | undefined;
 			const newTheme = typeof next === "function" ? next(current) : next;
-			if (!isThemeSelection(newTheme, themes, enableSystem)) return;
+			if (!isThemeSelection(newTheme, stableThemes, enableSystem)) return;
 			const resolved = resolveSelection(
 				newTheme,
 				getSnapshot().systemTheme,
@@ -230,7 +241,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		},
 		[
 			validForcedTheme,
-			themes,
+			stableThemes,
 			enableSystem,
 			systemThemeMap,
 			storage,
@@ -285,11 +296,12 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			last &&
 			last.resolved === resolvedTheme &&
 			last.attribute === attribute &&
-			last.themes === themes &&
-			last.valueMap === valueMap &&
+			last.themes === stableThemes &&
+			last.valueMap === stableValueMap &&
 			last.target === target &&
+			last.disableTransitionOnChange === disableTransitionOnChange &&
 			last.enableColorScheme === enableColorScheme &&
-			last.themeColor === themeColor &&
+			last.themeColor === stableThemeColor &&
 			last.themeRoot === themeRoot
 		) {
 			return;
@@ -298,12 +310,12 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	}, [
 		resolvedTheme,
 		attribute,
-		themes,
-		valueMap,
+		stableThemes,
+		stableValueMap,
 		target,
 		disableTransitionOnChange,
 		enableColorScheme,
-		themeColor,
+		stableThemeColor,
 		themeRoot,
 	]);
 
@@ -390,10 +402,10 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			resolvedTheme,
 			systemTheme,
 			forcedTheme: validForcedTheme,
-			themes,
+			themes: stableThemes,
 			setTheme: setTheme as ThemeContextValue<string>["setTheme"],
 		}),
-		[validForcedTheme, theme, resolvedTheme, systemTheme, themes, setTheme],
+		[validForcedTheme, theme, resolvedTheme, systemTheme, stableThemes, setTheme],
 	);
 
 	return <ThemeContext.Provider value={contextValue}>{children}</ThemeContext.Provider>;
