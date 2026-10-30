@@ -9,7 +9,7 @@ import { Changelog } from "./changelog";
 import { CodeBlock } from "./code-block";
 import { Heading } from "./heading";
 import { InstallCommand } from "./install-command";
-import { MigrateWithAI } from "./agent-prompt";
+import { MigrateWithAI, SetupWithAI } from "./agent-prompt";
 import { Beta, Breaking, Bug, Fixed, No, Since, Yes } from "./mdx-badges";
 import { Do, Dont } from "./practice";
 import { BreakingNote, Prop, PropsMore, PropsTable } from "./props-table";
@@ -44,6 +44,7 @@ export function getMDXComponents(components?: MDXComponents) {
 		Configurator: () => <Configurator />,
 		InstallCommand,
 		MigrateWithAI,
+		SetupWithAI,
 		h2: (props) => <Heading as="h2" {...props} />,
 		h3: (props) => <Heading as="h3" {...props} />,
 		h4: (props) => <Heading as="h4" {...props} />,

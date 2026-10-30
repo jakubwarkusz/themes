@@ -54,9 +54,12 @@ export function PageActions({ markdownUrl, pageUrl }: { markdownUrl: string; pag
 
 	return (
 		<div className="flex items-center gap-1">
-			<button type="button" onClick={copy} aria-live="polite" className={ACTION}>
+			<button type="button" onClick={copy} className={ACTION}>
 				<CopyIcons copied={copied} />
-				{copied ? "Copied" : "Copy Markdown"}
+				Copy Markdown
+				<span aria-live="polite" className="sr-only">
+					{copied ? "Copied" : ""}
+				</span>
 			</button>
 			<Popover>
 				<PopoverTrigger className={ACTION}>

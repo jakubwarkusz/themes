@@ -56,9 +56,12 @@ export function AgentPrompt({
 				</p>
 			</div>
 			<div className="flex flex-wrap gap-1.5">
-				<button type="button" onClick={copy} aria-live="polite" className={ACTION}>
+				<button type="button" onClick={copy} className={ACTION}>
 					<CopyIcons copied={copied} />
-					{copied ? "Copied" : "Copy prompt"}
+					Copy prompt
+					<span aria-live="polite" className="sr-only">
+						{copied ? "Copied" : ""}
+					</span>
 				</button>
 				{links(prompt).map((link) => (
 					<a key={link.label} href={link.href} className={ACTION}>
@@ -78,6 +81,17 @@ export function MigrateWithAI() {
 			title="Migrate with an AI agent"
 			description="A ready prompt that points your agent at this guide and the agent checklist. Paste it into Claude Code, Codex or any agent working in your repository."
 			prompt={MIGRATE_PROMPT}
+		/>
+	);
+}
+
+export function SetupWithAI() {
+	return (
+		<AgentPrompt
+			className="my-6"
+			title="Set up themes with an AI agent"
+			description="A ready prompt that points your agent at this guide. Paste it into Claude Code, Codex or any agent working in your repository."
+			prompt={SETUP_PROMPT}
 		/>
 	);
 }
