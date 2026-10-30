@@ -26,7 +26,7 @@ export type CookieOptions = {
 	maxAge?: number;
 	/** SameSite attribute. Defaults to "Lax" */
 	sameSite?: "Strict" | "Lax" | "None";
-	/** Secure flag. Defaults to true on HTTPS */
+	/** Secure flag. Defaults to true on HTTPS. Always set when sameSite is "None". */
 	secure?: boolean;
 	/** Cookie path. Defaults to "/" */
 	path?: string;
