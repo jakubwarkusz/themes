@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
+import { AutoCode } from "./api-code";
 
 function inlineCode(text: string) {
 	return text
 		.split("`")
-		.map((part, index) => (index % 2 ? <code key={index}>{part}</code> : part));
+		.map((part, index) => (index % 2 ? <AutoCode key={index}>{part}</AutoCode> : part));
 }
 
 export function Changes({ children }: { children: ReactNode }) {
@@ -54,9 +55,9 @@ export function Entry({
 }) {
 	return (
 		<div className="flex flex-col gap-1 border-b border-fd-border/60 py-4 leading-relaxed">
-			<code className="not-prose font-mono text-[13px] font-medium break-all text-fd-foreground">
+			<span className="font-mono text-[13px] font-medium break-all text-fd-foreground">
 				{name}
-			</code>
+			</span>
 			{use ? <span className="text-fd-foreground">{inlineCode(use)}</span> : null}
 			{children ? <div className="text-fd-muted-foreground [&_p]:m-0">{children}</div> : null}
 		</div>

@@ -2,7 +2,9 @@ import { findNeighbour } from "fumadocs-core/page-tree";
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/layouts/docs/page";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
+import type { ComponentProps, ComponentType } from "react";
 import { notFound } from "next/navigation";
+import { ApiPagesProvider, AutoCode, LinkScope } from "@/components/api-code";
 import { getMDXComponents } from "@/components/mdx";
 import { OlderReleasesProvider } from "@/components/older-releases";
 import { PageActions } from "@/components/page-actions";
@@ -11,6 +13,16 @@ import { Toc, TocPopover, TocProvider } from "@/components/toc";
 import { getReleases, isLegacy, type Release } from "@/lib/changelog";
 import { gitConfig } from "@/lib/layout.shared";
 import { getPageImage, source } from "@/lib/source";
+
+function scopedLink(Link: ComponentType<ComponentProps<"a">>) {
+	return function ScopedLink(props: ComponentProps<"a">) {
+		return (
+			<LinkScope>
+				<Link {...props} />
+			</LinkScope>
+		);
+	};
+}
 
 const toTocItem = (release: Release) => ({
 	title: release.version,
@@ -24,6 +36,15 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 	if (!page) notFound();
 
 	const MDX = page.data.body;
+	const apiPages = Object.fromEntries(
+		source
+			.getPages()
+			.filter((api) => api.url.startsWith("/docs/api/") && api.url !== page.url)
+			.map((api) => [
+				api.data.title,
+				{ url: api.url, title: api.data.title, description: api.data.description },
+			]),
+	);
 	const neighbours = findNeighbour(source.getPageTree(), page.url);
 	const releases = page.path === "changelog.mdx" ? await getReleases() : undefined;
 	const legacyToc = releases?.filter(isLegacy).map(toTocItem) ?? [];
@@ -57,11 +78,14 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 				)}
 			</div>
 			<DocsBody>
-				<MDX
-					components={getMDXComponents({
-						a: createRelativeLink(source, page),
-					})}
-				/>
+				<ApiPagesProvider pages={apiPages}>
+					<MDX
+						components={getMDXComponents({
+							a: scopedLink(createRelativeLink(source, page)),
+							code: AutoCode,
+						})}
+					/>
+				</ApiPagesProvider>
 			</DocsBody>
 			<PageFooter
 				page={page.url}

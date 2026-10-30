@@ -2,22 +2,12 @@
 
 import { ArrowRight01Icon, Link04Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Popover, PopoverContent, PopoverTrigger } from "fumadocs-ui/components/ui/popover";
-import {
-	Children,
-	Fragment,
-	isValidElement,
-	type PointerEvent,
-	type ReactNode,
-	useRef,
-	useState,
-} from "react";
+import { Children, Fragment, isValidElement, type ReactNode } from "react";
 import { CopyIcons, useCopied } from "./copy-button";
+import { HoverPreview } from "./hover-preview";
 import { Beta, Breaking, Since } from "./mdx-badges";
 
 const STACK_AFTER = 32;
-const OPEN_DELAY = 300;
-const CLOSE_DELAY = 150;
 
 type TypePreviewData = {
 	title: string;
@@ -49,87 +39,48 @@ function readTypePreview(href: string): TypePreviewData | null {
 	return { title: heading.textContent ?? "", description, fields };
 }
 
-function TypeLink({ href, type }: { href: string; type: string }) {
-	const [preview, setPreview] = useState<TypePreviewData | null>(null);
-	const [open, setOpen] = useState(false);
-	const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-	function schedule(next: boolean) {
-		clearTimeout(timer.current);
-		timer.current = setTimeout(
-			() => {
-				if (next) {
-					const data = readTypePreview(href);
-					if (!data) return;
-					setPreview(data);
-				}
-				setOpen(next);
-			},
-			next ? OPEN_DELAY : CLOSE_DELAY,
-		);
-	}
-
-	const hover = {
-		onPointerEnter: (event: PointerEvent) => {
-			if (event.pointerType === "mouse") schedule(true);
-		},
-		onPointerLeave: (event: PointerEvent) => {
-			if (event.pointerType === "mouse") schedule(false);
-		},
-	};
+function TypePreviewCard({ href }: { href: string }) {
+	const preview = readTypePreview(href);
+	if (!preview) return null;
 
 	return (
-		<Popover
-			open={open}
-			onOpenChange={(next) => {
-				if (!next) setOpen(false);
-			}}
+		<>
+			<div className="flex flex-col gap-1">
+				<span className="font-mono text-[13px] font-medium text-fd-foreground">
+					{preview.title}
+				</span>
+				{preview.description ? (
+					<p className="line-clamp-2 text-xs leading-relaxed text-fd-muted-foreground">
+						{preview.description}
+					</p>
+				) : null}
+			</div>
+			<dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 border-t border-fd-border/60 pt-3 font-mono text-xs">
+				{preview.fields.map((field) => (
+					<Fragment key={field.name}>
+						<dt className="text-fd-foreground">{field.name}</dt>
+						<dd className="wrap-break-word text-[#693ACF] dark:text-[#9D6AFB]">
+							{field.type}
+						</dd>
+					</Fragment>
+				))}
+			</dl>
+		</>
+	);
+}
+
+function TypeLink({ href, type }: { href: string; type: string }) {
+	return (
+		<HoverPreview
+			href={href}
+			canOpen={() => readTypePreview(href) !== null}
+			content={<TypePreviewCard href={href} />}
+			className="min-w-0 wrap-break-word text-[#693ACF] underline decoration-current/30 decoration-dotted underline-offset-4 outline-none transition-[text-decoration-color] duration-150 hover:decoration-current focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-fd-ring dark:text-[#9D6AFB]"
 		>
-			<PopoverTrigger asChild>
-				<a
-					href={href}
-					{...hover}
-					onFocus={() => schedule(true)}
-					onBlur={() => schedule(false)}
-					className="min-w-0 wrap-break-word text-[#693ACF] underline decoration-current/30 decoration-dotted underline-offset-4 outline-none transition-[text-decoration-color] duration-150 hover:decoration-current focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-fd-ring dark:text-[#9D6AFB]"
-				>
-					<code>
-						<TypeText type={type} />
-					</code>
-				</a>
-			</PopoverTrigger>
-			{preview ? (
-				<PopoverContent
-					align="start"
-					sideOffset={6}
-					onOpenAutoFocus={(event: Event) => event.preventDefault()}
-					onCloseAutoFocus={(event: Event) => event.preventDefault()}
-					{...hover}
-					className="flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-3 rounded-xl border-0 bg-fd-popover p-3 shadow-[0_10px_24px_rgb(0_0_0/0.09),0_2px_8px_rgb(0_0_0/0.06),0_0_0_1px_var(--color-fd-border)] backdrop-blur-none"
-				>
-					<div className="flex flex-col gap-1">
-						<span className="font-mono text-[13px] font-medium text-fd-foreground">
-							{preview.title}
-						</span>
-						{preview.description ? (
-							<p className="line-clamp-2 text-xs leading-relaxed text-fd-muted-foreground">
-								{preview.description}
-							</p>
-						) : null}
-					</div>
-					<dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 border-t border-fd-border/60 pt-3 font-mono text-xs">
-						{preview.fields.map((field) => (
-							<Fragment key={field.name}>
-								<dt className="text-fd-foreground">{field.name}</dt>
-								<dd className="wrap-break-word text-[#693ACF] dark:text-[#9D6AFB]">
-									{field.type}
-								</dd>
-							</Fragment>
-						))}
-					</dl>
-				</PopoverContent>
-			) : null}
-		</Popover>
+			<code>
+				<TypeText type={type} />
+			</code>
+		</HoverPreview>
 	);
 }
 
