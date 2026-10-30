@@ -2,7 +2,8 @@
 
 import { useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/cn";
-import { CopyButton } from "./copy-button";
+import { CopyIcons, useCopied } from "./copy-button";
+import { PM_LOGOS } from "./pm-logos";
 
 export const PKG_MANAGERS = [
 	{ label: "bun", command: "bun add @wrksz/themes" },
@@ -60,17 +61,13 @@ export function InstallCommand({ className }: { className?: string }) {
 	const [picked, setPicked] = useState(false);
 	const command = PKG_MANAGERS.find((mgr) => mgr.label === pm)?.command ?? "";
 	const active = PKG_MANAGERS.findIndex((mgr) => mgr.label === pm);
+	const [copied, copy] = useCopied(() => navigator.clipboard.writeText(command));
 
 	return (
-		<div
-			className={cn(
-				"not-prose flex flex-col gap-1 rounded-xl bg-fd-card p-1.5 sm:flex-row sm:items-center",
-				className,
-			)}
-		>
+		<figure className={cn("not-prose my-6 rounded-xl bg-fd-card p-1.5", className)}>
 			<fieldset
 				aria-label="Package manager"
-				className="relative grid h-8 min-w-0 shrink-0 grid-cols-4 sm:w-48"
+				className="relative grid h-8 w-full grid-cols-4 sm:w-80"
 			>
 				<span
 					aria-hidden
@@ -80,35 +77,64 @@ export function InstallCommand({ className }: { className?: string }) {
 					)}
 					style={{ transform: `translateX(${active * 100}%)` }}
 				/>
-				{PKG_MANAGERS.map((mgr) => (
-					<button
-						key={mgr.label}
-						type="button"
-						aria-pressed={pm === mgr.label}
-						onClick={() => {
-							setPicked(true);
-							writePm(mgr.label);
-						}}
-						className={cn(
-							"relative rounded-md text-xs font-medium outline-none transition-[color,scale] duration-150 focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.96]",
-							pm === mgr.label
-								? "text-fd-foreground"
-								: "text-fd-muted-foreground hover:text-fd-foreground",
-						)}
-					>
-						{mgr.label}
-					</button>
-				))}
+				{PKG_MANAGERS.map((mgr) => {
+					const Logo = PM_LOGOS[mgr.label];
+					const selected = pm === mgr.label;
+					return (
+						<button
+							key={mgr.label}
+							type="button"
+							aria-pressed={selected}
+							onClick={() => {
+								setPicked(true);
+								writePm(mgr.label);
+							}}
+							className={cn(
+								"group relative flex items-center justify-center gap-1.5 rounded-md text-xs font-medium outline-none transition-[color,scale] duration-150 focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.96]",
+								selected
+									? "text-fd-foreground"
+									: "text-fd-muted-foreground hover:text-fd-foreground",
+							)}
+						>
+							<Logo
+								className={cn(
+									"size-3.5 shrink-0 transition-[opacity,filter] duration-150",
+									!selected &&
+										"opacity-60 grayscale group-hover:opacity-100 group-hover:grayscale-0",
+								)}
+							/>
+							{mgr.label}
+						</button>
+					);
+				})}
 			</fieldset>
-			<div className="flex h-8 min-w-0 flex-1 items-center gap-2 pl-2.5 sm:pl-3">
-				<span className="select-none font-mono text-[13px] text-fd-muted-foreground">
-					$
-				</span>
-				<code className="flex-1 truncate text-left font-mono text-[13px] text-fd-foreground">
-					{command}
+			<div className="relative mt-1.5 flex h-10 items-center gap-1.5 ps-3 pe-1 font-mono text-[13px]">
+				<button
+					type="button"
+					tabIndex={-1}
+					aria-hidden
+					onClick={copy}
+					className="absolute inset-0 rounded-md outline-none"
+				/>
+				<span className="select-none text-fd-muted-foreground">$</span>
+				<code className="min-w-0 flex-1 truncate">
+					<span className="text-[#693ACF] dark:text-[#9D6AFB]">{pm}</span>
+					<span className="text-[#199F43] dark:text-[#5ECC71]">
+						{command.slice(pm.length)}
+					</span>
 				</code>
-				<CopyButton getValue={() => command} label="Copy command" />
+				<button
+					type="button"
+					onClick={copy}
+					aria-label={copied ? "Copied" : "Copy command"}
+					className="relative z-10 flex size-8 shrink-0 items-center justify-center rounded-md text-fd-muted-foreground outline-none transition-[color,background-color] duration-150 ease-out hover:bg-fd-accent hover:text-fd-foreground focus-visible:ring-2 focus-visible:ring-fd-ring"
+				>
+					<CopyIcons
+						copied={copied}
+						className="transition-[scale] duration-150 ease-out [button:active>&]:scale-[0.96]"
+					/>
+				</button>
 			</div>
-		</div>
+		</figure>
 	);
 }
