@@ -9,7 +9,7 @@ import { remarkLLMsComponents } from "./src/lib/remark-llms-components";
 export const docs = defineDocs({
 	dir: "content/docs",
 	docs: {
-		schema: pageSchema,
+		schema: pageSchema.extend({ actions: pageSchema.shape.full }),
 		postprocess: {
 			includeProcessedMarkdown: true,
 		},
