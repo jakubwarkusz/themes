@@ -3,7 +3,7 @@
 import { ArrowDown01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Popover, PopoverContent, PopoverTrigger } from "fumadocs-ui/components/ui/popover";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CopyIcons, useCopied } from "@/components/copy-button";
 import { PKG_MANAGERS, usePackageManager, writePm } from "@/components/install-command";
 import { PM_LOGOS } from "@/components/pm-logos";
@@ -12,12 +12,18 @@ import { cn } from "@/lib/cn";
 export function HeroInstall() {
 	const pm = usePackageManager();
 	const [open, setOpen] = useState(false);
+	const [offset, setOffset] = useState({ side: 6, align: 0 });
+	const box = useRef<HTMLDivElement>(null);
+	const trigger = useRef<HTMLButtonElement>(null);
 	const command = PKG_MANAGERS.find((mgr) => mgr.label === pm)?.command ?? "";
 	const rest = command.slice(pm.length);
 	const [copied, copy] = useCopied(() => navigator.clipboard.writeText(command));
 
 	return (
-		<div className="relative flex h-8 w-70 max-w-full items-center gap-1.5 rounded-md bg-fd-card ps-3 pe-0.5 font-mono text-[13px]">
+		<div
+			ref={box}
+			className="relative flex h-8 w-70 max-w-full items-center gap-1.5 rounded-md bg-fd-card ps-3 pe-0.5 font-mono text-[13px]"
+		>
 			<button
 				type="button"
 				tabIndex={-1}
@@ -26,8 +32,22 @@ export function HeroInstall() {
 				className="absolute inset-0 rounded-md outline-none"
 			/>
 			<span className="select-none text-fd-muted-foreground">$</span>
-			<Popover open={open} onOpenChange={setOpen}>
+			<Popover
+				open={open}
+				onOpenChange={(next) => {
+					const outer = box.current?.getBoundingClientRect();
+					const inner = trigger.current?.getBoundingClientRect();
+					if (next && outer && inner) {
+						setOffset({
+							side: outer.bottom - inner.bottom + 4,
+							align: outer.left - inner.left,
+						});
+					}
+					setOpen(next);
+				}}
+			>
 				<PopoverTrigger
+					ref={trigger}
 					aria-label={`Package manager: ${pm}`}
 					className="group relative z-10 flex items-center gap-0.5 rounded-sm text-[#693ACF] outline-none focus-visible:ring-2 focus-visible:ring-fd-ring dark:text-[#9D6AFB]"
 				>
@@ -42,7 +62,8 @@ export function HeroInstall() {
 				</PopoverTrigger>
 				<PopoverContent
 					align="start"
-					sideOffset={6}
+					sideOffset={offset.side}
+					alignOffset={offset.align}
 					className="flex min-w-36 flex-col rounded-xl border-0 bg-fd-popover p-1 font-mono text-[13px] shadow-[0_10px_24px_rgb(0_0_0/0.09),0_2px_8px_rgb(0_0_0/0.06),0_0_0_1px_var(--color-fd-border)] backdrop-blur-none"
 				>
 					{PKG_MANAGERS.map((mgr) => {
