@@ -5,6 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { createContext, type ReactNode, use, useId, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { CopyButton } from "./copy-button";
+import { scrollFade } from "./scroll-fade";
 
 const COLLAPSE_AFTER = 16;
 
@@ -39,9 +40,12 @@ export function CodeBlock({
 			) : null}
 			<div
 				id={id}
-				ref={viewport}
+				ref={(element) => {
+					viewport.current = element;
+					return scrollFade(element);
+				}}
 				className={cn(
-					"overflow-x-auto outline-none",
+					"scroll-fade overflow-x-auto outline-none",
 					collapsed && "max-h-[calc(16*1.625*0.875rem+0.875rem)] overflow-y-hidden",
 				)}
 			>
@@ -76,7 +80,7 @@ export function CodeBlock({
 					copyValue ?? viewport.current?.querySelector("pre")?.textContent ?? ""
 				}
 				label="Copy code"
-				className="absolute top-2 right-2"
+				className="absolute top-2 right-2 bg-fd-card"
 			/>
 		</figure>
 	);
