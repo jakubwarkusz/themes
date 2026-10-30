@@ -14,6 +14,13 @@ export const PKG_MANAGERS = [
 
 export type PkgManager = (typeof PKG_MANAGERS)[number]["label"];
 
+const DLX: Record<PkgManager, string> = {
+	bun: "bunx --bun",
+	npm: "npx",
+	pnpm: "pnpm dlx",
+	yarn: "yarn dlx",
+};
+
 const STORAGE_KEY = "wrksz-themes:package-manager";
 const DEFAULT_PM: PkgManager = "pnpm";
 const listeners = new Set<() => void>();
@@ -56,10 +63,13 @@ export function usePackageManager() {
 	return useSyncExternalStore(subscribe, readPm, () => DEFAULT_PM);
 }
 
-export function InstallCommand({ className }: { className?: string }) {
+export function InstallCommand({ registry, className }: { registry?: string; className?: string }) {
 	const pm = usePackageManager();
 	const [picked, setPicked] = useState(false);
-	const command = PKG_MANAGERS.find((mgr) => mgr.label === pm)?.command ?? "";
+	const command = registry
+		? `${DLX[pm]} shadcn@latest add ${registry}`
+		: (PKG_MANAGERS.find((mgr) => mgr.label === pm)?.command ?? "");
+	const runner = registry ? DLX[pm] : pm;
 	const active = PKG_MANAGERS.findIndex((mgr) => mgr.label === pm);
 	const [copied, copy] = useCopied(() => navigator.clipboard.writeText(command));
 
@@ -118,9 +128,9 @@ export function InstallCommand({ className }: { className?: string }) {
 				/>
 				<span className="select-none text-fd-muted-foreground">$</span>
 				<code className="min-w-0 flex-1 truncate">
-					<span className="text-[#693ACF] dark:text-[#9D6AFB]">{pm}</span>
+					<span className="text-[#693ACF] dark:text-[#9D6AFB]">{runner}</span>
 					<span className="text-[#199F43] dark:text-[#5ECC71]">
-						{command.slice(pm.length)}
+						{command.slice(runner.length)}
 					</span>
 				</code>
 				<button

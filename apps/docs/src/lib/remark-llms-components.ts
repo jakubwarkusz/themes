@@ -14,7 +14,14 @@ type JsxNode = {
 	children: unknown[];
 };
 
-const UI_ONLY = new Set(["Changelog", "Configurator", "MigrateWithAI", "SetupWithAI"]);
+const UI_ONLY = new Set([
+	"Changelog",
+	"Configurator",
+	"MigrateWithAI",
+	"SetupWithAI",
+	"TogglePreview",
+	"ToggleWithAI",
+]);
 
 function isJsx(node: unknown): node is JsxNode {
 	const type = (node as { type?: string }).type;
@@ -137,8 +144,12 @@ function replacement(node: JsxNode): Parameters<typeof replaceSource>[2] | undef
 						].join("\n");
 					})
 					.join("\n\n");
-		case "InstallCommand":
-			return "```bash\nnpm install @wrksz/themes\n```";
+		case "InstallCommand": {
+			const registry = attr(node, "registry");
+			return typeof registry === "string"
+				? `\`\`\`bash\nnpx shadcn@latest add ${registry}\n\`\`\``
+				: "```bash\nnpm install @wrksz/themes\n```";
+		}
 		case "Callout":
 			return (s) => {
 				const type = attr(node, "type");

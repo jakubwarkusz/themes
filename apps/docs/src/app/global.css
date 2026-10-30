@@ -23,6 +23,13 @@ html {
 	--font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 	--font-mono:
 		var(--font-ioskeley-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	--color-background: var(--color-fd-background);
+	--color-foreground: var(--color-fd-foreground);
+	--color-muted-foreground: var(--color-fd-muted-foreground);
+	--color-accent: var(--color-fd-accent);
+	--color-border: var(--color-fd-border);
+	--color-input: var(--color-fd-border);
+	--color-ring: var(--color-fd-ring);
 }
 
 body {

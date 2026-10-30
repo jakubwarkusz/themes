@@ -1,0 +1,62 @@
+---
+title: Theme toggles
+description: Ready-made theme switchers built on useTheme. Install them with the shadcn CLI or copy the code.
+---
+
+Each toggle is a single client component that reads and updates the theme with `useTheme` from `@wrksz/themes/client`. They use shadcn/ui color tokens (`bg-accent`, `text-muted-foreground`, `border-input`), so they drop into a shadcn project as-is. Without shadcn, copy the file and map those tokens to your own colors.
+
+The previews on this page control this site's theme.
+
+<ToggleWithAI />
+
+## Icons
+
+All toggles import their icons from one file, `theme-icons.tsx`. The shadcn CLI installs it with the first toggle you add. It uses [Hugeicons](https://hugeicons.com) by default; to use another icon library, change the four exports in this file and the toggles follow. In a shadcn project, `npx shadcn@latest migrate icons components/theme-icons.tsx` does it for you and asks which library to switch to.
+
+<include meta='title="components/theme-icons.tsx"'>../../src/registry/theme-icons.tsx</include>
+
+## Theme toggle
+
+An icon button that switches between light and dark. The icons swap with Tailwind's `dark:` variant instead of React state, so the right icon shows before hydration.
+
+<TogglePreview name="theme-toggle" />
+
+<InstallCommand registry="https://themes.wrksz.dev/r/theme-toggle.json" />
+
+<include meta='title="components/theme-toggle.tsx"'>../../src/registry/theme-toggle.tsx</include>
+
+## Theme switcher
+
+A segmented control for light, system and dark. The indicator stays hidden until the stored theme is known, so it never slides in from the wrong option.
+
+<TogglePreview name="theme-switcher" />
+
+<InstallCommand registry="https://themes.wrksz.dev/r/theme-switcher.json" />
+
+<include meta='title="components/theme-switcher.tsx"'>../../src/registry/theme-switcher.tsx</include>
+
+## Theme select
+
+A native `<select>`, so keyboard and screen reader support come from the browser. It stays disabled until the theme is known.
+
+<TogglePreview name="theme-select" />
+
+<InstallCommand registry="https://themes.wrksz.dev/r/theme-select.json" />
+
+<include meta='title="components/theme-select.tsx"'>../../src/registry/theme-select.tsx</include>
+
+## Theme cycle
+
+A button that cycles light, dark and system and shows the current choice as text.
+
+<TogglePreview name="theme-cycle" />
+
+<InstallCommand registry="https://themes.wrksz.dev/r/theme-cycle.json" />
+
+<include meta='title="components/theme-cycle.tsx"'>../../src/registry/theme-cycle.tsx</include>
+
+## Requirements
+
+- A `ThemeProvider` above the toggle.
+- `enableSystem` for the system option in the switcher, select and cycle. It is on by default.
+- For the theme toggle, `attribute="class"` with Tailwind's `dark:` variant on the `.dark` class, the shadcn default.

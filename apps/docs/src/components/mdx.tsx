@@ -11,7 +11,7 @@ import { Check, Choice, Choices } from "./choices";
 import { CodeBlock } from "./code-block";
 import { Heading } from "./heading";
 import { InstallCommand } from "./install-command";
-import { MigrateWithAI, SetupWithAI } from "./agent-prompt";
+import { MigrateWithAI, SetupWithAI, ToggleWithAI } from "./agent-prompt";
 import { Beta, Breaking, Bug, Fixed, No, Since, Yes } from "./mdx-badges";
 import { Do, Dont } from "./practice";
 import { BreakingNote, Prop, PropsMore, PropsTable } from "./props-table";
@@ -25,6 +25,7 @@ import {
 	TailwindDemo,
 } from "./example-demos";
 import { ThemeDemo } from "./theme-demo";
+import { TogglePreview } from "./toggle-preview";
 
 const Configurator = dynamic(() => import("./configurator").then((mod) => mod.Configurator));
 
@@ -58,12 +59,14 @@ export function getMDXComponents(components?: MDXComponents) {
 		InstallCommand,
 		MigrateWithAI,
 		SetupWithAI,
+		ToggleWithAI,
 		h2: (props) => <Heading as="h2" {...props} />,
 		h3: (props) => <Heading as="h3" {...props} />,
 		h4: (props) => <Heading as="h4" {...props} />,
 		h5: (props) => <Heading as="h5" {...props} />,
 		h6: (props) => <Heading as="h6" {...props} />,
 		ThemeDemo,
+		TogglePreview,
 		ScopedDemo,
 		ForcedDemo,
 		TailwindDemo,

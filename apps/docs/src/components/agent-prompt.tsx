@@ -18,6 +18,14 @@ Detect the framework first. In a Next.js App Router project, render ThemeProvide
 Match the existing styling: point Tailwind's dark variant or the CSS variables at the provider's attribute, and add a theme switcher that fits the current UI.
 If the project already uses next-themes, migrate it instead of adding a second provider. Type-check and build the app and report what you changed.`;
 
+const TOGGLE_PROMPT = `Add a theme toggle to this project using the @wrksz/themes theme toggles.
+
+Read https://themes.wrksz.dev/llms.mdx/docs/theme-toggles and pick the variant that fits the existing UI: an icon button for compact headers, the segmented switcher or select when users need a system option.
+Make sure a ThemeProvider from @wrksz/themes is already set up; if not, follow https://themes.wrksz.dev/llms.mdx/docs/agents first.
+If the project uses the shadcn CLI, install the toggle from its registry URL. Otherwise copy the component and theme-icons.tsx into the components folder.
+Replace the icons in theme-icons.tsx with the icon library this project already uses, and remove the Hugeicons dependency if nothing else needs it. If the project does not use shadcn color tokens, map bg-accent, text-muted-foreground, border-input and the other tokens to its own colors.
+Place the toggle where the existing navigation puts its controls, then type-check and build the app and report what you changed.`;
+
 const ACTION =
 	"inline-flex h-8 cursor-default items-center gap-2 rounded-md bg-fd-background px-3 text-sm font-medium text-fd-foreground outline-none transition-[background-color,scale] duration-150 ease-out hover:bg-fd-secondary focus-visible:ring-2 focus-visible:ring-fd-ring active:scale-[0.97] dark:bg-fd-secondary/40 dark:hover:bg-fd-secondary";
 
@@ -92,6 +100,17 @@ export function SetupWithAI() {
 			title="Set up themes with an AI agent"
 			description="A ready prompt that points your agent at this guide. Paste it into Claude Code, Codex or any agent working in your repository."
 			prompt={SETUP_PROMPT}
+		/>
+	);
+}
+
+export function ToggleWithAI() {
+	return (
+		<AgentPrompt
+			className="my-6"
+			title="Add a toggle with an AI agent"
+			description="A ready prompt that picks a toggle for your UI, swaps the icons for your icon library and matches your colors. Paste it into Claude Code, Codex or any agent working in your repository."
+			prompt={TOGGLE_PROMPT}
 		/>
 	);
 }
