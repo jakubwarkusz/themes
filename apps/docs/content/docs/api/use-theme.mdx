@@ -26,14 +26,26 @@ export function ThemeToggle() {
 
 ## Return value
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `theme` | `string \| undefined` | Current theme - may be `"system"` |
-| `resolvedTheme` | `string \| undefined` | Actual applied theme - never `"system"`. `undefined` before hydration |
-| `systemTheme` | `"light" \| "dark" \| undefined` | Current system preference |
-| `forcedTheme` | `string \| undefined` | Forced theme if set via `forcedTheme` prop |
-| `themes` | `string[]` | Available themes |
-| `setTheme` | `(theme: string \| "system" \| ((current: string \| "system" \| undefined) => string \| "system")) => void` | Update the current theme, or pass a function to compute it from the current value |
+<PropsTable>
+  <Prop name="theme" type="string | undefined">
+    Current theme - may be `"system"`
+  </Prop>
+  <Prop name="resolvedTheme" type="string | undefined">
+    Actual applied theme - never `"system"`. `undefined` before hydration
+  </Prop>
+  <Prop name="systemTheme" type='"light" | "dark" | undefined'>
+    Current system preference
+  </Prop>
+  <Prop name="forcedTheme" type="string | undefined">
+    Forced theme if set via `forcedTheme` prop
+  </Prop>
+  <Prop name="themes" type="string[]">
+    Available themes
+  </Prop>
+  <Prop name="setTheme" type='(theme: string | "system" | ((current: string | "system" | undefined) => string | "system")) => void'>
+    Update the current theme, or pass a function to compute it from the current value
+  </Prop>
+</PropsTable>
 
 ## Generic types
 

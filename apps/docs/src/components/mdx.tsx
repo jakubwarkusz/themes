@@ -12,6 +12,7 @@ import { InstallCommand } from "./install-command";
 import { MigrateWithAI } from "./agent-prompt";
 import { Beta, Breaking, Bug, Fixed, No, Since, Yes } from "./mdx-badges";
 import { Do, Dont } from "./practice";
+import { BreakingNote, Prop, PropsMore, PropsTable } from "./props-table";
 import { ScrollFade } from "./scroll-fade";
 import {
 	DataAttributeDemo,
@@ -79,6 +80,10 @@ export function getMDXComponents(components?: MDXComponents) {
 				<table {...props} />
 			</ScrollFade>
 		),
+		BreakingNote,
+		Prop,
+		PropsMore,
+		PropsTable,
 		Tab,
 		Tabs,
 		Since,

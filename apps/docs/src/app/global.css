@@ -192,6 +192,16 @@ kbd {
 	}
 }
 
+@keyframes prop-target {
+	0%,
+	40% {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
 #toc-title {
 	display: none;
 }

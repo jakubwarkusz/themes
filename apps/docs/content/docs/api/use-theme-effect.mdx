@@ -26,9 +26,13 @@ export function ThemeAnalytics() {
 
 ## Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `effect` | `(theme, resolvedTheme) => void \| (() => void)` | Callback run after mount on theme changes |
-| `deps` | `DependencyList` | Optional dependency list, same semantics as `useEffect` |
+<PropsTable>
+  <Prop name="effect" type="(theme, resolvedTheme) => void | (() => void)">
+    Callback run after mount on theme changes
+  </Prop>
+  <Prop name="deps" type="DependencyList">
+    Optional dependency list, same semantics as `useEffect`
+  </Prop>
+</PropsTable>
 
 `theme` may be `"system"`, while `resolvedTheme` is the concrete applied value.

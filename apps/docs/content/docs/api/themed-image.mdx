@@ -18,12 +18,24 @@ import { ThemedImage } from "@wrksz/themes/client";
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `src` | `Record<string, string>` | **required** | Map of theme name to image source |
-| `alt` | `string` | **required** | Alt text |
-| `fallback` | `string` | transparent 1x1 GIF | Shown before the theme resolves |
-| `...rest` | `ImgHTMLAttributes` | - | All other `<img>` attributes |
+<PropsTable>
+  <Prop name="src" type="Record<string, string>" required>
+    Map of theme name to image source
+  </Prop>
+  <Prop name="alt" type="string" required>
+    Alt text
+  </Prop>
+  <Prop name="fallback" type="string">
+    Shown before the theme resolves. Defaults to a transparent 1x1 GIF.
+  </Prop>
+  <Prop
+    name="...rest"
+    type="ImgHTMLAttributes"
+    typeHref="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/img#attributes"
+  >
+    All other `<img>` attributes
+  </Prop>
+</PropsTable>
 
 ## Examples
 

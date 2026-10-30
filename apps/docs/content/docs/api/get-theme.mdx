@@ -106,8 +106,14 @@ prefetchable.
 
 ## Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `storageKey` | `string` | `"theme"` | Cookie name to read from |
-| `defaultTheme` | `string` | `"system"` | Returned when no valid theme is found. When `themes` is a readonly tuple, this must be one of those themes or `"system"` |
-| `themes` | `readonly string[]` | - | When provided, stored values not in the list are ignored and `defaultTheme` is returned. Use `as const` for return type inference |
+<PropsTable>
+  <Prop name="storageKey" type="string" default='"theme"'>
+    Cookie name to read from
+  </Prop>
+  <Prop name="defaultTheme" type="string" default='"system"'>
+    Returned when no valid theme is found. When `themes` is a readonly tuple, this must be one of those themes or `"system"`
+  </Prop>
+  <Prop name="themes" type="readonly string[]">
+    When provided, stored values not in the list are ignored and `defaultTheme` is returned. Use `as const` for return type inference
+  </Prop>
+</PropsTable>
