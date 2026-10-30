@@ -27,5 +27,5 @@ export async function getLLMText(page: InferPageType<typeof source>) {
 
 	return `# ${page.data.title}
 
-${processed}`;
+${processed.replace(/\n{3,}/g, "\n\n")}`;
 }
