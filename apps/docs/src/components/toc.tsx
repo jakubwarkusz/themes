@@ -41,11 +41,10 @@ const DASH_WIDTH = [16, 11, 7] as const;
 const CURRENT_WIDTH = 32;
 const WAKE = ["pointermove", "wheel", "touchstart", "keydown"] as const;
 
-const fadeWithList =
-	"opacity-0 transition-opacity duration-100 group-hover:opacity-100 group-hover:delay-[60ms] group-hover:duration-200 group-focus-within:opacity-100 group-focus-within:delay-[60ms] group-focus-within:duration-200";
+const OPENING = 250;
 
 const titleSwap =
-	"transition-[opacity,filter,color] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:[transition-property:opacity,filter] group-focus-within:[transition-property:opacity,filter] motion-reduce:transition-[opacity,color]";
+	"transition-[opacity,filter,color,translate] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:[transition-property:opacity,filter,translate] group-focus-within:[transition-property:opacity,filter,translate] motion-reduce:transition-[opacity,color]";
 
 const titleHidden =
 	"opacity-0 blur-[4px] group-hover:opacity-100 group-hover:blur-none group-hover:delay-[60ms] group-hover:duration-200 group-focus-within:opacity-100 group-focus-within:blur-none group-focus-within:delay-[60ms] group-focus-within:duration-200";
@@ -62,43 +61,15 @@ function stripLinks(node: ReactNode): ReactNode {
 	});
 }
 
-function TocGuides({
-	depths,
-	index,
-	current,
-	endGap,
-}: {
-	depths: number[];
-	index: number;
-	current: boolean;
-	endGap: string;
-}) {
-	const depth = depths[index];
-	const next = depths[index + 1] ?? 0;
-
-	return Array.from({ length: depth }, (_, level) => (
-		<span
-			// oxlint-disable-next-line react/no-array-index-key
-			key={level}
-			aria-hidden
-			className={cn(
-				"w-3 shrink-0 border-l",
-				current && level === depth - 1
-					? "border-fd-muted-foreground"
-					: "border-fd-border/60",
-			)}
-			style={{ marginBottom: next > level ? "0.1875rem" : endGap } as CSSProperties}
-		/>
-	));
-}
-
 function TocRail({ headings }: { headings: Heading[] }) {
-	const active = useActiveIndex(headings, RAIL_OFFSET);
-	const section = useSectionProgress(headings, RAIL_OFFSET, active);
+	const { active, pinned } = useActiveIndex(headings, RAIL_OFFSET);
+	const section = useSectionProgress(headings, RAIL_OFFSET, active, pinned);
 	const list = useRef<HTMLOListElement>(null);
 	const [tops, setTops] = useState<number[] | null>(null);
 	const [live, setLive] = useState(false);
 	const [settling, setSettling] = useState(true);
+	const [opening, setOpening] = useState(false);
+	const openTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 	const still = !live || settling;
 
 	useEffect(() => {
@@ -139,7 +110,16 @@ function TocRail({ headings }: { headings: Heading[] }) {
 	return (
 		<nav
 			aria-label="On this page"
-			className={cn("group relative w-52", still && "**:transition-none")}
+			onPointerEnter={() => {
+				setOpening(true);
+				clearTimeout(openTimer.current);
+				openTimer.current = setTimeout(() => setOpening(false), OPENING);
+			}}
+			className={cn(
+				"group pointer-events-none relative w-52",
+				still && "**:transition-none",
+				opening && "[&_a]:pointer-events-none",
+			)}
 		>
 			<ol ref={list} className={cn("pointer-events-none", !tops && "invisible")}>
 				{headings.map((heading, index) => {
@@ -150,10 +130,14 @@ function TocRail({ headings }: { headings: Heading[] }) {
 					return (
 						<li
 							key={heading.id}
-							className="pointer-events-auto grid grid-cols-[2rem_1fr] gap-x-2.5 translate-y-(--rest-y) transition-[translate] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-y-0 group-hover:duration-250 group-focus-within:translate-y-0 group-focus-within:duration-250 motion-reduce:transition-none"
+							className="grid grid-cols-[2rem_1fr] gap-x-2.5 group-focus-within:pointer-events-auto group-hover:pointer-events-auto translate-y-(--rest-y) transition-[translate] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-y-0 group-hover:duration-250 group-focus-within:translate-y-0 group-focus-within:duration-250 motion-reduce:transition-none"
 							style={{ "--rest-y": `${restY}px` } as CSSProperties}
 						>
-							<span aria-hidden className="flex items-center" style={{ height: ROW }}>
+							<span
+								aria-hidden
+								className="pointer-events-auto flex items-center"
+								style={{ height: ROW }}
+							>
 								<span
 									className={cn(
 										"relative h-0.5 overflow-hidden rounded-full transition-[width] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
@@ -175,16 +159,9 @@ function TocRail({ headings }: { headings: Heading[] }) {
 							</span>
 
 							<div className="-mt-0.75 flex">
-								<span aria-hidden className={cn("flex", fadeWithList)}>
-									<TocGuides
-										depths={depths}
-										index={index}
-										current={current}
-										endGap="0.75rem"
-									/>
-								</span>
 								<a
 									href={`#${heading.id}`}
+									style={{ "--indent": `${depth * 12}px` } as CSSProperties}
 									aria-current={current ? "location" : undefined}
 									onClick={(event) => {
 										event.preventDefault();
@@ -194,9 +171,10 @@ function TocRail({ headings }: { headings: Heading[] }) {
 									className={cn(
 										"block min-w-0 flex-1 pb-3 text-sm leading-4.5 text-pretty wrap-anywhere [&_code]:text-[0.9em]",
 										titleSwap,
-										depth > 0 && "pl-2",
+										depth > 0 &&
+											"pl-(--indent) -translate-x-(--indent) group-hover:translate-x-0 group-focus-within:translate-x-0",
 										current
-											? "text-fd-foreground"
+											? "pointer-events-auto text-fd-foreground"
 											: cn(
 													"text-fd-muted-foreground hover:text-fd-foreground/80",
 													titleHidden,
@@ -235,8 +213,8 @@ function useHeadings() {
 const POPOVER_OFFSET = 112;
 
 function TocPopoverPanel({ headings }: { headings: Heading[] }) {
-	const active = useActiveIndex(headings, POPOVER_OFFSET);
-	const section = useSectionProgress(headings, POPOVER_OFFSET, active);
+	const { active, pinned } = useActiveIndex(headings, POPOVER_OFFSET);
+	const section = useSectionProgress(headings, POPOVER_OFFSET, active, pinned);
 	const overall = useTransform(section, (value) => (active + value) / headings.length);
 	const [started, setStarted] = useState(false);
 	const [open, setOpen] = useState(false);

@@ -1,18 +1,24 @@
 "use client";
 
 import { type MotionValue, useMotionValue, useSpring } from "motion/react";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { activationLine, type TocHeading } from "./toc-active-heading";
 
 export function useSectionProgress(
 	headings: Pick<TocHeading, "id">[],
 	offset: number,
 	active: number,
+	pinned: boolean,
 ): MotionValue<number> {
 	const progress = useMotionValue(0);
 	const smooth = useSpring(progress, { stiffness: 500, damping: 50 });
 
-	useEffect(() => {
+	useLayoutEffect(() => {
+		if (pinned) {
+			progress.set(0);
+			smooth.jump(0);
+			return;
+		}
 		const article = document.querySelector("article");
 		if (!article || headings.length === 0) return;
 		const top = (el: Element | null) =>
@@ -44,7 +50,7 @@ export function useSectionProgress(
 			window.removeEventListener("resize", schedule);
 			if (frame !== null) cancelAnimationFrame(frame);
 		};
-	}, [headings, offset, active, progress, smooth]);
+	}, [headings, offset, active, pinned, progress, smooth]);
 
 	return smooth;
 }

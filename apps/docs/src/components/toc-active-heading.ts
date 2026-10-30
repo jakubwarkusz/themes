@@ -5,10 +5,11 @@ import { useEffect, useRef, useState } from "react";
 export type TocHeading = { id: string; level: number };
 
 export const RAIL_OFFSET = 33;
-export const READING_LINE = 0.4;
+const LANDING_SLACK = 16;
+const SETTLE = 150;
 
 const SELECT_EVENT = "toc:select";
-const RELEASE = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
+const RELEASE = ["wheel", "touchstart", "keydown"] as const;
 
 export function activationLine(offset: number): number {
 	const viewport = window.innerHeight;
@@ -16,7 +17,7 @@ export function activationLine(offset: number): number {
 	const remaining = scrollable - window.scrollY;
 	const span = Math.min(viewport, scrollable);
 	const endProgress = span > 0 ? Math.min(1, Math.max(0, 1 - remaining / span)) : 0;
-	const base = Math.max(offset, viewport * READING_LINE);
+	const base = offset + LANDING_SLACK;
 	return base + endProgress * (viewport - base - 1);
 }
 
@@ -33,6 +34,7 @@ export function resolveActiveIndex(headings: Pick<TocHeading, "id">[], offset: n
 export function useActiveIndex(headings: Pick<TocHeading, "id">[], offset: number) {
 	const [active, setActive] = useState(0);
 	const locked = useRef(false);
+	const [pinned, setPinned] = useState(false);
 
 	useEffect(() => {
 		if (headings.length === 0) return;
@@ -59,10 +61,25 @@ export function useActiveIndex(headings: Pick<TocHeading, "id">[], offset: numbe
 	}, [headings, offset]);
 
 	useEffect(() => {
+		let settle: ReturnType<typeof setTimeout> | undefined;
+		let target = -1;
 		const release = () => {
 			locked.current = false;
+			setPinned(false);
+			clearTimeout(settle);
 			for (const type of RELEASE) window.removeEventListener(type, release);
+			window.removeEventListener("scroll", wait);
+			window.removeEventListener("scroll", release);
 			setActive(resolveActiveIndex(headings, offset));
+		};
+		const settled = () => {
+			window.removeEventListener("scroll", wait);
+			if (resolveActiveIndex(headings, offset) === target) release();
+			else window.addEventListener("scroll", release, { passive: true });
+		};
+		const wait = () => {
+			clearTimeout(settle);
+			settle = setTimeout(settled, SETTLE);
 		};
 		const pin = (event: Event) => {
 			const index = headings.findIndex(
@@ -70,17 +87,25 @@ export function useActiveIndex(headings: Pick<TocHeading, "id">[], offset: numbe
 			);
 			if (index < 0) return;
 			setActive(index);
+			target = index;
 			locked.current = true;
+			setPinned(true);
+			window.removeEventListener("scroll", release);
 			for (const type of RELEASE) window.addEventListener(type, release, { passive: true });
+			window.addEventListener("scroll", wait, { passive: true });
+			wait();
 		};
 		window.addEventListener(SELECT_EVENT, pin);
 		return () => {
 			window.removeEventListener(SELECT_EVENT, pin);
+			clearTimeout(settle);
+			window.removeEventListener("scroll", wait);
+			window.removeEventListener("scroll", release);
 			for (const type of RELEASE) window.removeEventListener(type, release);
 		};
 	}, [headings, offset]);
 
-	return active;
+	return { active, pinned };
 }
 
 export function scrollToHeading(id: string, offset: number) {
