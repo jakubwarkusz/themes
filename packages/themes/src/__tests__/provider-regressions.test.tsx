@@ -1,11 +1,16 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
-import { Activity } from "react";
+import * as React from "react";
+import type { ReactNode } from "react";
 import { useTheme } from "../core/context.js";
 import { getExtendedScript } from "../core/extended-script.js";
 import { getScript, type ScriptConfig } from "../core/script.js";
 import { ClientThemeProvider } from "../providers/client-provider.js";
 import { ExtendedClientThemeProvider } from "../providers/extended-client-provider.js";
+
+// React 18 does not export Activity; skip this coverage on the 18.3 support floor.
+type ActivityComponent = (props: { mode: "hidden" | "visible"; children?: ReactNode }) => ReactNode;
+const Activity = (React as unknown as { Activity?: ActivityComponent }).Activity;
 
 function ThemeReader() {
 	const { theme, resolvedTheme, systemTheme } = useTheme();
@@ -58,14 +63,16 @@ for (const { name, Provider, bootstrap } of [
 	},
 ]) {
 	describe(`${name} provider regressions`, () => {
-		test.each(["class", "data-theme"] as const)(
+		test.skipIf(!Activity).each(["class", "data-theme"] as const)(
 			"restores %s and color scheme when an Activity becomes visible again",
 			(attribute) => {
+				const Preserve = Activity;
+				if (!Preserve) return;
 				mockMedia();
 				localStorage.setItem("theme", "dark");
 				const onThemeChange = vi.fn();
 				const content = (mode: "visible" | "hidden") => (
-					<Activity mode={mode}>
+					<Preserve mode={mode}>
 						<Provider
 							attribute={attribute}
 							target="#theme-regression"
@@ -73,7 +80,7 @@ for (const { name, Provider, bootstrap } of [
 						>
 							<ThemeReader />
 						</Provider>
-					</Activity>
+					</Preserve>
 				);
 				const view = render(content("visible"));
 				for (const cycle of [1, 2]) {

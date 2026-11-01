@@ -1,9 +1,14 @@
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { Activity, type ReactNode, useLayoutEffect } from "react";
+import * as React from "react";
+import { type ReactNode, useLayoutEffect } from "react";
 import { useTheme } from "../core/context.js";
 import { ExtendedClientThemeProvider } from "../providers/extended-client-provider.js";
 import { clearCookies } from "./setup.js";
+
+// React 18 does not export Activity; skip this coverage on the 18.3 support floor.
+type ActivityComponent = (props: { mode: "hidden" | "visible"; children?: ReactNode }) => ReactNode;
+const Activity = (React as unknown as { Activity?: ActivityComponent }).Activity;
 
 (globalThis as unknown as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -70,7 +75,11 @@ afterEach(() => {
 });
 
 describe("ExtendedClientThemeProvider", () => {
-	test("restores attributes cleared while hidden before an Activity reveal paints", () => {
+	test.skipIf(!Activity)(
+		"restores attributes cleared while hidden before an Activity reveal paints",
+		() => {
+		const Preserve = Activity;
+		if (!Preserve) return;
 		const seen: (string | null)[] = [];
 		function HtmlProbe({ mode }: { mode: string }) {
 			useLayoutEffect(() => {
@@ -81,7 +90,7 @@ describe("ExtendedClientThemeProvider", () => {
 		}
 		const tree = (mode: "hidden" | "visible") => (
 			<>
-				<Activity mode={mode}>
+				<Preserve mode={mode}>
 					<ExtendedClientThemeProvider
 						attribute="data-theme"
 						defaultTheme="dark"
@@ -90,7 +99,7 @@ describe("ExtendedClientThemeProvider", () => {
 					>
 						<ThemeConsumer />
 					</ExtendedClientThemeProvider>
-				</Activity>
+				</Preserve>
 				<HtmlProbe mode={mode} />
 			</>
 		);
@@ -100,7 +109,8 @@ describe("ExtendedClientThemeProvider", () => {
 		document.documentElement.removeAttribute("data-theme");
 		view.rerender(tree("visible"));
 		expect(seen.at(-1)).toBe("dark");
-	});
+		},
+	);
 
 	test("re-applies when a data attribute is cleared without a history event", async () => {
 		wrap(<ThemeConsumer />, { attribute: "data-theme" });
@@ -193,14 +203,16 @@ describe("ExtendedClientThemeProvider", () => {
 		expect(screen.getByTestId("second-theme").textContent).toBe("dark");
 	});
 
-	test("refreshes an Activity-preserved provider when visible", () => {
+	test.skipIf(!Activity)("refreshes an Activity-preserved provider when visible", () => {
+		const Preserve = Activity;
+		if (!Preserve) return;
 		const providers = (mode: "hidden" | "visible") => (
 			<>
-				<Activity mode={mode}>
+				<Preserve mode={mode}>
 					<ExtendedClientThemeProvider storageKey="activity" enableSameDocumentSync>
 						<ThemeConsumer prefix="preserved-" />
 					</ExtendedClientThemeProvider>
-				</Activity>
+				</Preserve>
 				<ExtendedClientThemeProvider storageKey="activity" enableSameDocumentSync>
 					<ThemeConsumer prefix="active-" />
 				</ExtendedClientThemeProvider>
