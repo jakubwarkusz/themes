@@ -26,16 +26,16 @@
 		"@types/react-dom": "^19.3.0",
 		"happy-dom": "^21.0.4",
 		"lefthook": "^2.2.2",
-		"next": ">=16.4.3",
-		"oxfmt": "^0.75.0",
-		"oxlint": "^1.90.0",
+		"next": ">=16.4.5",
+		"oxfmt": "^0.77.0",
+		"oxlint": "^1.92.0",
 		"react": "^19.3.1",
 		"react-dom": "^19.3.1",
-		"rolldown": "^1.2.16",
-		"tsdown": "^0.23.4",
+		"rolldown": "^1.3.0",
+		"tsdown": "^0.23.7",
 		"tsx": "^4.23.15",
 		"typescript": "^7.0.2",
-		"vitest": "^5.0.5"
+		"vitest": "^5.1.0"
 	},
 	"engines": {
 		"node": "^24.11.0 || >=26.0.0",
