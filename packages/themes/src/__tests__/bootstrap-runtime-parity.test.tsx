@@ -41,19 +41,19 @@ const noTransition = false;
 
 const cases: ParityCase[] = [
 	{
-		name: "mapped multi-class storage with complete DOM side effects",
+		name: "mapped class tokens use HTML whitespace without changing the data attribute",
 		themes: ["light", "dark"],
 		attribute: ["class", "data-theme"],
 		enableSystem: false,
 		storedTheme: "dark",
-		value: { dark: "dark dark-palette" },
+		value: { dark: "dark\tdark-palette\nhigh-contrast" },
 		themeColor: { dark: "#000" },
 		enableColorScheme: true,
 		disableTransitionOnChange: "background-color 0s",
 		prefersDark: false,
 		expected: {
-			classes: ["dark", "dark-palette"],
-			dataTheme: "dark dark-palette",
+			classes: ["dark", "dark-palette", "high-contrast"],
+			dataTheme: "dark\tdark-palette\nhigh-contrast",
 			colorScheme: "dark",
 			themeColor: "#000",
 			transitionStyle: "*,*::before,*::after{transition:background-color 0s!important}",
@@ -102,6 +102,24 @@ const cases: ParityCase[] = [
 		storedTheme: "light",
 		initialTheme: "light",
 		forcedTheme: "dark",
+		enableColorScheme: true,
+		disableTransitionOnChange: noTransition,
+		prefersDark: false,
+		expected: {
+			classes: ["dark"],
+			dataTheme: null,
+			colorScheme: "dark",
+			themeColor: null,
+			transitionStyle: null,
+		},
+	},
+	{
+		name: "an unknown forced theme falls through to storage",
+		themes: ["light", "dark"],
+		attribute: "class",
+		enableSystem: false,
+		storedTheme: "dark",
+		forcedTheme: "unknown",
 		enableColorScheme: true,
 		disableTransitionOnChange: noTransition,
 		prefersDark: false,
@@ -357,18 +375,15 @@ describe("bootstrap/runtime/provider parity", () => {
 				});
 			});
 
-			resetDom(parityCase);
-			const providerSnapshot = captureDom(() => {
-				render(
-					<ClientThemeProvider<string> {...getProviderProps(parityCase)}>
-						<span>content</span>
-					</ClientThemeProvider>,
-				);
-			});
-
 			expect(scriptSnapshot).toEqual(parityCase.expected);
 			expect(directDomSnapshot).toEqual(parityCase.expected);
-			expect(providerSnapshot).toEqual(parityCase.expected);
+			for (const Provider of [ClientThemeProvider, ExtendedClientThemeProvider]) {
+				resetDom(parityCase);
+				const providerSnapshot = captureDom(() =>
+					render(<Provider {...getProviderProps(parityCase)}>{null}</Provider>),
+				);
+				expect(providerSnapshot).toEqual(parityCase.expected);
+			}
 			for (const Provider of [ThemeProvider, ExtendedThemeProvider]) {
 				resetDom(parityCase);
 				const client = Provider({

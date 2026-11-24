@@ -4,7 +4,7 @@ export function splitClassTokens(value: string): string[] {
 	let cached = tokens.get(value);
 	if (!cached) {
 		if (tokens.size === 32) tokens.clear();
-		cached = value.split(" ").filter(Boolean);
+		cached = value.split(/[ \t\n\f\r]+/).filter(Boolean);
 		tokens.set(value, cached);
 	}
 	return cached;

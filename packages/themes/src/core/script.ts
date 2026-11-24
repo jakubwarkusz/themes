@@ -19,38 +19,32 @@ export type ScriptConfig = {
 };
 
 /**
- * Serializes the deterministic bootstrap into an IIFE string safe for <script>.
+ * Serializes bootstrap arguments into an IIFE string safe for <script>.
  */
-function safeJson(value: unknown): string {
-	return (JSON.stringify(value) as string)
+export function renderBootstrap(source: string, args: readonly unknown[]): string {
+	const json = JSON.stringify(args)
 		.replace(/</g, "\\u003c")
 		.replace(/\u2028/g, "\\u2028")
 		.replace(/\u2029/g, "\\u2029");
+	return "(" + source + ")(" + json.slice(1, -1) + ")";
 }
 
 export function getScript(config: ScriptConfig): string {
-	return (
-		"(" +
-		(config.storage == "localStorage" ? S.slice(0, 197) + S.slice(461) : S) +
-		")(" +
-		[
-			config.storageKey,
-			config.attribute,
-			config.defaultTheme,
-			config.enableSystem,
-			config.enableColorScheme,
-			config.forcedTheme ?? null,
-			config.themes,
-			config.value ?? null,
-			config.target,
-			config.storage,
-			config.themeColors ?? null,
-			config.initialTheme ?? null,
-			config.disableTransitionOnChange,
-			config.followSystem,
-		]
-			.map(safeJson)
-			.join(",") +
-		")"
-	);
+	const source = config.storage === "localStorage" ? S.slice(0, 197) + S.slice(461) : S;
+	return renderBootstrap(source, [
+		config.storageKey,
+		config.attribute,
+		config.defaultTheme,
+		config.enableSystem,
+		config.enableColorScheme,
+		config.forcedTheme ?? null,
+		config.themes,
+		config.value ?? null,
+		config.target,
+		config.storage,
+		config.themeColors ?? null,
+		config.initialTheme ?? null,
+		config.disableTransitionOnChange,
+		config.followSystem,
+	]);
 }

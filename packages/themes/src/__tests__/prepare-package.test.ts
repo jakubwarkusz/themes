@@ -45,10 +45,12 @@ describe("publication package", () => {
 		expect(manifest.devDependencies.react).toBe("^19.0.0");
 	});
 
-	test("copies artifacts and docs, removes stale output, and refreshes the release version", async () => {
-		const root = await mkdtemp(resolve(tmpdir(), "themes-package-"));
-		temporaryRoots.push(root);
-		await mkdir(resolve(root, "dist"));
+	test("copies artifacts, license and docs, removes stale output, and refreshes the release version", async () => {
+		const workspace = await mkdtemp(resolve(tmpdir(), "themes-package-"));
+		temporaryRoots.push(workspace);
+		const root = resolve(workspace, "packages/themes");
+		await mkdir(resolve(root, "dist"), { recursive: true });
+		await writeFile(resolve(workspace, "LICENSE"), "Example license");
 		const source = JSON.stringify({
 			name: "@wrksz/themes",
 			version: "2.0.5",
@@ -65,6 +67,7 @@ describe("publication package", () => {
 		for (const path of ["README.md", "AGENTS.md", "dist/index.js", "dist/index.d.ts"]) {
 			expect(await readFile(resolve(output, path), "utf8")).toBe(`content: ${path}`);
 		}
+		expect(await readFile(resolve(output, "LICENSE"), "utf8")).toBe("Example license");
 		expect(JSON.parse(await readFile(resolve(output, "package.json"), "utf8"))).toEqual({
 			name: "@wrksz/themes",
 			version: "2.0.6",

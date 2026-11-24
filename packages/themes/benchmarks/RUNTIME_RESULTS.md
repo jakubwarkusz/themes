@@ -41,3 +41,57 @@ accepting the remaining size cost if optimization alone did not meet the old lim
 Only exceeded provider/factory budgets are increased, with small margins for build variation;
 hook, script, image, and package-install budgets are unchanged. The baseline is not refreshed,
 so reports continue to expose the cost rather than resetting the deltas to zero.
+
+## Child-list scanning
+
+Compared with `8f90540` on macOS with Node.js 26.8.2. The browser harness ran both
+compiled observers on the production Next.js 16.4.5 fixture in Chromium 156.
+It alternated the implementations, timing only their MutationObserver callbacks for
+40 measured batches after eight warmups. Each batch had 600 real child-list records
+under a document root and outside eight scoped targets.
+
+| Workload                                     | Before, median ms | After, median ms |
+| -------------------------------------------- | ----------------: | ---------------: |
+| Chromium, one added and one removed node     |               1.5 |              1.3 |
+| Chromium, 16 added and 16 removed nodes      |              13.3 |            11.05 |
+| Happy DOM, 1,000 records across eight scopes |             1.596 |            0.813 |
+
+The Chromium numbers measure callback time in a scripted workload. The Happy DOM
+benchmark uses synthetic observer delivery. Provider and factory bundle fixtures
+shrank by 30 B raw and 3–6 B gzip. The unpacked package shrank from 59,401 B to
+59,357 B. Full verification passed, including Chromium, Firefox, and WebKit E2E.
+
+## Typed Next factory payload
+
+Two static Next.js 16.4.5 production Turbopack builds render the same route and theme
+control. The plain variant uses the server `ThemeProvider` and the typed variant uses
+`createThemes` from `@wrksz/themes/next/create-themes`. Both use the same built library.
+
+| Gzip bytes                       | Server provider | Typed factory |  Delta |
+| -------------------------------- | --------------: | ------------: | -----: |
+| Unique script chunks in the HTML |         177,944 |       179,181 | +1,237 |
+| HTML with embedded RSC           |           2,634 |         2,427 |   -207 |
+| Total                            |         180,578 |       181,608 | +1,030 |
+
+The script total sums each referenced file compressed separately. The HTML includes
+the inline bootstrap and embedded RSC. These sizes exclude response headers and
+describe build artifacts under gzip, with every resource counted once.
+
+### Factory and bootstrap simplifications
+
+On the same Next.js 16.4.5 fixture, the typed factory went from 179,181 B to
+179,109 B gzip across the scripts referenced in the HTML. The HTML, including
+embedded RSC, went from 2,427 B to 2,426 B gzip. The unpacked library went from
+59,357 B to 58,982 B.
+
+In an isolated copy of the final fixture, stubbing the bootstrap generator reduced
+the client scripts by another 664 B gzip. This measures how much the generator
+contributes to that client build. The stub omits the bootstrap and is only a sizing
+probe. The production fixture passed Chromium checks for the theme before
+hydration, subsequent hydration, and switching themes.
+
+Generating the default bootstrap 30,000 times took a median of 41.30 ms before and
+9.44 ms after on Node.js 26.8.2. Both variants were alternated across 16 measured
+batches after four warmup batches. The benchmark covered all five storage modes
+with default and mapped configurations. All ten configurations produced identical
+bootstrap strings.

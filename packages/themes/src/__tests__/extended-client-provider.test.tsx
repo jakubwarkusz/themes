@@ -128,26 +128,38 @@ describe("ExtendedClientThemeProvider", () => {
 		expect(document.documentElement.classList.contains("midnight")).toBe(true);
 	});
 
-	test("preserves a custom variant family while following system", () => {
-		const mediaQuery = mockMatchMedia(false);
-		wrap(<ThemeConsumer />, {
-			themes: ["light-red", "dark-red", "light-blue", "dark-blue"],
-			defaultTheme: "light-red",
-			followSystem: true,
-			systemThemeMap: {
-				"light-red": { light: "light-red", dark: "dark-red" },
-				"dark-red": { light: "light-red", dark: "dark-red" },
-				"light-blue": { light: "light-blue", dark: "dark-blue" },
-				"dark-blue": { light: "light-blue", dark: "dark-blue" },
-			},
-		});
+	test.each(["visible", "hidden"] as const)(
+		"preserves a custom variant family when the system changes while %s",
+		(mode) => {
+			const mediaQuery = mockMatchMedia(false);
+			const tree = (activity: "hidden" | "visible") => (
+				<Activity mode={activity}>
+					<ExtendedClientThemeProvider
+						themes={["light-red", "dark-red", "light-blue", "dark-blue"]}
+						defaultTheme="light-red"
+						initialTheme="light-blue"
+						followSystem
+						systemThemeMap={{
+							"light-red": { light: "light-red", dark: "dark-red" },
+							"dark-red": { light: "light-red", dark: "dark-red" },
+							"light-blue": { light: "light-blue", dark: "dark-blue" },
+							"dark-blue": { light: "light-blue", dark: "dark-blue" },
+						}}
+					>
+						<ThemeConsumer />
+					</ExtendedClientThemeProvider>
+				</Activity>
+			);
+			const view = render(tree("visible"));
+			if (mode === "hidden") view.rerender(tree("hidden"));
+			act(() => mediaQuery.dispatchChange(true));
+			if (mode === "hidden") view.rerender(tree("visible"));
 
-		act(() => mediaQuery.dispatchChange(true));
-
-		expect(screen.getByTestId("theme").textContent).toBe("light-red");
-		expect(screen.getByTestId("resolved").textContent).toBe("dark-red");
-		expect(document.documentElement.classList.contains("dark-red")).toBe(true);
-	});
+			expect(screen.getByTestId("theme").textContent).toBe("light-blue");
+			expect(screen.getByTestId("resolved").textContent).toBe("dark-blue");
+			expect(document.documentElement.classList.contains("dark-blue")).toBe(true);
+		},
+	);
 
 	test("keeps same-document synchronization disabled by default", () => {
 		render(
@@ -175,14 +187,26 @@ describe("ExtendedClientThemeProvider", () => {
 		expect(screen.getByTestId("second-theme").textContent).toBe("light");
 	});
 
-	test("synchronizes providers when enabled", () => {
+	test("synchronizes providers with different targets when enabled", () => {
 		render(
 			<>
-				<ExtendedClientThemeProvider storageKey="shared-enabled" enableSameDocumentSync>
-					<ThemeConsumer prefix="first-" />
+				<ExtendedClientThemeProvider
+					storageKey="shared-enabled"
+					enableSameDocumentSync
+					target="#first-scope"
+				>
+					<div id="first-scope">
+						<ThemeConsumer prefix="first-" />
+					</div>
 				</ExtendedClientThemeProvider>
-				<ExtendedClientThemeProvider storageKey="shared-enabled" enableSameDocumentSync>
-					<ThemeConsumer prefix="second-" />
+				<ExtendedClientThemeProvider
+					storageKey="shared-enabled"
+					enableSameDocumentSync
+					target="#second-scope"
+				>
+					<div id="second-scope">
+						<ThemeConsumer prefix="second-" />
+					</div>
 				</ExtendedClientThemeProvider>
 			</>,
 		);
@@ -191,6 +215,8 @@ describe("ExtendedClientThemeProvider", () => {
 
 		expect(screen.getByTestId("first-theme").textContent).toBe("dark");
 		expect(screen.getByTestId("second-theme").textContent).toBe("dark");
+		expect(document.getElementById("first-scope")?.className).toBe("dark");
+		expect(document.getElementById("second-scope")?.className).toBe("dark");
 	});
 
 	test("refreshes an Activity-preserved provider when visible", () => {

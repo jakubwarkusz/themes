@@ -27,7 +27,7 @@ import type {
 	ThemeContextValue,
 	ThemeProviderProps,
 } from "../core/types.js";
-import { useEffectEvent } from "../core/use-effect-event.js";
+import { useCommittedCallback, useEffectEvent } from "../core/use-effect-event.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
 const useIsomorphicLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect;
@@ -97,11 +97,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			? (systemTheme as ResolvedTheme<Themes> | undefined)
 			: (selectedTheme as ResolvedTheme<Themes>);
 
-	const onThemeChangeEvent = useEffectEvent((next: Themes) => {
-		onThemeChange?.(next);
-	});
-
-	const applyToDomEvent = useEffectEvent((resolved: string) => {
+	const applyToDom = useCommittedCallback((resolved: string) => {
 		const last: LastAppliedTheme = {
 			resolved,
 			attribute,
@@ -123,26 +119,32 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				? domWindow.matchMedia("(prefers-color-scheme: dark)")
 				: null;
 		const system = mq ? (mq.matches ? "dark" : "light") : undefined;
-		let initial: Themes | "system";
+		const { theme: current, systemTheme: previousSystem } = getSnapshot();
+		let initial = resolvedDefault;
 
-		// Forced theme short-circuits init and must not persist to storage.
-		if (validForcedTheme) {
-			initial = validForcedTheme;
-		} else if (initialTheme && isThemeSelection(initialTheme, themes, enableSystem)) {
+		if (
+			current === undefined &&
+			initialTheme &&
+			isThemeSelection(initialTheme, themes, enableSystem)
+		) {
 			initial = initialTheme;
-			writeStoredTheme(
-				storage,
-				storageKey,
-				String(initialTheme),
-				cookieOptions,
-				onStorageError,
-			);
+			if (!validForcedTheme)
+				writeStoredTheme(storage, storageKey, initialTheme, cookieOptions, onStorageError);
+		} else if (
+			followSystem &&
+			!validForcedTheme &&
+			system &&
+			previousSystem &&
+			system !== previousSystem
+		) {
+			initial = "system";
 		} else {
-			const stored = readStoredTheme(storage, storageKey, onStorageError);
-			initial =
-				!followSystem && stored && isThemeSelection(stored, themes, enableSystem)
-					? (stored as Themes | "system")
-					: resolvedDefault;
+			const selection =
+				followSystem || storage === "none"
+					? current
+					: readStoredTheme(storage, storageKey, onStorageError);
+			if (selection && isThemeSelection(selection, themes, enableSystem))
+				initial = selection as Themes | "system";
 		}
 
 		setStoreState({ theme: initial, systemTheme: system });
@@ -155,13 +157,10 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			if (followSystem) {
 				setStoreTheme("system");
 			}
-			applyToDomEvent(next);
-			onThemeChangeEvent(next as Themes);
+			applyToDom(next);
+			onThemeChange?.(next as Themes);
 		}
 	});
-	// Public API: must be a regular callback (not an Effect Event) so consumers can
-	// call it from event handlers and receive it via context under oxlint rules.
-	// oxlint-disable-next-line react-hooks/exhaustive-deps -- applyToDomEvent is an effect event.
 	const setTheme = useCallback(
 		(
 			next:
@@ -178,11 +177,9 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				newTheme === "system" ? (getSnapshot().systemTheme ?? "light") : newTheme;
 
 			setStoreTheme(newTheme);
-			// oxlint-disable-next-line react-hooks/rules-of-hooks -- shared apply path; setTheme stays a public callback.
-			applyToDomEvent(resolved);
-			onThemeChange?.(newTheme as Themes);
-
+			applyToDom(resolved);
 			writeStoredTheme(storage, storageKey, newTheme, cookieOptions, onStorageError);
+			onThemeChange?.(newTheme as Themes);
 		},
 		[
 			validForcedTheme,
@@ -195,6 +192,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			getSnapshot,
 			setStoreTheme,
 			onThemeChange,
+			applyToDom,
 		],
 	);
 
@@ -202,6 +200,9 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 	useEffect(() => {
 		lastAppliedRef.current = null;
 		initializeEvent();
+	}, []);
+
+	useEffect(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
 		return subscribeHistoryReapply(
@@ -213,8 +214,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			() => getTargetEl(lastAppliedRef.current?.target ?? "html"),
 			attribute,
 		);
-		// oxlint-disable-next-line react-hooks/exhaustive-deps -- attribute is captured per subscription; Activity reveals resubscribe.
-	}, []);
+	}, [attribute]);
 
 	useIsomorphicLayoutEffect(() => {
 		const last = lastAppliedRef.current;
@@ -223,7 +223,6 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 	// setTheme / system / storage already write the DOM. Re-apply only when
 	// resolvedTheme or DOM config changed from outside those paths.
-	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		if (!resolvedTheme) return;
 		const last = lastAppliedRef.current;
@@ -240,7 +239,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		) {
 			return;
 		}
-		applyToDomEvent(resolvedTheme);
+		applyToDom(resolvedTheme);
 	}, [
 		resolvedTheme,
 		attribute,
@@ -250,6 +249,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		disableTransitionOnChange,
 		enableColorScheme,
 		themeColor,
+		applyToDom,
 	]);
 
 	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
@@ -265,26 +265,19 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		return () => mq.removeEventListener?.("change", handler);
 	}, [enableSystem, setStoreSystemTheme]);
 
-	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		const domWindow = getDomWindow();
-		if (!domWindow) return;
-		if (
-			followSystem ||
-			storage === "none" ||
-			storage === "sessionStorage" ||
-			storage === "cookie"
-		)
+		if (!domWindow || followSystem || (storage !== "localStorage" && storage !== "hybrid"))
 			return;
 
 		const handler = (e: StorageEvent) => {
-			if (e.storageArea !== localStorage || e.key !== storageKey) return;
+			if ((e.key !== null && e.key !== storageKey) || e.storageArea !== localStorage) return;
 			const newTheme = e.newValue ?? resolvedDefault;
 			if (!isThemeSelection(newTheme, themes, enableSystem)) return;
 			const resolved =
 				newTheme === "system" ? (getSnapshot().systemTheme ?? "light") : newTheme;
 			setStoreTheme(newTheme);
-			if (!validForcedTheme) applyToDomEvent(resolved);
+			if (!validForcedTheme) applyToDom(resolved);
 		};
 		domWindow.addEventListener("storage", handler);
 		return () => domWindow.removeEventListener("storage", handler);
@@ -298,6 +291,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 		validForcedTheme,
 		getSnapshot,
 		setStoreTheme,
+		applyToDom,
 	]);
 
 	const contextTheme =

@@ -67,7 +67,9 @@ test("unrelated class mutations", async ({ bench }) => {
 		() => applyThemeToDom({ ...options, target: "html" }),
 		() => document.documentElement,
 	);
-	const records = [{ type: "attributes", target }] as unknown as MutationRecord[];
+	const records = [
+		{ type: "attributes", attributeName: "class", target },
+	] as unknown as MutationRecord[];
 	try {
 		await bench("1000 unrelated mutation batches and frames", () => {
 			for (let index = 0; index < 1000; index++) {
@@ -77,6 +79,35 @@ test("unrelated class mutations", async ({ bench }) => {
 		}).run();
 	} finally {
 		stop();
+	}
+});
+
+test("unrelated child-list mutations with scoped providers", async ({ bench }) => {
+	const scopes = Array.from({ length: 8 }, () => document.createElement("section"));
+	document.body.append(...scopes);
+	const stops = scopes.map((scope) =>
+		subscribeHistoryReapply(
+			window,
+			() => {},
+			() => scope,
+		),
+	);
+	const addedNodes = Array.from({ length: 16 }, () => document.createElement("div"));
+	const removedNodes = Array.from({ length: 16 }, () => document.createElement("div"));
+	const records = Array.from({ length: 1000 }, () => ({
+		type: "childList",
+		attributeName: null,
+		target,
+		addedNodes,
+		removedNodes,
+	})) as unknown as MutationRecord[];
+	try {
+		await bench("1000 unrelated child-list records across 8 scopes", () => {
+			deliver(records);
+		}).run();
+	} finally {
+		for (const stop of stops) stop();
+		for (const scope of scopes) scope.remove();
 	}
 });
 

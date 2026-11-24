@@ -124,36 +124,26 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Select React version
+      - name: Install library dependencies for React ${{ matrix.react }}
         env:
           REACT: ${{ matrix.react }}
           REACT_TYPES: ${{ matrix.react-types }}
           REACT_DOM_TYPES: ${{ matrix.react-dom-types }}
         run: |
-          # Force one React version across the workspace (apps pin their own range),
-          # then reinstall so peer links under packages/* are rewritten.
+          # Use one React version for the library and its test tools.
+          # The Next.js apps use their own React versions in their jobs.
           printf '\n  react: %s\n  react-dom: %s\n' "${REACT}" "${REACT}" >> pnpm-workspace.yaml
-          pnpm add --workspace-root --save-dev \
+          pnpm --workspace-packages=packages/themes add --workspace-root --save-dev --save-exact \
             "react@${REACT}" \
             "react-dom@${REACT}" \
             "@types/react@${REACT_TYPES}" \
             "@types/react-dom@${REACT_DOM_TYPES}"
-          pnpm --filter theme-docs --filter next-16-3-compat add \
-            "react@${REACT}" \
-            "react-dom@${REACT}"
-          pnpm --filter theme-docs --filter next-16-3-compat add --save-dev \
-            "@types/react@${REACT_TYPES}" \
-            "@types/react-dom@${REACT_DOM_TYPES}"
-          pnpm install
 
       - name: Test effect event compatibility
-        run: pnpm --filter @wrksz/themes test src/__tests__/use-effect-event-compat.test.tsx
+        run: pnpm --workspace-packages=packages/themes --filter @wrksz/themes test src/__tests__/use-effect-event-compat.test.tsx
 
       - name: Build
-        run: pnpm --filter @wrksz/themes build
+        run: pnpm --workspace-packages=packages/themes --filter @wrksz/themes build
 
   typescript-compatibility:
     name: TypeScript ${{ matrix.version }}
@@ -240,24 +230,22 @@ jobs:
       - name: Build fixture
         run: pnpm --filter next-16-3-compat build
 
-      # Local verify:full needs the same browser:
-      # pnpm --filter next-16-3-compat exec playwright install chromium
-      - name: Cache Playwright Chromium
+      - name: Cache Playwright browsers
         uses: actions/cache@v6
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          key: playwright-browsers-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            playwright-chromium-${{ runner.os }}-
+            playwright-browsers-${{ runner.os }}-
 
-      - name: Install Chromium
+      - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm --filter next-16-3-compat exec playwright install --with-deps chromium
+        run: pnpm --filter next-16-3-compat exec playwright install --with-deps chromium firefox webkit
 
-      - name: Install Chromium OS dependencies
+      - name: Install browser OS dependencies
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm --filter next-16-3-compat exec playwright install-deps chromium
+        run: pnpm --filter next-16-3-compat exec playwright install-deps chromium firefox webkit
 
-      - name: Test Instant Navigations
+      - name: Run browser E2E
         run: pnpm --filter next-16-3-compat test:e2e

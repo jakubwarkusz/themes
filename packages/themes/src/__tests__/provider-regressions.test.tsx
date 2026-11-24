@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Activity } from "react";
 import { useTheme } from "../core/context.js";
 import { getExtendedScript } from "../core/extended-script.js";
@@ -11,6 +11,15 @@ function ThemeReader() {
 	const { theme, resolvedTheme, systemTheme } = useTheme();
 	return (
 		<output data-testid="state">{JSON.stringify({ theme, resolvedTheme, systemTheme })}</output>
+	);
+}
+
+function SelectTheme({ theme }: { theme: "light" | "dark" }) {
+	const { setTheme } = useTheme();
+	return (
+		<button type="button" onClick={() => setTheme(theme)}>
+			{theme}
+		</button>
 	);
 }
 
@@ -58,6 +67,138 @@ for (const { name, Provider, bootstrap } of [
 	},
 ]) {
 	describe(`${name} provider regressions`, () => {
+		test("restores a stored selection after removing the initial forced theme", () => {
+			localStorage.setItem("theme", "light");
+			const content = (forced: boolean) => (
+				<Provider
+					{...(forced ? { forcedTheme: "dark" } : {})}
+					target="#theme-regression"
+					enableSystem={false}
+				>
+					<ThemeReader />
+				</Provider>
+			);
+			const view = render(content(true));
+			expect(target.className).toBe("layout dark");
+			expect(localStorage.getItem("theme")).toBe("light");
+			view.rerender(content(false));
+			expect(target.className).toBe("layout light");
+			expect(screen.getByTestId("state").textContent).toContain('"theme":"light"');
+		});
+
+		test("returns to the default when another tab clears localStorage", () => {
+			localStorage.setItem("theme", "dark");
+			render(
+				<Provider target="#theme-regression" enableSystem={false}>
+					<ThemeReader />
+				</Provider>,
+			);
+			expect(target.className).toBe("layout dark");
+			localStorage.clear();
+			act(() => {
+				window.dispatchEvent(new StorageEvent("storage", { storageArea: localStorage }));
+			});
+			expect(target.className).toBe("layout light");
+		});
+
+		test.each(["none", "localStorage"] as const)(
+			"keeps a manual theme across Activity reveals with %s storage",
+			(storage) => {
+				const content = (mode: "hidden" | "visible") => (
+					<Activity mode={mode}>
+						<Provider
+							initialTheme="light"
+							enableSystem={false}
+							storage={storage}
+							target="#theme-regression"
+						>
+							<ThemeReader />
+							<SelectTheme theme="dark" />
+						</Provider>
+					</Activity>
+				);
+				const view = render(content("visible"));
+				fireEvent.click(screen.getByRole("button", { name: "dark" }));
+				view.rerender(content("hidden"));
+				view.rerender(content("visible"));
+				expect(target.className).toBe("layout dark");
+				expect(screen.getByTestId("state").textContent).toContain('"theme":"dark"');
+			},
+		);
+
+		test("keeps the initial theme on Activity reveal until the system preference changes", () => {
+			const changeSystem = mockMedia();
+			const content = (mode: "hidden" | "visible") => (
+				<Activity mode={mode}>
+					<Provider
+						initialTheme="sepia"
+						themes={["light", "dark", "sepia"]}
+						followSystem
+						target="#theme-regression"
+					>
+						<ThemeReader />
+					</Provider>
+				</Activity>
+			);
+			const view = render(content("visible"));
+			expect(target.className).toBe("layout sepia");
+			expect(localStorage.getItem("theme")).toBe("sepia");
+
+			view.rerender(content("hidden"));
+			localStorage.setItem("theme", "light");
+			view.rerender(content("visible"));
+			expect(target.className).toBe("layout sepia");
+			expect(screen.getByTestId("state").textContent).toContain('"theme":"sepia"');
+			expect(localStorage.getItem("theme")).toBe("light");
+
+			view.rerender(content("hidden"));
+			changeSystem(false);
+			view.rerender(content("visible"));
+			expect(target.className).toBe("layout light");
+			expect(screen.getByTestId("state").textContent).toContain('"theme":"system"');
+			expect(localStorage.getItem("theme")).toBe("light");
+		});
+
+		test("persists the last selection when onThemeChange sets another theme", () => {
+			render(
+				<Provider
+					target="#theme-regression"
+					enableSystem={false}
+					onThemeChange={(theme) => {
+						if (theme === "dark")
+							fireEvent.click(screen.getByRole("button", { name: "light" }));
+					}}
+				>
+					<ThemeReader />
+					<SelectTheme theme="dark" />
+					<SelectTheme theme="light" />
+				</Provider>,
+			);
+			fireEvent.click(screen.getByRole("button", { name: "dark" }));
+			expect(target.className).toBe("layout light");
+			expect(localStorage.getItem("theme")).toBe("light");
+			expect(screen.getByTestId("state").textContent).toContain('"theme":"light"');
+		});
+
+		test("restores a replacement attribute while another provider is subscribed", async () => {
+			const content = (attribute: "class" | "data-appearance") => (
+				<>
+					<Provider target="#peer-theme" storage="none" defaultTheme="light">
+						<span id="peer-theme" />
+					</Provider>
+					<Provider target="#theme-regression" attribute={attribute} forcedTheme="dark">
+						<span />
+					</Provider>
+				</>
+			);
+			const view = render(content("class"));
+			view.rerender(content("data-appearance"));
+			expect(target.getAttribute("data-appearance")).toBe("dark");
+			await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+			target.removeAttribute("data-appearance");
+			await waitFor(() => expect(target.getAttribute("data-appearance")).toBe("dark"));
+		});
+
 		test.each(["class", "data-theme"] as const)(
 			"restores %s and color scheme when an Activity becomes visible again",
 			(attribute) => {

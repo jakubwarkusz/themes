@@ -9,7 +9,9 @@ CI=true pnpm install --frozen-lockfile
 pnpm verify
 ```
 
-Use `pnpm verify:full` before requesting release review. It adds TypeScript 5.9/6/7 declaration checks, bundle comparison, production builds, dependency audit, and the Next.js Playwright fixture. Install Chromium once with `pnpm --filter next-16-3-compat exec playwright install chromium`.
+Use `pnpm verify:full` before requesting release review. It adds TypeScript 5.9/6/7 declaration checks, bundle comparison, production builds, dependency audit, and the Next.js Playwright fixture. Install the fixture browsers with `pnpm --filter next-16-3-compat exec playwright install chromium firefox webkit`.
+
+If Playwright's Firefox reports `Could not find profile folder` on macOS 27, use a temporary application data directory with `CFFIXED_USER_HOME="$(mktemp -d)" pnpm verify:full`. [Playwright issue](https://github.com/microsoft/playwright/issues/42768)
 
 ## Change expectations
 
