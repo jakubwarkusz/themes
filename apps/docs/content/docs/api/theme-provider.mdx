@@ -159,7 +159,7 @@ Heavier capabilities stay behind opt-in imports so the default provider bundle d
 
 <PropsTable>
   <Prop name="enableSameDocumentSync" type="boolean" default="false">
-    Synchronize providers that share a storage key in the same document
+    Synchronize providers in the same document that use the same storage mode and key, including across different targets. Requires persistent or session storage.
   </Prop>
   <Prop name="systemThemeMap" type="{ light: string; dark: string } | Record<string, { light: string; dark: string }>">
     Serializable custom resolution for system-aware variants
@@ -387,7 +387,7 @@ Use `followSystem` to ignore any stored value and always apply the system prefer
 </ThemeProvider>
 ```
 
-Unlike `defaultTheme="system"`, which applies the system preference only on first visit and then stores the resolved value, `followSystem` re-reads `prefers-color-scheme` on every mount and ignores the stored value entirely.
+With `defaultTheme="system"`, a saved selection takes precedence and `"system"` follows the operating system until the user chooses another theme. `followSystem` ignores the saved selection on mount and follows later changes to `prefers-color-scheme` even after a manual switch.
 
 ### Disable storage
 

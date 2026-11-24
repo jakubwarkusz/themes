@@ -175,14 +175,26 @@ describe("ExtendedClientThemeProvider", () => {
 		expect(screen.getByTestId("second-theme").textContent).toBe("light");
 	});
 
-	test("synchronizes providers when enabled", () => {
+	test("synchronizes providers with different targets when enabled", () => {
 		render(
 			<>
-				<ExtendedClientThemeProvider storageKey="shared-enabled" enableSameDocumentSync>
-					<ThemeConsumer prefix="first-" />
+				<ExtendedClientThemeProvider
+					storageKey="shared-enabled"
+					enableSameDocumentSync
+					target="#first-scope"
+				>
+					<div id="first-scope">
+						<ThemeConsumer prefix="first-" />
+					</div>
 				</ExtendedClientThemeProvider>
-				<ExtendedClientThemeProvider storageKey="shared-enabled" enableSameDocumentSync>
-					<ThemeConsumer prefix="second-" />
+				<ExtendedClientThemeProvider
+					storageKey="shared-enabled"
+					enableSameDocumentSync
+					target="#second-scope"
+				>
+					<div id="second-scope">
+						<ThemeConsumer prefix="second-" />
+					</div>
 				</ExtendedClientThemeProvider>
 			</>,
 		);
@@ -191,6 +203,8 @@ describe("ExtendedClientThemeProvider", () => {
 
 		expect(screen.getByTestId("first-theme").textContent).toBe("dark");
 		expect(screen.getByTestId("second-theme").textContent).toBe("dark");
+		expect(document.getElementById("first-scope")?.className).toBe("dark");
+		expect(document.getElementById("second-scope")?.className).toBe("dark");
 	});
 
 	test("refreshes an Activity-preserved provider when visible", () => {

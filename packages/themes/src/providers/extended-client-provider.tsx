@@ -24,7 +24,7 @@ import { createThemeStore } from "../core/store.js";
 import { publishThemeChannel, subscribeThemeChannel } from "../core/sync.js";
 import { isThemeSelection, resolveDefaultTheme } from "../core/theme-validation.js";
 import type { Attribute, DefaultTheme, ThemeContextValue } from "../core/types.js";
-import { useEffectEvent } from "../core/use-effect-event.js";
+import { useCommittedCallback, useEffectEvent } from "../core/use-effect-event.js";
 
 const DEFAULT_THEMES: string[] = ["light", "dark"];
 const useIsomorphicLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect;
@@ -120,13 +120,9 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 				systemThemeMap as SystemThemeMap<string> | undefined,
 			) as Themes | undefined)
 		: undefined;
-	const channel = `${storage ?? "localStorage"}:${storageKey}:${target}`;
+	const channel = `${storage}:${storageKey}`;
 
-	const onThemeChangeEvent = useEffectEvent((next: Themes) => {
-		onThemeChange?.(next);
-	});
-
-	const applyToDomEvent = useEffectEvent((resolved: string) => {
+	const applyToDom = useCommittedCallback((resolved: string) => {
 		const last: LastAppliedTheme = {
 			resolved,
 			attribute,
@@ -153,26 +149,22 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 				? domWindow.matchMedia("(prefers-color-scheme: dark)")
 				: null;
 		const system = mq ? (mq.matches ? "dark" : "light") : undefined;
-		let initial: Themes | "system";
+		const current = getSnapshot().theme;
+		let initial = resolvedDefault;
 
-		// Forced theme short-circuits init and must not persist to storage.
-		if (validForcedTheme) {
-			initial = validForcedTheme;
-		} else if (initialTheme && isThemeSelection(initialTheme, themes, enableSystem)) {
+		if (
+			current === undefined &&
+			initialTheme &&
+			isThemeSelection(initialTheme, themes, enableSystem)
+		) {
 			initial = initialTheme;
-			writeStoredTheme(
-				storage,
-				storageKey,
-				String(initialTheme),
-				cookieOptions,
-				onStorageError,
-			);
-		} else {
-			const stored = readStoredTheme(storage, storageKey, onStorageError);
-			initial =
-				!followSystem && stored && isThemeSelection(stored, themes, enableSystem)
-					? (stored as Themes | "system")
-					: resolvedDefault;
+			if (!validForcedTheme)
+				writeStoredTheme(storage, storageKey, initialTheme, cookieOptions, onStorageError);
+		} else if (!followSystem) {
+			const stored =
+				storage === "none" ? current : readStoredTheme(storage, storageKey, onStorageError);
+			if (stored && isThemeSelection(stored, themes, enableSystem))
+				initial = stored as Themes | "system";
 		}
 
 		setStoreState({ theme: initial, systemTheme: system });
@@ -196,12 +188,11 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 					next,
 					systemThemeMap as SystemThemeMap<string> | undefined,
 				) ?? next;
-			applyToDomEvent(resolved);
-			onThemeChangeEvent(next as Themes);
+			applyToDom(resolved);
+			onThemeChange?.(next as Themes);
 		}
 	});
 
-	// oxlint-disable-next-line react-hooks/exhaustive-deps -- applyToDomEvent is an effect event.
 	const setTheme = useCallback(
 		(
 			next:
@@ -221,12 +212,11 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			);
 
 			setStoreTheme(newTheme);
-			// oxlint-disable-next-line react-hooks/rules-of-hooks -- shared apply path; setTheme stays a public callback.
-			if (resolved) applyToDomEvent(resolved);
-			onThemeChange?.(newTheme as Themes);
+			if (resolved) applyToDom(resolved);
 			writeStoredTheme(storage, storageKey, newTheme, cookieOptions, onStorageError);
 			if (enableSameDocumentSync && storage !== "none")
 				publishThemeChannel(channel, newTheme);
+			onThemeChange?.(newTheme as Themes);
 		},
 		[
 			validForcedTheme,
@@ -242,6 +232,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			getSnapshot,
 			setStoreTheme,
 			onThemeChange,
+			applyToDom,
 		],
 	);
 
@@ -249,13 +240,16 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	useEffect(() => {
 		lastAppliedRef.current = null;
 		initializeEvent();
+	}, []);
+
+	useEffect(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
 		return subscribeHistoryReapply(
 			domWindow,
 			() => {
 				const last = lastAppliedRef.current;
-				if (last) applyToDomEvent(last.resolved);
+				if (last) applyToDom(last.resolved);
 			},
 			() => {
 				const last = lastAppliedRef.current;
@@ -263,8 +257,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			},
 			attribute,
 		);
-		// oxlint-disable-next-line react-hooks/exhaustive-deps -- attribute is captured per subscription; Activity reveals resubscribe.
-	}, []);
+	}, [applyToDom, attribute]);
 
 	useIsomorphicLayoutEffect(() => {
 		const last = lastAppliedRef.current;
@@ -277,7 +270,6 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 
 	// setTheme / system / storage already write the DOM. Re-apply only when
 	// resolvedTheme or DOM config changed from outside those paths.
-	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		if (!resolvedTheme) return;
 		const last = lastAppliedRef.current;
@@ -288,13 +280,14 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			last.themes === themes &&
 			last.valueMap === valueMap &&
 			last.target === target &&
+			last.disableTransitionOnChange === disableTransitionOnChange &&
 			last.enableColorScheme === enableColorScheme &&
 			last.themeColor === themeColor &&
 			last.themeRoot === themeRoot
 		) {
 			return;
 		}
-		applyToDomEvent(resolvedTheme);
+		applyToDom(resolvedTheme);
 	}, [
 		resolvedTheme,
 		attribute,
@@ -305,6 +298,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		enableColorScheme,
 		themeColor,
 		themeRoot,
+		applyToDom,
 	]);
 
 	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
@@ -320,7 +314,6 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		return () => mq.removeEventListener?.("change", handler);
 	}, [enableSystem, setStoreSystemTheme]);
 
-	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		const domWindow = getDomWindow();
 		if (!domWindow) return;
@@ -333,7 +326,11 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			return;
 
 		const handler = (event: StorageEvent) => {
-			if (event.storageArea !== localStorage || event.key !== storageKey) return;
+			if (
+				(event.key !== null && event.key !== storageKey) ||
+				event.storageArea !== localStorage
+			)
+				return;
 			const newTheme = event.newValue ?? resolvedDefault;
 			if (!isThemeSelection(newTheme, themes, enableSystem)) return;
 			const resolved = resolveSelection(
@@ -342,7 +339,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 				systemThemeMap as SystemThemeMap<string> | undefined,
 			);
 			setStoreTheme(newTheme);
-			if (!validForcedTheme && resolved) applyToDomEvent(resolved);
+			if (!validForcedTheme && resolved) applyToDom(resolved);
 		};
 		domWindow.addEventListener("storage", handler);
 		return () => domWindow.removeEventListener("storage", handler);
@@ -357,9 +354,9 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		validForcedTheme,
 		getSnapshot,
 		setStoreTheme,
+		applyToDom,
 	]);
 
-	// oxlint-disable-next-line react-hooks/exhaustive-deps -- effect events are intentionally non-reactive.
 	useEffect(() => {
 		if (!enableSameDocumentSync || storage === "none") return;
 		return subscribeThemeChannel(channel, (newTheme) => {
@@ -370,7 +367,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 				getSnapshot().systemTheme,
 				systemThemeMap as SystemThemeMap<string> | undefined,
 			);
-			if (!validForcedTheme && resolved) applyToDomEvent(resolved);
+			if (!validForcedTheme && resolved) applyToDom(resolved);
 		});
 	}, [
 		enableSameDocumentSync,
@@ -382,6 +379,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		validForcedTheme,
 		getSnapshot,
 		setStoreTheme,
+		applyToDom,
 	]);
 
 	const contextValue = useMemo(

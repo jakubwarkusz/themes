@@ -6,7 +6,8 @@ type EffectEventHook = <Arguments extends unknown[], Result>(
 	callback: (...arguments_: Arguments) => Result,
 ) => (...arguments_: Arguments) => Result;
 
-function useEffectEventFallback<Arguments extends unknown[], Result>(
+// Shared by the compatibility fallback and callbacks also used from UI events.
+export function useCommittedCallback<Arguments extends unknown[], Result>(
 	callback: (...arguments_: Arguments) => Result,
 ): (...arguments_: Arguments) => Result {
 	const callbackRef = React.useRef(callback);
@@ -24,4 +25,4 @@ const nativeUseEffectEvent = (
 	}
 ).useEffectEvent;
 
-export const useEffectEvent: EffectEventHook = nativeUseEffectEvent ?? useEffectEventFallback;
+export const useEffectEvent: EffectEventHook = nativeUseEffectEvent ?? useCommittedCallback;

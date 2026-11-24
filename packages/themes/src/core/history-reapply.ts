@@ -59,9 +59,9 @@ export function subscribeHistoryReapply(
 					}
 				});
 			});
-			observer.observe(w.document, options);
 		}
 	}
+	observer?.observe(w.document, options);
 	w.addEventListener("popstate", apply);
 	return () => {
 		w.removeEventListener("popstate", apply);
@@ -69,6 +69,8 @@ export function subscribeHistoryReapply(
 		pending.delete(apply);
 		if (!listeners.size) {
 			observer?.disconnect();
+			observer = undefined;
+			options.attributeFilter = ["class"];
 			if (frame !== undefined) w.cancelAnimationFrame(frame);
 			frame = undefined;
 		}
