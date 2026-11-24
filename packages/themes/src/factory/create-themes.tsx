@@ -118,12 +118,6 @@ export function createThemesBindings<const Themes extends readonly [string, ...s
 export function createThemes<const Themes extends readonly [string, ...string[]]>(
 	config: CreateThemesConfig<Themes>,
 ): CreateThemesResult<Themes> {
-	const bindings = createThemesBindings(config);
-	return {
-		ThemeProvider: bindings.ThemeProvider,
-		useTheme: bindings.useTheme,
-		useThemeValue: bindings.useThemeValue,
-		useThemeEffect: bindings.useThemeEffect,
-		ThemedImage: bindings.ThemedImage,
-	};
+	const { themeContext: _themeContext, ...bindings } = createThemesBindings(config);
+	return bindings;
 }

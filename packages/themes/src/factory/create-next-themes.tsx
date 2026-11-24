@@ -3,7 +3,6 @@
 import type { ReactElement } from "react";
 import { getScriptConfig } from "../core/script-config.js";
 import { getScript } from "../core/script.js";
-import type { ThemeContextInstance } from "../core/context.js";
 import type { ThemeProviderProps } from "../core/types.js";
 import { ClientNextThemeProvider } from "../providers/client-next-provider.js";
 import { ThemeScript, type ThemeScriptProps } from "../theme-script.js";
@@ -29,29 +28,11 @@ export type CreateNextThemesResult<Themes extends readonly string[]> =
 		ThemeScript: (props?: Omit<ThemeScriptProps<Themes[number]>, "themes">) => ReactElement;
 	};
 
-type NextProviderProps<Themes extends string> = Omit<ThemeProviderProps<Themes>, "themes"> & {
-	themes: readonly Themes[];
-	themeContext: ThemeContextInstance<Themes>;
-};
-
-function toThemeScriptProps<Themes extends readonly string[]>(
-	config: CreateThemesConfig<Themes>,
-): Omit<ThemeScriptProps<Themes[number]>, "themes"> {
-	const {
-		onThemeChange: _onThemeChange,
-		onStorageError: _onStorageError,
-		cookieOptions: _cookieOptions,
-		themes: _themes,
-		...scriptDefaults
-	} = config;
-	return scriptDefaults;
-}
-
 export function createThemes<const Themes extends readonly [string, ...string[]]>(
 	config: CreateThemesConfig<Themes>,
 ): CreateNextThemesResult<Themes> {
-	const bindings = createThemesBindings(config);
-	const scriptDefaults = toThemeScriptProps(config);
+	const { themeContext, ThemeProvider, ...hooks } = createThemesBindings(config);
+	const scriptDefaults = { ...config };
 	type ThemeName = Themes[number];
 
 	function TypedNextThemeProvider(
@@ -61,10 +42,13 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 			...config,
 			...props,
 			themes: config.themes,
-			themeContext: bindings.themeContext,
-		} satisfies NextProviderProps<ThemeName>;
+		};
 		return (
-			<ClientNextThemeProvider {...merged} bootstrap={getScript(getScriptConfig(merged))} />
+			<ClientNextThemeProvider
+				{...merged}
+				themeContext={themeContext}
+				bootstrap={getScript(getScriptConfig(merged))}
+			/>
 		);
 	}
 
@@ -75,13 +59,10 @@ export function createThemes<const Themes extends readonly [string, ...string[]]
 	}
 
 	return {
-		ThemeProvider: bindings.ThemeProvider,
+		ThemeProvider,
 		NextThemeProvider: TypedNextThemeProvider,
 		ThemeScript: TypedThemeScript,
-		useTheme: bindings.useTheme,
-		useThemeValue: bindings.useThemeValue,
-		useThemeEffect: bindings.useThemeEffect,
-		ThemedImage: bindings.ThemedImage,
+		...hooks,
 	};
 }
 
