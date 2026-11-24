@@ -60,3 +60,19 @@ The Chromium numbers measure callback time in a scripted workload. The Happy DOM
 benchmark uses synthetic observer delivery. Provider and factory bundle fixtures
 shrank by 30 B raw and 3–6 B gzip. The unpacked package shrank from 59,401 B to
 59,357 B. Full verification passed, including Chromium, Firefox, and WebKit E2E.
+
+## Typed Next factory payload
+
+Two static Next.js 16.4.5 production Turbopack builds render the same route and theme
+control. The plain variant uses the server `ThemeProvider` and the typed variant uses
+`createThemes` from `@wrksz/themes/next/create-themes`. Both use the same built library.
+
+| Gzip bytes                       | Server provider | Typed factory |  Delta |
+| -------------------------------- | --------------: | ------------: | -----: |
+| Unique script chunks in the HTML |         177,944 |       179,181 | +1,237 |
+| HTML with embedded RSC           |           2,634 |         2,427 |   -207 |
+| Total                            |         180,578 |       181,608 | +1,030 |
+
+The script total sums each referenced file compressed separately. The HTML includes
+the inline bootstrap and embedded RSC. These sizes exclude response headers and
+describe build artifacts under gzip, with every resource counted once.
