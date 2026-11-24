@@ -76,3 +76,22 @@ control. The plain variant uses the server `ThemeProvider` and the typed variant
 The script total sums each referenced file compressed separately. The HTML includes
 the inline bootstrap and embedded RSC. These sizes exclude response headers and
 describe build artifacts under gzip, with every resource counted once.
+
+### Factory and bootstrap simplifications
+
+On the same Next.js 16.4.5 fixture, the typed factory went from 179,181 B to
+179,109 B gzip across the scripts referenced in the HTML. The HTML, including
+embedded RSC, went from 2,427 B to 2,426 B gzip. The unpacked library went from
+59,357 B to 58,982 B.
+
+In an isolated copy of the final fixture, stubbing the bootstrap generator reduced
+the client scripts by another 664 B gzip. This measures how much the generator
+contributes to that client build. The stub omits the bootstrap and is only a sizing
+probe. The production fixture passed Chromium checks for the theme before
+hydration, subsequent hydration, and switching themes.
+
+Generating the default bootstrap 30,000 times took a median of 41.30 ms before and
+9.44 ms after on Node.js 26.8.2. Both variants were alternated across 16 measured
+batches after four warmup batches. The benchmark covered all five storage modes
+with default and mapped configurations. All ten configurations produced identical
+bootstrap strings.
