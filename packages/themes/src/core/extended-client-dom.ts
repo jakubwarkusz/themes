@@ -96,12 +96,12 @@ export function applyExtendedThemeToDom({
 	const nextClassValues = hasClass ? splitClassTokens(attributeValue) : [];
 	const nextAttrValue = attributeValue || null;
 	const nextDataAttributes = attributes.filter((current) => current !== "class");
-	const removeClassValues = hasClass
-		? previous?.element === element
+	const removeClassValues =
+		previous?.element === element
 			? previous.classTokens
-			: themes.flatMap((theme) => splitClassTokens(valueMap?.[theme] ?? theme))
-		: [];
-	const staleClasses = !hasClass && previous?.element === element ? previous.classTokens : [];
+			: hasClass
+				? themes.flatMap((theme) => splitClassTokens(valueMap?.[theme] ?? theme))
+				: [];
 
 	if (previous) {
 		if (previous.element !== element) {
@@ -117,34 +117,26 @@ export function applyExtendedThemeToDom({
 		}
 	}
 
-	let needsUpdate = staleClasses.some((token) => element.classList.contains(token));
-	let classChanged = false;
-	for (const current of attributes) {
-		if (current === "class") {
-			classChanged =
-				removeClassValues.some(
-					(token) =>
-						!nextClassValues.includes(token) && element.classList.contains(token),
-				) || nextClassValues.some((token) => !element.classList.contains(token));
-			needsUpdate ||= classChanged;
-		} else {
-			needsUpdate ||= element.getAttribute(current) !== nextAttrValue;
-		}
-	}
+	const classChanged =
+		removeClassValues.some(
+			(token) => !nextClassValues.includes(token) && element.classList.contains(token),
+		) || nextClassValues.some((token) => !element.classList.contains(token));
 
-	if (needsUpdate && disableTransitionOnChange) {
+	if (
+		disableTransitionOnChange &&
+		(classChanged ||
+			nextDataAttributes.some((attr) => element.getAttribute(attr) !== nextAttrValue))
+	) {
 		const styleRoot = themeRoot && "host" in themeRoot ? themeRoot : document.head;
 		disableTransitions(disableTransitionOnChange, styleRoot);
 	}
 
-	if (staleClasses.length) element.classList.remove(...staleClasses);
-	for (const current of attributes) {
-		if (current === "class") {
-			if (classChanged) {
-				element.classList.remove(...removeClassValues);
-				element.classList.add(...nextClassValues);
-			}
-		} else if (element.getAttribute(current) !== nextAttrValue) {
+	if (classChanged) {
+		element.classList.remove(...removeClassValues);
+		element.classList.add(...nextClassValues);
+	}
+	for (const current of nextDataAttributes) {
+		if (element.getAttribute(current) !== nextAttrValue) {
 			if (nextAttrValue) element.setAttribute(current, nextAttrValue);
 			else element.removeAttribute(current);
 		}

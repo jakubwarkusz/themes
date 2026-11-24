@@ -29,7 +29,7 @@ export function extendedThemeBootstrap(
 ): void {
 	let selection: string;
 
-	if (forcedTheme) {
+	if (forcedTheme && themes.includes(forcedTheme)) {
 		selection = forcedTheme;
 	} else if (
 		initialTheme &&
@@ -98,27 +98,23 @@ export function extendedThemeBootstrap(
 	if (!element) return;
 
 	const attributes = Array.isArray(attribute) ? attribute : [attribute];
-	const toRemove = themes.flatMap((current) =>
-		(value?.[current] ?? current).split(" ").filter((t) => t),
-	);
-	const toAdd = attributeValue.split(" ").filter((t) => t);
+	const whitespace = /[ \t\n\f\r]+/;
+	const split = (name: string) => name.split(whitespace).filter(Boolean);
+	const hasClass = attributes.includes("class");
+	const toRemove = hasClass ? themes.flatMap((name) => split(value?.[name] ?? name)) : [];
+	const toAdd = hasClass ? split(attributeValue) : [];
 	const nextAttrValue = attributeValue || null;
-	let changed = false;
-	let classChanged = false;
+	const classChanged =
+		toRemove.some((token) => !toAdd.includes(token) && element.classList.contains(token)) ||
+		toAdd.some((token) => !element.classList.contains(token));
 
-	for (const current of attributes) {
-		if (current === "class") {
-			classChanged =
-				toRemove.some(
-					(token) => !toAdd.includes(token) && element.classList.contains(token),
-				) || toAdd.some((token) => !element.classList.contains(token));
-			changed ||= classChanged;
-		} else {
-			changed ||= element.getAttribute(current) !== nextAttrValue;
-		}
-	}
-
-	if (changed && disableTransitionOnChange) {
+	if (
+		disableTransitionOnChange &&
+		(classChanged ||
+			attributes.some(
+				(attr) => attr !== "class" && element.getAttribute(attr) !== nextAttrValue,
+			))
+	) {
 		const css =
 			typeof disableTransitionOnChange === "string" ? disableTransitionOnChange : "none";
 		const style = document.createElement("style");
@@ -127,13 +123,12 @@ export function extendedThemeBootstrap(
 		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
 	}
 
+	if (classChanged) {
+		element.classList.remove(...toRemove);
+		element.classList.add(...toAdd);
+	}
 	for (const current of attributes) {
-		if (current === "class") {
-			if (classChanged) {
-				element.classList.remove(...toRemove);
-				element.classList.add(...toAdd);
-			}
-		} else if (element.getAttribute(current) !== nextAttrValue) {
+		if (current !== "class" && element.getAttribute(current) !== nextAttrValue) {
 			if (nextAttrValue) element.setAttribute(current, nextAttrValue);
 			else element.removeAttribute(current);
 		}

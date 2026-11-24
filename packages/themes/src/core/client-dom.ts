@@ -69,38 +69,29 @@ export function applyThemeToDom({
 	const removeClassValues =
 		themed[LAST_CLASS_TOKENS] ??
 		(hasClass ? themes.flatMap((t) => splitClassTokens(valueMap?.[t] ?? t)) : []);
-	const staleClasses = !hasClass ? themed[LAST_CLASS_TOKENS] : undefined;
 	const nextAttrValue = attrValue || null;
-	let needsUpdate = staleClasses?.some((token) => el.classList.contains(token)) ?? false;
-	let classChanged = false;
-	for (const attr of attrs) {
-		if (attr === "class") {
-			classChanged =
-				removeClassValues.some(
-					(token) => !nextClassValues.includes(token) && el.classList.contains(token),
-				) || nextClassValues.some((token) => !el.classList.contains(token));
-			needsUpdate ||= classChanged;
-		} else {
-			needsUpdate ||= el.getAttribute(attr) !== nextAttrValue;
-		}
-	}
+	const classChanged =
+		removeClassValues.some(
+			(token) => !nextClassValues.includes(token) && el.classList.contains(token),
+		) || nextClassValues.some((token) => !el.classList.contains(token));
 
-	if (needsUpdate && disableTransitionOnChange) {
+	if (
+		disableTransitionOnChange &&
+		(classChanged ||
+			attrs.some((attr) => attr !== "class" && el.getAttribute(attr) !== nextAttrValue))
+	) {
 		disableTransitions(disableTransitionOnChange);
 	}
 
-	if (staleClasses) {
-		el.classList.remove(...staleClasses);
-		delete themed[LAST_CLASS_TOKENS];
+	if (classChanged) {
+		el.classList.remove(...removeClassValues);
+		el.classList.add(...nextClassValues);
 	}
+	if (hasClass) themed[LAST_CLASS_TOKENS] = nextClassValues;
+	else delete themed[LAST_CLASS_TOKENS];
+
 	for (const attr of attrs) {
-		if (attr === "class") {
-			if (classChanged) {
-				el.classList.remove(...removeClassValues);
-				el.classList.add(...nextClassValues);
-			}
-			themed[LAST_CLASS_TOKENS] = nextClassValues;
-		} else if (el.getAttribute(attr) !== nextAttrValue) {
+		if (attr !== "class" && el.getAttribute(attr) !== nextAttrValue) {
 			if (nextAttrValue) el.setAttribute(attr, nextAttrValue);
 			else el.removeAttribute(attr);
 		}

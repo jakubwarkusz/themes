@@ -76,24 +76,21 @@ export function themeBootstrap(
 	if (!el) return;
 
 	const attrs = Array.isArray(attribute) ? attribute : [attribute];
-	const toRemove = themes.flatMap((name) => (value?.[name] ?? name).split(" ").filter((t) => t));
-	const toAdd = attrValue.split(" ").filter((t) => t);
+	const whitespace = /[ \t\n\f\r]+/;
+	const split = (name: string) => name.split(whitespace).filter(Boolean);
+	const hasClass = attrs.includes("class");
+	const toRemove = hasClass ? themes.flatMap((name) => split(value?.[name] ?? name)) : [];
+	const toAdd = hasClass ? split(attrValue) : [];
 	const nextAttrValue = attrValue || null;
-	let changed = false;
-	let classChanged = false;
+	const classChanged =
+		toRemove.some((token) => !toAdd.includes(token) && el.classList.contains(token)) ||
+		toAdd.some((token) => !el.classList.contains(token));
 
-	for (const attr of attrs) {
-		if (attr === "class") {
-			classChanged =
-				toRemove.some((token) => !toAdd.includes(token) && el.classList.contains(token)) ||
-				toAdd.some((token) => !el.classList.contains(token));
-			changed ||= classChanged;
-		} else {
-			changed ||= el.getAttribute(attr) !== nextAttrValue;
-		}
-	}
-
-	if (changed && disableTransitionOnChange) {
+	if (
+		disableTransitionOnChange &&
+		(classChanged ||
+			attrs.some((attr) => attr !== "class" && el.getAttribute(attr) !== nextAttrValue))
+	) {
 		const css =
 			typeof disableTransitionOnChange === "string" ? disableTransitionOnChange : "none";
 		const style = document.createElement("style");
@@ -102,13 +99,12 @@ export function themeBootstrap(
 		requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
 	}
 
+	if (classChanged) {
+		el.classList.remove(...toRemove);
+		el.classList.add(...toAdd);
+	}
 	for (const attr of attrs) {
-		if (attr === "class") {
-			if (classChanged) {
-				el.classList.remove(...toRemove);
-				el.classList.add(...toAdd);
-			}
-		} else if (el.getAttribute(attr) !== nextAttrValue) {
+		if (attr !== "class" && el.getAttribute(attr) !== nextAttrValue) {
 			if (nextAttrValue) el.setAttribute(attr, nextAttrValue);
 			else el.removeAttribute(attr);
 		}
