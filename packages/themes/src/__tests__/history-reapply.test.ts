@@ -13,6 +13,7 @@ function mutation(
 ): MutationRecord {
 	return {
 		type,
+		attributeName: type === "attributes" ? "class" : null,
 		target: document.documentElement,
 		addedNodes: [node],
 		removedNodes: [],
@@ -129,6 +130,29 @@ describe("history reapply lifecycle", () => {
 		flushFrame();
 		expect(callback).toHaveBeenCalledTimes(3);
 	});
+
+	test.each(["addedNodes", "removedNodes"] as const)(
+		"reapplies when %s contains an unchanged scoped target",
+		(changed) => {
+			const changedNodes = document.createDocumentFragment();
+			const subtree = document.createElement("div");
+			changedNodes.append(subtree);
+			const target = subtree.appendChild(document.createElement("section"));
+			const emptyNodes = document.createDocumentFragment().childNodes;
+			const callback = vi.fn();
+			subscribe(callback, () => target);
+			deliver([
+				{
+					...mutation("childList"),
+					addedNodes: emptyNodes,
+					removedNodes: emptyNodes,
+					[changed]: changedNodes.childNodes,
+				},
+			]);
+			flushFrame();
+			expect(callback).toHaveBeenCalledOnce();
+		},
+	);
 
 	test("coalesces mutations and calls every active subscriber", () => {
 		const first = vi.fn(),

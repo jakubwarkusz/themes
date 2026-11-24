@@ -111,9 +111,10 @@ Run the runtime microbenchmarks separately from correctness tests:
 pnpm --filter @wrksz/themes exec vitest bench --run benchmarks/runtime.bench.ts
 ```
 
-The three workloads measure batches of 1,000 unchanged DOM applications, unrelated class
-mutations with a frame flush after each delivery, and rapid theme changes followed by two
-animation frames. Use the same benchmark file, dependencies, and runtime for both revisions.
+The workloads measure batches of 1,000 unchanged DOM applications, unrelated class
+mutations with a frame flush after each delivery, unrelated child-list records across eight
+scoped targets, and rapid theme changes followed by two animation frames. Use the same
+benchmark file, dependencies, and runtime for both revisions.
 JSON results can be saved with `--reporter=json --outputFile=/tmp/themes-runtime.json`.
 
 These are synthetic happy-dom measurements with controlled observer delivery and animation

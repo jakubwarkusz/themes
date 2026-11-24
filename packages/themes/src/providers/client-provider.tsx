@@ -257,13 +257,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 
 	useEffect(() => {
 		const domWindow = getDomWindow();
-		if (!domWindow) return;
-		if (
-			followSystem ||
-			storage === "none" ||
-			storage === "sessionStorage" ||
-			storage === "cookie"
-		)
+		if (!domWindow || followSystem || (storage !== "localStorage" && storage !== "hybrid"))
 			return;
 
 		const handler = (e: StorageEvent) => {

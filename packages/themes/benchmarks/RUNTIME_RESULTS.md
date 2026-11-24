@@ -41,3 +41,22 @@ accepting the remaining size cost if optimization alone did not meet the old lim
 Only exceeded provider/factory budgets are increased, with small margins for build variation;
 hook, script, image, and package-install budgets are unchanged. The baseline is not refreshed,
 so reports continue to expose the cost rather than resetting the deltas to zero.
+
+## Child-list scanning
+
+Compared with `8f90540` on macOS with Node.js 26.8.2. The browser harness ran both
+compiled observers on the production Next.js 16.4.5 fixture in Chromium 156.
+It alternated the implementations, timing only their MutationObserver callbacks for
+40 measured batches after eight warmups. Each batch had 600 real child-list records
+under a document root and outside eight scoped targets.
+
+| Workload                                     | Before, median ms | After, median ms |
+| -------------------------------------------- | ----------------: | ---------------: |
+| Chromium, one added and one removed node     |               1.5 |              1.3 |
+| Chromium, 16 added and 16 removed nodes      |              13.3 |            11.05 |
+| Happy DOM, 1,000 records across eight scopes |             1.596 |            0.813 |
+
+The Chromium numbers measure callback time in a scripted workload. The Happy DOM
+benchmark uses synthetic observer delivery. Provider and factory bundle fixtures
+shrank by 30 B raw and 3–6 B gzip. The unpacked package shrank from 59,401 B to
+59,357 B. Full verification passed, including Chromium, Firefox, and WebKit E2E.
