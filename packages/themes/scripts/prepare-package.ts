@@ -17,6 +17,7 @@ export async function preparePackage(root: string): Promise<string> {
 	for (const path of ["dist", "README.md", "AGENTS.md"]) {
 		await cp(resolve(root, path), resolve(output, path), { recursive: true });
 	}
+	await cp(resolve(root, "../../LICENSE"), resolve(output, "LICENSE"));
 	await writeFile(
 		resolve(output, "package.json"),
 		`${JSON.stringify(createPublishManifest(manifest), null, 2)}\n`,

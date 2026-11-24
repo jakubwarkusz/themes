@@ -37,6 +37,7 @@ const manifest = JSON.parse(await readFile(resolve(root, "package.json"), "utf8"
 };
 const paths = new Set(report.files.map((file) => `./${file.path}`));
 assert.ok(paths.has("./AGENTS.md"), "Consumer agent guidance missing from the npm package.");
+assert.ok(paths.has("./LICENSE"), "License missing from the npm package.");
 for (const entry of Object.values(manifest.exports)) {
 	for (const path of typeof entry === "string" ? [entry] : Object.values(entry.import)) {
 		assert.ok(paths.has(path), `Published export missing: ${path}. Run pnpm build first.`);
