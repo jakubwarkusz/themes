@@ -126,6 +126,39 @@ for (const { name, Provider, bootstrap } of [
 			},
 		);
 
+		test("keeps the initial theme on Activity reveal until the system preference changes", () => {
+			const changeSystem = mockMedia();
+			const content = (mode: "hidden" | "visible") => (
+				<Activity mode={mode}>
+					<Provider
+						initialTheme="sepia"
+						themes={["light", "dark", "sepia"]}
+						followSystem
+						target="#theme-regression"
+					>
+						<ThemeReader />
+					</Provider>
+				</Activity>
+			);
+			const view = render(content("visible"));
+			expect(target.className).toBe("layout sepia");
+			expect(localStorage.getItem("theme")).toBe("sepia");
+
+			view.rerender(content("hidden"));
+			localStorage.setItem("theme", "light");
+			view.rerender(content("visible"));
+			expect(target.className).toBe("layout sepia");
+			expect(screen.getByTestId("state").textContent).toContain('"theme":"sepia"');
+			expect(localStorage.getItem("theme")).toBe("light");
+
+			view.rerender(content("hidden"));
+			changeSystem(false);
+			view.rerender(content("visible"));
+			expect(target.className).toBe("layout light");
+			expect(screen.getByTestId("state").textContent).toContain('"theme":"system"');
+			expect(localStorage.getItem("theme")).toBe("light");
+		});
+
 		test("persists the last selection when onThemeChange sets another theme", () => {
 			render(
 				<Provider

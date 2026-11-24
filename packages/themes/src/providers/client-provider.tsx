@@ -119,7 +119,7 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 				? domWindow.matchMedia("(prefers-color-scheme: dark)")
 				: null;
 		const system = mq ? (mq.matches ? "dark" : "light") : undefined;
-		const current = getSnapshot().theme;
+		const { theme: current, systemTheme: previousSystem } = getSnapshot();
 		let initial = resolvedDefault;
 
 		if (
@@ -130,11 +130,21 @@ export function ClientThemeProvider<Themes extends string = DefaultTheme>({
 			initial = initialTheme;
 			if (!validForcedTheme)
 				writeStoredTheme(storage, storageKey, initialTheme, cookieOptions, onStorageError);
-		} else if (!followSystem) {
-			const stored =
-				storage === "none" ? current : readStoredTheme(storage, storageKey, onStorageError);
-			if (stored && isThemeSelection(stored, themes, enableSystem))
-				initial = stored as Themes | "system";
+		} else if (
+			followSystem &&
+			!validForcedTheme &&
+			system &&
+			previousSystem &&
+			system !== previousSystem
+		) {
+			initial = "system";
+		} else {
+			const selection =
+				followSystem || storage === "none"
+					? current
+					: readStoredTheme(storage, storageKey, onStorageError);
+			if (selection && isThemeSelection(selection, themes, enableSystem))
+				initial = selection as Themes | "system";
 		}
 
 		setStoreState({ theme: initial, systemTheme: system });

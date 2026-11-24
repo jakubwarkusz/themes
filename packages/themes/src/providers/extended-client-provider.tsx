@@ -112,6 +112,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 	);
 
 	const validForcedTheme = forcedTheme && themes.includes(forcedTheme) ? forcedTheme : undefined;
+	const followsVariant = followSystem && !!systemThemeMap && !isDirectSystemMap(systemThemeMap);
 	const selectedTheme = validForcedTheme ?? theme;
 	const resolvedTheme = selectedTheme
 		? (resolveSelection(
@@ -149,7 +150,7 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 				? domWindow.matchMedia("(prefers-color-scheme: dark)")
 				: null;
 		const system = mq ? (mq.matches ? "dark" : "light") : undefined;
-		const current = getSnapshot().theme;
+		const { theme: current, systemTheme: previousSystem } = getSnapshot();
 		let initial = resolvedDefault;
 
 		if (
@@ -160,11 +161,22 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 			initial = initialTheme;
 			if (!validForcedTheme)
 				writeStoredTheme(storage, storageKey, initialTheme, cookieOptions, onStorageError);
-		} else if (!followSystem) {
-			const stored =
-				storage === "none" ? current : readStoredTheme(storage, storageKey, onStorageError);
-			if (stored && isThemeSelection(stored, themes, enableSystem))
-				initial = stored as Themes | "system";
+		} else if (
+			followSystem &&
+			!followsVariant &&
+			!validForcedTheme &&
+			system &&
+			previousSystem &&
+			system !== previousSystem
+		) {
+			initial = "system";
+		} else {
+			const selection =
+				followSystem || storage === "none"
+					? current
+					: readStoredTheme(storage, storageKey, onStorageError);
+			if (selection && isThemeSelection(selection, themes, enableSystem))
+				initial = selection as Themes | "system";
 		}
 
 		setStoreState({ theme: initial, systemTheme: system });
@@ -175,8 +187,6 @@ export function ExtendedClientThemeProvider<Themes extends string = DefaultTheme
 		if (validForcedTheme) return;
 		const current = getSnapshot().theme;
 		if (current === "system" || current === undefined || followSystem) {
-			const followsVariant =
-				followSystem && !!systemThemeMap && !isDirectSystemMap(systemThemeMap);
 			if (followSystem && !followsVariant) setStoreTheme("system");
 			const resolved =
 				resolveSelection(
