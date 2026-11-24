@@ -16,3 +16,5 @@ overrides:
   postcss: 8.5.28
   sharp: 0.35.5
   next: ">=16.3.5"
+  # Patched editor middleware for Vitest and the docs tooling.
+  vite: "~8.3.3"
