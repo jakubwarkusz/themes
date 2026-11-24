@@ -5,6 +5,64 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2026-11-24
+
+### Added
+
+- *(changelog)* Add AuthorCard component and integrate contributor information ([7c47ac7](https://github.com/jakubwarkusz/themes/commit/7c47ac7d443a2138c358495ce165114d8e6361e6))
+- *(docs)* Enhance migration guide and add Contributors section ([62ce0d8](https://github.com/jakubwarkusz/themes/commit/62ce0d85bfda2cbf6ae2d26728e1643c2e32decb))
+- *(docs)* Add Agents section and enhance scrolling behavior ([7691c83](https://github.com/jakubwarkusz/themes/commit/7691c8376dca352eff58826751f19abb3c86ab17))
+- *(docs)* Update global styles and enhance scrolling functionality ([9e44e3a](https://github.com/jakubwarkusz/themes/commit/9e44e3a1e26ec620ea031aa28d91896f4fb9b5f5))
+- *(docs)* Implement older releases context and enhance TOC functionality ([2e3559c](https://github.com/jakubwarkusz/themes/commit/2e3559c156eace55f02e4148b71024108b2b102e))
+- *(docs)* Enhance HeroInstall component with package manager logos and copy functionality ([5093b9e](https://github.com/jakubwarkusz/themes/commit/5093b9ed80b42967eae7b2ea445b47957a01115a))
+- *(docs)* Update InstallCommand component with package manager logos and enhanced copy functionality ([ab5454b](https://github.com/jakubwarkusz/themes/commit/ab5454bc2c88107a132d16ef8134aa43e1099831))
+- *(docs)* Enhance documentation with PropsTable component for better prop representation ([17a6c91](https://github.com/jakubwarkusz/themes/commit/17a6c91955d8ed1d09dbb83ed57c065d703ec2ff))
+- *(docs)* Add SetupWithAI component and enhance button accessibility ([e9e7051](https://github.com/jakubwarkusz/themes/commit/e9e7051e7db041e8d9aab6d0ae1352afc57e4bad))
+- *(docs)* Integrate remarkLLMsComponents for enhanced documentation rendering ([57840ff](https://github.com/jakubwarkusz/themes/commit/57840ff9c9d320afa3f03f5e2b59fdd923215e58))
+- *(docs)* Extend pageSchema to include actions and conditionally render PageActions ([7c039a0](https://github.com/jakubwarkusz/themes/commit/7c039a00eab4eb4745e1db7bc49e036417841855))
+- *(docs)* Enhance HeroInstall component with dynamic popover positioning ([95cde9e](https://github.com/jakubwarkusz/themes/commit/95cde9ee6e02858ee7a815fbde2ed1b3e9f98470))
+- *(docs)* Restructure documentation components for improved clarity and consistency ([715306f](https://github.com/jakubwarkusz/themes/commit/715306fa1c52c818585acef8f5a1fd30bd1da3d2))
+- *(docs)* Introduce API code components and hover previews for enhanced documentation interactivity ([8e87429](https://github.com/jakubwarkusz/themes/commit/8e87429578ec508d3ca1fede65f6d501015bd73f))
+- *(docs)* Enhance CodeBlock component with scroll fade effect and styling updates ([8ce095b](https://github.com/jakubwarkusz/themes/commit/8ce095b1f92d4319ed7f3eeec636175bbd70f482))
+- *(docs)* Enhance table of contents functionality with pinned state and improved scrolling behavior ([2052337](https://github.com/jakubwarkusz/themes/commit/205233770e28c5dd87337b8b53ad860530924f6a))
+- *(docs)* Add theme toggles documentation and components ([44646db](https://github.com/jakubwarkusz/themes/commit/44646db227115720058bdc4f6cbc2a542b3ba54b))
+
+### Fixed
+
+- *(docs)* Improve layout responsiveness in changelog and older releases components ([8bca5a3](https://github.com/jakubwarkusz/themes/commit/8bca5a383d560b0c74823f5923bc20fe37f9a910))
+- *(docs)* Adjust overscroll behavior for improved user experience ([101a60e](https://github.com/jakubwarkusz/themes/commit/101a60eed0deba71d106acb874553f9aa9ffa023))
+- *(docs)* Correct edit URL path in documentation page component ([352e07e](https://github.com/jakubwarkusz/themes/commit/352e07e2284abb6f507dbc476516d515193aa915))
+- *(docs)* Update callout components to use 'breaking' type for breaking changes ([0d24cc6](https://github.com/jakubwarkusz/themes/commit/0d24cc665071bb8cc279da8752911729163215f9))
+- *(docs)* Update HoxgerLogo SVG dimensions and paths for improved rendering ([d51100f](https://github.com/jakubwarkusz/themes/commit/d51100f023b638f303414d23e8481fb642929a86))
+- *(themes)* Align bootstrap and runtime DOM handling ([2b3ffa4](https://github.com/jakubwarkusz/themes/commit/2b3ffa4b2527d9bde631fc74d4395ddd4048e0b0))
+- *(themes)* Preserve theme state across provider updates ([af23715](https://github.com/jakubwarkusz/themes/commit/af237159b4de758b997f63329b5ca4f0b6ed508c))
+- *(packaging)* Include the MIT license ([83aaa64](https://github.com/jakubwarkusz/themes/commit/83aaa6424142f42e3893ffedb29f4fadb2a7f578))
+- *(themes)* Preserve theme on Activity reveal ([df8bf47](https://github.com/jakubwarkusz/themes/commit/df8bf47ee51b57da59f93350549fa4126cbc1757))
+
+### Performance
+
+- *(themes)* Scan mutation node lists without copying ([933d980](https://github.com/jakubwarkusz/themes/commit/933d98039bcd85ece6ff9ee5dc39fe70cf15ce5e))
+- *(themes)* Reuse typed factory bindings ([6c51bbe](https://github.com/jakubwarkusz/themes/commit/6c51bbeacc107804d68b4ee7752617863189a7c4))
+- *(themes)* Serialize bootstrap arguments in one pass ([1435e77](https://github.com/jakubwarkusz/themes/commit/1435e773530ff8e41c5cd505792736c8f5547e2a))
+
+### Changed
+
+- *(docs)* Simplify sidebar base class styles ([90421f9](https://github.com/jakubwarkusz/themes/commit/90421f9cd7fa41a374b2c7ea848501791861cd81))
+- *(docs)* Simplify viewport margin settings in animation components ([1a63d36](https://github.com/jakubwarkusz/themes/commit/1a63d3696758d7500cb2af98e87f89e5f34d6b16))
+
+### Documentation
+
+- *(benchmarks)* Record typed Next factory payload ([36685e2](https://github.com/jakubwarkusz/themes/commit/36685e237577a968d04607fc938e0989e6eb606b))
+- *(benchmarks)* Record factory and bootstrap reductions ([28c1d58](https://github.com/jakubwarkusz/themes/commit/28c1d580f5ab1a522e205c87dd3fa4c9734966e0))
+
+### Miscellaneous
+
+- Isolate the library React compatibility matrix ([5eddb0f](https://github.com/jakubwarkusz/themes/commit/5eddb0f5eedb4f50ed4ddc41780348f45b853146))
+
+### Other
+
+- Merge main into fix/theme-regressions ([de6c03f](https://github.com/jakubwarkusz/themes/commit/de6c03ff5a14e7bc625b68371fac61bf00d0f1d2))
+
 ## [2.1.1] - 2026-10-18
 
 ### Added
@@ -697,6 +755,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial commit ([b02cc49](https://github.com/jakubwarkusz/themes/commit/b02cc498a9e984409781ca39562eff22c79827d7))
 
+[2.1.2]: https://github.com/jakubwarkusz/themes/compare/v2.1.1..v2.1.2
 [2.1.1]: https://github.com/jakubwarkusz/themes/compare/v2.1.0..v2.1.1
 [2.1.0]: https://github.com/jakubwarkusz/themes/compare/v2.0.4..v2.1.0
 [2.0.4]: https://github.com/jakubwarkusz/themes/compare/v2.0.3..v2.0.4
